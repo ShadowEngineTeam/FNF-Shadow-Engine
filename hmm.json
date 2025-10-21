@@ -12,28 +12,28 @@
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HorrorPackage/openfl"
+      "url": "https://github.com/FNF-SE/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HorrorPackage/flixel"
+      "url": "https://github.com/FNF-SE/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HorrorPackage/flixel-addons"
+      "url": "https://github.com/FNF-SE/flixel-addons"
     },
     {
       "name": "flixel-ui",
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HorrorPackage/flixel-ui"
+      "url": "https://github.com/FNF-SE/flixel-ui"
     },
     {
       "name": "hxcpp",

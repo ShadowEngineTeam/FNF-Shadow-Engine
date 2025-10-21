@@ -152,6 +152,27 @@ class WeekData
 		}
 		#end
 	}
+	
+	private static function isValidWeekJson(data:Dynamic):Bool
+	{
+		if (data == null) return false;
+
+		final requiredFields = ["songs", "weekCharacters", "weekName"];
+
+		for (field in requiredFields)
+		{
+			if (!Reflect.hasField(data, field))
+				return false;
+		}
+
+		final songs = Reflect.field(data, "songs");
+		final chars = Reflect.field(data, "weekCharacters");
+		if (songs == null || chars == null || songs.length <= 0 || chars.length <= 0)
+			return false;
+
+		return true;
+	}
+
 
 	private static function addWeek(weekToCheck:String, path:String, directory:String, i:Int, originalLength:Int)
 	{
@@ -193,7 +214,14 @@ class WeekData
 
 		if (rawJson != null && rawJson.length > 0)
 		{
-			return cast haxe.Json.parse(rawJson);
+			if (rawJson != null && rawJson.length > 0)
+			{
+				var parsed:Dynamic = haxe.Json.parse(rawJson);
+				if (isValidWeekJson(parsed))
+					return cast parsed;
+				else
+					return null; // Skip invalid week jsons
+			}
 		}
 		return null;
 	}
