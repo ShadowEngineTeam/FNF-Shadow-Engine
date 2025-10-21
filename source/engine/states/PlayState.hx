@@ -19,6 +19,7 @@ import openfl.utils.Assets;
 import openfl.events.KeyboardEvent;
 import cutscenes.CutsceneHandler;
 import cutscenes.DialogueBoxPsych;
+import states.editors.CharacterEditorState;
 import states.editors.ChartingState;
 import substates.PauseSubState;
 import substates.GameOverSubstate;

@@ -42,16 +42,11 @@
 	<!-- Assets -->
 	<assets path="assets/embed" embed="true" />
 	<assets path="assets/fonts" embed="true" />
-	<assets path="assets/shared" embed="true" unless="NOEMBED" />
-	<assets path="assets/shared" if="NOEMBED" />
-	<assets path="images-astc" rename="assets/shared/images" embed="true" if="ASTC" unless="NOEMBED" />
-	<assets path="images-astc" rename="assets/shared/images" if="ASTC NOEMBED" />
-	<assets path="images-ktx" rename="assets/shared/images" embed="true" if="ETC2" unless="NOEMBED" />
-	<assets path="images-ktx" rename="assets/shared/images" if="ETC2 NOEMBED" />
-	<assets path="images-dds" rename="assets/shared/images" embed="true" if="S3TC" unless="NOEMBED" />
-	<assets path="images-dds" rename="assets/shared/images" if="S3TC NOEMBED" />
-	<assets path="images-png" rename="assets/shared/images" embed="true" if="PNG" unless="NOEMBED" />
-	<assets path="images-png" rename="assets/shared/images" if="PNG NOEMBED" />
+	<assets path="assets/shared" />
+	<assets path="images-astc" rename="assets/shared/images" if="ASTC" />
+	<assets path="images-ktx" rename="assets/shared/images" if="ETC2" />
+	<assets path="images-dds" rename="assets/shared/images" if="S3TC" />
+	<assets path="images-png" rename="assets/shared/images" if="PNG" />
 	
 	<define name="PNG" if="display" /> <!-- vscode shit -->
 	<define name="NO_TEXTURE_FORMAT" unless="ASTC || ETC2 || S3TC || PNG" />
@@ -120,7 +115,10 @@
 	<haxeflag name="--macro" value="include('my.pack')" />
 
 	<!--Include all classes as possible-->
-	<haxeflag name="-dce" value="no" unless="DCEBUILD" />
+	<section unless="DCEBUILD">
+		<haxeflag name="-dce" value="no" />
+		<haxeflag name="--macro" value="macros.KeepMacro.keepClasses()" />
+	</section>
 
 	<!-- _________________________________ Custom Icons _______________________________ -->
 	

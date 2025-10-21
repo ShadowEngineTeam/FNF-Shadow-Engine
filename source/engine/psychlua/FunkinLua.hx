@@ -126,6 +126,7 @@ class FunkinLua
 		set('ratingName', '');
 		set('ratingFC', '');
 		set('version', MainMenuState.psychEngineVersion.trim());
+		set('shadowVersion', MainMenuState.shadowEngineVersion.trim());
 
 		set('inGameOver', false);
 		set('mustHitSection', false);

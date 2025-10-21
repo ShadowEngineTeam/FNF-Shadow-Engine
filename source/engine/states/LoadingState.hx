@@ -290,7 +290,7 @@ class LoadingState extends MusicBeatState
 		preloadCharacter(player1, prefixVocals);
 		if (player2 != player1)
 			preloadCharacter(player2, prefixVocals);
-		if (!stageData.hide_girlfriend && gfVersion != player2 && gfVersion != player1)
+		if (!stageData?.hide_girlfriend && gfVersion != player2 && gfVersion != player1)
 			preloadCharacter(gfVersion);
 
 		if (!dontPreloadDefaultVoices && needsVoices)

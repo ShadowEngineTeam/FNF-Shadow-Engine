@@ -10,7 +10,7 @@ Ready to be source-modded.
 - Uses CNE FPS Counter and Some Code From [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (RIP)](https://github.com/Vortex2Oblivion/LeatherEngine) and [REDACTED]
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For Better Audio
-- Slightly More Accurate FPS
+- Slightly More Accurate FPS And Less RAM Usage
 - Some 0.6.3 Compability
 - Linux ARM Support (FNF on Raspberry Pi baby)
 - Kade Engine Results Screen
