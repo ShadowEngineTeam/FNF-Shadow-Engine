@@ -1,2 +1,1 @@
-- Implement RuleScript(?)
-- Unhardcode startLuasNamed and startHScriptsNamed to use all classes
+- Switch to RuleScript(?)
