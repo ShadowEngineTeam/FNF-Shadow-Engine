@@ -26,7 +26,7 @@ class Project extends HXProject
 	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
 	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
 
-	static final ENABLE_ASCII_ART :Bool = true;
+	static final ENABLE_ASCII_ART:Bool = true;
 
 	public function new():Void
 	{
