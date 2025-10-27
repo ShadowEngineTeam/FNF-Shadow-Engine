@@ -34,41 +34,7 @@ import mobile.psychlua.Functions;
 
 class FunkinLua
 {
-	public var lua(get, set):State;
-
-	private function get_lua():State
-		return FunkinLua.getLuaInstance();
-
-	private function set_lua(value:State):State
-		return FunkinLua.setLuaInstance(value);
-
-	public static function getLuaInstance():State
-	{
-		var curState = FlxG.state;
-		if (curState.subState != null && Std.isOfType(curState.subState, MusicBeatSubstate))
-			return cast(curState.subState, MusicBeatSubstate).lua;
-		if (Std.isOfType(curState, MusicBeatState))
-			return cast(curState, MusicBeatState).lua;
-		return null;
-	}
-
-	public static function setLuaInstance(value:State):State
-	{
-		var curState = FlxG.state;
-		if (curState.subState != null && Std.isOfType(curState.subState, MusicBeatSubstate))
-			return (cast(curState.subState, MusicBeatSubstate).lua = value);
-		if (Std.isOfType(curState, MusicBeatState))
-			return (cast(curState, MusicBeatState).lua = value);
-		return null;
-	}
-
-	public static function getCurrentMusicState():Dynamic
-	{
-        final s = FlxG.state;
-        if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
-            return cast(s.subState, MusicBeatSubstate);
-        return Std.isOfType(s, MusicBeatState) ? cast(s, MusicBeatState) : null;
-    }
+	public var lua:State = null;
 
 	public var camTarget:FlxCamera;
 	public var scriptName:String = '';
@@ -117,7 +83,7 @@ class FunkinLua
 		set('luaDeprecatedWarnings', true);
 		set('inChartEditor', false);
 
-		if (PlayState.instance is PlayState)
+		if (FunkinLua.getCurrentMusicState() is PlayState)
 		{
 			set('bpm', PlayState.SONG.bpm);
 			set('scrollSpeed', PlayState.SONG.speed);
@@ -2104,5 +2070,13 @@ class FunkinLua
 		#end
 		return false;
 	}
+
+	public static function getCurrentMusicState():Dynamic
+	{
+        final s = FlxG.state;
+        if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
+            return cast(s.subState, MusicBeatSubstate);
+        return Std.isOfType(s, MusicBeatState) ? cast(s, MusicBeatState) : null;
+    }
 }
 #end

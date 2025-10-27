@@ -28,7 +28,8 @@ class CustomSubstate extends MusicBeatSubstate
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
-				PlayState.instance.vocals.pause();
+				if (PlayState.instance.vocals != null)
+					PlayState.instance.vocals.pause();
 			}
 		}
 		FunkinLua.getCurrentMusicState().openSubState(new CustomSubstate(name));
@@ -40,7 +41,7 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		if (instance != null)
 		{
-			PlayState.instance.closeSubState();
+			FunkinLua.getCurrentMusicState().closeSubState();
 			instance = null;
 			return true;
 		}

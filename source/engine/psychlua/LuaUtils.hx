@@ -311,7 +311,7 @@ class LuaUtils
 		switch (objectName)
 		{
 			case 'this' | 'instance' | 'game':
-				return PlayState.instance;
+				return FunkinLua.getCurrentMusicState();
 
 			default:
 				var obj:Dynamic = FunkinLua.getCurrentMusicState().getLuaObject(objectName, checkForTextsToo);
@@ -324,7 +324,7 @@ class LuaUtils
 	inline public static function getTextObject(name:String):FlxText
 	{
 		return #if LUA_ALLOWED FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
-		Reflect.getProperty(PlayState.instance, name);
+		Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
 	}
 
 	public static function isOfTypes(value:Any, types:Array<Dynamic>)

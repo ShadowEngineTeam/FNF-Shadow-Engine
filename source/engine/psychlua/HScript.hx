@@ -344,13 +344,13 @@ class HScript extends SScript
 		set('insert', FlxG.state.insert);
 		set('remove', FlxG.state.remove);
 
-		if (PlayState.instance == FlxG.state)
+		if (FunkinLua.getCurrentMusicState() is PlayState)
 		{
 			set('addBehindGF', PlayState.instance.addBehindGF);
 			set('addBehindDad', PlayState.instance.addBehindDad);
 			set('addBehindBF', PlayState.instance.addBehindBF);
-			setSpecialObject(PlayState.instance, false, PlayState.instance.instancesExclude);
 		}
+		setSpecialObject(FunkinLua.getCurrentMusicState(), false, FunkinLua.getCurrentMusicState().instancesExclude);
 
 		if (varsToBring != null)
 		{

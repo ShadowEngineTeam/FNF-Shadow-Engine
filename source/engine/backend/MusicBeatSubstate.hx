@@ -31,7 +31,6 @@ class MusicBeatSubstate extends FlxSubState
 	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
 	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
-	public var lua:State = null;
 	#end
 
 	#if LUA_ALLOWED
@@ -40,6 +39,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	private var luaDebugCam:FlxCamera;
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -292,7 +292,11 @@ class MusicBeatSubstate extends FlxSubState
 		super();
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		luaDebugGroup.cameras = [FlxG.camera];
+		luaDebugCam = new FlxCamera();
+		luaDebugCam.bgColor.alpha = 0;
+		FlxG.cameras.add(luaDebugCam, false);
+		luaDebugGroup.cameras = [luaDebugCam];
+		add(luaDebugGroup);
 		#end
 		add(luaDebugGroup);
 		#if LUA_ALLOWED
