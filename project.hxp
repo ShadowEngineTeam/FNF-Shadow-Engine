@@ -3,6 +3,7 @@ import hxp.*;
 import lime.tools.*;
 import sys.io.File;
 import sys.FileSystem;
+import lime.graphics.Image;
 
 using StringTools;
 
@@ -24,6 +25,8 @@ class Project extends HXProject
 	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
 	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
 	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
+
+	static final ENABLE_ASCII_ART :Bool = true;
 
 	public function new():Void
 	{
@@ -98,6 +101,18 @@ class Project extends HXProject
 			targetPlatform = "Hashlink (" + targetPlatform + ")";
 
 		trace('');
+		if (ENABLE_ASCII_ART)
+		{
+			var asciiArt = generateAsciiArt("icons/icon64.png", width - 2, 100);
+			var asciiLines = asciiArt.split("\n");
+			for (line in asciiLines)
+			{
+				if (line == '11Qm~>Xi{<XtJ~>!?Ou~>_i!i;<i!!~-;| !-fii]!#iLj)-' || line == 'tttttt~-xX1|_;Xl^``;]I!#0j];I;;wvUOl<t}{<<###+-1')
+					continue; // skipping line that ion like
+				var paddedLine = StringTools.rpad(line, " ", width - 2);
+				trace("=" + paddedLine + "=");
+			}
+		}
 		trace(StringTools.lpad("", "=", width));
 		trace(centerText(TITLE, width));
 		trace(StringTools.lpad("", "=", width));
@@ -301,6 +316,56 @@ class Project extends HXProject
 	function includeAssetLibrary(name:String, embed:Bool = false, preload:Bool = false):Void
 	{
     	this.libraries.push(new Library('', name, null, embed, preload, false, ""));
+	}
+
+	function generateAsciiArt(imagePath:String, targetWidth:Int, maxHeight:Int = 20):String {
+		try {
+			var image = Image.fromFile(imagePath);
+			if (image == null) throw "Image could not be loaded.";
+
+			var scaleX = targetWidth / image.width;
+			var scaleY = (maxHeight / image.height) * 0.5; // compensate for tall text characters
+			var scale = Math.min(scaleX, scaleY); // maintain aspect ratio
+
+			var newWidth = Math.round(image.width * scale);
+			var newHeight = Math.round(image.height * scale);
+			if (newWidth <= 0) newWidth = 1;
+			if (newHeight <= 0) newHeight = 1;
+
+			var chars = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light → dark
+
+			var result = [];
+			for (y in 0...newHeight) {
+				if (y % 2 == 1) continue;
+
+				var line = "";
+				for (x in 0...newWidth) {
+					var origX = Math.floor(x / scale);
+					var origY = Math.floor(y / scale);
+					if (origX >= image.width || origY >= image.height) {
+						line += " ";
+						continue;
+					}
+
+					var color = image.getPixel32(origX, origY);
+					var r = (color >> 16) & 0xFF;
+					var g = (color >> 8) & 0xFF;
+					var b = color & 0xFF;
+					var gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+
+					var index = Math.floor((gray / 255) * (chars.length - 1));
+					line += chars.charAt(index);
+				}
+
+				var padding = Math.floor((targetWidth - newWidth) / 2);
+				line = StringTools.lpad("", " ", padding) + line + StringTools.rpad("", " ", targetWidth - newWidth - padding);
+				result.push(line);
+			}
+
+			return result.join("\n");
+		} catch (e:Dynamic) {
+			return "ASCII Art Load Failed";
+		}
 	}
 
 	inline function addIcon(icon:String, ?size:Int):Void
