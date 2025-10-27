@@ -22,18 +22,18 @@ class CustomSubstate extends MusicBeatSubstate
 		if (pauseGame)
 		{
 			FlxG.camera.followLerp = 0;
-			PlayState.instance.persistentUpdate = false;
-			PlayState.instance.persistentDraw = true;
-			PlayState.instance.paused = true;
+			FunkinLua.getCurrentMusicState().persistentUpdate = false;
+			FunkinLua.getCurrentMusicState().persistentDraw = true;
+			FunkinLua.getCurrentMusicState().paused = true;
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
 				PlayState.instance.vocals.pause();
 			}
 		}
-		PlayState.instance.openSubState(new CustomSubstate(name));
-		PlayState.instance.setOnHScript('customSubstate', instance);
-		PlayState.instance.setOnHScript('customSubstateName', name);
+		FunkinLua.getCurrentMusicState().openSubState(new CustomSubstate(name));
+		FunkinLua.getCurrentMusicState().setOnHScript('customSubstate', instance);
+		FunkinLua.getCurrentMusicState().setOnHScript('customSubstateName', name);
 	}
 
 	public static function closeCustomSubstate()
@@ -51,10 +51,10 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		if (instance != null)
 		{
-			var tagObject:FlxObject = cast(PlayState.instance.variables.get(tag), FlxObject);
+			var tagObject:FlxObject = cast(FunkinLua.getCurrentMusicState().variables.get(tag), FlxObject);
 			#if LUA_ALLOWED
 			if (tagObject == null)
-				tagObject = cast(PlayState.instance.modchartSprites.get(tag), FlxObject);
+				tagObject = cast(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), FlxObject);
 			#end
 
 			if (tagObject != null)
@@ -73,7 +73,7 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		if (instance != null)
 		{
-			var tagObject:FlxObject = PlayState.instance.luaTouchPad;
+			var tagObject:FlxObject = FunkinLua.getCurrentMusicState().luaTouchPad;
 
 			if (tagObject != null)
 			{
@@ -91,9 +91,9 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		instance = this;
 
-		PlayState.instance.callOnScripts('onCustomSubstateCreate', [name]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateCreate', [name]);
 		super.create();
-		PlayState.instance.callOnScripts('onCustomSubstateCreatePost', [name]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateCreatePost', [name]);
 	}
 
 	public function new(name:String)
@@ -105,18 +105,19 @@ class CustomSubstate extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
-		PlayState.instance.callOnScripts('onCustomSubstateUpdate', [name, elapsed]);
+		final args:Array<Dynamic> = [name, elapsed];
+		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateUpdate', args);
 		super.update(elapsed);
-		PlayState.instance.callOnScripts('onCustomSubstateUpdatePost', [name, elapsed]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateUpdatePost', args);
 	}
 
 	override function destroy()
 	{
-		PlayState.instance.callOnScripts('onCustomSubstateDestroy', [name]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateDestroy', [name]);
 		name = 'unnamed';
 
-		PlayState.instance.setOnHScript('customSubstate', null);
-		PlayState.instance.setOnHScript('customSubstateName', name);
+		FunkinLua.getCurrentMusicState().setOnHScript('customSubstate', null);
+		FunkinLua.getCurrentMusicState().setOnHScript('customSubstateName', name);
 		super.destroy();
 	}
 }

@@ -76,15 +76,15 @@ class ExtraFunctions
 			switch (name)
 			{
 				case 'left':
-					return PlayState.instance.controls.NOTE_LEFT_P;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_LEFT_P;
 				case 'down':
-					return PlayState.instance.controls.NOTE_DOWN_P;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_DOWN_P;
 				case 'up':
-					return PlayState.instance.controls.NOTE_UP_P;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_UP_P;
 				case 'right':
-					return PlayState.instance.controls.NOTE_RIGHT_P;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_RIGHT_P;
 				default:
-					return PlayState.instance.controls.justPressed(name);
+					return FunkinLua.getCurrentMusicState().controls.justPressed(name);
 			}
 			return false;
 		});
@@ -94,15 +94,15 @@ class ExtraFunctions
 			switch (name)
 			{
 				case 'left':
-					return PlayState.instance.controls.NOTE_LEFT;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_LEFT;
 				case 'down':
-					return PlayState.instance.controls.NOTE_DOWN;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_DOWN;
 				case 'up':
-					return PlayState.instance.controls.NOTE_UP;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_UP;
 				case 'right':
-					return PlayState.instance.controls.NOTE_RIGHT;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_RIGHT;
 				default:
-					return PlayState.instance.controls.pressed(name);
+					return FunkinLua.getCurrentMusicState().controls.pressed(name);
 			}
 			return false;
 		});
@@ -112,15 +112,15 @@ class ExtraFunctions
 			switch (name)
 			{
 				case 'left':
-					return PlayState.instance.controls.NOTE_LEFT_R;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_LEFT_R;
 				case 'down':
-					return PlayState.instance.controls.NOTE_DOWN_R;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_DOWN_R;
 				case 'up':
-					return PlayState.instance.controls.NOTE_UP_R;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_UP_R;
 				case 'right':
-					return PlayState.instance.controls.NOTE_RIGHT_R;
+					return FunkinLua.getCurrentMusicState().controls.NOTE_RIGHT_R;
 				default:
-					return PlayState.instance.controls.justReleased(name);
+					return FunkinLua.getCurrentMusicState().controls.justReleased(name);
 			}
 			return false;
 		});
@@ -128,30 +128,30 @@ class ExtraFunctions
 		// Save data management
 		funk.set("initSaveData", function(name:String, ?folder:String = 'psychenginemods')
 		{
-			if (!PlayState.instance.modchartSaves.exists(name))
+			if (!FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
 			{
 				var save:FlxSave = new FlxSave();
 				// folder goes unused for flixel 5 users. @BeastlyGhost
 				save.bind(name, CoolUtil.getSavePath() + '/' + folder);
-				PlayState.instance.modchartSaves.set(name, save);
+				FunkinLua.getCurrentMusicState().modchartSaves.set(name, save);
 				return;
 			}
 			FunkinLua.luaTrace('initSaveData: Save file already initialized: ' + name);
 		});
 		funk.set("flushSaveData", function(name:String)
 		{
-			if (PlayState.instance.modchartSaves.exists(name))
+			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
 			{
-				PlayState.instance.modchartSaves.get(name).flush();
+				FunkinLua.getCurrentMusicState().modchartSaves.get(name).flush();
 				return;
 			}
 			FunkinLua.luaTrace('flushSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("getDataFromSave", function(name:String, field:String, ?defaultValue:Dynamic = null)
 		{
-			if (PlayState.instance.modchartSaves.exists(name))
+			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
 			{
-				var saveData = PlayState.instance.modchartSaves.get(name).data;
+				var saveData = FunkinLua.getCurrentMusicState().modchartSaves.get(name).data;
 				if (Reflect.hasField(saveData, field))
 					return Reflect.field(saveData, field);
 				else
@@ -162,18 +162,18 @@ class ExtraFunctions
 		});
 		funk.set("setDataFromSave", function(name:String, field:String, value:Dynamic)
 		{
-			if (PlayState.instance.modchartSaves.exists(name))
+			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
 			{
-				Reflect.setField(PlayState.instance.modchartSaves.get(name).data, field, value);
+				Reflect.setField(FunkinLua.getCurrentMusicState().modchartSaves.get(name).data, field, value);
 				return;
 			}
 			FunkinLua.luaTrace('setDataFromSave: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("eraseSaveData", function(name:String)
 		{
-			if (PlayState.instance.modchartSaves.exists(name))
+			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
 			{
-				PlayState.instance.modchartSaves.get(name).erase();
+				FunkinLua.getCurrentMusicState().modchartSaves.get(name).erase();
 				return;
 			}
 			FunkinLua.luaTrace('eraseSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);

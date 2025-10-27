@@ -25,6 +25,7 @@ class Mods
 		'weeks',
 		'fonts',
 		'scripts',
+		'stateScripts',
 		'achievements'
 	];
 

@@ -365,6 +365,8 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (curSelected >= optionsArray.length)
 			curSelected = 0;
 
+		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelection');
+
 		var bullShit:Int = 0;
 
 		for (item in grpOptions.members)

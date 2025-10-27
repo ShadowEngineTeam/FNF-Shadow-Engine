@@ -7,6 +7,13 @@ import backend.Discord;
 #if LUA_ALLOWED
 import llua.*;
 import llua.Lua;
+import psychlua.*;
+#else
+import psychlua.LuaUtils;
+import psychlua.HScript;
+#end
+#if HSCRIPT_ALLOWED
+import tea.SScript;
 #end
 #if VIDEOS_ALLOWED
 import backend.VideoManager;

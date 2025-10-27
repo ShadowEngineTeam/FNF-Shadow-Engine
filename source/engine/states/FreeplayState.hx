@@ -481,6 +481,8 @@ class FreeplayState extends MusicBeatState
 		if (curDifficulty >= Difficulty.list.length)
 			curDifficulty = 0;
 
+		FunkinLua.getCurrentMusicState().callOnScripts('onChangeDifficulty');
+
 		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
@@ -513,6 +515,8 @@ class FreeplayState extends MusicBeatState
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
+
+		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelection');
 
 		var newColor:Int = songs[curSelected].color;
 		if (newColor != intendedColor)

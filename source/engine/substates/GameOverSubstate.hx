@@ -74,8 +74,8 @@ class GameOverSubstate extends MusicBeatSubstate
 		FlxG.camera.focusOn(new FlxPoint(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
 		add(camFollow);
 
-		PlayState.instance.setOnScripts('inGameOver', true);
-		PlayState.instance.callOnScripts('onGameOverStart', []);
+		FunkinLua.getCurrentMusicState().setOnScripts('inGameOver', true);
+		FunkinLua.getCurrentMusicState().callOnScripts('onGameOverStart', []);
 
 		addTouchPad("NONE", "A_B");
 		addTouchPadCamera(false);
@@ -89,7 +89,7 @@ class GameOverSubstate extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
-		PlayState.instance.callOnScripts('onUpdate', [elapsed]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onUpdate', [elapsed]);
 
 		if (controls.ACCEPT)
 		{
@@ -111,7 +111,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				MusicBeatState.switchState(new FreeplayState());
 
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			PlayState.instance.callOnScripts('onGameOverConfirm', [false]);
+			FunkinLua.getCurrentMusicState().callOnScripts('onGameOverConfirm', [false]);
 		}
 
 		if (boyfriend.animation.curAnim != null)
@@ -156,7 +156,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		{
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
-		PlayState.instance.callOnScripts('onUpdatePost', [elapsed]);
+		FunkinLua.getCurrentMusicState().callOnScripts('onUpdatePost', [elapsed]);
 	}
 
 	var isEnding:Bool = false;
@@ -181,7 +181,7 @@ class GameOverSubstate extends MusicBeatSubstate
 					MusicBeatState.resetState();
 				});
 			});
-			PlayState.instance.callOnScripts('onGameOverConfirm', [true]);
+			FunkinLua.getCurrentMusicState().callOnScripts('onGameOverConfirm', [true]);
 		}
 	}
 

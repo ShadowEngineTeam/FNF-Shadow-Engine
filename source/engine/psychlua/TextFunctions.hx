@@ -4,7 +4,7 @@ class TextFunctions
 {
 	public static function implement(funk:FunkinLua)
 	{
-		var game:PlayState = PlayState.instance;
+		var game:Dynamic = FunkinLua.getCurrentMusicState();
 		funk.set("makeLuaText", function(tag:String, text:String, width:Int, x:Float, y:Float)
 		{
 			tag = tag.replace('.', '');

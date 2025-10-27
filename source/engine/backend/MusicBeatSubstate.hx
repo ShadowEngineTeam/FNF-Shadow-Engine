@@ -1,17 +1,11 @@
 package backend;
 
 import flixel.FlxSubState;
+import flixel.util.FlxSave;
 
 class MusicBeatSubstate extends FlxSubState
 {
 	public static var instance:MusicBeatSubstate;
-
-	public function new()
-	{
-		instance = this;
-		controls.isInSubstate = true;
-		super();
-	}
 
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -24,6 +18,32 @@ class MusicBeatSubstate extends FlxSubState
 
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
+
+	#if HSCRIPT_ALLOWED
+	public var hscriptArray:Array<HScript> = [];
+	public var instancesExclude:Array<String> = [];
+	#end
+
+	#if LUA_ALLOWED
+	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
+	public var modchartSprites:Map<String, ModchartSprite> = new Map<String, ModchartSprite>();
+	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
+	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
+	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
+	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
+	public var lua:State = null;
+	#end
+
+	#if LUA_ALLOWED
+	public var luaArray:Array<FunkinLua> = [];
+	#end
+
+	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	#end
+
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
+
 	private var controls(get, never):Controls;
 
 	inline function get_controls():Controls
@@ -31,6 +51,8 @@ class MusicBeatSubstate extends FlxSubState
 
 	public var touchPad:TouchPad;
 	public var touchPadCam:FlxCamera;
+	public var luaTouchPad:TouchPad;
+	public var luaTouchPadCam:FlxCamera;
 	public var mobileControls:IMobileControls;
 	public var mobileControlsCam:FlxCamera;
 
@@ -108,13 +130,178 @@ class MusicBeatSubstate extends FlxSubState
 		}
 	}
 
+	public function makeLuaTouchPad(DPadMode:String, ActionMode:String)
+	{
+		if (members.contains(luaTouchPad))
+			return;
+
+		if (!variables.exists("luaTouchPad"))
+			variables.set("luaTouchPad", luaTouchPad);
+
+		luaTouchPad = new TouchPad(DPadMode, ActionMode, NONE);
+		luaTouchPad.alpha = ClientPrefs.data.controlsAlpha;
+	}
+
+	public function addLuaTouchPad()
+	{
+		if (luaTouchPad == null || members.contains(luaTouchPad))
+			return;
+
+		var target = LuaUtils.getTargetInstance();
+		target.insert(target.members.length + 1, luaTouchPad);
+	}
+
+	public function addLuaTouchPadCamera(defaultDrawTarget:Bool = false)
+	{
+		if (luaTouchPad != null)
+		{
+			luaTouchPadCam = new FlxCamera();
+			luaTouchPadCam.bgColor.alpha = 0;
+			FlxG.cameras.add(luaTouchPadCam, defaultDrawTarget);
+			luaTouchPad.cameras = [luaTouchPadCam];
+		}
+	}
+
+	public function removeLuaTouchPad()
+	{
+		if (luaTouchPad != null)
+		{
+			luaTouchPad.kill();
+			luaTouchPad.destroy();
+			remove(luaTouchPad);
+			luaTouchPad = null;
+		}
+	}
+
+	public function luaTouchPadPressed(button:Dynamic):Bool
+	{
+		if (luaTouchPad != null)
+		{
+			if (Std.isOfType(button, String))
+				return luaTouchPad.buttonPressed(MobileInputID.fromString(button));
+			else if (Std.isOfType(button, Array))
+			{
+				var FUCK:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i foud to fix
+				var idArray:Array<MobileInputID> = [];
+				for (strId in FUCK)
+					idArray.push(MobileInputID.fromString(strId));
+				return luaTouchPad.anyPressed(idArray);
+			}
+			else
+				return false;
+		}
+		return false;
+	}
+
+	public function luaTouchPadJustPressed(button:Dynamic):Bool
+	{
+		if (luaTouchPad != null)
+		{
+			if (Std.isOfType(button, String))
+				return luaTouchPad.buttonJustPressed(MobileInputID.fromString(button));
+			else if (Std.isOfType(button, Array))
+			{
+				var FUCK:Array<String> = button;
+				var idArray:Array<MobileInputID> = [];
+				for (strId in FUCK)
+					idArray.push(MobileInputID.fromString(strId));
+				return luaTouchPad.anyJustPressed(idArray);
+			}
+			else
+				return false;
+		}
+		return false;
+	}
+
+	public function luaTouchPadJustReleased(button:Dynamic):Bool
+	{
+		if (luaTouchPad != null)
+		{
+			if (Std.isOfType(button, String))
+				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			else if (Std.isOfType(button, Array))
+			{
+				var FUCK:Array<String> = button;
+				var idArray:Array<MobileInputID> = [];
+				for (strId in FUCK)
+					idArray.push(MobileInputID.fromString(strId));
+				return luaTouchPad.anyJustReleased(idArray);
+			}
+			else
+				return false;
+		}
+		return false;
+	}
+
+	public function luaTouchPadReleased(button:Dynamic):Bool
+	{
+		if (luaTouchPad != null)
+		{
+			if (Std.isOfType(button, String))
+				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			else if (Std.isOfType(button, Array))
+			{
+				var FUCK:Array<String> = button;
+				var idArray:Array<MobileInputID> = [];
+				for (strId in FUCK)
+					idArray.push(MobileInputID.fromString(strId));
+				return luaTouchPad.anyReleased(idArray);
+			}
+			else
+				return false;
+		}
+		return false;
+	}
+
 	override function destroy()
 	{
 		removeTouchPad();
+		removeLuaTouchPad();
 		removeMobileControls();
+
+		#if LUA_ALLOWED
+		for (lua in luaArray)
+		{
+			lua.call('onDestroy', []);
+			lua.stop();
+		}
+		luaArray = [];
+		FunkinLua.customFunctions.clear();
+		#end
+
+		#if HSCRIPT_ALLOWED
+		for (script in hscriptArray)
+			if (script != null)
+			{
+				script.call('onDestroy');
+				script.destroy();
+			}
+
+		while (hscriptArray.length > 0)
+			hscriptArray.pop();
+		#end
 
 		super.destroy();
 		controls.isInSubstate = false;
+	}
+
+	public function new()
+	{
+		instance = this;
+		controls.isInSubstate = true;
+		super();
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		luaDebugGroup.cameras = [FlxG.camera];
+		#end
+		add(luaDebugGroup);
+		#if LUA_ALLOWED
+		startLuasNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.lua');
+		#end
+		#if HSCRIPT_ALLOWED
+		startHScriptsNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.hx');
+		#end
+		callOnScripts('onCreatePost');
 	}
 
 	override function update(elapsed:Float)
@@ -141,7 +328,14 @@ class MusicBeatSubstate extends FlxSubState
 			}
 		}
 
+		callOnScripts('onUpdate', [elapsed]);
+
+		setOnScripts('curDecStep', curDecStep);
+		setOnScripts('curDecBeat', curDecBeat);
+
 		super.update(elapsed);
+
+		callOnScripts('onUpdatePost', [elapsed]);
 	}
 
 	private function updateSection():Void
@@ -210,6 +404,9 @@ class MusicBeatSubstate extends FlxSubState
 	public function sectionHit():Void
 	{
 		// yep, you guessed it, nothing again, dumbass
+		// OR NOT!!!! - Lily
+		setOnScripts('curSection', curSection);
+		callOnScripts('onSectionHit');
 	}
 
 	function getBeatsOnSection()
@@ -218,5 +415,302 @@ class MusicBeatSubstate extends FlxSubState
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
 			val = PlayState.SONG.notes[curSection].sectionBeats;
 		return val == null ? 4 : val;
+	}
+
+	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	public function addTextToDebug(text:String, color:FlxColor)
+	{
+		var newText:psychlua.DebugLuaText = luaDebugGroup.recycle(psychlua.DebugLuaText);
+		newText.text = text;
+		newText.color = color;
+		newText.disableTime = 6;
+		newText.alpha = 1;
+		newText.setPosition(10, 8 - newText.height);
+
+		luaDebugGroup.forEachAlive(function(spr:psychlua.DebugLuaText)
+		{
+			spr.y += newText.height + 2;
+		});
+		luaDebugGroup.add(newText);
+		#if sys
+		Sys.println(text);
+		#else
+		trace(text);
+		#end
+	}
+	#end
+
+	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
+	{
+		#if LUA_ALLOWED
+		if (modchartSprites.exists(tag))
+			return modchartSprites.get(tag);
+		if (text && modchartTexts.exists(tag))
+			return modchartTexts.get(tag);
+		if (variables.exists(tag))
+			return variables.get(tag);
+		#end
+		return null;
+	}
+
+	#if LUA_ALLOWED
+	public function startLuasNamed(luaFile:String)
+	{
+		#if MODS_ALLOWED
+		var luaToLoad:String = Paths.modFolders(luaFile);
+		if (!FileSystem.exists(luaToLoad))
+			luaToLoad = Paths.getSharedPath(luaFile);
+
+		if (FileSystem.exists(luaToLoad))
+		#else
+		var luaToLoad:String = Paths.getSharedPath(luaFile);
+		if (Assets.exists(luaToLoad))
+		#end
+		{
+			for (script in luaArray)
+				if (script.scriptName == luaToLoad)
+					return false;
+
+			new FunkinLua(luaToLoad);
+			return true;
+		}
+		return false;
+	}
+	#end
+
+	#if HSCRIPT_ALLOWED
+	public function startHScriptsNamed(scriptFile:String)
+	{
+		#if MODS_ALLOWED
+		var scriptToLoad:String = Paths.modFolders(scriptFile);
+		if (!FileSystem.exists(scriptToLoad))
+			scriptToLoad = Paths.getSharedPath(scriptFile);
+		#else
+		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+		#end
+
+		if (#if MODS_ALLOWED FileSystem.exists(scriptToLoad) #else Assets.exists(scriptToLoad) #end)
+		{
+			if (SScript.global.exists(scriptToLoad))
+				return false;
+
+			initHScript(scriptToLoad);
+			return true;
+		}
+		return false;
+	}
+
+	public function initHScript(file:String)
+	{
+		try
+		{
+			var newScript:HScript = new HScript(null, file);
+			if (newScript.parsingException != null)
+			{
+				addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
+				newScript.destroy();
+				return;
+			}
+
+			hscriptArray.push(newScript);
+			if (newScript.exists('onCreate'))
+			{
+				var callValue = newScript.call('onCreate');
+				if (!callValue.succeeded)
+				{
+					for (e in callValue.exceptions)
+					{
+						if (e != null)
+						{
+							var len:Int = e.message.indexOf('\n') + 1;
+							if (len <= 0)
+								len = e.message.length;
+							addTextToDebug('ERROR ($file: onCreate) - ${e.message.substr(0, len)}', FlxColor.RED);
+						}
+					}
+
+					newScript.destroy();
+					hscriptArray.remove(newScript);
+					trace('failed to initialize tea interp!!! ($file)');
+				}
+				else
+					trace('initialized tea interp successfully: $file');
+			}
+		}
+		catch (e)
+		{
+			var len:Int = e.message.indexOf('\n') + 1;
+			if (len <= 0)
+				len = e.message.length;
+			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
+			var newScript:HScript = cast(SScript.global.get(file), HScript);
+			if (newScript != null)
+			{
+				newScript.destroy();
+				hscriptArray.remove(newScript);
+			}
+		}
+	}
+	#end
+
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null,
+			excludeValues:Array<Dynamic> = null):Dynamic
+	{
+		var returnVal:Dynamic = LuaUtils.Function_Continue;
+		if (args == null)
+			args = [];
+		if (exclusions == null)
+			exclusions = [];
+		if (excludeValues == null)
+			excludeValues = [LuaUtils.Function_Continue];
+
+		var result:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		if (result == null || excludeValues.contains(result))
+			result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		return result;
+	}
+
+	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null,
+			excludeValues:Array<Dynamic> = null):Dynamic
+	{
+		var returnVal:Dynamic = LuaUtils.Function_Continue;
+		#if LUA_ALLOWED
+		if (args == null)
+			args = [];
+		if (exclusions == null)
+			exclusions = [];
+		if (excludeValues == null)
+			excludeValues = [LuaUtils.Function_Continue];
+
+		var arr:Array<FunkinLua> = [];
+		for (script in luaArray)
+		{
+			if (script.closed)
+			{
+				arr.push(script);
+				continue;
+			}
+
+			if (exclusions.contains(script.scriptName))
+				continue;
+
+			var myValue:Dynamic = script.call(funcToCall, args);
+			if ((myValue == LuaUtils.Function_StopLua || myValue == LuaUtils.Function_StopAll)
+				&& !excludeValues.contains(myValue)
+				&& !ignoreStops)
+			{
+				returnVal = myValue;
+				break;
+			}
+
+			if (myValue != null && !excludeValues.contains(myValue))
+				returnVal = myValue;
+
+			if (script.closed)
+				arr.push(script);
+		}
+
+		if (arr.length > 0)
+			for (script in arr)
+				luaArray.remove(script);
+		#end
+		return returnVal;
+	}
+
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
+			excludeValues:Array<Dynamic> = null):Dynamic
+	{
+		var returnVal:Dynamic = LuaUtils.Function_Continue;
+
+		#if HSCRIPT_ALLOWED
+		if (exclusions == null)
+			exclusions = new Array();
+		if (excludeValues == null)
+			excludeValues = new Array();
+		excludeValues.push(LuaUtils.Function_Continue);
+
+		var len:Int = hscriptArray.length;
+		if (len < 1)
+			return returnVal;
+		for (i in 0...len)
+		{
+			var script:HScript = hscriptArray[i];
+			if (script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
+				continue;
+
+			var myValue:Dynamic = null;
+			try
+			{
+				var callValue = script.call(funcToCall, args);
+				if (!callValue.succeeded)
+				{
+					var e = callValue.exceptions[0];
+					if (e != null)
+					{
+						var len:Int = e.message.indexOf('\n') + 1;
+						if (len <= 0)
+							len = e.message.length;
+						addTextToDebug('ERROR (${callValue.calledFunction}) - ' + e.message.substr(0, len), FlxColor.RED);
+					}
+				}
+				else
+				{
+					myValue = callValue.returnValue;
+					if ((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll)
+						&& !excludeValues.contains(myValue)
+						&& !ignoreStops)
+					{
+						returnVal = myValue;
+						break;
+					}
+
+					if (myValue != null && !excludeValues.contains(myValue))
+						returnVal = myValue;
+				}
+			}
+		}
+		#end
+
+		return returnVal;
+	}
+
+	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null)
+	{
+		if (exclusions == null)
+			exclusions = [];
+		setOnLuas(variable, arg, exclusions);
+		setOnHScript(variable, arg, exclusions);
+	}
+
+	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null)
+	{
+		#if LUA_ALLOWED
+		if (exclusions == null)
+			exclusions = [];
+		for (script in luaArray)
+		{
+			if (exclusions.contains(script.scriptName))
+				continue;
+
+			script.set(variable, arg);
+		}
+		#end
+	}
+
+	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null)
+	{
+		#if HSCRIPT_ALLOWED
+		if (exclusions == null)
+			exclusions = [];
+		for (script in hscriptArray)
+		{
+			if (exclusions.contains(script.origin))
+				continue;
+
+			if (!instancesExclude.contains(variable))
+				instancesExclude.push(variable);
+			script.set(variable, arg);
+		}
+		#end
 	}
 }

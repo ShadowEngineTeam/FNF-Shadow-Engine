@@ -49,6 +49,7 @@ class Prompt extends MusicBeatSubstate
 		{
 			if (okc != null)
 				okc();
+			FunkinLua.getCurrentMusicState().callOnScripts('onOK');
 			close();
 			controls.isInSubstate = false;
 		});
@@ -56,6 +57,7 @@ class Prompt extends MusicBeatSubstate
 		{
 			if (cancelc != null)
 				cancelc();
+			FunkinLua.getCurrentMusicState().callOnScripts('onNO');
 			close();
 			controls.isInSubstate = false;
 		});

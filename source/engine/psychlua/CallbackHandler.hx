@@ -20,13 +20,16 @@ class CallbackHandler
 				if (last == null || last.lua != l)
 				{
 					// trace('looping thru scripts');
-					for (script in PlayState.instance.luaArray)
-						if (script != FunkinLua.lastCalledScript && script != null && script.lua == l)
+					for (script in cast(FunkinLua.getCurrentMusicState().luaArray, Array<Dynamic>))
+					{
+						final funk:FunkinLua = cast(script, FunkinLua);
+						if (funk != FunkinLua.lastCalledScript && funk != null && funk.lua == l)
 						{
 							// trace('found script');
-							cbf = script.callbacks.get(fname);
+							cbf = funk.callbacks.get(fname);
 							break;
 						}
+					}
 				}
 				else
 					cbf = last.callbacks.get(fname);

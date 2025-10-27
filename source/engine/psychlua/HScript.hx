@@ -40,7 +40,7 @@ class HScript extends SScript
 			@:privateAccess
 			if (hs.parsingException != null)
 			{
-				PlayState.instance.addTextToDebug('ERROR ON LOADING (${hs.origin}): ${hs.parsingException.message}', FlxColor.RED);
+				FunkinLua.getCurrentMusicState().addTextToDebug('ERROR ON LOADING (${hs.origin}): ${hs.parsingException.message}', FlxColor.RED);
 			}
 		}
 	}
@@ -122,21 +122,21 @@ class HScript extends SScript
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
 		{
-			PlayState.instance.variables.set(name, value);
+			FunkinLua.getCurrentMusicState().variables.set(name, value);
 			return value;
 		});
 		set('getVar', function(name:String)
 		{
 			var result:Dynamic = null;
-			if (PlayState.instance.variables.exists(name))
-				result = PlayState.instance.variables.get(name);
+			if (FunkinLua.getCurrentMusicState().variables.exists(name))
+				result = FunkinLua.getCurrentMusicState().variables.get(name);
 			return result;
 		});
 		set('removeVar', function(name:String)
 		{
-			if (PlayState.instance.variables.exists(name))
+			if (FunkinLua.getCurrentMusicState().variables.exists(name))
 			{
-				PlayState.instance.variables.remove(name);
+				FunkinLua.getCurrentMusicState().variables.remove(name);
 				return true;
 			}
 			return false;
@@ -145,7 +145,7 @@ class HScript extends SScript
 		{
 			if (color == null)
 				color = FlxColor.WHITE;
-			PlayState.instance.addTextToDebug(text, color);
+			FunkinLua.getCurrentMusicState().addTextToDebug(text, color);
 		});
 		set('getModSetting', function(saveTag:String, ?modName:String = null)
 		{
@@ -153,7 +153,7 @@ class HScript extends SScript
 			{
 				if (this.modFolder == null)
 				{
-					PlayState.instance.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					FunkinLua.getCurrentMusicState().addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
 					return null;
 				}
 				modName = this.modFolder;
@@ -271,9 +271,12 @@ class HScript extends SScript
 		#if LUA_ALLOWED
 		set('createGlobalCallback', function(name:String, func:Dynamic)
 		{
-			for (script in PlayState.instance.luaArray)
-				if (script != null && script.lua != null && !script.closed)
-					Lua_helper.add_callback(script.lua, name, func);
+			for (script in cast(FunkinLua.getCurrentMusicState().luaArray, Array<Dynamic>))
+			{
+				final funk:FunkinLua = cast(script, FunkinLua);
+				if (funk != null && funk.lua != null && !funk.closed)
+					Lua_helper.add_callback(funk.lua, name, func);
+			}
 
 			FunkinLua.customFunctions.set(name, func);
 		});
@@ -313,7 +316,7 @@ class HScript extends SScript
 				}
 				#end
 				if (PlayState.instance != null)
-					PlayState.instance.addTextToDebug('$origin - $msg', FlxColor.RED);
+					FunkinLua.getCurrentMusicState().addTextToDebug('$origin - $msg', FlxColor.RED);
 				else
 					trace('$origin - $msg');
 			}
@@ -372,7 +375,7 @@ class HScript extends SScript
 			#if LUA_ALLOWED
 			FunkinLua.luaTrace(origin + ' - No HScript function named: $funcToRun', false, false, FlxColor.RED);
 			#else
-			PlayState.instance.addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
+			FunkinLua.getCurrentMusicState().addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
 			#end
 			return null;
 		}
@@ -391,7 +394,7 @@ class HScript extends SScript
 					return null;
 				}
 				#end
-				PlayState.instance.addTextToDebug('$origin - $msg', FlxColor.RED);
+				FunkinLua.getCurrentMusicState().addTextToDebug('$origin - $msg', FlxColor.RED);
 			}
 			return null;
 		}
@@ -411,7 +414,7 @@ class HScript extends SScript
 		funk.addLocalCallback("runHaxeCode",
 			function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 			{
-				#if SScript
+				#if HSCRIPT_ALLOWED
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
 				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
@@ -438,7 +441,7 @@ class HScript extends SScript
 
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null)
 		{
-			#if SScript
+			#if HSCRIPT_ALLOWED
 			var callValue = funk.hscript.executeFunction(funcToRun, funcArgs);
 			if (!callValue.succeeded)
 			{
@@ -467,12 +470,12 @@ class HScript extends SScript
 			if (c == null)
 				c = Type.resolveEnum(str + libName);
 
-			#if SScript
+			#if HSCRIPT_ALLOWED
 			if (c != null)
 				SScript.globalVariables[libName] = c;
 			#end
 
-			#if SScript
+			#if HSCRIPT_ALLOWED
 			if (funk.hscript != null)
 			{
 				try

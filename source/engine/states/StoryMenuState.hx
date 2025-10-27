@@ -290,6 +290,8 @@ class StoryMenuState extends MusicBeatState
 				PlayState.isStoryMode = true;
 				selectedWeek = true;
 
+				FunkinLua.getCurrentMusicState().callOnScripts('onSelectWeek');
+
 				var diffic = Difficulty.getFilePath(curDifficulty);
 				if (diffic == null)
 					diffic = '';
@@ -347,6 +349,8 @@ class StoryMenuState extends MusicBeatState
 		if (curDifficulty >= Difficulty.list.length)
 			curDifficulty = 0;
 
+		FunkinLua.getCurrentMusicState().callOnScripts('onChangeDifficulty');
+
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
 		var diff:String = Difficulty.getString(curDifficulty);
@@ -388,6 +392,8 @@ class StoryMenuState extends MusicBeatState
 			curWeek = 0;
 		if (curWeek < 0)
 			curWeek = loadedWeeks.length - 1;
+
+		FunkinLua.getCurrentMusicState().callOnScripts('onChangeWeek');
 
 		var leWeek:WeekData = loadedWeeks[curWeek];
 		WeekData.setDirectoryFromWeek(leWeek);
