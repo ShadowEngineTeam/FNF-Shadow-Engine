@@ -7,7 +7,7 @@ Ready to be source-modded.
 ## Differences Between The Original
 - Uses our [Lime](https://github.com/HomuHomu833-haxelibs/lime) and [HXCPP](https://github.com/HomuHomu833-haxelibs/hxcpp) forks
 - Uses latest Haxe
-- Uses CNE FPS Counter and some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (RIP)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine) and [REDACTED]
+- Uses some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (RIP)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine) and [REDACTED]
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
