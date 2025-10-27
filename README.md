@@ -19,6 +19,6 @@ Ready to be source-modded.
 - Stripped to only have Test song and some characters
 - Kade Engine Note Timing (man I feel old), VSync and Pop Up Score Option
 - Includes all classes as possible into source
-- Custom Classes Support!! (ig idk honestly if I did good job)
+- Scriptable Classes Support!! (ig idk honestly if I did good job)
 
 Discord server: https://discord.gg/krFK9WWYHg
