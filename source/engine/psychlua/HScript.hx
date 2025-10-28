@@ -315,7 +315,7 @@ class HScript extends SScript
 					return;
 				}
 				#end
-				if (PlayState.instance != null)
+				if (FunkinLua.getCurrentMusicState() != null)
 					FunkinLua.getCurrentMusicState().addTextToDebug('$origin - $msg', FlxColor.RED);
 				else
 					trace('$origin - $msg');

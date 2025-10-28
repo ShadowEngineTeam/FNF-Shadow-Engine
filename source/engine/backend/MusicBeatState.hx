@@ -39,6 +39,7 @@ class MusicBeatState extends FlxUIState
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
+	private var currentClassName:String;
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -287,11 +288,19 @@ class MusicBeatState extends FlxUIState
 
 	var _psychCameraInitialized:Bool = false;
 
-	override function create()
+	public function new()
 	{
 		if (FlxG.mouse.cursor != null && !(FlxG.mouse.cursor.bitmapData is FunkinCursor))
 			FlxG.mouse.load(new FunkinCursor(0, 0));
 
+		currentClassName = Std.string(Type.getClassName(Type.getClass(this))).replace('states.', '').replace('.', '/');
+		callOnScripts('onNew');
+		super();
+		callOnScripts('onNewPost');
+	}
+
+	override function create()
+	{
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED
 		Mods.updatedOnState = false;
@@ -310,15 +319,15 @@ class MusicBeatState extends FlxUIState
 		#end
 
 		#if LUA_ALLOWED
-		startLuasNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.lua');
+		startLuasNamed('stateScripts/' + currentClassName + '.lua');
 		#end
 		#if HSCRIPT_ALLOWED
-		startHScriptsNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.hx');
+		startHScriptsNamed('stateScripts/' + currentClassName + '.hx');
 		#end
 
-		callOnScripts('onCreatePost');
-
 		super.create();
+
+		callOnScripts('onCreatePost');
 
 		if (!skip)
 		{

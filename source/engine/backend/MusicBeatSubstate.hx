@@ -40,6 +40,7 @@ class MusicBeatSubstate extends FlxSubState
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
+	private var currentClassName:String;
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -288,8 +289,18 @@ class MusicBeatSubstate extends FlxSubState
 	public function new()
 	{
 		instance = this;
+		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
+			.replace('states.', '')
+			.replace('substates.', '')
+			.replace('.', '/');
 		controls.isInSubstate = true;
+		callOnScripts('onNew');
 		super();
+		callOnScripts('onNewPost');
+	}
+
+	override function create()
+	{
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
 		luaDebugCam = new FlxCamera();
@@ -300,12 +311,25 @@ class MusicBeatSubstate extends FlxSubState
 		#end
 		add(luaDebugGroup);
 		#if LUA_ALLOWED
-		startLuasNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.lua');
+		startLuasNamed('substateScripts/' + currentClassName + '.lua');
 		#end
 		#if HSCRIPT_ALLOWED
-		startHScriptsNamed('stateScripts/' + Std.string(Type.getClassName(Type.getClass(this))).replace('.', '/') + '.hx');
+		startHScriptsNamed('substateScripts/' + currentClassName + '.hx');
 		#end
+		super.create();
 		callOnScripts('onCreatePost');
+	}
+
+	override function openSubState(subState:FlxSubState)
+	{
+		callOnScripts('onOpenSubState');
+		super.openSubState(subState);
+	}
+
+	override function closeSubState()
+	{
+		callOnScripts('onCloseSubState');
+		super.closeSubState();
 	}
 
 	override function update(elapsed:Float)

@@ -3,7 +3,7 @@ package backend;
 import flixel.util.FlxGradient;
 import flixel.FlxSubState;
 
-class CustomFadeTransition extends FlxSubState
+class CustomFadeTransition extends MusicBeatSubstate
 {
 	public static var finishCallback:Void->Void;
 
