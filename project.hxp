@@ -24,6 +24,7 @@ class Project extends HXProject
 	static final LUA_ALLOWED:CompileFlag = CompileFlag.get("LUA_ALLOWED");
 	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
 	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
+	static final MODCHARTS_ALLOWED:CompileFlag = CompileFlag.get("MODCHARTS_ALLOWED");
 	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
 
 	static final ENABLE_ASCII_ART:Bool = true;
@@ -184,6 +185,7 @@ class Project extends HXProject
 		LUA_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
 		VIDEOS_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
 		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
+		MODCHARTS_ALLOWED.integrate(DCEBUILD.isDisabled());
 		DCEBUILD.integrate(false);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
@@ -228,6 +230,17 @@ class Project extends HXProject
 		if (DISCORD_ALLOWED.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
+		if (MODCHARTS_ALLOWED.isEnabled())
+		{
+			setHaxedef('FM_ENGINE', 'Shadow');
+			setHaxedef('FM_ENGINE_VERSION', '0.7'); // SE based with 0.7.3
+
+			addMacroFlag('modchart.backend.macros.Macro.includeFiles()');
+			addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.buildFlxCamera())','flixel.FlxCamera')");
+			//addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.buildFlxDrawTrianglesItem())','flixel.graphics.tile.FlxDrawTrianglesItem')");
+			//addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.addModchartStorage())','flixel.FlxBasic')");
+		}
+
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
 	}
@@ -271,6 +284,8 @@ class Project extends HXProject
 			includeHaxelib("hxvlc");
 		if (DISCORD_ALLOWED.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
+		if (MODCHARTS_ALLOWED.isEnabled())
+			includeHaxelib("funkin-modchart");
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");

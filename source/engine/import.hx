@@ -3,6 +3,10 @@
 #if DISCORD_ALLOWED
 import backend.Discord;
 #end
+// FunkinModchart
+#if MODCHARTS_ALLOWED
+import modchart.Manager as ModchartManager;
+#end
 // Psych
 #if LUA_ALLOWED
 import hxluajit.*;

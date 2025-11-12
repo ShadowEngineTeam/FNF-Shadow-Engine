@@ -75,6 +75,11 @@ class PlayState extends MusicBeatState
 	public var dadMap:Map<String, Character> = new Map<String, Character>();
 	public var gfMap:Map<String, Character> = new Map<String, Character>();
 
+	#if MODCHARTS_ALLOWED
+	public var modchartInstances:Map<String, ModchartManager> = new Map<String, ModchartManager>();
+	public var manager:ModchartManager;
+	#end
+
 	public var BF_X:Float = 770;
 	public var BF_Y:Float = 100;
 	public var DAD_X:Float = 100;
@@ -588,6 +593,11 @@ class PlayState extends MusicBeatState
 		comboGroup.cameras = [camHUD];
 
 		startingSong = true;
+
+		#if MODCHARTS_ALLOWED
+		manager = new ModchartManager();
+		add(manager);
+		#end
 
 		#if LUA_ALLOWED
 		for (notetype in noteTypes)
