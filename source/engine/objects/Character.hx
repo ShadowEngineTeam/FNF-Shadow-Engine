@@ -178,7 +178,7 @@ class Character extends FlxAnimate
 			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
 			{
 				spriteType = TEXTURE_ATLAS;
-				frames = Paths.getTextureAtlas(json.image, {swfMode: true, cacheOnLoad: true});
+				frames = Paths.getTextureAtlas(json.image);
 			}
 			else
 			{

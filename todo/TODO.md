@@ -1,6 +1,5 @@
 - Switch SScript to RuleScript(?) [in a nutshell screw SScript]
 - Add hxfmod
-- Add flixel-animate
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Results Screen, Freeplay(?), Char Select(?) and Wide Screen Support
 - Add editor for Results Screen and Char Select(?)
