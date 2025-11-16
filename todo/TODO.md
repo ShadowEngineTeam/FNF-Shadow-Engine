@@ -6,5 +6,4 @@
 - Add Base Game Files
 - Add our UI for editors
 - Add multikey support(?)
-- Make Modchart support better(?)
 - Add Scritable Classes (eg Class that is empty so modders can do shit with it)
