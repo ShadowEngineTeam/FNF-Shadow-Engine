@@ -75,6 +75,8 @@ function createGhost(char)
         setProperty(ghostTag .. '.color', 0x000000)
     end
     setProperty(ghostTag .. '.alpha', 1)
+	setProperty(ghostTag .. '.blend', getProperty(char .. '.blend'))
+	setProperty(ghostTag .. '.shader', getProperty(char .. '.shader'))
     doTweenAlpha(ghostTag .. 'delete', ghostTag, 0, 0.4)
 
     local data = getGhostData(char)
