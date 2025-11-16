@@ -57,6 +57,7 @@ class Character extends FlxAnimate
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public var isPlayer:Bool = false;
+	public var isMultiAtlas:Bool = false; // for psychlua smh
 	public var curCharacter:String = DEFAULT_CHARACTER;
 
 	public var holdTimer:Float = 0;
@@ -163,6 +164,7 @@ class Character extends FlxAnimate
 		if (!(json.image is String))
 		{
 			spriteType = MULTI_ATLAS;
+			isMultiAtlas = true;
 			frames = Paths.getAtlas(json.image[0]);
 			final split:Array<String> = json.image;
 			if (frames != null)
