@@ -5,7 +5,7 @@
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HomuHomu833-haxelibs/lime"
+      "url": "https://github.com/HomuHomu833-haxe-stuff/lime"
     },
     {
       "name": "openfl",
@@ -40,7 +40,7 @@
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HomuHomu833-haxelibs/hxcpp"
+      "url": "https://github.com/HomuHomu833-haxe-stuff/hxcpp"
     },
     {
       "name": "SScript",
@@ -71,14 +71,14 @@
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HomuHomu833-haxelibs/format"
+      "url": "https://github.com/HomuHomu833-haxe-stuff/format"
     },
     {
       "name": "hxp",
       "type": "git",
       "dir": null,
       "ref": null,
-      "url": "https://github.com/HomuHomu833-haxelibs/hxp"
+      "url": "https://github.com/HomuHomu833-haxe-stuff/hxp"
     },
     {
       "name": "hxvlc",
