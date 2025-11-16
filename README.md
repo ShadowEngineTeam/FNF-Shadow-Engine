@@ -23,6 +23,7 @@ For the lore of this engine see [ORIGIN.md](./ORIGIN.md).
 - Linux ARM support (FNF on Raspberry Pi baby)
 - Kade Engine Results Screen
 - PlayState has `changeNoteSkin` for easy in-game note skin changing
+- Modcharting Support (see [FNF-Modcharting-Tools](https://github.com/FNF-SE/FNF-Modcharting-Tools))
 - Play as Opponent
 - Stripped to only have Test song and some characters
 - Kade Engine Note Timing (man I feel old), VSync and Pop Up Score Option
