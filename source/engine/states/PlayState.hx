@@ -33,9 +33,11 @@ import substates.ResultsScreen;
 import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
+#if MODCHARTS_ALLOWED
 import modcharting.ModchartFuncs;
 import modcharting.NoteMovement;
 import modcharting.PlayfieldRenderer;
+#end
 
 /**
  * This is where all the Gameplay stuff happens and is managed
@@ -77,11 +79,6 @@ class PlayState extends MusicBeatState
 	public var boyfriendMap:Map<String, Character> = new Map<String, Character>();
 	public var dadMap:Map<String, Character> = new Map<String, Character>();
 	public var gfMap:Map<String, Character> = new Map<String, Character>();
-
-	#if MODCHARTS_ALLOWED
-	public var modchartInstances:Map<String, ModchartManager> = new Map<String, ModchartManager>();
-	public var manager:ModchartManager;
-	#end
 
 	public var BF_X:Float = 770;
 	public var BF_Y:Float = 100;
@@ -530,10 +527,12 @@ class PlayState extends MusicBeatState
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
 		generateSong(SONG.song);
-
+		
+		#if MODCHARTS_ALLOWED
 		playfieldRenderer = new PlayfieldRenderer(strumLineNotes, notes, this);
-		playfieldRenderer.cameras = [camHUD];
-		add(playfieldRenderer);
+		//playfieldRenderer.cameras = [camHUD];
+		noteGroup.add(playfieldRenderer);
+		#end
 
 		noteGroup.add(grpNoteSplashes);
 		noteGroup.add(grpHoldSplashes);
@@ -600,11 +599,6 @@ class PlayState extends MusicBeatState
 		comboGroup.cameras = [camHUD];
 
 		startingSong = true;
-
-		#if MODCHARTS_ALLOWED
-		manager = new ModchartManager();
-		add(manager);
-		#end
 
 		#if LUA_ALLOWED
 		for (notetype in noteTypes)
@@ -1014,7 +1008,9 @@ class PlayState extends MusicBeatState
 				generateStaticArrows(0, SONG.playerArrowSkin);
 			}
 
+			#if MODCHARTS_ALLOWED
 			NoteMovement.getDefaultStrumPos(this);
+			#end
 
 			if (characterPlayingAsDad && !ClientPrefs.data.middleScroll)
 				for (i in 0...opponentStrums.members.length)

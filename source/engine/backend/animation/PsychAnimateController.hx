@@ -1,6 +1,5 @@
 package backend.animation;
 
-import flixel.animation.FlxAnimationController;
 import animate.FlxAnimateController;
 
 class PsychAnimateController extends FlxAnimateController

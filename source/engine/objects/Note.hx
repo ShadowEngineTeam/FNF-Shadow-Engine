@@ -74,7 +74,9 @@ class Note extends FlxSkewedSprite
 
 	public var inEditor:Bool = false;
 
+	#if MODCHARTS_ALLOWED
 	public var mesh:modcharting.SustainStrip = null;
+	#end
   	public var z:Float = 0;
 
 	public var animSuffix:String = '';

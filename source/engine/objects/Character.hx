@@ -135,6 +135,7 @@ class Character extends FlxAnimate
 		recalculateDanceIdle();
 		dance();
 	}
+
 	override function initVars()
 	{
 		super.initVars();
@@ -175,7 +176,8 @@ class Character extends FlxAnimate
 		}
 		else
 		{
-			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
+			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE)
+				&& !Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, Paths.GPU_IMAGE_EXT)}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
 			{
 				spriteType = TEXTURE_ATLAS;
 				frames = Paths.getTextureAtlas(json.image);

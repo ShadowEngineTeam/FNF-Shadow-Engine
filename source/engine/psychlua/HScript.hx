@@ -102,9 +102,6 @@ class HScript extends SScript
 		set('PlayState', PlayState);
 		set('Paths', Paths);
 		set('CoolUtil', CoolUtil);
-		#if MODCHARTS_ALLOWED
-		set('ModchartManager', ModchartManager);
-		#end
 		set('StorageUtil', StorageUtil);
 		set('Conductor', Conductor);
 		set('ClientPrefs', ClientPrefs);
@@ -122,6 +119,7 @@ class HScript extends SScript
 		set('VideoManager', backend.VideoManager);
 		#end
 
+		#if MODCHARTS_ALLOWED
 		set('Math', Math);
 		set('ModchartEditorState', modcharting.ModchartEditorState);
 		set('ModchartEvent', modcharting.ModchartEvent);
@@ -142,6 +140,7 @@ class HScript extends SScript
 		set('SustainStrip', modcharting.SustainStrip);
 		
 		modcharting.ModchartFuncs.loadHScriptFunctions(this);
+		#end
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
@@ -527,10 +526,12 @@ class HScript extends SScript
 		super.destroy();
 	}
 
+	#if MODCHARTS_ALLOWED
 	public function initMod(mod:modcharting.Modifier)
 	{
 		call("initMod", [mod]);
 	}
+	#end
 }
 
 class CustomFlxColor

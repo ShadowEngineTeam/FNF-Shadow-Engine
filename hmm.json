@@ -88,18 +88,18 @@
       "url": "https://github.com/FNF-SE/hxvlc"
     },
 	{
-	  "name": "flixel-animate",
-	  "type": "git",
-	  "dir": null,
-	  "ref": null,
-	  "url": "https://github.com/MaybeMaru/flixel-animate"
+      "name": "flixel-animate",
+      "type": "git",
+      "dir": null,
+      "ref": null,
+      "url": "https://github.com/MaybeMaru/flixel-animate"
 	},
 	{
-      "name": "funkin-modchart",
+      "name": "fnf-modcharting-tools",
       "type": "git",
       "dir": null,
       "ref": "dev",
-      "url": "https://github.com/theoo-h/FunkinModchart"
+      "url": "https://github.com/FNF-SE/FNF-Modcharting-Tools"
     }
   ]
 }

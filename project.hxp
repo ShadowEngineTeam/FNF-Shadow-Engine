@@ -233,13 +233,8 @@ class Project extends HXProject
 
 		if (MODCHARTS_ALLOWED.isEnabled())
 		{
-			setHaxedef('FM_ENGINE', 'Shadow');
-			setHaxedef('FM_ENGINE_VERSION', '0.7'); // SE based with PE 0.7.3
-
-			addMacroFlag('modchart.backend.macros.Macro.includeFiles()');
-			addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.buildFlxCamera())','flixel.FlxCamera')");
-			//addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.buildFlxDrawTrianglesItem())','flixel.graphics.tile.FlxDrawTrianglesItem')");
-			//addMacroFlag("addMetadata('@:build(modchart.backend.macros.Macro.addModchartStorage())','flixel.FlxBasic')");
+			setHaxedef('PSYCH', 'Shadow');
+			setHaxedef('PSYCHVERSION', '0.7.3'); // SE based with PE 0.7.3
 		}
 
 		if (isMobile() || isWeb())
@@ -276,9 +271,7 @@ class Project extends HXProject
 		includeHaxelib("flixel");
 		includeHaxelib("flixel-ui");
 		includeHaxelib("flixel-addons");
-		includeHaxelib("flixel-aniamte");
-
-		includeHaxelib("fnf-modcharting-tools");
+		includeHaxelib("flixel-animate");
 
 		if (LUA_ALLOWED.isEnabled())
 			includeHaxelib("hxluajit");
@@ -289,7 +282,7 @@ class Project extends HXProject
 		if (DISCORD_ALLOWED.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
 		if (MODCHARTS_ALLOWED.isEnabled())
-			includeHaxelib("funkin-modchart");
+			includeHaxelib("fnf-modcharting-tools");
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");
