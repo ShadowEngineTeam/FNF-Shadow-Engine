@@ -11,6 +11,7 @@ import openfl.utils.Assets;
 import openfl.system.System;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
+import animate.FlxAnimateFrames;
 
 class Paths
 {
@@ -141,7 +142,7 @@ class Paths
 		return if (library == "shared") getSharedPath(file); else getLibraryPathForce(file, library);
 	}
 
-	inline static function getLibraryPathForce(file:String, library:String, ?level:String)
+	static function getLibraryPathForce(file:String, library:String, ?level:String)
 	{
 		if (level == null)
 			level = library;
@@ -424,7 +425,7 @@ class Paths
 		return getPackerAtlas(key, library);
 	}
 
-	inline static public function getSparrowAtlas(key:String, ?library:String = null):FlxAtlasFrames
+	static public function getSparrowAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 		#if MODS_ALLOWED
@@ -440,7 +441,7 @@ class Paths
 		#end
 	}
 
-	inline static public function getPackerAtlas(key:String, ?library:String = null):FlxAtlasFrames
+	static public function getPackerAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 		#if MODS_ALLOWED
@@ -456,7 +457,7 @@ class Paths
 		#end
 	}
 
-	inline static public function getAsepriteAtlas(key:String, ?library:String = null):FlxAtlasFrames
+	static public function getAsepriteAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 		#if MODS_ALLOWED
@@ -472,7 +473,29 @@ class Paths
 		#end
 	}
 
-	inline static public function formatToSongPath(path:String)
+	public static function getTextureAtlas(key:String, ?library:String = null, ?settings:FlxAnimateSettings):FlxAnimateFrames
+	{
+		var animateFolder:String = getPath('images/$key', library);
+		#if MODS_ALLOWED
+		var mdosExists:Bool = false;
+
+		var modsAnimate:String = modsImages(key);
+		if (FileSystem.exists(modsAnimate))
+			mdosExists = true;
+
+		if (settings == null)
+			settings = {};
+
+		if (settings.filterQuality == null && ClientPrefs.data.lowQuality)
+			settings.filterQuality = FilterQuality.LOW;
+		
+		return FlxAnimateFrames.fromAnimate(mdosExists ? modsAnimate : animateFolder, settings);
+		#else
+		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
+		#end
+	}
+
+	static public function formatToSongPath(path:String)
 	{
 		var invalidChars = ~/[~&\\;:<>#]/;
 		var hideChars = ~/[.,'"%?!]/;

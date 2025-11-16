@@ -1,11 +1,10 @@
 - Switch SScript to RuleScript(?) [in a nutshell screw SScript]
 - Add hxfmod
-- Add flixel-animate
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Results Screen, Freeplay(?), Char Select(?) and Wide Screen Support
 - Add editor for Results Screen and Char Select(?)
 - Add Base Game Files
 - Add our UI for editors
 - Add multikey support(?)
-- Add FunkinModchart(?)
+- Make Modchart support better(?)
 - Add Scritable Classes (eg Class that is empty so modders can do shit with it)

@@ -102,6 +102,9 @@ class HScript extends SScript
 		set('PlayState', PlayState);
 		set('Paths', Paths);
 		set('CoolUtil', CoolUtil);
+		#if MODCHARTS_ALLOWED
+		set('ModchartManager', ModchartManager);
+		#end
 		set('StorageUtil', StorageUtil);
 		set('Conductor', Conductor);
 		set('ClientPrefs', ClientPrefs);
