@@ -1,11 +1,13 @@
 package objects;
 
 import backend.animation.PsychAnimationController;
+#if MODCHARTS_ALLOWED
 import flixel.addons.effects.FlxSkewedSprite;
+#end
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
-class StrumNote extends FlxSkewedSprite
+class StrumNote extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 {
 	public var rgbShader:RGBShaderReference;
 	public var resetAnim:Float = 0;
