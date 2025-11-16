@@ -1,13 +1,13 @@
 package backend;
 
 import flixel.FlxSubState;
-import flixel.addons.ui.FlxUIState;
+import modcharting.ModchartMusicBeatState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
 import backend.PsychCamera;
 import flixel.util.FlxSave;
 
-class MusicBeatState extends FlxUIState
+class MusicBeatState extends ModchartMusicBeatState
 {
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;

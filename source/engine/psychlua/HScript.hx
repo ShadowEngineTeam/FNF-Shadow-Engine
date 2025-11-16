@@ -119,6 +119,27 @@ class HScript extends SScript
 		set('VideoManager', backend.VideoManager);
 		#end
 
+		set('Math', Math);
+		set('ModchartEditorState', modcharting.ModchartEditorState);
+		set('ModchartEvent', modcharting.ModchartEvent);
+		set('ModchartEventManager', modcharting.ModchartEventManager);
+		set('ModchartFile', modcharting.ModchartFile);
+		set('ModchartFuncs', modcharting.ModchartFuncs);
+		set('ModchartMusicBeatState', modcharting.ModchartMusicBeatState);
+		set('ModchartUtil', modcharting.ModchartUtil);
+		for (i in ['mod', 'Modifier'])
+			set(i, modcharting.Modifier);
+		set('ModifierSubValue', modcharting.Modifier.ModifierSubValue);
+		set('ModTable', modcharting.ModTable);
+		set('NoteMovement', modcharting.NoteMovement);
+		set('NotePositionData', modcharting.NotePositionData);
+		set('Playfield', modcharting.Playfield);
+		set('PlayfieldRenderer', modcharting.PlayfieldRenderer);
+		set('SimpleQuaternion', modcharting.SimpleQuaternion);
+		set('SustainStrip', modcharting.SustainStrip);
+		
+		modcharting.ModchartFuncs.loadHScriptFunctions(this);
+
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
 		{
@@ -501,6 +522,11 @@ class HScript extends SScript
 		#if LUA_ALLOWED parentLua = null; #end
 
 		super.destroy();
+	}
+
+	public function initMod(mod:modcharting.Modifier)
+	{
+		call("initMod", [mod]);
 	}
 }
 

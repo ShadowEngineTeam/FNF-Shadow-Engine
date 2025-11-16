@@ -263,6 +263,8 @@ class Project extends HXProject
 		includeHaxelib("flixel-ui");
 		includeHaxelib("flixel-addons");
 
+		includeHaxelib("fnf-modcharting-tools");
+
 		if (LUA_ALLOWED.isEnabled())
 			includeHaxelib("hxluajit");
 		if (HSCRIPT_ALLOWED.isEnabled())

@@ -33,6 +33,9 @@ import substates.ResultsScreen;
 import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
+import modcharting.ModchartFuncs;
+import modcharting.NoteMovement;
+import modcharting.PlayfieldRenderer;
 
 /**
  * This is where all the Gameplay stuff happens and is managed
@@ -523,6 +526,10 @@ class PlayState extends MusicBeatState
 
 		generateSong(SONG.song);
 
+		playfieldRenderer = new PlayfieldRenderer(strumLineNotes, notes, this);
+		playfieldRenderer.cameras = [camHUD];
+		add(playfieldRenderer);
+
 		noteGroup.add(grpNoteSplashes);
 		noteGroup.add(grpHoldSplashes);
 
@@ -996,6 +1003,8 @@ class PlayState extends MusicBeatState
 				generateStaticArrows(1, SONG.opponentArrowSkin);
 				generateStaticArrows(0, SONG.playerArrowSkin);
 			}
+
+			NoteMovement.getDefaultStrumPos(this);
 
 			if (characterPlayingAsDad && !ClientPrefs.data.middleScroll)
 				for (i in 0...opponentStrums.members.length)
