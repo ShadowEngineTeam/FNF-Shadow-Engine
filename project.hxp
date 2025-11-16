@@ -233,7 +233,7 @@ class Project extends HXProject
 
 		if (MODCHARTS_ALLOWED.isEnabled())
 		{
-			setHaxedef('PSYCH', 'Shadow');
+			setHaxedef('PSYCH');
 			setHaxedef('PSYCHVERSION', '0.7.3'); // SE based with PE 0.7.3
 		}
 
