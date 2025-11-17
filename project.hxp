@@ -293,16 +293,38 @@ class Project extends HXProject
 
 	function configureIcons()
 	{
-		// SHADOW TODO: maybe?
-		/*if (isAndroid())
+		if (isAndroid())
 			adaptiveIcon = new AdaptiveIcon('icons/android/', true);
-		else*/
-		//{
-			final prefix:String = isIOS() ? "_noalpha" : "";
+		else if (isIOS())
+		{
+			final sizes = [
+				"20x20@1x" => 20,
+				//"20x20@2x" => 40, // also used by 40x40@1x
+				"20x20@3x" => 60,
+				"29x29@1x" => 29,
+				"29x29@2x" => 58,
+				"29x29@3x" => 87,
+				"40x40@1x" => 40,
+				"40x40@2x" => 80,
+				//"40x40@3x" => 120, // also used by 60x60@2x
+				"60x60@2x" => 120,
+				"60x60@3x" => 180,
+				"76x76@1x" => 76,
+				"76x76@2x" => 152,
+				"83.5x83.5@2x" => 167
+			];
+
+			for (path => px in sizes)
+        		addIcon('icons/ios/SE-Icon-Default-${path}.png', px);
+
+			addIcon("icons/legacy/iconOG_noalpha.png"); // lime requires default as well
+		}
+		else
+		{
 			for (size in [16, 32, 64])
-				addIcon('icons/icon${size}${prefix}.png', size);
-			addIcon('icons/iconOG${prefix}.png');
-		//}
+				addIcon('icons/desktop/icon${size}.png', size);
+			addIcon('icons/desktop/iconOG.png');
+		}
 	}
 
 	function includeHaxelib(name:String, version:String = ""):Void

@@ -1,0 +1,1 @@
+Android and iOS icons configured in [EasyAppIcon](https://easyappicon.com)
