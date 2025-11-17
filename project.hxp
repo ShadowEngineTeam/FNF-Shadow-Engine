@@ -312,12 +312,13 @@ class Project extends HXProject
 				"76x76@1x" => 76,
 				"76x76@2x" => 152,
 				"83.5x83.5@2x" => 167
+				"600x600" => 600
 			];
 
 			for (path => px in sizes)
         		addIcon('icons/ios/SE-Icon-Default-${path}.png', px);
 
-			addIcon("icons/legacy/iconOG_noalpha.png"); // lime requires default as well
+			addIcon("icons/ios/SE-Icon-Default-600x600.png"); // lime requires default as well
 		}
 		else
 		{
