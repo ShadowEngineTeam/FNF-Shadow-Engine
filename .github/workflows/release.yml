@@ -27,31 +27,31 @@ jobs:
             artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
           - name: Linux ARM64
-            os: ubuntu-22.04-arm
+            os: ubuntu-24.04-arm
             buildArgs: "linux -arm64 -final -D HXCPP_ARM64 -D officialBuild"
             assetType: ASTC
             artifactName: linuxBuild-arm64
             artifactPath: export/release/linux/bin/*
           - name: macOS x86_64
-            os: macos-15
+            os: macos-26
             buildArgs: "mac -final -64 -D HXCPP_M64 -D officialBuild"
             assetType: S3TC
             artifactName: macOSBuild-x86_64
             artifactPath: export/release/macos/bin/*
           - name: macOS ARM64
-            os: macos-15
+            os: macos-26
             buildArgs: "mac -final -arm64 -D HXCPP_ARM64 -D officialBuild"
             assetType: S3TC
             artifactName: macOSBuild-arm64
             artifactPath: export/release/macos/bin/*
           - name: Android
-            os: macos-15
+            os: macos-26
             buildArgs: "android -final -D officialBuild"
             assetType: ASTC
             artifactName: androidBuild
             artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
-            os: macos-15
+            os: macos-26
             buildArgs: "ios -eval -final -nosign -D officialBuild"
             assetType: ASTC
             artifactName: iOSBuild
