@@ -31,6 +31,8 @@ using StringTools;
 #include <psapi.h>
 #elif defined(__APPLE__) && defined(__MACH__)
 #include <mach/mach.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
 #include <sys/sysinfo.h>
 #endif
