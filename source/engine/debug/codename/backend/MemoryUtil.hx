@@ -22,10 +22,18 @@ using StringTools;
  *
  * DISCLAIMER: Hardware info is only available on Native platforms.
 **/
-#if (cpp && windows)
+#if cpp
 @:cppFileCode('
 #include <iostream>
+#include <cstdio>
+#if defined(_WIN32)
 #include <windows.h>
+#include <psapi.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+#include <mach/mach.h>
+#elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
+#include <sys/sysinfo.h>
+#endif
 ')
 #end
 final class MemoryUtil
@@ -77,6 +85,67 @@ final class MemoryUtil
 	#end
 	#end
 	public static function getTotalMem():Float
+	{
+		return 0;
+	}
+
+	/**
+	 * Gets the total swap/virtual memory of the system.
+	 * Output depends on the hardware.
+	**/
+	#if cpp
+	#if (linux || android)
+	@:functionCode('
+		FILE *meminfo = fopen("/proc/meminfo", "r");
+
+		if(meminfo == NULL)
+			return -1;
+
+		char line[256];
+		while(fgets(line, sizeof(line), meminfo))
+		{
+			int swap;
+			if(sscanf(line, "SwapTotal: %d kB", &swap) == 1)
+			{
+				fclose(meminfo);
+				return (swap / 1024); // in MB
+			}
+		}
+
+		fclose(meminfo);
+		return -1;
+	')
+	#elseif (mac || ios)
+	@:functionCode('
+		double totalSwap = 0;
+		FILE *fp = popen("sysctl -n vm.swapusage", "r");
+		if(fp)
+		{
+			char buffer[128];
+			if(fgets(buffer, sizeof(buffer), fp))
+			{
+				double total, used, free;
+				sscanf(buffer, "total = %lfM, used = %lfM, free = %lfM", &total, &used, &free);
+				totalSwap = total;
+			}
+			pclose(fp);
+		}
+		return totalSwap;
+	')
+	#elseif windows
+	@:functionCode('
+		PERFORMANCE_INFORMATION pi;
+		pi.cb = sizeof(pi);
+		if(GetPerformanceInfo(&pi, sizeof(pi)))
+		{
+			SIZE_T totalSwap = (pi.CommitLimit - pi.PhysicalTotal) * pi.PageSize;
+			return (double)totalSwap / (1024.0 * 1024.0); // MB
+		}
+		return 0;
+	')
+	#end
+	#end
+	public static function getTotalSwapMem():Float
 	{
 		return 0;
 	}

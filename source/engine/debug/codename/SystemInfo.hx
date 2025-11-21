@@ -33,6 +33,7 @@ class SystemInfo extends FramerateCategory
 	public static var vRAM:String = "Unknown";
 	public static var cpuName:String = "Unknown";
 	public static var totalMem:String = "Unknown";
+	public static var totalSwapMem:String = "Unknown";
 	public static var memType:String = "Unknown";
 	public static var gpuMaxSize:String = "Unknown";
 
@@ -179,6 +180,8 @@ class SystemInfo extends FramerateCategory
 		{
 			Log.error('Unable to grab RAM Type: $e');
 		}
+
+		totalSwapMem = Std.string(MemoryUtil.getTotalSwapMem() / 1024) + " GB";
 		formatSysInfo();
 	}
 
@@ -206,7 +209,7 @@ class SystemInfo extends FramerateCategory
 		}
 		// if (gpuMaxSize != "Unknown") __formattedSysText += '\nMax Bitmap Size: $gpuMaxSize';
 		if (totalMem != "Unknown" && memType != "Unknown")
-			__formattedSysText += '\nTotal MEM: $totalMem $memType';
+			__formattedSysText += '\nTotal MEM: $totalMem $memType ${totalSwapMem != "Unknown" ? '+ $totalSwapMem SWAP' : ""}';
 	}
 
 	static function getSizeString(size:Float):String
