@@ -1,5 +1,6 @@
 package debug.codename;
 
+import debug.codename.backend.MemoryUtil;
 import debug.codename.backend.RegisteryUtil;
 import lime.utils.Log;
 #if android
@@ -141,8 +142,8 @@ class SystemInfo extends FramerateCategory
 			Log.error('Unable to grab CPU Name: $e');
 		}
 		@:privateAccess
-		if (FlxG.renderTile)
-		{ // Blit doesn't enable the gpu. Idk if we should fix this
+		if (FlxG.renderTile) // Blit doesn't enable the gpu. Idk if we should fix this
+		{
 			if (flixel.FlxG.stage.context3D != null && flixel.FlxG.stage.context3D.gl != null)
 			{
 				gpuName = Std.string(flixel.FlxG.stage.context3D.gl.getParameter(flixel.FlxG.stage.context3D.gl.RENDERER)).split("/")[0].trim();
@@ -158,13 +159,25 @@ class SystemInfo extends FramerateCategory
 						Log.error('Unable to grab GPU VRAM');
 					else
 					{
-						var vRAMBytesFloat:#if cpp Float64 #else Float #end = vRAMBytes * 1024;
-						vRAM = CoolUtil.getSizeString64(vRAMBytesFloat);
+						vRAM = getSizeString(vRAMBytes / 1024);
 					}
 				}
 			}
 			else
 				Log.error('Unable to grab GPU Info');
+		}
+
+		#if cpp
+		totalMem = Std.string(MemoryUtil.getTotalMem() / 1024) + " GB";
+		#end
+
+		try
+		{
+			memType = MemoryUtil.getMemType();
+		}
+		catch (e)
+		{
+			Log.error('Unable to grab RAM Type: $e');
 		}
 		formatSysInfo();
 	}
@@ -196,6 +209,19 @@ class SystemInfo extends FramerateCategory
 			__formattedSysText += '\nTotal MEM: $totalMem $memType';
 	}
 
+	static function getSizeString(size:Float):String
+	{
+		if (size < 1024)
+			return Std.int(size) + " MB";
+		else if (size < 1024 * 1024)
+			return Std.int(size / 1024) + " GB";
+		else
+		{
+			var tb = size / (1024 * 1024);
+			return Std.int(tb) + "." + CoolUtil.addZeros(Std.string(Std.int((tb % 1) * 100)), 2) + " TB";
+		}
+	}
+
 	public function new()
 	{
 		super("System Info");
@@ -207,6 +233,9 @@ class SystemInfo extends FramerateCategory
 			return;
 
 		_text = __formattedSysText;
+		#if (cpp || hl)
+		//_text += '${__formattedSysText == "" ? "" : "\n"}Garbage Collector: ${MemoryUtil.disableCount ? "OFF" : "ON"} (${MemoryUtil.disableCount})';
+		#end
 
 		this.text.text = _text;
 		super.__enterFrame(t);

@@ -41,12 +41,23 @@ class MemoryCounter extends Sprite
 			return;
 		super.__enterFrame(t);
 
-		memory = external.memory.Memory.getCurrentUsage();
+		final mem = external.memory.Memory.getCurrentUsage();
+
+		if (mem == memory)
+		{
+			updateLabelPosition();
+			return;
+		}
+
+		memory = mem;
 		if (memoryPeak < memory)
 			memoryPeak = memory;
 		memoryText.text = CoolUtil.getSizeString(memory);
 		memoryPeakText.text = ' / ${CoolUtil.getSizeString(memoryPeak)}';
 
-		memoryPeakText.x = memoryText.x + memoryText.width;
+		updateLabelPosition();
 	}
+
+	private inline function updateLabelPosition():Void
+		memoryPeakText.x = memoryText.x + memoryText.width;
 }
