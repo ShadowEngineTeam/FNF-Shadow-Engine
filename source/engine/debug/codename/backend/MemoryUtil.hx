@@ -3,15 +3,6 @@ package debug.codename.backend;
 #if sys
 import sys.io.Process;
 #end
-#if cpp
-import cpp.vm.Gc;
-#elseif hl
-import hl.Gc;
-#elseif java
-import java.vm.Gc;
-#elseif neko
-import neko.vm.Gc;
-#end
 import openfl.system.System;
 
 using StringTools;
