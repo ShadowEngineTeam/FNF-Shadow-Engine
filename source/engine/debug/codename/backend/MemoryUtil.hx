@@ -59,18 +59,17 @@ final class MemoryUtil
 	')
 	#elseif (mac || ios)
 	@:functionCode('
-	int mib [] = { CTL_HW, HW_MEMSIZE };
-	int64_t value = 0;
-	size_t length = sizeof(value);
+		int mib [] = { CTL_HW, HW_MEMSIZE };
+		int64_t value = 0;
+		size_t length = sizeof(value);
 
-	if(-1 == sysctl(mib, 2, &value, &length, NULL, 0))
-		return -1; // An error occurred
+		if(-1 == sysctl(mib, 2, &value, &length, NULL, 0))
+			return -1;
 
-	return value / 1024 / 1024;
+		return value / 1024 / 1024;
 	')
 	#elseif windows
 	@:functionCode("
-		// simple but effective code
 		unsigned long long allocatedRAM = 0;
 		GetPhysicallyInstalledSystemMemory(&allocatedRAM);
 		return (allocatedRAM / 1024);
@@ -101,7 +100,7 @@ final class MemoryUtil
 			if(sscanf(line, "SwapTotal: %d kB", &swap) == 1)
 			{
 				fclose(meminfo);
-				return (swap / 1024); // in MB
+				return (swap / 1024);
 			}
 		}
 
@@ -110,20 +109,15 @@ final class MemoryUtil
 	')
 	#elseif (mac || ios)
 	@:functionCode('
-		double totalSwap = 0;
-		FILE *fp = popen("sysctl -n vm.swapusage", "r");
-		if(fp)
-		{
-			char buffer[128];
-			if(fgets(buffer, sizeof(buffer), fp))
-			{
-				double total, used, free;
-				sscanf(buffer, "total = %lfM, used = %lfM, free = %lfM", &total, &used, &free);
-				totalSwap = total;
-			}
-			pclose(fp);
+		struct xsw_usage swapInfo;
+		size_t size = sizeof(swapInfo);
+
+		if (sysctlbyname("vm.swapusage", &swapInfo, &size, nullptr, 0) != 0) {
+			perror("sysctlbyname");
+			return 1;
 		}
-		return totalSwap;
+
+		return swapInfo.xsu_total / 1024 / 1024;
 	')
 	#elseif windows
 	@:functionCode('
@@ -132,7 +126,7 @@ final class MemoryUtil
 		if(GetPerformanceInfo(&pi, sizeof(pi)))
 		{
 			SIZE_T totalSwap = (pi.CommitLimit - pi.PhysicalTotal) * pi.PageSize;
-			return (double)totalSwap / (1024.0 * 1024.0); // MB
+			return (double)totalSwap / (1024.0 * 1024.0);
 		}
 		return 0;
 	')
