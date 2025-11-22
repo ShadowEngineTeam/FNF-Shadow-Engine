@@ -24,6 +24,7 @@ For the lore of this engine see [ORIGIN.md](./ORIGIN.md).
 - Kade Engine Results Screen
 - PlayState has `changeNoteSkin` for easy in-game note skin changing
 - Modcharting Support (see [FNF-Modcharting-Tools](https://github.com/FNF-SE/FNF-Modcharting-Tools))
+- [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) to [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate)
 - Play as Opponent
 - Stripped to only have Test song and some characters
 - Kade Engine Note Timing (man I feel old), VSync and Pop Up Score Option
