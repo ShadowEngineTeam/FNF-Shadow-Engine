@@ -87,6 +87,14 @@ class Main extends Sprite
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 
+		#if android
+		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt"))
+		{
+			File.saveContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt", 'false');
+			Sys.setCwd(StorageUtil.getStorageDirectory());
+		}
+		#end
+
 		setupGame();
 	}
 

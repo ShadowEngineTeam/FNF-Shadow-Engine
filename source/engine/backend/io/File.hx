@@ -33,30 +33,36 @@ class File
 		return path;
 	}
 
-	public static function getContent(path:String):String
+	public static function getContent(path:String):Null<String>
 	{
 		#if MODS_ALLOWED
 		if (SysFileSystem.exists(cwd(path)))
 			return SysFile.getContent(cwd(path));
 		#end
 
-		return Assets.getText(openflcwd(path));
+		if (Assets.exists(openflcwd(path)))
+			return Assets.getText(openflcwd(path));
+
+		return null;
 	}
 
-	public static function getBytes(path:String):haxe.io.Bytes
+	public static function getBytes(path:String):Null<haxe.io.Bytes>
 	{
 		#if MODS_ALLOWED
 		if (SysFileSystem.exists(cwd(path)))
 			return SysFile.getBytes(cwd(path));
 		#end
 
-		switch (haxe.io.Path.extension(path).toLowerCase())
-		{
-			case 'otf' | 'ttf':
-				return openfl.utils.ByteArray.fromFile(openflcwd(path));
-			default:
-				return Assets.getBytes(openflcwd(path));
-		}
+		if (Assets.exists(openflcwd(path)))
+			switch (haxe.io.Path.extension(path).toLowerCase())
+			{
+				case 'otf' | 'ttf':
+					return openfl.utils.ByteArray.fromFile(openflcwd(path));
+				default:
+					return Assets.getBytes(openflcwd(path));
+			}
+
+		return null;
 	}
 
 	public static function saveContent(path:String, content:String):Void

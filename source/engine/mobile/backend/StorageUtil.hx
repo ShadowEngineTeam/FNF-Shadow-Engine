@@ -8,7 +8,22 @@ class StorageUtil
 {
 	#if sys
 	public static function getStorageDirectory():String
-		return #if android haxe.io.Path.addTrailingSlash(AndroidContext.getExternalFilesDir()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
+		return #if android haxe.io.Path.addTrailingSlash(getAndroidStorageDirectory()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
+
+	#if android
+	private static function getAndroidStorageDirectory():String
+	{
+		final useExternal:Bool = switch (File.getContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt").trim().toLowerCase())
+		{
+			case "true": true;
+			default: false;
+		}
+		if (useExternal)
+			return "/sdcard/.ShadowEngine"; // yes we hardcode woo
+		else
+			return AndroidContext.getExternalFilesDir();
+	}
+	#end
 
 	public static function saveContent(fileName:String, fileData:String, ?alert:Bool = true):Void
 	{

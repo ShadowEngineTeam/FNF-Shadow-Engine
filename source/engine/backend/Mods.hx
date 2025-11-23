@@ -248,7 +248,7 @@ class Mods
 			fileStr += values[0] + '|' + (values[1] ? '1' : '0');
 		}
 
-		File.saveContent('modsList.txt', fileStr);
+		File.saveContent(#if mobile Sys.getCwd() + #end 'modsList.txt', fileStr);
 		updatedOnState = true;
 		// trace('Saved modsList.txt');
 		#end
