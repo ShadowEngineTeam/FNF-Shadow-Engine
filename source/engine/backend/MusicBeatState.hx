@@ -341,12 +341,14 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 	override function openSubState(subState:FlxSubState)
 	{
+		controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
 	}
 
 	override function closeSubState()
 	{
+		controls.isInSubstate = false;
 		callOnScripts('onCloseSubState');
 		super.closeSubState();
 	}
@@ -371,6 +373,9 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 		updateCurStep();
 		updateBeat();
+
+		if (controls.isInSubstate)
+			controls.isInSubstate = false;
 
 		if (oldStep != curStep)
 		{

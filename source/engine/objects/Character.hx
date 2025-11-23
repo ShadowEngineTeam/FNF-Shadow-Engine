@@ -105,11 +105,7 @@ class Character extends FlxAnimate
 				var characterPath:String = 'characters/$curCharacter.json';
 
 				var path:String = Paths.getPath(characterPath, TEXT, null, true);
-				#if MODS_ALLOWED
 				if (!FileSystem.exists(path))
-				#else
-				if (!Assets.exists(path))
-				#end
 				{
 					path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER +
 						'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
@@ -119,11 +115,7 @@ class Character extends FlxAnimate
 
 				try
 				{
-					#if MODS_ALLOWED
 					loadCharacterFile(Json.parse(File.getContent(path), path));
-					#else
-					loadCharacterFile(Json.parse(Assets.getText(path), path));
-					#end
 				}
 				catch (e:Dynamic)
 				{

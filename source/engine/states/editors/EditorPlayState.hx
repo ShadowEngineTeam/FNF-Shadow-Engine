@@ -1176,11 +1176,7 @@ class EditorPlayState extends MusicBeatSubstate
 				'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 		}
 
-		#if MODS_ALLOWED
 		var rawJson = File.getContent(path);
-		#else
-		var rawJson = OpenFlAssets.getText(path);
-		#end
 		return cast Json.parse(rawJson, path);
 	}
 }

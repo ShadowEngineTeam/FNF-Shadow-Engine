@@ -480,11 +480,7 @@ class FunkinLua
 
 				luaTrace('startDialogue: Trying to load dialogue: ' + path);
 
-				#if MODS_ALLOWED
 				if (FileSystem.exists(path))
-				#else
-				if (Assets.exists(path))
-				#end
 				{
 					var shit:DialogueFile = DialogueBoxPsych.parseDialogue(path);
 					if (shit.dialogue.length > 0)
@@ -1739,10 +1735,10 @@ class FunkinLua
 
 		try
 		{
-			var isString:Bool = !#if MODS_ALLOWED FileSystem #else Assets #end.exists(scriptName);
+			var isString:Bool = !FileSystem.exists(scriptName);
 			var result:Dynamic = null;
 			if (!isString)
-				result = #if MODS_ALLOWED LuaL.dofile(lua, scriptName) #else LuaL.dostring(lua, Assets.getText(scriptName)) #end;
+				result = sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : LuaL.dostring(lua, File.getContent(scriptName));
 			else
 				result = LuaL.dostring(lua, scriptName);
 

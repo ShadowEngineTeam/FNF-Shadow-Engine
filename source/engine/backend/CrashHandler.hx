@@ -3,10 +3,6 @@ package backend;
 import openfl.events.UncaughtErrorEvent;
 import openfl.events.ErrorEvent;
 import openfl.errors.Error;
-#if sys
-import sys.FileSystem;
-import sys.io.File;
-#end
 
 using StringTools;
 using flixel.util.FlxArrayUtil;

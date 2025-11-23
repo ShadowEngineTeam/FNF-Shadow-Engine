@@ -412,7 +412,7 @@ class PlayState extends MusicBeatState
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'scripts/'))
 		{
-			for (file in Paths.readDirectory(folder))
+			for (file in FileSystem.readDirectory(folder))
 			{
 				#if LUA_ALLOWED
 				if (file.toLowerCase().endsWith('.lua'))
@@ -421,7 +421,7 @@ class PlayState extends MusicBeatState
 
 				#if HSCRIPT_ALLOWED
 				if (file.toLowerCase().endsWith('.hx'))
-					FunkinLua.getCurrentMusicState().initHScript(#if MODS_ALLOWED folder + file #else Assets.getText(folder + file) #end);
+					FunkinLua.getCurrentMusicState().initHScript(folder + file);
 				#end
 			}
 		}
@@ -627,7 +627,7 @@ class PlayState extends MusicBeatState
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/'))
 		{
-			for (file in Paths.readDirectory(folder))
+			for (file in FileSystem.readDirectory(folder))
 			{
 				#if LUA_ALLOWED
 				if (file.toLowerCase().endsWith('.lua'))
@@ -636,7 +636,7 @@ class PlayState extends MusicBeatState
 
 				#if HSCRIPT_ALLOWED
 				if (file.toLowerCase().endsWith('.hx'))
-					FunkinLua.getCurrentMusicState().initHScript(#if MODS_ALLOWED folder + file #else Assets.getText(folder + file) #end);
+					FunkinLua.getCurrentMusicState().initHScript(folder + file);
 				#end
 			}
 		}
@@ -837,7 +837,7 @@ class PlayState extends MusicBeatState
 		#end
 		{
 			scriptFile = Paths.getSharedPath(scriptFile);
-			if (#if MODS_ALLOWED FileSystem.exists(scriptFile) #else Assets.exists(scriptFile) #end)
+			if (FileSystem.exists(scriptFile))
 				doPush = true;
 		}
 
@@ -871,7 +871,7 @@ class PlayState extends MusicBeatState
 		var video:VideoManager = new VideoManager();
 		inCutscene = true;
 
-		if (#if MODS_ALLOWED !FileSystem.exists(filepath) #else !Assets.exists(filepath) #end)
+		if (!FileSystem.exists(filepath))
 		{
 			FlxG.log.warn('Couldnt find video file: ' + name);
 			startAndEnd();

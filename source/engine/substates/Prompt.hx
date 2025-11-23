@@ -51,7 +51,6 @@ class Prompt extends MusicBeatSubstate
 				okc();
 			FunkinLua.getCurrentMusicState().callOnScripts('onOK');
 			close();
-			controls.isInSubstate = false;
 		});
 		buttonNo = new FlxButton(633.3, 450, op2, function()
 		{
@@ -59,9 +58,7 @@ class Prompt extends MusicBeatSubstate
 				cancelc();
 			FunkinLua.getCurrentMusicState().callOnScripts('onNO');
 			close();
-			controls.isInSubstate = false;
 		});
-		controls.isInSubstate = true;
 		super();
 	}
 

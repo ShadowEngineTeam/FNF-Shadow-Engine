@@ -54,7 +54,7 @@ class Mods
 		var modsFolder:String = Paths.mods();
 		if (FileSystem.exists(modsFolder))
 		{
-			for (folder in Paths.readDirectory(modsFolder))
+			for (folder in FileSystem.readDirectory(modsFolder))
 			{
 				var path = haxe.io.Path.join([modsFolder, folder]);
 				if (FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder.toLowerCase()) && !list.contains(folder))
@@ -102,7 +102,6 @@ class Mods
 	{
 		var foldersToCheck:Array<String> = [];
 
-		#if MODS_ALLOWED
 		if (FileSystem.exists(path + fileToFind))
 			foldersToCheck.push(path + fileToFind);
 
@@ -113,6 +112,7 @@ class Mods
 				foldersToCheck.push(pth);
 		}
 
+		#if MODS_ALLOWED
 		if (mods)
 		{
 			// Global mods first
@@ -136,17 +136,6 @@ class Mods
 					foldersToCheck.push(folder);
 			}
 		}
-		#else
-		if (fileToFind.indexOf(path) == 0)
-			fileToFind = fileToFind.substr(path.length);
-
-		foldersToCheck.push(path + fileToFind);
-
-		/*if(Paths.currentLevel != null && Paths.currentLevel != path)
-			{
-				var pth:String = Paths.getFolderPath(fileToFind, Paths.currentLevel);
-				foldersToCheck.push(pth);
-		}*/
 		#end
 		return foldersToCheck;
 	}
@@ -162,11 +151,7 @@ class Mods
 		{
 			try
 			{
-				#if MODS_ALLOWED
 				var rawJson:String = File.getContent(path);
-				#else
-				var rawJson:String = Assets.getText(path);
-				#end
 				if (rawJson != null && rawJson.length > 0)
 					return Json.parse(rawJson, path);
 			}
@@ -190,7 +175,7 @@ class Mods
 		#if MODS_ALLOWED
 		try
 		{
-			for (mod in CoolUtil.coolTextFile(#if mobiile Sys.getCwd() + #end 'modsList.txt'))
+			for (mod in CoolUtil.coolTextFile(#if mobile Sys.getCwd() + #end 'modsList.txt'))
 			{
 				// trace('Mod: $mod');
 				if (mod.trim().length < 1)
