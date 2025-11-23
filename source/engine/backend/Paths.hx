@@ -226,9 +226,9 @@ class Paths
 		return voices;
 	}
 
-	inline static public function inst(song:String):Sound
+	inline static public function inst(song:String, postfix:String = null):Sound
 	{
-		var songKey:String = 'songs/${formatToSongPath(song)}/Inst${LOADOLD ? "-Old" : ""}';
+		var songKey:String = 'songs/${formatToSongPath(song)}/Inst${postfix != null ? '-$postfix' : ''}${LOADOLD ? "-Old" : ""}';
 		var inst = returnSound(null, songKey);
 		return inst;
 	}

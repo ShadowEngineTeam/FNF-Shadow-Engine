@@ -13,7 +13,7 @@
 	"storyName": "",
 	"weekBefore": "tutorial",
 	"weekName": "Test",
-	"difficulties": "Normal",
+	"difficulties": "Normal, Erect, Nightmare",
 	"startUnlocked": true,
 
 	"hideStoryMode": false,
