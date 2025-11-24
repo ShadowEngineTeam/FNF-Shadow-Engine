@@ -499,7 +499,7 @@ class MusicBeatSubstate extends FlxSubState
 		if (FileSystem.exists(luaToLoad))
 		#else
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaToLoad))
+		if (openfl.Assets.exists(luaToLoad))
 		#end
 		{
 			for (script in luaArray)

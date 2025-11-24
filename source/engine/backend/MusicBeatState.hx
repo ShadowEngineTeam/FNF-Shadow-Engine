@@ -615,7 +615,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 		if (FileSystem.exists(luaToLoad))
 		#else
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaToLoad))
+		if (openfl.Assets.exists(luaToLoad))
 		#end
 		{
 			for (script in luaArray)
