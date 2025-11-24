@@ -96,15 +96,12 @@ class WeekData
 	{
 		weeksList = [];
 		weeksLoaded.clear();
-		#if MODS_ALLOWED
-		var directories:Array<String> = [Paths.mods(), Paths.getSharedPath()];
+		var directories:Array<String> = [#if MODS_ALLOWED Paths.mods(), #end Paths.getSharedPath()];
 		var originalLength:Int = directories.length;
 
+		#if MODS_ALLOWED
 		for (mod in Mods.parseList().enabled)
 			directories.push(Paths.mods(mod + '/'));
-		#else
-		var directories:Array<String> = [Paths.getSharedPath()];
-		var originalLength:Int = directories.length;
 		#end
 
 		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getSharedPath('weeks/weekList.txt'));
@@ -140,7 +137,6 @@ class WeekData
 			}
 		}
 
-		#if MODS_ALLOWED
 		for (i in 0...directories.length)
 		{
 			var directory:String = directories[i] + 'weeks/';
@@ -156,7 +152,7 @@ class WeekData
 					}
 				}
 
-				for (file in Paths.readDirectory(directory))
+				for (file in FileSystem.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -166,7 +162,6 @@ class WeekData
 				}
 			}
 		}
-		#end
 	}
 	
 	private static function isValidWeekJson(data:Dynamic):Bool
@@ -216,17 +211,10 @@ class WeekData
 	private static function getWeekFile(path:String):WeekFile
 	{
 		var rawJson:String = null;
-		#if MODS_ALLOWED
 		if (FileSystem.exists(path))
 		{
 			rawJson = File.getContent(path);
 		}
-		#else
-		if (OpenFlAssets.exists(path))
-		{
-			rawJson = OpenFlAssets.getText(path);
-		}
-		#end
 
 		if (rawJson != null && rawJson.length > 0)
 		{

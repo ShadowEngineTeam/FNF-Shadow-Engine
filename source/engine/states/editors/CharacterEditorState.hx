@@ -492,11 +492,7 @@ class CharacterEditorState extends MusicBeatState
 
 			var characterPath:String = 'characters/$intended.json';
 			var path:String = Paths.getPath(characterPath, TEXT, null, true);
-			#if MODS_ALLOWED
 			if (FileSystem.exists(path))
-			#else
-			if (Assets.exists(path))
-			#end
 			{
 				_char = intended;
 				check_player.checked = character.isPlayer;
@@ -1366,7 +1362,6 @@ class CharacterEditorState extends MusicBeatState
 	function reloadCharacterDropDown()
 	{
 		characterList = Mods.mergeAllTextsNamed('data/characterList.txt', Paths.getSharedPath());
-		#if MODS_ALLOWED
 		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'characters/');
 		for (folder in foldersToCheck)
 			for (file in FileSystem.readDirectory(folder))
@@ -1376,7 +1371,6 @@ class CharacterEditorState extends MusicBeatState
 					if (!characterList.contains(charToCheck))
 						characterList.push(charToCheck);
 				}
-		#end
 		if (characterList.length < 1)
 			characterList.push('');
 		charDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(characterList, true));

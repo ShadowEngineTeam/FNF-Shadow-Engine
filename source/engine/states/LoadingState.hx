@@ -297,7 +297,7 @@ class LoadingState extends MusicBeatState
 			if (folder.trim().endsWith('/'))
 			{
 				for (subfolder in Mods.directoriesWithFile(Paths.getSharedPath(), '$prefix/$folder'))
-					for (file in Paths.readDirectory(subfolder))
+					for (file in FileSystem.readDirectory(subfolder))
 						if (file.endsWith(ext))
 							arr.push(folder + file.substr(0, file.length - ext.length));
 
@@ -467,11 +467,7 @@ class LoadingState extends MusicBeatState
 		try
 		{
 			var path:String = Paths.getPath('characters/$char.json', TEXT, null, true);
-			#if MODS_ALLOWED
 			var character:Dynamic = Json.parse(File.getContent(path), path);
-			#else
-			var character:Dynamic = Json.parse(Assets.getText(path), path);
-			#end
 
 			imagesToPrepare.push(character.image);
 			if (prefixVocals != null && character.vocals_file != null)

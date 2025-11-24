@@ -40,6 +40,13 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 		#end
 
+		#if android
+		option = new Option('Use EXTERNAL Folder',
+			'If checked, the game will use the .ShadowEngine folder for the mods folder.', 'useExternalStorage', 'bool');
+		option.onChange = onChangeStorageDir;
+		addOption(option);
+		#end
+
 		if (MobileData.mode == 3)
 		{
 			option = new Option('Hitbox Design', 'Choose how your hitbox should look like.', 'hitboxType', 'string', hintOptions);
@@ -57,4 +64,12 @@ class MobileOptionsSubState extends BaseOptionsMenu
 
 		super();
 	}
+
+	#if android
+	private function onChangeStorageDir():Void
+	{
+		File.saveContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt", '${ClientPrefs.data.useExternalStorage}');
+		Sys.setCwd(StorageUtil.getStorageDirectory());
+	}
+	#end
 }

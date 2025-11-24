@@ -87,6 +87,14 @@ class Main extends Sprite
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		}
 
+		#if android
+		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt"))
+		{
+			File.saveContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt", 'false');
+			Sys.setCwd(StorageUtil.getStorageDirectory());
+		}
+		#end
+
 		setupGame();
 	}
 
@@ -98,9 +106,8 @@ class Main extends Sprite
 		Controls.instance = new Controls();
 		ClientPrefs.loadDefaultKeys();
 
-		final funkinGame:FlxGame = new FlxGame(game.width, game.height,
-			#if (mobile && MODS_ALLOWED) !mobile.states.CopyState.checkExistingFiles() ? mobile.states.CopyState : #end game.initialState,
-			#if (flixel < "5.0.0") game.zoom, #end game.framerate, game.framerate, game.skipSplash, game.startFullscreen);
+		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate,
+			game.framerate, game.skipSplash, game.startFullscreen);
 
 		@:privateAccess
 		{
