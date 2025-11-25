@@ -508,12 +508,16 @@ class FunkinLua
 			}
 				return false;
 			});
-			set("startVideo", function(videoFile:String)
-			{
+			set("startVideo", function(videoFile:String, ?canSkip:Bool = true, ?forMidSong:Bool = false, ?shouldLoop:Bool = false, ?playOnLoad:Bool = true) {
 				#if VIDEOS_ALLOWED
-				if (FileSystem.exists(Paths.video(videoFile)))
+				if(FileSystem.exists(Paths.video(videoFile)))
 				{
-					cast(game, PlayState).startVideo(videoFile);
+					if(cast(game, PlayState).videoCutscene != null)
+					{
+						cast(game, PlayState).remove(cast(game, PlayState).videoCutscene);
+						cast(game, PlayState).videoCutscene.destroy();
+					}
+					cast(game, PlayState).videoCutscene = cast(game, PlayState).startVideo(videoFile, forMidSong, canSkip, shouldLoop, playOnLoad);
 					return true;
 				}
 				else
@@ -521,15 +525,17 @@ class FunkinLua
 					luaTrace('startVideo: Video file not found: ' + videoFile, false, false, FlxColor.RED);
 				}
 				return false;
+
 				#else
-				if (cast(game, PlayState).endingSong)
+				PlayState.instance.inCutscene = true;
+				new FlxTimer().start(0.1, function(tmr:FlxTimer)
 				{
-					cast(game, PlayState).endSong();
-				}
-				else
-				{
-					cast(game, PlayState).startCountdown();
-				}
+					PlayState.instance.inCutscene = false;
+					if(cast(game, PlayState).endingSong)
+						cast(game, PlayState).endSong();
+					else
+						cast(game, PlayState).startCountdown();
+				});
 				return true;
 				#end
 			});

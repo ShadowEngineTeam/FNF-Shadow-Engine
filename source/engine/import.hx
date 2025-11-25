@@ -17,10 +17,6 @@ import psychlua.HScript;
 #if HSCRIPT_ALLOWED
 import tea.SScript;
 #end
-#if VIDEOS_ALLOWED
-import backend.VideoManager;
-import backend.VideoSpriteManager;
-#end
 // Mobile Controls
 import mobile.objects.MobileControls;
 import mobile.objects.IMobileControls;

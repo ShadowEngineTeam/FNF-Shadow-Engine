@@ -17,6 +17,9 @@ class Paths
 {
 	public static var IMAGE_EXT:String = "png";
 	public static var GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif ETC2 "ktx" #elseif S3TC "dds" #else IMAGE_EXT #end;
+	#if VIDEOS_ALLOWED
+	public static var VIDEO_EXT = "mp4";
+	#end
 	public static var LOADOLD:Bool = false;
 
 	public static function excludeAsset(key:String)
@@ -198,7 +201,7 @@ class Paths
 			return file;
 		}
 		#end
-		return 'assets/videos/$key.mp4';
+		return 'assets/videos/$key.$VIDEO_EXT';
 	}
 	#end
 
@@ -548,10 +551,12 @@ class Paths
 		return modFolders('data/' + key + '.json');
 	}
 
+	#if VIDEOS_ALLOWED
 	inline static public function modsVideo(key:String)
 	{
-		return modFolders('videos/' + key + '.mp4');
+		return modFolders('videos/' + key + '.' + VIDEO_EXT);
 	}
+	#end
 
 	inline static public function modsSounds(path:String, key:String)
 	{
