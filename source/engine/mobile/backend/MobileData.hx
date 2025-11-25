@@ -101,15 +101,14 @@ class MobileData
 		folder = folder.contains(':') ? folder.split(':')[1] : folder;
 
 		#if MODS_ALLOWED if (FileSystem.exists(folder)) #end
-		for (file in Paths.readDirectory(folder))
+		for (file in FileSystem.readDirectory(folder))
 		{
-			var fileWithNoLib:String = file.contains(':') ? file.split(':')[1] : file;
-			if (Path.extension(fileWithNoLib) == 'json')
+			if (Path.extension(file) == 'json')
 			{
 				file = Path.join([folder, Path.withoutDirectory(file)]);
 				var str = #if MODS_ALLOWED File.getContent(file) #else Assets.getText(file) #end;
 				var json:TouchButtonsData = cast Json.parse(str, file);
-				var mapKey:String = Path.withoutDirectory(Path.withoutExtension(fileWithNoLib));
+				var mapKey:String = Path.withoutDirectory(Path.withoutExtension(file));
 				map.set(mapKey, json);
 			}
 		}

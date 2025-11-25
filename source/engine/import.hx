@@ -42,12 +42,6 @@ import android.os.Build.VERSION as AndroidVersion;
 import android.os.Build.VERSION_CODES as AndroidVersionCode;
 //import android.os.BatteryManager as AndroidBatteryManager;
 #end
-#if sys
-import sys.*;
-import sys.io.*;
-#elseif js
-import js.html.*;
-#end
 import backend.Paths;
 import backend.Controls;
 import backend.CoolUtil;
@@ -58,6 +52,7 @@ import backend.ClientPrefs;
 import backend.Conductor;
 import backend.BaseStage;
 import backend.Difficulty;
+import backend.io.*;
 import backend.Mods;
 import mobile.backend.StorageUtil;
 import objects.Alphabet;
@@ -80,6 +75,10 @@ import flixel.tweens.FlxTween;
 import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.system.FlxAssets.FlxShader;
+
+// flixel-animte (texture atlas)
+import animate.FlxAnimate;
+
 import haxe.Json;
 
 using StringTools;

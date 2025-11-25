@@ -255,6 +255,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	override function destroy()
 	{
+		controls.isInSubstate = false;
 		removeTouchPad();
 		removeLuaTouchPad();
 		removeMobileControls();
@@ -282,7 +283,6 @@ class MusicBeatSubstate extends FlxSubState
 		#end
 
 		super.destroy();
-		controls.isInSubstate = false;
 	}
 
 	public function new()
@@ -322,6 +322,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	override function openSubState(subState:FlxSubState)
 	{
+		controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
 	}
@@ -341,6 +342,9 @@ class MusicBeatSubstate extends FlxSubState
 
 		updateCurStep();
 		updateBeat();
+
+		if (!controls.isInSubstate)
+			controls.isInSubstate = true;
 
 		if (oldStep != curStep)
 		{
@@ -495,7 +499,7 @@ class MusicBeatSubstate extends FlxSubState
 		if (FileSystem.exists(luaToLoad))
 		#else
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaToLoad))
+		if (openfl.Assets.exists(luaToLoad))
 		#end
 		{
 			for (script in luaArray)

@@ -458,11 +458,7 @@ class ChartingState extends MusicBeatState
 		{
 			var songName:String = Paths.formatToSongPath(_song.song);
 			var file:String = Paths.json(songName + '/events');
-			#if sys
 			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
-			#else
-			if (openfl.Assets.exists(file))
-			#end
 			{
 				clearEvents();
 				var events:SwagSong = Song.loadFromJson('events', songName);
@@ -526,13 +522,12 @@ class ChartingState extends MusicBeatState
 				tempArray.push(character);
 		}
 
-		#if MODS_ALLOWED
 		for (i in 0...directories.length)
 		{
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in Paths.readDirectory(directory))
+				for (file in FileSystem.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -547,7 +542,6 @@ class ChartingState extends MusicBeatState
 				}
 			}
 		}
-		#end
 		tempArray = [];
 
 		var player1DropDown = new FlxUIDropDownMenu(10, stepperSpeed.y + 45, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true),
@@ -602,13 +596,12 @@ class ChartingState extends MusicBeatState
 			}
 			tempArray.push(stage);
 		}
-		#if MODS_ALLOWED
 		for (i in 0...directories.length)
 		{
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in Paths.readDirectory(directory))
+				for (file in FileSystem.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -623,7 +616,6 @@ class ChartingState extends MusicBeatState
 				}
 			}
 		}
-		#end
 
 		if (stages.length < 1)
 			stages.push('stage');
@@ -975,7 +967,7 @@ class ChartingState extends MusicBeatState
 		#if sys
 		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'custom_notetypes/');
 		for (folder in foldersToCheck)
-			for (file in Paths.readDirectory(folder))
+			for (file in FileSystem.readDirectory(folder))
 			{
 				var fileName:String = file.toLowerCase().trim();
 				var wordLen:Int = 4; // length of word ".lua" and ".txt";
@@ -1045,7 +1037,7 @@ class ChartingState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in Paths.readDirectory(directory))
+				for (file in FileSystem.readDirectory(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith('.txt'))
@@ -2991,11 +2983,7 @@ class ChartingState extends MusicBeatState
 			characterFailed = true;
 		}
 
-		#if MODS_ALLOWED
 		var rawJson = File.getContent(path);
-		#else
-		var rawJson = openfl.Assets.getText(path);
-		#end
 		return cast Json.parse(rawJson, path);
 	}
 

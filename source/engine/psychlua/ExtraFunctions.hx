@@ -260,7 +260,7 @@ class ExtraFunctions
 			var list:Array<String> = [];
 			if (FileSystem.exists(folder))
 			{
-				for (folder in Paths.readDirectory(folder))
+				for (folder in FileSystem.readDirectory(folder))
 				{
 					if (!list.contains(folder))
 					{

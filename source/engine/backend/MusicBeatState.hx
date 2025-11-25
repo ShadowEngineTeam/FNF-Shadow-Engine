@@ -341,12 +341,14 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 	override function openSubState(subState:FlxSubState)
 	{
+		controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
 	}
 
 	override function closeSubState()
 	{
+		controls.isInSubstate = false;
 		callOnScripts('onCloseSubState');
 		super.closeSubState();
 	}
@@ -371,6 +373,9 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 		updateCurStep();
 		updateBeat();
+
+		if (controls.isInSubstate)
+			controls.isInSubstate = false;
 
 		if (oldStep != curStep)
 		{
@@ -610,7 +615,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 		if (FileSystem.exists(luaToLoad))
 		#else
 		var luaToLoad:String = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaToLoad))
+		if (openfl.Assets.exists(luaToLoad))
 		#end
 		{
 			for (script in luaArray)

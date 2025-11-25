@@ -16,6 +16,9 @@ import states.TitleState;
 	#if mobile
 	public var screensaver:Bool = false;
 	#end
+	#if android
+	public var useExternalStorage:Bool = false;
+	#end
 	public var hitboxType:String = "Gradient";
 	public var gameOverVibration:Bool = false;
 

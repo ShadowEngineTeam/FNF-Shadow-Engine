@@ -1,6 +1,5 @@
 package objects;
 
-import backend.animation.PsychAnimationController;
 #if MODCHARTS_ALLOWED
 import flixel.addons.effects.FlxSkewedSprite;
 #end
@@ -36,8 +35,6 @@ class StrumNote extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #e
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
 	{
-		animation = new PsychAnimationController(this);
-
 		rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
 		rgbShader.enabled = false;
 		if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)

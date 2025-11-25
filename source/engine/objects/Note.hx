@@ -1,6 +1,5 @@
 package objects;
 
-import backend.animation.PsychAnimationController;
 import backend.NoteTypesConfig;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
@@ -224,8 +223,6 @@ class Note extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
 	{
 		super();
-
-		animation = new PsychAnimationController(this);
 
 		antialiasing = ClientPrefs.data.antialiasing;
 		if (createdFrom == null)
