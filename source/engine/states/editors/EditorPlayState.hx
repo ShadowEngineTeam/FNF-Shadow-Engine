@@ -353,10 +353,10 @@ class EditorPlayState extends MusicBeatSubstate
 		{
 			if (songData.needsVoices)
 			{
-				var playerVocals = Paths.voices(songData.song, (boyfriendVocals == null || boyfriendVocals.length < 1) ? 'Player' : boyfriendVocals);
-				vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song));
+				var playerVocals = Paths.voices(songData.song, (boyfriendVocals == null || boyfriendVocals.length < 1) ? 'Player' : boyfriendVocals + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
+				vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)));
 
-				var oppVocals = Paths.voices(songData.song, (dadVocals == null || dadVocals.length < 1) ? 'Opponent' : dadVocals);
+				var oppVocals = Paths.voices(songData.song, (dadVocals == null || dadVocals.length < 1) ? 'Opponent' : dadVocals + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
 				if (oppVocals != null)
 					opponentVocals.loadEmbedded(oppVocals);
 			}
@@ -375,7 +375,7 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
 
-		inst = new FlxSound().loadEmbedded(Paths.inst(songData.song));
+		inst = new FlxSound().loadEmbedded(Paths.inst(songData.song, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)));
 		FlxG.sound.list.add(inst);
 		FlxG.sound.music.volume = 0;
 

@@ -350,30 +350,45 @@ class StoryMenuState extends MusicBeatState
 			curDifficulty = 0;
 
 		FunkinLua.getCurrentMusicState().callOnScripts('onChangeDifficulty');
-
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
 		var diff:String = Difficulty.getString(curDifficulty);
-		var newImage:FlxGraphic = Paths.image('menudifficulties/' + Paths.formatToSongPath(diff));
-		//trace(Mods.currentModDirectory + ', menudifficulties/' + Paths.formatToSongPath(diff));
+		var diffPath:String = 'menudifficulties/' + Paths.formatToSongPath(diff);
+		var spriteSheetExists:Bool = Paths.fileExists('images/menudifficulties/$diff.xml', TEXT);
 
-		if (sprDifficulty.graphic != newImage)
+		if (spriteSheetExists)
 		{
-			sprDifficulty.loadGraphic(newImage);
-			sprDifficulty.x = leftArrow.x + 60;
-			sprDifficulty.x += (308 - sprDifficulty.width) / 3;
-			sprDifficulty.alpha = 0;
-			sprDifficulty.y = leftArrow.y - 15;
-
-			if (tweenDifficulty != null)
-				tweenDifficulty.cancel();
-			tweenDifficulty = FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07, {
-				onComplete: function(twn:FlxTween)
-				{
-					tweenDifficulty = null;
-				}
-			});
+			sprDifficulty.frames = Paths.getSparrowAtlas('menudifficulties/$diff');
+			sprDifficulty.animation.addByPrefix('idle', 'idle', 24, true);
+			sprDifficulty.animation.play('idle');
 		}
+		else
+		{
+			sprDifficulty.loadGraphic(Paths.image(diffPath));
+		}
+
+		var baseX:Float = leftArrow.x + (spriteSheetExists ? 50 : 60);
+		var centerOffset:Float = (310 - sprDifficulty.width) * 0.33;
+		sprDifficulty.x = baseX + centerOffset;
+
+		var startY:Float = leftArrow.y - 15;
+		var endY:Float = leftArrow.y + (spriteSheetExists ? 5 : 15);
+
+		sprDifficulty.alpha = 0;
+		sprDifficulty.y = startY;
+		sprDifficulty.updateHitbox();
+
+		if (tweenDifficulty != null)
+			tweenDifficulty.cancel();
+
+		tweenDifficulty = FlxTween.tween(sprDifficulty, {y: endY, alpha: 1}, 0.10, {
+			ease: FlxEase.quadOut,
+			onComplete: function(twn:FlxTween)
+			{
+				tweenDifficulty = null;
+			}
+		});
+
 		lastDifficultyName = diff;
 
 		#if !switch
@@ -436,7 +451,7 @@ class StoryMenuState extends MusicBeatState
 			curDifficulty = 0;
 
 		var newPos:Int = Difficulty.list.indexOf(lastDifficultyName);
-		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
+		// trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
 		if (newPos > -1)
 		{
 			curDifficulty = newPos;
