@@ -363,7 +363,7 @@ class FreeplayState extends MusicBeatState
 						vocals = null;
 					}*/
 
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, (Difficulty.getString(curDifficulty).toLowerCase() == "erect" || Difficulty.getString(curDifficulty).toLowerCase() == "nightmare" ? "Erect" : null)), 0.8);
+					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, Difficulty.getSongPrefix(curDifficulty, false)), 0.8);
 					/*if (vocals != null) // Sync vocals to Inst
 					{
 						vocals.play();

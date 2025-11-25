@@ -66,6 +66,18 @@ class Difficulty
 		return list[num == null ? PlayState.storyDifficulty : num];
 	}
 
+	inline public static function getSongPrefix(num:Null<Int> = null, ?includeDash:Bool = true):Null<String>
+	{
+		final idx:Int = num ?? PlayState.storyDifficulty;
+		final raw:String = list[idx];
+		final dash:String = includeDash ? "-" : "";
+
+		if (raw.toLowerCase() == "erect" || raw.toLowerCase() == "nightmare")
+			return dash + "Erect";
+
+		return null;
+	}
+
 	inline public static function getDefault():String
 	{
 		return defaultDifficulty;

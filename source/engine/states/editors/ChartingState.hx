@@ -1517,8 +1517,8 @@ class ChartingState extends MusicBeatState
 		try
 		{
 			var playerVocals = Paths.voices(currentSongName,
-				(characterData.vocalsP1 == null || characterData.vocalsP1.length < 1) ? 'Player' : characterData.vocalsP1 + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
-			vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(currentSongName, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)));
+				(characterData.vocalsP1 == null || characterData.vocalsP1.length < 1) ? 'Player' : characterData.vocalsP1 + Difficulty.getSongPrefix());
+			vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
 		}
 		vocals.autoDestroy = false;
 		FlxG.sound.list.add(vocals);
@@ -1527,7 +1527,7 @@ class ChartingState extends MusicBeatState
 		try
 		{
 			var oppVocals = Paths.voices(currentSongName,
-				(characterData.vocalsP2 == null || characterData.vocalsP2.length < 1) ? 'Opponent' : characterData.vocalsP2 + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
+				(characterData.vocalsP2 == null || characterData.vocalsP2.length < 1) ? 'Opponent' : characterData.vocalsP2 + Difficulty.getSongPrefix());
 			if (oppVocals != null)
 				opponentVocals.loadEmbedded(oppVocals);
 		}
@@ -1600,7 +1600,7 @@ class ChartingState extends MusicBeatState
 
 	function generateSong()
 	{
-		FlxG.sound.playMusic(Paths.inst(currentSongName, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)), 0.6 /*, false*/);
+		FlxG.sound.playMusic(Paths.inst(currentSongName, Difficulty.getSongPrefix(null, false)), 0.6 /*, false*/);
 		FlxG.sound.music.autoDestroy = false;
 		if (instVolume != null)
 			FlxG.sound.music.volume = instVolume.value;

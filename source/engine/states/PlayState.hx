@@ -1375,14 +1375,14 @@ class PlayState extends MusicBeatState
 		{
 			if (songData.needsVoices)
 			{
-				var playerVocals = Paths.voices(curSong, boyfriend.vocalsFile + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
+				var playerVocals = Paths.voices(curSong, boyfriend.vocalsFile + Difficulty.getSongPrefix());
 				if (playerVocals == null)
-					playerVocals = Paths.voices(curSong, 'Player' + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
-				vocals.loadEmbedded(playerVocals ?? Paths.voices(curSong, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)));
+					playerVocals = Paths.voices(curSong, 'Player' + Difficulty.getSongPrefix());
+				vocals.loadEmbedded(playerVocals ?? Paths.voices(curSong, Difficulty.getSongPrefix(null, false)));
 
-				var oppVocals = Paths.voices(curSong, dad.vocalsFile + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
+				var oppVocals = Paths.voices(curSong, dad.vocalsFile + Difficulty.getSongPrefix());
 				if (oppVocals == null)
-					oppVocals = Paths.voices(curSong, 'Opponent' + (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "-Erect" : ""));
+					oppVocals = Paths.voices(curSong, 'Opponent' + Difficulty.getSongPrefix());
 				if (oppVocals != null)
 					opponentVocals.loadEmbedded(oppVocals);
 			}
@@ -1405,7 +1405,7 @@ class PlayState extends MusicBeatState
 		inst = new FlxSound();
 		try
 		{
-			inst.loadEmbedded(Paths.inst(songData.song, (Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare" ? "Erect" : null)));
+			inst.loadEmbedded(Paths.inst(songData.song, Difficulty.getSongPrefix(null, false)));
 		}
 		catch (e:Dynamic)
 		{
