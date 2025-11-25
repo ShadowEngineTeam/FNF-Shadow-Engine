@@ -176,8 +176,7 @@ class Character extends FlxAnimate
 			else
 			{
 				spriteType = SPRITE;
-				isAnimateAtlas = false;
-				isMultiAtlas = false;
+				isMultiAtlas = isAnimateAtlas = false;
 				frames = Paths.getAtlas(json.image);
 			}
 			imageFile = json.image;
