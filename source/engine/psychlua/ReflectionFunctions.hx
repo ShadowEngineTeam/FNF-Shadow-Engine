@@ -59,6 +59,8 @@ class ReflectionFunctions
 				classVar = 'backend.Conductor';
 			else if (classVar == 'GameOverSubstate')
 				classVar = 'substates.GameOverSubstate';
+			else if (classVar == 'PlayState') // I swear why people use PlayState??? wtf
+				classVar = 'states.PlayState';
 
 			var myClass:Dynamic = Type.resolveClass(classVar);
 			if (myClass == null)
@@ -91,6 +93,8 @@ class ReflectionFunctions
 				classVar = 'backend.Conductor';
 			else if (classVar == 'GameOverSubstate')
 				classVar = 'substates.GameOverSubstate';
+			else if (classVar == 'PlayState') // I swear why people use PlayState??? wtf
+				classVar = 'states.PlayState';
 
 			var myClass:Dynamic = Type.resolveClass(classVar);
 			if (myClass == null)
