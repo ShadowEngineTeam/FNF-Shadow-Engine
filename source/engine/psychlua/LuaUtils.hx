@@ -394,13 +394,10 @@ class LuaUtils
 		return false;
 	}
 
-	public static function loadFrames(spr:FlxSprite, image:String, spriteType:String)
+	public static function loadFrames(spr:FlxSprite, image:String, spriteType:String, ?animateSettings:{?swfMode:Bool, ?cacheOnLoad:Bool})
 	{
 		switch (spriteType.toLowerCase().trim())
 		{
-			// case "texture" | "textureatlas" | "tex":
-			// spr.frames = AtlasFrameMaker.construct(image);
-
 			// case "texture_noaa" | "textureatlas_noaa" | "tex_noaa":
 			// spr.frames = AtlasFrameMaker.construct(image, null, true);
 
@@ -409,7 +406,8 @@ class LuaUtils
 
 			case "packer" | "packeratlas" | "pac":
 				spr.frames = Paths.getPackerAtlas(image);
-
+			case "texture" | "textureatlas" | "tex":
+				spr.frames = Paths.getTextureAtlas(image, animateSettings != null ? {swfMode: animateSettings.swfMode ?? false, cacheOnLoad: animateSettings.cacheOnLoad ?? false} : null);
 			default:
 				spr.frames = Paths.getSparrowAtlas(image);
 		}

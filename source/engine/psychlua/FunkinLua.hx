@@ -1188,13 +1188,14 @@ class FunkinLua
 			game.modchartSprites.set(tag, leSprite);
 			leSprite.active = true;
 		});
-		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = "sparrow")
+		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = "sparrow", swfMode:Bool = false, cacheOnLoad:Bool = false)
 		{
 			tag = tag.replace('.', '');
 			LuaUtils.resetSpriteTag(tag);
+			trace('making animated lua sprite: ' + tag + ' with type $spriteType');
 			var leSprite:ModchartSprite = new ModchartSprite(x, y);
 
-			LuaUtils.loadFrames(leSprite, image, spriteType);
+			LuaUtils.loadFrames(leSprite, image, spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});
 			game.modchartSprites.set(tag, leSprite);
 		});
 
@@ -1262,10 +1263,7 @@ class FunkinLua
 			}
 			else
 			{
-				if (obj.anim != null)
-					obj.anim.play(name, forced, reverse, startFrame); // FlxAnimate
-				else
-					obj.animation.play(name, forced, reverse, startFrame);
+				obj.animation.play(name, forced, reverse, startFrame);
 				return true;
 			}
 			return false;
@@ -1736,6 +1734,7 @@ class FunkinLua
 		ShaderFunctions.implement(this);
 		DeprecatedFunctions.implement(this);
 		MobileFunctions.implement(this);
+		FlixelAnimateFunctions.implement(this);
 		#if MODCHARTS_ALLOWED modcharting.ModchartFuncs.loadLuaFunctions(this); #end
 		#if android AndroidFunctions.implement(this); #end
 
