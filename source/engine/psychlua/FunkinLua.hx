@@ -1192,7 +1192,6 @@ class FunkinLua
 		{
 			tag = tag.replace('.', '');
 			LuaUtils.resetSpriteTag(tag);
-			trace('making animated lua sprite: ' + tag + ' with type $spriteType');
 			var leSprite:ModchartSprite = new ModchartSprite(x, y);
 
 			LuaUtils.loadFrames(leSprite, image, spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});

@@ -2,7 +2,6 @@ package psychlua;
 
 class FlixelAnimateFunctions
 {
-
 	public static function implement(funk:FunkinLua)
 	{
 		funk.set("addAnimationBySymbol", function(obj:String, name:String, symbol:String, framerate:Int = 24, loop:Bool = true)
@@ -67,7 +66,5 @@ class FlixelAnimateFunctions
 	}
 
 	public static inline function formatIndices(indices:String):Array<Int>
-	{
 		return [for (i in indices.trim().split(',')) Std.parseInt(i)];
-	}
 }
