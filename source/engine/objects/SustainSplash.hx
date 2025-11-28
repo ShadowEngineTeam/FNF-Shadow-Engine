@@ -28,7 +28,7 @@ class SustainSplash extends FlxSprite
 		SustainSplash.frameRate = frameRate;
 		SustainSplash.mainGroup = group;
 
-		for (img in ['holdCover', 'holdCoverPurple', 'holdCoverBlue', 'holdCoverGreen', 'holdCoverRed'])
+		for (img in [DEFAULT_TEXTURE, '${DEFAULT_TEXTURE}Purple', '${DEFAULT_TEXTURE}Blue', '${DEFAULT_TEXTURE}Green', '${DEFAULT_TEXTURE}Red'])
 			Paths.getSparrowAtlas(img);
 	}
 
@@ -87,6 +87,9 @@ class SustainSplash extends FlxSprite
 
 	public function reloadSustainSplash(texture:String):Void
 	{
+		if (texture != null && texture != DEFAULT_TEXTURE)
+			precacheSustainSplash();
+
 		if (texture == null)
 			texture = DEFAULT_TEXTURE;
 
@@ -137,6 +140,13 @@ class SustainSplash extends FlxSprite
 
 			rgbShader = rgbShaders[noteData];
 		}
+	}
+
+	private function precacheSustainSplash():Void
+	{
+		var tex:String = texture ?? DEFAULT_TEXTURE;
+		for (img in [tex, '${tex}Purple', '${tex}Blue', '${tex}Green', '${tex}Red'])
+			Paths.getSparrowAtlas(img);
 	}
 
 	override function update(elapsed:Float)
