@@ -8,7 +8,6 @@
 - Add multikey support(?)
 - Add Scritable Classes (eg Class that is empty so modders can do shit with it)
 - Refactor/Redo Scriptable Classes Support(?)
-- Rewrite SustainSplash
 - Refactor the game (ApplicationMain) to be a library(?)
 
 - Fix iOS crash
