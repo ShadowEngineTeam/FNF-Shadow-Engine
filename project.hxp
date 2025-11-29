@@ -53,23 +53,28 @@ class Project extends HXProject
 		trace("");
 	}
 
-	function getHaxeVersion():String {
+	function getHaxeVersion():String
+	{
 		var process = new sys.io.Process("haxe", ["-version"]);
 		var version:String = "";
 
-		try {
+		try
+		{
 			version = process.stdout.readAll().toString().trim();
-		} catch (e) {}
+		}
+		catch (e) {}
 
 		process.close();
 		return version;
 	}
 
-	function doWelcomeHeader() {
+	function doWelcomeHeader()
+	{
 		var haxeVersion = getHaxeVersion().trim();
 		var width = 50;
 
-		inline function centerText(text:String, width:Int):String {
+		inline function centerText(text:String, width:Int):String
+		{
 			var innerWidth = width - 2;
 			var padding = Std.int(Math.max(0, Std.int((innerWidth - text.length) / 2)));
 			var left = StringTools.lpad("", " ", padding);
@@ -77,15 +82,19 @@ class Project extends HXProject
 			return "=" + left + text + right + "=";
 		}
 
-		inline function infoLine(label:String, value:String):String {
+		inline function infoLine(label:String, value:String):String
+		{
 			var innerWidth = width - 2;
-			if (label.length == 0) {
+			if (label.length == 0)
+			{
 				// no label: center the value
 				var padding = Std.int(Math.max(0, (innerWidth - value.length) / 2));
 				var left = StringTools.lpad("", " ", padding);
 				var right = StringTools.lpad("", " ", innerWidth - value.length - padding);
 				return "=" + left + value + right + "=";
-			} else {
+			}
+			else
+			{
 				var colonPos = Std.int(innerWidth / 2);
 				var labelPart = StringTools.lpad(label, " ", Std.int(Math.max(0, colonPos - 2)));
 				var valuePart = value;
@@ -141,7 +150,7 @@ class Project extends HXProject
 		meta.version = VERSION;
 		meta.company = COMPANY;
 		meta.packageName = PACKAGE;
-		
+
 		app.main = MAIN_CLASS;
 		app.file = EXECUTABLE;
 		app.preloader = PRELOADER;
@@ -167,7 +176,8 @@ class Project extends HXProject
 			window.fullscreen = false;
 			window.resizable = true;
 			window.vsync = false;
-		} else if (isMobile())
+		}
+		else if (isMobile())
 		{
 			window.orientation = Orientation.LANDSCAPE;
 			window.fullscreen = true;
@@ -177,7 +187,7 @@ class Project extends HXProject
 			window.allowHighDPI = true;
 		}
 	}
-	
+
 	function configureCompileFlags()
 	{
 		MODS_ALLOWED.integrate(isDesktop() || isMobile());
@@ -317,7 +327,7 @@ class Project extends HXProject
 			];
 
 			for (path => px in sizes)
-        		addIcon('icons/ios/SE-Icon-Default-${path}.png', px);
+				addIcon('icons/ios/SE-Icon-Default-${path}.png', px);
 
 			addIcon("icons/ios/SE-Icon-Default-1024x1024.png"); // lime requires default as well
 		}
@@ -343,7 +353,8 @@ class Project extends HXProject
 
 	public function addAssetPath(path:String, ?rename:String, embed:Bool = false):Void
 	{
-		if (path == "") return;
+		if (path == "")
+			return;
 
 		var targetPath = Path.addTrailingSlash(rename ?? path);
 
@@ -363,13 +374,16 @@ class Project extends HXProject
 
 	function includeAssetLibrary(name:String, embed:Bool = false, preload:Bool = false):Void
 	{
-    	this.libraries.push(new Library('', name, null, embed, preload, false, ""));
+		this.libraries.push(new Library('', name, null, embed, preload, false, ""));
 	}
 
-	function generateAsciiArt(imagePath:String, targetWidth:Int, maxHeight:Int = 20):String {
-		try {
+	function generateAsciiArt(imagePath:String, targetWidth:Int, maxHeight:Int = 20):String
+	{
+		try
+		{
 			var image = Image.fromFile(imagePath);
-			if (image == null) throw "Image could not be loaded.";
+			if (image == null)
+				throw "Image could not be loaded.";
 
 			var scaleX = targetWidth / image.width;
 			var scaleY = (maxHeight / image.height) * 0.5; // compensate for tall text characters
@@ -377,20 +391,26 @@ class Project extends HXProject
 
 			var newWidth = Math.round(image.width * scale);
 			var newHeight = Math.round(image.height * scale);
-			if (newWidth <= 0) newWidth = 1;
-			if (newHeight <= 0) newHeight = 1;
+			if (newWidth <= 0)
+				newWidth = 1;
+			if (newHeight <= 0)
+				newHeight = 1;
 
 			var chars = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light → dark
 
 			var result = [];
-			for (y in 0...newHeight) {
-				if (y % 2 == 1) continue;
+			for (y in 0...newHeight)
+			{
+				if (y % 2 == 1)
+					continue;
 
 				var line = "";
-				for (x in 0...newWidth) {
+				for (x in 0...newWidth)
+				{
 					var origX = Math.floor(x / scale);
 					var origY = Math.floor(y / scale);
-					if (origX >= image.width || origY >= image.height) {
+					if (origX >= image.width || origY >= image.height)
+					{
 						line += " ";
 						continue;
 					}
@@ -411,7 +431,9 @@ class Project extends HXProject
 			}
 
 			return result.join("\n");
-		} catch (e:Dynamic) {
+		}
+		catch (e:Dynamic)
+		{
 			return "ASCII Art Load Failed";
 		}
 	}
@@ -424,7 +446,7 @@ class Project extends HXProject
 
 	inline function addMacroFlag(value:String):Void
 		addHaxeFlag('--macro ${value}');
-	
+
 	inline function isDebug():Bool
 		return debug;
 
@@ -479,23 +501,27 @@ class Project extends HXProject
 	public inline function getDefine(name:String):Null<Dynamic>
 		return defines.get(name);
 
-  	public inline function setDefine(name:String, ?value:String):Void
-    	defines.set(name, value ?? "");
+	public inline function setDefine(name:String, ?value:String):Void
+		defines.set(name, value ?? "");
 
-  	public inline function unsetDefine(name:String):Void
-    	defines.remove(name);
+	public inline function unsetDefine(name:String):Void
+		defines.remove(name);
 }
 
-class CompileFlag {
+class CompileFlag
+{
 	public static final INVERSION:String = "NO_";
 	public static var project:Project;
 
-	public static function get(name:String):CompileFlag {
+	public static function get(name:String):CompileFlag
+	{
 		return new CompileFlag(name);
 	}
 
 	var name:String;
-	public function new(name:String) {
+
+	public function new(name:String)
+	{
 		this.name = name;
 	}
 
@@ -515,23 +541,30 @@ class CompileFlag {
 			getInverse().enable(true);
 	}
 
-	public function integrate(defaultEnabled:Bool = false):Void {
+	public function integrate(defaultEnabled:Bool = false):Void
+	{
 		var inverse = getInverse();
 
-		if (isEnabled()) inverse.disable(true);
-		else if (inverse.isEnabled()) disable(true);
-		else (defaultEnabled ? enable : disable)(true);
+		if (isEnabled())
+			inverse.disable(true);
+		else if (inverse.isEnabled())
+			disable(true);
+		else
+			(defaultEnabled ? enable : disable)(true);
 	}
-	
-	public function isEnabled():Bool {
+
+	public function isEnabled():Bool
+	{
 		return project.haxedefs.exists(name) || project.defines.exists(name);
 	}
 
-	public function isDisabled():Bool {
+	public function isDisabled():Bool
+	{
 		return getInverse().isEnabled() || !isEnabled();
 	}
 
-	function getInverse():CompileFlag {
+	function getInverse():CompileFlag
+	{
 		var inversionName = name;
 		if (!inversionName.startsWith(INVERSION))
 			inversionName = INVERSION + inversionName;

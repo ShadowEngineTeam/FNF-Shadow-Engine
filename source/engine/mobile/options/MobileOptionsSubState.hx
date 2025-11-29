@@ -41,8 +41,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		#end
 
 		#if android
-		option = new Option('Use EXTERNAL Folder',
-			'If checked, the game will use the .ShadowEngine folder for the mods folder.', 'useExternalStorage', 'bool');
+		option = new Option('Use EXTERNAL Folder', 'If checked, the game will use the .ShadowEngine folder for the mods folder.', 'useExternalStorage', 'bool');
 		option.onChange = onChangeStorageDir;
 		addOption(option);
 		#end

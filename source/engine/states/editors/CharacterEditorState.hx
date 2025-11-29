@@ -490,11 +490,11 @@ class CharacterEditorState extends MusicBeatState
 				reloadCharacterDropDown();
 				updatePointerPos();
 			}
-		else
-		{
-			reloadCharacterDropDown();
-			FlxG.sound.play(Paths.sound('cancelMenu'));
-		}
+			else
+			{
+				reloadCharacterDropDown();
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+			}
 		});
 		reloadCharacterDropDown();
 		charDropDown.selectedLabel = _char;
@@ -1291,7 +1291,7 @@ class CharacterEditorState extends MusicBeatState
 					character.anim.addBySymbol(anim, name, fps, loop);
 			}
 			else
-			{				
+			{
 				if (indices != null && indices.length > 0)
 					character.anim.addBySymbolIndices(anim, name, indices, fps, loop);
 				else

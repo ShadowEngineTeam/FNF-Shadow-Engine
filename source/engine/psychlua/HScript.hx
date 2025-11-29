@@ -134,7 +134,7 @@ class HScript extends SScript
 		set('PlayfieldRenderer', modcharting.PlayfieldRenderer);
 		set('SimpleQuaternion', modcharting.SimpleQuaternion);
 		set('SustainStrip', modcharting.SustainStrip);
-		
+
 		modcharting.ModchartFuncs.loadHScriptFunctions(this);
 		#end
 

@@ -72,7 +72,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.system.FlxAssets.FlxShader;
 
-// flixel-animte (texture atlas)
+// flixel-animate
 import animate.FlxAnimate;
 
 import haxe.Json;

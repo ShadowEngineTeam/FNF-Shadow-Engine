@@ -288,43 +288,42 @@ class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 
 	function checkTouchOverlap():Bool
 	{
-	    for (camera in cameras)
+		for (camera in cameras)
 		{
-	        #if mac
-	        var button = FlxMouseButton.getByID(FlxMouseButtonID.LEFT);
-	        var mouse = FlxG.mouse;
-	        var worldPos:FlxPoint = mouse.getWorldPosition(camera, _point);
-	
-	        for (zone in deadZones)
-	            if (zone != null && zone.overlapsPoint(worldPos, true, camera))
-	                return false;
-	
-	        if (checkInput(mouse, button, button.justPressedPosition, camera))
-	            return true;
-	        #else
-	        for (touch in FlxG.touches.list)
-			{
-	            final worldPos:FlxPoint = touch.getWorldPosition(camera, _point);
-	
-	            for (zone in deadZones)
-	                if (zone != null && zone.overlapsPoint(worldPos, true, camera))
-	                    return false;
-	
-	            if (checkInput(touch, touch, touch.justPressedPosition, camera))
-	                return true;
-	        }
-	        #end
-	    }
+			#if mac
+			var button = FlxMouseButton.getByID(FlxMouseButtonID.LEFT);
+			var mouse = FlxG.mouse;
+			var worldPos:FlxPoint = mouse.getWorldPosition(camera, _point);
 
-	    return false;
+			for (zone in deadZones)
+				if (zone != null && zone.overlapsPoint(worldPos, true, camera))
+					return false;
+
+			if (checkInput(mouse, button, button.justPressedPosition, camera))
+				return true;
+			#else
+			for (touch in FlxG.touches.list)
+			{
+				final worldPos:FlxPoint = touch.getWorldPosition(camera, _point);
+
+				for (zone in deadZones)
+					if (zone != null && zone.overlapsPoint(worldPos, true, camera))
+						return false;
+
+				if (checkInput(touch, touch, touch.justPressedPosition, camera))
+					return true;
+			}
+			#end
+		}
+
+		return false;
 	}
 
 	function checkInput(pointer:FlxPointer, input:IFlxInput, justPressedPosition:FlxPoint, camera:FlxCamera):Bool
 	{
 		/*var worldPos = pointer.getWorldPosition(camera, _point);
-	    if (worldPos.x < x - width / 2 || worldPos.x > x + width / 2 ||
-	        worldPos.y < y - height / 2 || worldPos.y > y + height / 2)
-	        return false;*/
+		if (worldPos.x < x - width / 2 || worldPos.x > x + width / 2 || worldPos.y < y - height / 2 || worldPos.y > y + height / 2)
+			return false;*/
 
 		if (maxInputMovement != Math.POSITIVE_INFINITY
 			&& justPressedPosition.distanceTo(pointer.getScreenPosition(FlxPoint.weak())) > maxInputMovement

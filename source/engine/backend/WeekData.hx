@@ -163,10 +163,11 @@ class WeekData
 			}
 		}
 	}
-	
+
 	private static function isValidWeekJson(data:Dynamic):Bool
 	{
-		if (data == null) return false;
+		if (data == null)
+			return false;
 
 		final requiredFields = ["songs", "weekCharacters", "weekName"];
 
@@ -183,7 +184,6 @@ class WeekData
 
 		return true;
 	}
-
 
 	private static function addWeek(weekToCheck:String, path:String, directory:String, i:Int, originalLength:Int)
 	{

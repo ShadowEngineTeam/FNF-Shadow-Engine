@@ -48,7 +48,7 @@ class JsonParser
 	}
 
 	var str:String;
-    var file:String;
+	var file:String;
 	var pos:Int;
 
 	function new(str:String, file:String)
@@ -362,11 +362,11 @@ class JsonParser
 	function invalidChar()
 	{
 		pos--; // rewind
-		throw (file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " at position " + pos;
+		throw(file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " at position " + pos;
 	}
 
 	function invalidNumber(start:Int)
 	{
-		throw (file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid number at position " + start + ": " + str.substr(start, pos - start);
+		throw(file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid number at position " + start + ": " + str.substr(start, pos - start);
 	}
 }

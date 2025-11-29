@@ -285,7 +285,7 @@ class MobileFunctions
 
 	public static function getMobileControlsAsString():String
 	{
-		try 
+		try
 		{
 			switch (MobileData.mode)
 			{

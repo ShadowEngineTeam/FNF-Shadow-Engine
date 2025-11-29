@@ -524,7 +524,7 @@ class PlayState extends MusicBeatState
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
 		generateSong(SONG.song);
-		
+
 		#if MODCHARTS_ALLOWED
 		playfieldRenderer = new PlayfieldRenderer(strumLineNotes, notes, this);
 		//playfieldRenderer.cameras = [camHUD];
@@ -722,7 +722,8 @@ class PlayState extends MusicBeatState
 		FlxG.animationTimeScale = value;
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
 		#if VIDEOS_ALLOWED
-		if(videoCutscene != null && videoCutscene.videoSprite != null) videoCutscene.videoSprite.bitmap.rate = value;
+		if (videoCutscene != null && videoCutscene.videoSprite != null)
+			videoCutscene.videoSprite.bitmap.rate = value;
 		#end
 		FunkinLua.getCurrentMusicState().setOnScripts('playbackRate', playbackRate);
 		#else
@@ -2095,25 +2096,38 @@ class PlayState extends MusicBeatState
 		final iconP2HasLoseIcon:Bool = (iconP2.animation.curAnim.frames.length >= 2);
 		final iconP2HasWinIcon:Bool = (iconP2.animation.curAnim.frames.length >= 3);
 
-		if (characterPlayingAsDad) {
-			if (healthBar.percent > 80) {
+		if (characterPlayingAsDad)
+		{
+			if (healthBar.percent > 80)
+			{
 				iconP1.animation.curAnim.curFrame = iconP1HasLoseIcon ? 1 : 0;
 				iconP2.animation.curAnim.curFrame = iconP2HasWinIcon ? 2 : 0;
-			} else if (healthBar.percent < 20) {
+			}
+			else if (healthBar.percent < 20)
+			{
 				iconP2.animation.curAnim.curFrame = iconP2HasLoseIcon ? 1 : 0;
 				iconP1.animation.curAnim.curFrame = iconP1HasWinIcon ? 2 : 0;
-			} else {
+			}
+			else
+			{
 				iconP1.animation.curAnim.curFrame = 0;
 				iconP2.animation.curAnim.curFrame = 0;
 			}
-		} else {
-			if (healthBar.percent < 20) {
+		}
+		else
+		{
+			if (healthBar.percent < 20)
+			{
 				iconP1.animation.curAnim.curFrame = iconP1HasLoseIcon ? 1 : 0;
 				iconP2.animation.curAnim.curFrame = iconP2HasWinIcon ? 2 : 0;
-			} else if (healthBar.percent > 80) {
+			}
+			else if (healthBar.percent > 80)
+			{
 				iconP2.animation.curAnim.curFrame = iconP2HasLoseIcon ? 1 : 0;
 				iconP1.animation.curAnim.curFrame = iconP1HasWinIcon ? 2 : 0;
-			} else {
+			}
+			else
+			{
 				iconP2.animation.curAnim.curFrame = 0;
 				iconP1.animation.curAnim.curFrame = 0;
 			}
@@ -2200,7 +2214,7 @@ class PlayState extends MusicBeatState
 				canResync = false;
 				canPause = false;
 				#if VIDEOS_ALLOWED
-				if(videoCutscene != null)
+				if (videoCutscene != null)
 				{
 					videoCutscene.destroy();
 					videoCutscene = null;
@@ -3394,7 +3408,6 @@ class PlayState extends MusicBeatState
 				gf.specialAnim = true;
 			}
 		}
-
 		@:privateAccess
 		if (char == dad && opponentVocals._sound != null)
 			opponentVocals.volume = 0;
@@ -3442,7 +3455,6 @@ class PlayState extends MusicBeatState
 				char.holdTimer = 0;
 			}
 		}
-
 		@:privateAccess
 		if (char == dad && opponentVocals._sound != null)
 			opponentVocals.volume = 1;
@@ -3451,7 +3463,6 @@ class PlayState extends MusicBeatState
 
 		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 		note.hitByOpponent = true;
-
 
 		final args2:Array<Dynamic> = [
 			notes.members.indexOf(note),
@@ -3643,7 +3654,7 @@ class PlayState extends MusicBeatState
 		Note.globalRgbShaders = [];
 		SustainSplash.close();
 		backend.NoteTypesConfig.clearNoteTypesData();
-		
+
 		@:privateAccess
 		FlxG.game._filters = [];
 		camGame.filters = camHUD.filters = camOther.filters = [];
@@ -3658,7 +3669,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if VIDEOS_ALLOWED
-		if(videoCutscene != null)
+		if (videoCutscene != null)
 		{
 			videoCutscene.destroy();
 			videoCutscene = null;

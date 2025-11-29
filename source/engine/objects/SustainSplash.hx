@@ -6,7 +6,7 @@ import shaders.RGBPalette.RGBShaderReference;
 class SustainSplash extends FlxSprite
 {
 	public static var DEFAULT_TEXTURE:String = 'holdCover';
-	
+
 	public static var startCrochet:Float;
 	public static var frameRate:Int;
 	public static var mainGroup:FlxTypedGroup<SustainSplash>;
@@ -18,7 +18,7 @@ class SustainSplash extends FlxSprite
 	public var targetStrumTime(default, null):Float;
 	public var mustPress(default, null):Bool = true;
 	public var useRGBShader:Bool = true;
-	
+
 	private var noRGBTextures:Array<String> = [];
 	private var curTexture:String = null;
 	private var reachedEnd:Bool = false;
@@ -47,7 +47,8 @@ class SustainSplash extends FlxSprite
 	{
 		for (splash in SustainSplash.mainGroup.members)
 		{
-			if (splash.exists && splash.alive && splash.noteData == noteData && splash.mustPress) splash.visible = false;
+			if (splash.exists && splash.alive && splash.noteData == noteData && splash.mustPress)
+				splash.visible = false;
 		}
 	}
 
@@ -55,7 +56,8 @@ class SustainSplash extends FlxSprite
 	{
 		for (splash in SustainSplash.mainGroup.members)
 		{
-			if (splash.exists && splash.alive && splash.noteData == noteData && splash.mustPress) splash.visible = true;
+			if (splash.exists && splash.alive && splash.noteData == noteData && splash.mustPress)
+				splash.visible = true;
 		}
 	}
 
@@ -80,7 +82,7 @@ class SustainSplash extends FlxSprite
 		this.mustPress = mustPress;
 		this.reachedEnd = false;
 		this.visible = true;
-		
+
 		initRGBShader();
 
 		if (this.rgbShader != null)
@@ -104,17 +106,17 @@ class SustainSplash extends FlxSprite
 			animation.play('start', true, false, 0);
 			return;
 		}
-		
+
 		curTexture = texture;
 
-		// var postfix:String = switch (noteData)
-		// {
-		// 	case 0: "Purple";
-		// 	case 1: "Blue";
-		// 	case 2: "Green";
-		// 	case 3: "Red";
-		// 	default: "";
-		// }
+		//var postfix:String = switch (noteData)
+		//{
+		// case 0: "Purple";
+		// case 1: "Blue";
+		// case 2: "Green";
+		// case 3: "Red";
+		// default: "";
+		//}
 
 		frames = Paths.getSparrowAtlas(texture);
 		animation.finishCallback = (name:String) ->
@@ -149,8 +151,9 @@ class SustainSplash extends FlxSprite
 				rgbShader.enabled = false;
 				rgbShaders[noteData] = rgbShader;
 			}
-			
-			if (rgbShader != null) rgbShader.enabled = false;
+
+			if (rgbShader != null)
+				rgbShader.enabled = false;
 
 			rgbShader = rgbShaders[noteData];
 		}

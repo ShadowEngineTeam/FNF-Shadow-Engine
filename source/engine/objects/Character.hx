@@ -95,7 +95,7 @@ class Character extends FlxAnimate
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
 	{
 		super(x, y);
-		
+
 		animOffsets = new Map<String, Array<Dynamic>>();
 		curCharacter = character;
 		this.isPlayer = isPlayer;
@@ -379,7 +379,7 @@ class Character extends FlxAnimate
 	{
 		specialAnim = false;
 		anim.play(AnimName, Force, Reversed, Frame);
-		
+
 		if (animOffsets.exists(AnimName))
 		{
 			var daOffset = animOffsets.get(AnimName);

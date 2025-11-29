@@ -40,7 +40,7 @@ class FileSystem
 		#end
 		if (Assets.exists(openflcwd(path)))
 			return true;
-		
+
 		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
 	}
 

@@ -77,7 +77,7 @@ class Note extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 
 	#if MODCHARTS_ALLOWED
 	public var mesh:modcharting.SustainStrip = null;
-  	public var z:Float = 0;
+	public var z:Float = 0;
 	#end
 
 	public var animSuffix:String = '';

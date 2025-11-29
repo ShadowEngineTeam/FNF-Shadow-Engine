@@ -1,4 +1,3 @@
-
 package psychlua;
 
 import backend.WeekData;
@@ -494,25 +493,26 @@ class FunkinLua
 						luaTrace('startDialogue: Your dialogue file is badly formatted!', false, false, FlxColor.RED);
 					}
 				}
-			else
-			{
-				luaTrace('startDialogue: Dialogue file not found', false, false, FlxColor.RED);
-				if (cast(game, PlayState).endingSong)
-				{
-					cast(game, PlayState).endSong();
-				}
 				else
 				{
-					cast(game, PlayState).startCountdown();
+					luaTrace('startDialogue: Dialogue file not found', false, false, FlxColor.RED);
+					if (cast(game, PlayState).endingSong)
+					{
+						cast(game, PlayState).endSong();
+					}
+					else
+					{
+						cast(game, PlayState).startCountdown();
+					}
 				}
-			}
 				return false;
 			});
-			set("startVideo", function(videoFile:String, ?canSkip:Bool = true, ?forMidSong:Bool = false, ?shouldLoop:Bool = false, ?playOnLoad:Bool = true) {
+			set("startVideo", function(videoFile:String, ?canSkip:Bool = true, ?forMidSong:Bool = false, ?shouldLoop:Bool = false, ?playOnLoad:Bool = true)
+			{
 				#if VIDEOS_ALLOWED
-				if(FileSystem.exists(Paths.video(videoFile)))
+				if (FileSystem.exists(Paths.video(videoFile)))
 				{
-					if(cast(game, PlayState).videoCutscene != null)
+					if (cast(game, PlayState).videoCutscene != null)
 					{
 						cast(game, PlayState).remove(cast(game, PlayState).videoCutscene);
 						cast(game, PlayState).videoCutscene.destroy();
@@ -525,13 +525,12 @@ class FunkinLua
 					luaTrace('startVideo: Video file not found: ' + videoFile, false, false, FlxColor.RED);
 				}
 				return false;
-
 				#else
 				PlayState.instance.inCutscene = true;
 				new FlxTimer().start(0.1, function(tmr:FlxTimer)
 				{
 					PlayState.instance.inCutscene = false;
-					if(cast(game, PlayState).endingSong)
+					if (cast(game, PlayState).endingSong)
 						cast(game, PlayState).endSong();
 					else
 						cast(game, PlayState).startCountdown();

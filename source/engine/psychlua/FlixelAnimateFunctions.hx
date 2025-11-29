@@ -21,7 +21,7 @@ class FlixelAnimateFunctions
 
 		funk.set("addAnimationBySymbolIndices", function(obj:String, name:String, symbol:String, indices:String, framerate:Int = 24, loop:Bool = true)
 		{
-			var animate:ModchartSprite  = LuaUtils.getObjectDirectly(obj, false);
+			var animate:ModchartSprite = LuaUtils.getObjectDirectly(obj, false);
 			if (animate != null)
 			{
 				animate.anim.addBySymbolIndices(name, symbol, formatIndices(indices), framerate, loop);

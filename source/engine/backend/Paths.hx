@@ -478,7 +478,7 @@ class Paths
 		var modsAnimate:String = modsImages(key);
 		if (FileSystem.exists(modsAnimate))
 			modsExists = true;
-		
+
 		return FlxAnimateFrames.fromAnimate(modsExists ? modsAnimate : animateFolder, settings);
 		#else
 		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
