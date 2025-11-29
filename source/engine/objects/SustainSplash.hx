@@ -47,7 +47,7 @@ class SustainSplash extends FlxSprite
 	{
 		for (splash in SustainSplash.mainGroup.members)
 		{
-			if (splashIsValid(splash, noteData) && splash.mustPress && splash.animation.curAnim.name != 'end' && (Math.abs(Conductor.songPosition - splash.targetStrumTime) > 30))
+			if (splashIsValid(splash, noteData) && splash.mustPress && (splash.animation.curAnim.name != 'end' || (Math.abs(Conductor.songPosition - splash.targetStrumTime) > 30)))
 				splash.visible = false;
 		}
 	}
