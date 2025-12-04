@@ -37,7 +37,7 @@ class Main extends Sprite
 	@:noCompletion
 	private static function __init__():Void
 	{
-		#if linux
+		#if (linux && !debug)
 		// request start game mode
 		if (GamemodeClient.request_start() != 0)
 		{

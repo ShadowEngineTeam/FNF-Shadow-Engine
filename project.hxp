@@ -275,7 +275,7 @@ class Project extends HXProject
 			if (defines.exists(format))
 				addAssetPath('images-${format.toLowerCase()}', 'assets/shared/images');
 
-		if (isLinux())
+		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");
 	}
 
@@ -300,7 +300,7 @@ class Project extends HXProject
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");
 
-		if (isLinux())
+		if (isLinux() && !isDebug())
 			includeHaxelib("hxgamemode");
 	}
 
