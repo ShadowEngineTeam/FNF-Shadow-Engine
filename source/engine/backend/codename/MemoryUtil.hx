@@ -44,10 +44,10 @@ final class MemoryUtil
 			return -1;
 
 		char line[256];
-		while (fgets(line, sizeof(line), meminfo))
+		while(fgets(line, sizeof(line), meminfo))
 		{
 			int ram;
-			if (sscanf(line, "MemTotal: %d kB", &ram) == 1)
+			if(sscanf(line, "MemTotal: %d kB", &ram) == 1)
 			{
 				fclose(meminfo);
 				return (ram / 1024);
@@ -63,7 +63,7 @@ final class MemoryUtil
 		int64_t value = 0;
 		size_t length = sizeof(value);
 
-		if (-1 == sysctl(mib, 2, &value, &length, NULL, 0))
+		if(-1 == sysctl(mib, 2, &value, &length, NULL, 0))
 			return -1;
 
 		return value / 1024 / 1024;
@@ -90,14 +90,14 @@ final class MemoryUtil
 	@:functionCode('
 		FILE *meminfo = fopen("/proc/meminfo", "r");
 
-		if (meminfo == NULL)
+		if(meminfo == NULL)
 			return -1;
 
 		char line[256];
-		while (fgets(line, sizeof(line), meminfo))
+		while(fgets(line, sizeof(line), meminfo))
 		{
 			int swap;
-			if (sscanf(line, "SwapTotal: %d kB", &swap) == 1)
+			if(sscanf(line, "SwapTotal: %d kB", &swap) == 1)
 			{
 				fclose(meminfo);
 				return (swap / 1024);
@@ -112,8 +112,7 @@ final class MemoryUtil
 		struct xsw_usage swapInfo;
 		size_t size = sizeof(swapInfo);
 
-		if (sysctlbyname("vm.swapusage", &swapInfo, &size, nullptr, 0) != 0)
-		{
+		if (sysctlbyname("vm.swapusage", &swapInfo, &size, nullptr, 0) != 0) {
 			perror("sysctlbyname");
 			return 1;
 		}
@@ -124,7 +123,7 @@ final class MemoryUtil
 	@:functionCode('
 		PERFORMANCE_INFORMATION pi;
 		pi.cb = sizeof(pi);
-		if (GetPerformanceInfo(&pi, sizeof(pi)))
+		if(GetPerformanceInfo(&pi, sizeof(pi)))
 		{
 			SIZE_T totalSwap = (pi.CommitLimit - pi.PhysicalTotal) * pi.PageSize;
 			return (double)totalSwap / (1024.0 * 1024.0);
@@ -134,54 +133,9 @@ final class MemoryUtil
 	#end
 	#end
 	public static function getTotalSwapMem():Float
+	{
 		return 0;
-
-	/**
-	 * Gets the current memory usage of the process (RSS + swap, in MB).
-	 * Output depends on the platform.
-	 */
-	#if cpp
-	#if (linux || android)
-	@:functionCode('
-		size_t vmrss = 0, vmswap = 0;
-		FILE *fp = fopen("/proc/self/status", "r");
-		if (fp)
-		{
-			char line[256];
-			while (fgets(line, sizeof(line), fp))
-			{
-				if (sscanf(line, "VmRSS: %zu kB", &vmrss) == 1)
-					continue;
-				if (sscanf(line, "VmSwap: %zu kB", &vmswap) == 1)
-					continue;
-			}
-			fclose(fp);
-			return (double)(vmrss + vmswap) / 1024.0;
-		}
-		return 0.0;
-	')
-	#elseif (mac || ios)
-	@:functionCode('
-		struct task_vm_info vmInfo;
-		mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
-
-		if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&vmInfo, &count) == KERN_SUCCESS)
-			return (double)((size_t)vmInfo.internal + (size_t)vmInfo.compressed) / (1024.0 * 1024.0);
-
-		return 0.0;
-	')
-	#elseif windows
-	@:functionCode('
-		PROCESS_MEMORY_COUNTERS_EX info;
-		if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&info, sizeof(info)))
-			return (double)info.PrivateUsage / (1024.0 * 1024.0);
-
-		return 0.0;
-	')
-	#end
-	#end
-	public static function getCurrentMemUsage():Float
-		return 0;
+	}
 
 	/**
 	 * Gets the memory type of the system.
