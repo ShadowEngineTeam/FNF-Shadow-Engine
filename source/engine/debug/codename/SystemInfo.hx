@@ -133,7 +133,7 @@ class SystemInfo extends FramerateCategory
 			    var trimmedLine = line.trim();
 			    if (trimmedLine.startsWith("Model name:"))
 			    {
-			        cpuName = trimmedLine.substr(trimmed.indexOf(":") + 1).trim();
+			        cpuName = trimmedLine.substr(trimmedLine.indexOf(":") + 1).trim();
 			        break;
 			    }
 			}
