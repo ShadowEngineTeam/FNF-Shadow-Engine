@@ -109,44 +109,6 @@ class Prompt extends MusicBeatSubstate
 		}
 	}
 
-	/*
-		override public function update(elapsed:Float):Void 
-		{
-			super.update(elapsed);
-			
-			
-			
-			if (!goAnyway){
-				
-				
-				
-			if (controls.UI_LEFT_P || controls.UI_RIGHT_P){
-				if (selected == 0){
-					selected = 1;
-				}else{
-					selected = 0;
-				}
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				//buttons.animation.play('but' + selected);
-			}
-			buttonAccept.color.brightness = 0.5;
-			buttonNo.color.brightness = 0.5;
-			if (selected == 0 ) buttonAccept.color.brightness = 0.9;
-			if (selected == 1 ) buttonNo.color.brightness = 0.9;
-			if (controls.ACCEPT ){
-				if (selected == 0){
-					FlxG.sound.play(Paths.sound('confirmMenu'));
-					if(okc != null)okc();
-				}else{
-					FlxG.sound.play(Paths.sound('cancelMenu'));
-					if(cancelc != null)cancelc();
-				}
-				close();
-			}
-			
-			}
-		}
-	 */
 	function makeSelectorGraphic(panel:FlxSprite, w, h, color:FlxColor)
 	{
 		panel.makeGraphic(w, h, color);

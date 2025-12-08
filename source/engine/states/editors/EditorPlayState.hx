@@ -513,8 +513,8 @@ class EditorPlayState extends MusicBeatSubstate
 				if (ClientPrefs.data.middleScroll)
 				{
 					babyArrow.x += 310;
-					if (i > 1)
-					{ // Up and Right
+					if (i > 1) // Up and Right
+					{
 						babyArrow.x += FlxG.width / 2 + 25;
 					}
 				}
@@ -772,10 +772,9 @@ class EditorPlayState extends MusicBeatSubstate
 
 		var shouldMiss:Bool = !ClientPrefs.data.ghostTapping;
 
-		if (plrInputNotes.length != 0)
-		{ // slightly faster than doing `> 0` lol
+		if (plrInputNotes.length != 0) // slightly faster than doing "> 0" lol
+		{
 			var funnyNote:Note = plrInputNotes[0]; // front note
-			// trace('✡⚐🕆☼ 💣⚐💣');
 
 			if (plrInputNotes.length > 1)
 			{
@@ -874,8 +873,8 @@ class EditorPlayState extends MusicBeatSubstate
 		// rewritten inputs???
 		if (notes.length > 0)
 		{
-			for (n in notes)
-			{ // I can't do a filter here, that's kinda awesome
+			for (n in notes) // I can't do a filter here, that's kinda awesome
+			{
 				var canHit:Bool = (n != null && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit);
 
 				if (guitarHeroSustains)
@@ -962,8 +961,8 @@ class EditorPlayState extends MusicBeatSubstate
 			invalidateNote(note);
 	}
 
-	function noteMiss(daNote:Note):Void
-	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	function noteMiss(daNote:Note):Void // You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	{
 		// Dupe note remove
 		notes.forEachAlive(function(note:Note)
 		{

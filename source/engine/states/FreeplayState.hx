@@ -231,13 +231,13 @@ class FreeplayState extends MusicBeatState
 			lerpRating = intendedRating;
 
 		var ratingSplit:Array<String> = Std.string(CoolUtil.floorDecimal(lerpRating * 100, 2)).split('.');
-		if (ratingSplit.length < 2)
-		{ // No decimals, add an empty space
+		if (ratingSplit.length < 2) // No decimals, add an empty space
+		{
 			ratingSplit.push('');
 		}
 
-		while (ratingSplit[1].length < 2)
-		{ // Less than 2 decimals in it, add decimals then
+		while (ratingSplit[1].length < 2) // Less than 2 decimals in it, add decimals then
+		{
 			ratingSplit[1] += '0';
 		}
 

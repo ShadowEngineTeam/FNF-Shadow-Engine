@@ -327,8 +327,8 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		{
 			nextAccept -= 1;
 		}
-		if (touchPad == null)
-		{ // sometimes it dosent add the vpad, hopefully this fixes it
+		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
+		{
 			addTouchPad("LEFT_FULL", "A_B_C");
 			addTouchPadCamera(false);
 		}

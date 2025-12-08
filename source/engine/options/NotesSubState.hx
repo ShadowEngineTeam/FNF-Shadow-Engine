@@ -204,14 +204,8 @@ class NotesSubState extends MusicBeatSubstate
 
 	function updateTip()
 	{
-		if (controls.mobileC)
-		{
-			// do sex
-		}
-		else
-		{
+		if (!controls.mobileC)
 			tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
-		}
 	}
 
 	var _storedColor:FlxColor;
@@ -265,7 +259,6 @@ class NotesSubState extends MusicBeatSubstate
 			controls.controllerMode = true;
 		else if (FlxG.mouse.justPressed || FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0)
 			controls.controllerMode = false;
-		//
 
 		var changedToController:Bool = false;
 		if (controls.controllerMode != _lastControllerMode)
@@ -311,7 +304,6 @@ class NotesSubState extends MusicBeatSubstate
 			controllerPointer.y = Math.max(0, Math.min(FlxG.height, controllerPointer.y + analogY * 1000 * elapsed));
 		}
 		var controllerPressed:Bool = (controls.controllerMode && controls.ACCEPT);
-		//
 
 		if (FlxG.keys.justPressed.CONTROL)
 		{

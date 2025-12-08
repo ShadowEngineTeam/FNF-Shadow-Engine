@@ -65,7 +65,6 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
-		//
 		var txtx = 60;
 		var txty = 640;
 
@@ -138,7 +137,6 @@ class NoteSplashDebugState extends MusicBeatState
 		stepperMaxFps.name = 'max_fps';
 		add(stepperMaxFps);
 
-		//
 		offsetsText = new FlxText(300, 150, 680, '', 16);
 		offsetsText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		offsetsText.scrollFactor.set();
@@ -375,7 +373,7 @@ class NoteSplashDebugState extends MusicBeatState
 		nameInputText.text = config.anim;
 		stepperMinFps.value = config.minFps;
 		stepperMaxFps.value = config.maxFps;
-		//
+
 
 		reloadAnims();
 	}

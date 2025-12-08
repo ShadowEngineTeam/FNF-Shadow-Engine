@@ -253,15 +253,13 @@ class Note extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 				rgbShader.enabled = false;
 
 			x += swagWidth * (noteData);
-			if (!isSustainNote && noteData < colArray.length)
-			{ // Doing this 'if' check to fix the warnings on Senpai songs
+			if (!isSustainNote && noteData < colArray.length) // Doing this 'if' check to fix the warnings on Senpai songs
+			{
 				var animToPlay:String = '';
 				animToPlay = colArray[noteData % colArray.length];
 				animation.play(animToPlay + 'Scroll');
 			}
 		}
-
-		// trace(prevNote);
 
 		if (prevNote != null)
 			prevNote.nextNote = this;

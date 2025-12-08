@@ -65,7 +65,6 @@ class WeekData
 		return weekFile;
 	}
 
-	// HELP: Is there any way to convert a WeekFile to WeekData without having to put all variables there manually? I'm kind of a noob in haxe lmao
 	public function new(weekFile:WeekFile, fileName:String)
 	{
 		#if web
@@ -83,7 +82,6 @@ class WeekData
 		hideFreeplay = weekFile.hideFreeplay;
 		difficulties = weekFile.difficulties;
 		#else
-		// here ya go - MiguelItsOut
 		for (field in Reflect.fields(weekFile))
 			if (Reflect.fields(this).contains(field)) // Reflect.hasField() won't fucking work :/
 				Reflect.setProperty(this, field, Reflect.getProperty(weekFile, field));
@@ -230,7 +228,7 @@ class WeekData
 		return null;
 	}
 
-	//   FUNCTIONS YOU WILL PROBABLY NEVER NEED TO USE
+	/* FUNCTIONS YOU WILL PROBABLY NEVER NEED TO USE */
 	// To use on PlayState.hx or Highscore stuff
 	public static function getWeekFileName():String
 	{

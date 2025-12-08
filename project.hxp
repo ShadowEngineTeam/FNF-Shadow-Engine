@@ -397,7 +397,7 @@ class Project extends HXProject
 			if (newHeight <= 0)
 				newHeight = 1;
 
-			var chars = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light → dark
+			var chars = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light to dark
 
 			var result = [];
 			for (y in 0...newHeight)

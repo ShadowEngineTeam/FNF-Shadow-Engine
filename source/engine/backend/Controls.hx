@@ -308,7 +308,7 @@ class Controls
 			return false;
 	}
 
-	// IGNORE THESE/ karim: no.
+	// IGNORE THESE
 	public static var instance:Controls;
 
 	public function new()

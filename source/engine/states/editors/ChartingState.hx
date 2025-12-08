@@ -1432,7 +1432,6 @@ class ChartingState extends MusicBeatState
 		var tab_group_data = new FlxUI(null, UI_box);
 		tab_group_data.name = 'Data';
 
-		//
 		gameOverCharacterInputText = new FlxUIInputText(10, 25, 150, _song.gameOverChar != null ? _song.gameOverChar : '', 8);
 		blockPressWhileTypingOn.push(gameOverCharacterInputText);
 
@@ -1444,7 +1443,6 @@ class ChartingState extends MusicBeatState
 
 		gameOverEndInputText = new FlxUIInputText(10, gameOverLoopInputText.y + 35, 150, _song.gameOverEnd != null ? _song.gameOverEnd : '', 8);
 		blockPressWhileTypingOn.push(gameOverEndInputText);
-		//
 
 		var check_disableNoteRGB:FlxUICheckBox = new FlxUICheckBox(10, 170, null, null, "Disable Note RGB", 100);
 		check_disableNoteRGB.checked = (_song.disableNoteRGB == true);
@@ -1455,7 +1453,6 @@ class ChartingState extends MusicBeatState
 			// trace('CHECKED!');
 		};
 
-		//
 		noteSkinInputText = new FlxUIInputText(10, 245, 150, _song.playerArrowSkin != null ? _song.playerArrowSkin : '', 8);
 		blockPressWhileTypingOn.push(noteSkinInputText);
 
@@ -1471,7 +1468,6 @@ class ChartingState extends MusicBeatState
 			_song.opponentArrowSkin = noteSkinInputText2.text;
 			updateGrid();
 		});
-		//
 
 		tab_group_data.add(gameOverCharacterInputText);
 		tab_group_data.add(gameOverSoundInputText);
@@ -2366,7 +2362,7 @@ class ChartingState extends MusicBeatState
 		}
 
 		#if FLX_PITCH
-		// PLAYBACK SPEED CONTROLS //
+		// PLAYBACK SPEED CONTROLS
 		var holdingShift = FlxG.keys.pressed.SHIFT;
 		var holdingLB = FlxG.keys.pressed.LBRACKET;
 		var holdingRB = FlxG.keys.pressed.RBRACKET;
@@ -2379,7 +2375,7 @@ class ChartingState extends MusicBeatState
 			playbackSpeed += 0.01;
 		if (touchPad.buttonG.justPressed || (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB)))
 			playbackSpeed = 1;
-		//
+
 
 		if (playbackSpeed <= 0.5)
 			playbackSpeed = 0.5;
@@ -3145,8 +3141,8 @@ class ChartingState extends MusicBeatState
 		var daSus:Dynamic = i[2];
 
 		var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, null, true);
-		if (daSus != null)
-		{ // Common note
+		if (daSus != null) // Common note
+		{
 			if (!Std.isOfType(i[3], String)) // Convert old note type to new note type format
 			{
 				i[3] = curNoteTypes[i[3]];
@@ -3158,8 +3154,8 @@ class ChartingState extends MusicBeatState
 			note.sustainLength = daSus;
 			note.noteType = i[3];
 		}
-		else
-		{ // Event note
+		else // Event note
+		{
 			note.loadGraphic(Paths.image('eventArrow'));
 			note.rgbShader.enabled = false;
 			note.eventName = getEventName(i[1]);
@@ -3351,9 +3347,6 @@ class ChartingState extends MusicBeatState
 
 	private function addNote(strum:Null<Float> = null, data:Null<Int> = null, type:Null<Int> = null):Void
 	{
-		// curUndoIndex++;
-		// var newsong = _song.notes;
-		//	undos.push(newsong);
 		var noteStrum = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
 		var noteData = 0;
 		if (controls.mobileC)
@@ -3400,20 +3393,10 @@ class ChartingState extends MusicBeatState
 		updateNoteUI();
 	}
 
-	// will figure this out l8r
-	function redo()
-	{
-		// _song = redos[curRedoIndex];
-	}
+	function redo() {}
 
 	function undo()
-	{
-		// redos.push(_song);
 		undos.pop();
-		// _song.notes = undos[undos.length - 1];
-		///trace(_song.notes);
-		// updateGrid();
-	}
 
 	function getStrumTime(yPos:Float, doZoomCalc:Bool = true):Float
 	{

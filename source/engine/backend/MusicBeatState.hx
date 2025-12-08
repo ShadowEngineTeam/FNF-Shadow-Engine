@@ -186,7 +186,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 				return luaTouchPad.buttonPressed(MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i foud to fix
+				var FUCK:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in FUCK)
 					idArray.push(MobileInputID.fromString(strId));

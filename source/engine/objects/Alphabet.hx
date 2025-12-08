@@ -264,15 +264,8 @@ class Alphabet extends FlxSpriteGroup
 	}
 }
 
-///////////////////////////////////////////
-// ALPHABET LETTERS, SYMBOLS AND NUMBERS //
-///////////////////////////////////////////
+/* ALPHABET LETTERS, SYMBOLS AND NUMBERS */
 
-/*enum LetterType
-	{
-	ALPHABET;
-	NUMBER_OR_SYMBOL;
-}*/
 typedef Letter =
 {
 	?anim:Null<String>,
@@ -282,9 +275,6 @@ typedef Letter =
 
 class AlphaCharacter extends FlxSprite
 {
-	// public static var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
-	// public static var numbers:String = "1234567890";
-	// public static var symbols:String = "|~#$%()*+-:;<=>@[]^_.,'!?";
 	public var image(default, set):String;
 
 	public static var allLetters:Map<String, Null<Letter>> = [

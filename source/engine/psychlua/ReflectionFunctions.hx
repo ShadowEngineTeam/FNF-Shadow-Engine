@@ -4,10 +4,8 @@ import Type.ValueType;
 import haxe.Constraints;
 import substates.GameOverSubstate;
 
-//
 // Functions that use a high amount of Reflections, which are somewhat CPU intensive
 // These functions are held together by duct tape
-//
 class ReflectionFunctions
 {
 	static final instanceStr:Dynamic = "##PSYCHLUA_STRINGTOOBJ";

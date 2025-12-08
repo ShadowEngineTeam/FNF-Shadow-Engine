@@ -100,7 +100,6 @@ class ModsMenuState extends MusicBeatState
 		if (mod != null)
 			bg.color = mod.bgColor;
 
-		//
 		var buttonX = bgList.x;
 		var buttonWidth = Std.int(bgList.width);
 		var buttonHeight = 80;
@@ -829,7 +828,6 @@ class ModsMenuState extends MusicBeatState
 
 		modsGroup.remove(curMod, true);
 		modsList.all.remove(mod);
-		// if(position > id) position--;
 		modsGroup.insert(position, curMod);
 		modsList.all.insert(position, mod);
 

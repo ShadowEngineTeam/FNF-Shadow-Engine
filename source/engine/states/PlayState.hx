@@ -220,7 +220,7 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
-	// Lua shit
+	// Lua shi
 	public static var instance:PlayState;
 
 	public var introSoundsSuffix:String = '';
@@ -256,7 +256,7 @@ class PlayState extends MusicBeatState
 	public var songSaveNotes:Array<Dynamic> = [];
 	public var songJudges:Array<String> = [];
 
-	// gacha horror related
+	// from gacha horror recreation
 	public var characterPlayingAsDad:Bool = false;
 
 	override public function create()
@@ -334,8 +334,8 @@ class PlayState extends MusicBeatState
 		curStage = SONG.stage;
 
 		var stageData:StageFile = StageData.getStageFile(curStage);
-		if (stageData == null)
-		{ // Stage couldn't be found, create a dummy stage for preventing a crash
+		if (stageData == null) // Stage couldn't be found, create a dummy stage for preventing a crash
+		{
 			stageData = StageData.dummy();
 		}
 
@@ -854,8 +854,8 @@ class PlayState extends MusicBeatState
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false)
 	{
-		if (gfCheck && char.curCharacter.startsWith('gf'))
-		{ // IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
+		if (gfCheck && char.curCharacter.startsWith('gf')) // IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
+		{
 			char.setPosition(GF_X, GF_Y);
 			char.scrollFactor.set(0.95, 0.95);
 			char.danceEveryNumBeats = 2;
@@ -1701,8 +1701,8 @@ class PlayState extends MusicBeatState
 				if (ClientPrefs.data.middleScroll)
 				{
 					babyArrow.x += 310;
-					if (i > 1)
-					{ // Up and Right
+					if (i > 1) // Up and Right
+					{
 						babyArrow.x += FlxG.width / 2 + 25;
 					}
 				}
@@ -2043,8 +2043,8 @@ class PlayState extends MusicBeatState
 				KillNotes();
 				FlxG.sound.music.onComplete();
 			}
-			if (FlxG.keys.justPressed.TWO)
-			{ // Go 10 seconds into the future :O
+			if (FlxG.keys.justPressed.TWO) // Go 10 seconds into the future!! :OOO
+			{
 				setSongTime(Conductor.songPosition + 10000);
 				clearNotesBefore(Conductor.songPosition);
 			}
@@ -2301,8 +2301,8 @@ class PlayState extends MusicBeatState
 
 				if (value != 0)
 				{
-					if (dad.curCharacter.startsWith('gf'))
-					{ // Tutorial GF is actually Dad! The GF is an imposter!! ding ding ding ding ding ding ding, dindinding, end my suffering
+					if (dad.curCharacter.startsWith('gf')) // Tutorial GF is actually Dad, what on my life I'm doing..-
+					{ 
 						dad.playAnim('cheer', true);
 						dad.specialAnim = true;
 						dad.heyTimer = flValue2;
@@ -2823,7 +2823,6 @@ class PlayState extends MusicBeatState
 	{
 		var noteDiffNoAbs:Float = note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
 		var noteDiff:Float = Math.abs(noteDiffNoAbs);
-		//vocals.volume = 1;
 
 		if (!ClientPrefs.data.comboStacking && comboGroup.members.length > 0)
 		{
@@ -3085,8 +3084,8 @@ class PlayState extends MusicBeatState
 
 		var shouldMiss:Bool = !ClientPrefs.data.ghostTapping;
 
-		if (plrInputNotes.length != 0)
-		{ // slightly faster than doing `> 0` lol
+		if (plrInputNotes.length != 0) // slightly faster than doing "> 0" lol
+		{
 			var funnyNote:Note = plrInputNotes[0]; // front note
 
 			if (plrInputNotes.length > 1)
@@ -3229,8 +3228,8 @@ class PlayState extends MusicBeatState
 		{
 			if (notes.length > 0)
 			{
-				for (n in notes)
-				{ // I can't do a filter here, that's kinda awesome
+				for (n in notes) // I can't do a filter here, that's kinda awesome
+				{
 					var canHit:Bool = (n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit);
 
 					if (guitarHeroSustains)
@@ -3272,8 +3271,8 @@ class PlayState extends MusicBeatState
 					keyReleased(i);
 	}
 
-	function noteMiss(daNote:Note):Void
-	{ // You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	function noteMiss(daNote:Note):Void // You didn't hit the key and let it go offscreen, also used by Hurt Notes
+	{
 		// Dupe note remove
 		notes.forEachAlive(function(note:Note)
 		{
@@ -3311,7 +3310,7 @@ class PlayState extends MusicBeatState
 	function noteMissPress(direction:Int = 1):Void // You pressed a key when there was no notes to press for this key
 	{
 		if (ClientPrefs.data.ghostTapping)
-			return; // fuck it
+			return; // fuck it we ball
 
 		noteMissCommon(direction);
 		FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));

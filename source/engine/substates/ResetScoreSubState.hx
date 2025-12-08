@@ -121,8 +121,8 @@ class ResetScoreSubState extends MusicBeatSubstate
 			ClientPrefs.saveSettings();
 			close();
 		}
-		if (touchPad == null)
-		{ // sometimes it dosent add the vpad, hopefully this fixes it
+		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
+		{
 			addTouchPad("LEFT_RIGHT", "A_B");
 			addTouchPadCamera(false);
 		}

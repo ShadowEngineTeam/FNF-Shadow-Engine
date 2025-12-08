@@ -311,8 +311,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 				}
 			}
 		}
-		else
-		{ // Dialogue ending
+		else // Dialogue ending
+		{
 			if (box != null && box.animation.curAnim.curFrame <= 0)
 			{
 				remove(box);
@@ -468,8 +468,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		return cast Json.parse(Assets.getText(path), path);
 	}
 
+	// Had to make it static because of the editors
 	public static function updateBoxOffsets(box:FlxSprite)
-	{ // Had to make it static because of the editors
+	{
 		box.centerOffsets();
 		box.updateHitbox();
 		if (box.animation.curAnim.name.startsWith('angry'))

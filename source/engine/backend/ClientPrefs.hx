@@ -21,8 +21,8 @@ import states.TitleState;
 	#end
 	public var hitboxType:String = "Gradient";
 	public var gameOverVibration:Bool = false;
-
 	// end of Mobile and Mobile Controls Releated
+
 	public var downScroll:Bool = false;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;

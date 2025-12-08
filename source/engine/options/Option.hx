@@ -101,7 +101,7 @@ class Option
 
 	public function change()
 	{
-		// nothing lol
+		// nothin'
 		if (onChange != null)
 			onChange();
 	}

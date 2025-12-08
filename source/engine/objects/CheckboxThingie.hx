@@ -12,7 +12,7 @@ class CheckboxThingie extends FlxSprite
 	{
 		super(x, y);
 
-		// why would we need velocity for this
+		// why would we need velocity for this??
 		moves = false;
 		immovable = true;
 

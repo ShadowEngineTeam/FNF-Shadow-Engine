@@ -6,7 +6,6 @@ import lime.system.System;
 import flixel.util.FlxColor;
 
 #if (cpp && windows)
-//import backend.codename.RegistryUtil;
 @:buildXml('
 <target id="haxe">
 	<section if="mingw">
@@ -151,15 +150,6 @@ class Native
 		', enable);
 		#end
 	}
-
-	/*public static function isSystemDarkMode():Bool
-	{
-		#if (cpp && windows)
-		return RegistryUtil.get(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "0";
-		#else
-		return false;
-		#end
-	}*/
 
 	#if cpp
 	@:functionCode('

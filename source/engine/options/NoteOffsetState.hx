@@ -151,8 +151,6 @@ class NoteOffsetState extends MusicBeatState
 		add(timeBar);
 		add(timeTxt);
 
-		///////////////////////
-
 		var blackBox:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, 40, FlxColor.BLACK);
 		blackBox.scrollFactor.set();
 		blackBox.alpha = 0.6;
@@ -319,7 +317,6 @@ class NoteOffsetState extends MusicBeatState
 				gamepadPressed = !FlxG.gamepads.anyJustPressed(START) && controls.ACCEPT;
 				gamepadReleased = !FlxG.gamepads.anyJustReleased(START) && controls.justReleased('accept');
 			}
-			//
 
 			// probably there's a better way to do this but, oh well.
 			if (FlxG.mouse.justPressed || gamepadPressed)

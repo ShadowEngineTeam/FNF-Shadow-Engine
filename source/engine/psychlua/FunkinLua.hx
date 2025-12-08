@@ -73,7 +73,7 @@ class FunkinLua
 		var myFolder:Array<String> = this.scriptName.split('/');
 		#if MODS_ALLOWED
 		if (myFolder[0] + '/' == Paths.mods()
-			&& (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1]))) // is inside mods folder
+			&& (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1]))) // this is inside mods folder
 			this.modFolder = myFolder[1];
 		#end
 
@@ -596,7 +596,6 @@ class FunkinLua
 				set(name, func);
 		}
 
-		//
 		set("getRunningScripts", function()
 		{
 			var runningScripts:Array<String> = [];
@@ -688,8 +687,8 @@ class FunkinLua
 				}
 		});
 
-		set("getGlobalFromScript", function(luaFile:String, global:String)
-		{ // returns the global from a script
+		set("getGlobalFromScript", function(luaFile:String, global:String) // returns the global from a script
+		{
 			var foundScript:String = findScript(luaFile);
 			if (foundScript != null)
 				for (_luaInstance in cast(game.luaArray, Array<Dynamic>))
@@ -706,8 +705,8 @@ class FunkinLua
 					}
 				}
 		});
-		set("setGlobalFromScript", function(luaFile:String, global:String, val:Dynamic)
-		{ // returns the global from a script
+		set("setGlobalFromScript", function(luaFile:String, global:String, val:Dynamic) // returns the global from a script
+		{
 			var foundScript:String = findScript(luaFile);
 			if (foundScript != null)
 				for (luaInstance in cast(game.luaArray, Array<Dynamic>))
@@ -737,8 +736,8 @@ class FunkinLua
 		});
 		set("getVar", FunkinLua.getCurrentMusicState().variables.get);
 
-		set("addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false)
-		{ // would be dope asf.
+		set("addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) // would be dope asf.
+		{
 			var foundScript:String = findScript(luaFile);
 			if (foundScript != null)
 			{
@@ -1712,7 +1711,6 @@ class FunkinLua
 			return LuaUtils.getModSetting(saveTag, modName);
 		});
 		#end
-		//
 
 		set("debugPrint", function(text:Dynamic = '', color:String = 'WHITE') FunkinLua.getCurrentMusicState().addTextToDebug(text, CoolUtil.colorFromString(color)));
 

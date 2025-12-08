@@ -55,7 +55,6 @@ class FunkinPreloader extends FlxBasePreloader
 
 	private var completeTime:Float = -1;
 
-	// Graphics
 	var logo:Bitmap;
 	#if TOUCH_HERE_TO_PLAY
 	var touchHereToPlay:Bitmap;
@@ -76,7 +75,7 @@ class FunkinPreloader extends FlxBasePreloader
 	public function new()
 	{
 		super(0.0);
-		trace('Initializing custom preloader...');
+		// trace('Initializing custom preloader...');
 	}
 
 	override function create():Void

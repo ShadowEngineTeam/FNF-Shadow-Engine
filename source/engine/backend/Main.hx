@@ -23,12 +23,12 @@ import hxgamemode.GamemodeClient;
 class Main extends Sprite
 {
 	public static final game = {
-		width: 1280, // WINDOW width
-		height: 720, // WINDOW height
+		width: 1280, // game width
+		height: 720, // game height
 		initialState: TitleState, // initial game state
 		zoom: -1.0, // game state bounds
 		framerate: 60, // default framerate
-		skipSplash: true, // if the default flixel splash screen should be skipped
+		skipSplash: true, // if the flixel splash screen should be skipped
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
@@ -38,7 +38,6 @@ class Main extends Sprite
 	private static function __init__():Void
 	{
 		#if (linux && !debug)
-		// request start game mode
 		if (GamemodeClient.request_start() != 0)
 		{
 			Sys.println('Failed to request gamemode start: ${GamemodeClient.error_string()}...');
@@ -154,10 +153,8 @@ class Main extends Sprite
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
 		{
-			#if mobile
 			if (fpsVar != null)
 				fpsVar.setScale(Math.min(Lib.current.stage.stageWidth / FlxG.width, Lib.current.stage.stageHeight / FlxG.height));
-			#end
 
 			if (FlxG.cameras != null)
 			{

@@ -215,7 +215,7 @@ class Character extends FlxAnimate
 				var animAnim:String = '' + anim.anim;
 				var animName:String = '' + anim.name;
 				var animFps:Int = anim.fps;
-				var animLoop:Bool = !!anim.loop; // Bruh
+				var animLoop:Bool = !!anim.loop; // bruh?
 				var animIndices:Array<Int> = anim.indices;
 
 				switch (spriteType)
