@@ -20,6 +20,19 @@ import openfl.events.KeyboardEvent;
 import hxgamemode.GamemodeClient;
 #end
 
+#if windows
+@:buildXml('
+<target id="haxe">
+	<lib name="wininet.lib" if="windows" />
+	<lib name="dwmapi.lib" if="windows" />
+</target>
+')
+@:cppFileCode('
+#include <windows.h>
+#include <winuser.h>
+')
+#end
+
 class Main extends Sprite
 {
 	public static final game = {
@@ -66,6 +79,14 @@ class Main extends Sprite
 		#if android
 		StorageUtil.requestPermissions();
 		#end
+		#end
+
+		#if (cpp && windows)
+		untyped __cpp__("
+			SetProcessDPIAware(); // allows for more crisp visuals
+			SetConsoleOutputCP(CP_UTF8);
+			DisableProcessWindowsGhosting() // lets you move the window and such if it's not responding
+		");
 		#end
 		super();
 
