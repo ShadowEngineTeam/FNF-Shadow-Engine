@@ -68,11 +68,6 @@ void getHandle() {
 #end
 class Native
 {
-	public static function __init__():Void
-	{
-		registerDPIAware();
-	}
-
 	public static function registerDPIAware():Void
 	{
 		#if (cpp && windows)
@@ -148,6 +143,13 @@ class Native
 				DwmSetWindowAttribute(window, 19, &darkMode, sizeof(darkMode));
 			UpdateWindow(window);
 		', enable);
+		#end
+	}
+
+	public static function setConsoleOutputToUTF8():Void
+	{
+		#if (cpp && windows)
+		untyped __cpp__('SetConsoleOutputCP(CP_UTF8);');
 		#end
 	}
 

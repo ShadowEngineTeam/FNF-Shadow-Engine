@@ -131,6 +131,8 @@ class ApplicationMain
         #end
 
         #if (windows && cpp)
+		Native.setConsoleOutputToUTF8();
+		Native.registerDPIAware();
         Native.fixScaling();
         Native.disableWindowsGhosting();
         Native.disableErrorReporting();
