@@ -136,7 +136,9 @@ class ClientPrefs
 		'accept' => [A, START],
 		'back' => [B],
 		'pause' => [START],
-		'reset' => [BACK]
+		'reset' => [BACK],
+		'fullscreen' => [NONE],
+		'fpsCounter' => [NONE]
 	];
 	public static var mobileBinds:Map<String, Array<MobileInputID>> = [
 		'note_up' => [MobileInputID.NOTE_UP, MobileInputID.UP2],
@@ -150,7 +152,9 @@ class ClientPrefs
 		'accept' => [MobileInputID.A],
 		'back' => [MobileInputID.B],
 		'pause' => [#if android MobileInputID.NONE #else MobileInputID.P #end],
-		'reset' => [MobileInputID.NONE]
+		'reset' => [MobileInputID.NONE],
+		'fullscreen' => [MobileInputID.NONE],
+		'fpsCounter' => [MobileInputID.NONE]
 	];
 	public static var defaultMobileBinds:Map<String, Array<MobileInputID>> = null;
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
