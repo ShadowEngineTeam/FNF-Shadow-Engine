@@ -243,8 +243,8 @@ class Project extends HXProject
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
 
-		if (VIDEOS_ALLOWED.isEnabled())
-			setHaxedef("HXVLC_SHARE_DIRECTORY");
+		/*if (VIDEOS_ALLOWED.isEnabled())
+			setHaxedef("HXVLC_SHARE_DIRECTORY");*/
 
 		if (DISCORD_ALLOWED.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
