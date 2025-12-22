@@ -165,7 +165,7 @@ jobs:
       - name: Tar macOS ARM64 Build For Release
         run: |
           cd /home/runner/macOSBuild-arm64
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-macOS-arm64.tar" .
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-arm64.tar" .
 
       - name: Download macOS x86_64 Build
         uses: actions/download-artifact@main
@@ -176,7 +176,7 @@ jobs:
       - name: Tar macOS x86_64 Build For Release
         run: |
           cd /home/runner/macOSBuild-x86_64
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-macOS-x86_64.tar" .
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-x86_64.tar" .
 
       - name: Download Windows i686 Build
         uses: actions/download-artifact@main
