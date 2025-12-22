@@ -56,7 +56,7 @@ jobs:
             "Linux i686")
               sudo dpkg --add-architecture i386
               sudo apt update
-              sudo apt install -y gcc-i686-linux-gnu g++-i686-linux-gnu libvlc-dev:i386 libvlccore-dev:i386
+              sudo apt install -y gcc-multilib g++-multilib libvlc-dev:i386 libvlccore-dev:i386
               ;;
             "Linux ARMV7")
               sudo dpkg --add-architecture armhf
@@ -94,9 +94,6 @@ jobs:
         shell: bash
         run: |
           case "${{ inputs.name }}" in
-            "Linux i686")
-              CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++ linux32 haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
-              ;;
             "Linux ARMV7")
               CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
               ;;
