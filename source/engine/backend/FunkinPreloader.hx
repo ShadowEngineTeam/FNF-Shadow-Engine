@@ -10,6 +10,7 @@ import flash.display.BitmapData;
 import flash.Lib;
 import flixel.system.FlxBasePreloader;
 import openfl.display.Sprite;
+import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
@@ -79,6 +80,85 @@ class FunkinPreloader extends FlxBasePreloader
 		#if TOUCH_HERE_TO_PLAY
 		setupTouchHereToPlay();
 		#end
+		updateLayout();
+
+		Lib.current.stage.addEventListener(Event.RESIZE, onResize);
+	}
+
+	function onResize(e:Event):Void
+	{
+		this._width = Lib.current.stage.stageWidth;
+		this._height = Lib.current.stage.stageHeight;
+		ratio = this._width / BASE_WIDTH / 2.0;
+
+		updateLayout();
+	}
+
+	function updateLayout():Void
+	{
+		if (logo != null)
+		{
+			logo.scaleX = logo.scaleY = ratio;
+			logo.x = (this._width - logo.width) / 2;
+			logo.y = (this._height - logo.height) / 2;
+		}
+
+		if (progressBarPieces != null)
+		{
+			var amountOfPieces:Int = 16;
+			var maxBarWidth:Float = this._width - BAR_PADDING * 2;
+			var pieceWidth:Float = maxBarWidth / amountOfPieces;
+			var pieceGap:Int = 8;
+
+			for (i in 0...progressBarPieces.length)
+			{
+				var piece = progressBarPieces[i];
+				piece.graphics.clear();
+				piece.graphics.beginFill(0xFFA4FF11);
+				piece.graphics.drawRoundRect(0, 0, pieceWidth - pieceGap, BAR_HEIGHT, 4, 4);
+				piece.graphics.endFill();
+				piece.x = BAR_PADDING + i * pieceWidth;
+				piece.y = this._height - BAR_PADDING - BAR_HEIGHT - 200;
+			}
+		}
+
+		if (progressLines != null)
+		{
+			progressLines.graphics.clear();
+			progressLines.graphics.lineStyle(2, 0xFFA4FF11);
+			progressLines.graphics.drawRect(-2, this._height - BAR_PADDING - BAR_HEIGHT - 208, this._width + 4, 30);
+		}
+
+		if (progressLeftText != null)
+		{
+			progressLeftText.x = BAR_PADDING;
+			progressLeftText.y = this._height - BAR_PADDING - BAR_HEIGHT - 290;
+			progressLeftText.width = this._width - BAR_PADDING * 2;
+		}
+		if (progressRightText != null)
+		{
+			progressRightText.x = BAR_PADDING;
+			progressRightText.y = this._height - BAR_PADDING - BAR_HEIGHT - 16 - 4;
+			progressRightText.width = this._width - BAR_PADDING * 2;
+		}
+
+		if (box != null)
+		{
+			box.x = this._width - BAR_PADDING - BAR_HEIGHT - 432;
+			box.y = this._height - BAR_PADDING - BAR_HEIGHT - 244;
+		}
+
+		if (vfdBitmap != null)
+			vfdBitmap.bitmapData = new BitmapData(this._width, this._height, true, 0xFFFFFFFF);
+
+		#if TOUCH_HERE_TO_PLAY
+		if (touchHereToPlay != null)
+		{
+			touchHereToPlay.scaleX = touchHereToPlay.scaleY = ratio;
+			touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
+			touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
+		}
+		#end
 	}
 
 	function setupStage():Void
@@ -95,9 +175,6 @@ class FunkinPreloader extends FlxBasePreloader
 		final logoPath:String = Paths.getPath('preloader/banner.png', IMAGE);
 		final logoBitmapData:BitmapData = BitmapData.fromBytes(File.getBytes(logoPath));
 		logo = new Bitmap(logoBitmapData);
-		logo.scaleX = logo.scaleY = ratio;
-		logo.x = (this._width - logo.width) / 2;
-		logo.y = (this._height - logo.height) / 2;
 		addChild(logo);
 	}
 
@@ -105,23 +182,13 @@ class FunkinPreloader extends FlxBasePreloader
 	{
 		var amountOfPieces:Int = 16;
 		progressBarPieces = [];
-		var maxBarWidth = this._width - BAR_PADDING * 2;
-		var pieceWidth = maxBarWidth / amountOfPieces;
-		var pieceGap:Int = 8;
 
 		progressLines = new Sprite();
-		progressLines.graphics.lineStyle(2, 0xFFA4FF11);
-		progressLines.graphics.drawRect(-2, this._height - BAR_PADDING - BAR_HEIGHT - 208, this._width + 4, 30);
 		addChild(progressLines);
-
+		
 		for (i in 0...amountOfPieces)
 		{
 			var piece = new Sprite();
-			piece.graphics.beginFill(0xFFA4FF11);
-			piece.graphics.drawRoundRect(0, 0, pieceWidth - pieceGap, BAR_HEIGHT, 4, 4);
-			piece.graphics.endFill();
-			piece.x = i * (piece.width + pieceGap);
-			piece.y = this._height - BAR_PADDING - BAR_HEIGHT - 200;
 			addChild(piece);
 			progressBarPieces.push(piece);
 		}
@@ -134,10 +201,7 @@ class FunkinPreloader extends FlxBasePreloader
 		progressLeftTextFormat.align = TextFormatAlign.LEFT;
 		progressLeftText.defaultTextFormat = progressLeftTextFormat;
 		progressLeftText.selectable = false;
-		progressLeftText.width = this._width - BAR_PADDING * 2;
 		progressLeftText.text = 'Downloading assets...';
-		progressLeftText.x = BAR_PADDING;
-		progressLeftText.y = this._height - BAR_PADDING - BAR_HEIGHT - 290;
 		addChild(progressLeftText);
 
 		progressRightText = new TextField();
@@ -145,10 +209,7 @@ class FunkinPreloader extends FlxBasePreloader
 		progressRightTextFormat.align = TextFormatAlign.RIGHT;
 		progressRightText.defaultTextFormat = progressRightTextFormat;
 		progressRightText.selectable = false;
-		progressRightText.width = this._width - BAR_PADDING * 2;
 		progressRightText.text = '0%';
-		progressRightText.x = BAR_PADDING;
-		progressRightText.y = this._height - BAR_PADDING - BAR_HEIGHT - 16 - 4;
 		addChild(progressRightText);
 	}
 
@@ -162,8 +223,6 @@ class FunkinPreloader extends FlxBasePreloader
 		box.graphics.beginFill(0xFFA4FF11, 0.1);
 		box.graphics.drawRoundRect(0, 0, 128, 20, 5, 5);
 		box.graphics.endFill();
-		box.x = this._width - BAR_PADDING - BAR_HEIGHT - 432;
-		box.y = this._height - BAR_PADDING - BAR_HEIGHT - 244;
 		addChild(box);
 
 		dspText = new TextField();
@@ -209,7 +268,7 @@ class FunkinPreloader extends FlxBasePreloader
 
 	function setupVFD():Void
 	{
-		vfdBitmap = new Bitmap(new BitmapData(this._width, this._height, true, 0xFFFFFFFF));
+		vfdBitmap = new Bitmap();
 		addChild(vfdBitmap);
 		vfdShader = new VFDOverlay();
 		vfdBitmap.shader = vfdShader;
@@ -221,9 +280,6 @@ class FunkinPreloader extends FlxBasePreloader
 		final touchPath:String = Paths.getPath('images/preloader/touchHereToPlay.png', IMAGE, null);
 		final touchBitmapData:BitmapData = BitmapData.fromBytes(File.getBytes(touchPath));
 		touchHereToPlay = new Bitmap(touchBitmapData);
-		touchHereToPlay.scaleX = touchHereToPlay.scaleY = ratio;
-		touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
-		touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
 		touchHereToPlay.alpha = 0.0;
 
 		touchHereSprite = new Sprite();
