@@ -207,10 +207,12 @@ class Project extends HXProject
 		setHaxedef("message.reporting", "pretty");
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");
+		setHaxedef("HXCPP_STACK_IDS");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
 		if (DCEBUILD.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
+		setHaxedef("HXCPP_GC_GENERATIONAL");
 		setHaxedef("lime_disable_assets_version");
 		//setHaxedef("lime_use_old_deltatime");
 
