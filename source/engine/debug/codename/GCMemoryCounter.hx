@@ -46,7 +46,7 @@ class GCMemoryCounter extends Sprite
 
 		super.__enterFrame(t);
 
-		final usedGc:Float = /*cpp.NativeGc.gcGarbageEstimate()*/ Gc.memInfo64(Gc.MEM_INFO_USAGE);
+		final usedGc = /*cpp.NativeGc.gcGarbageEstimate()*/ Gc.memInfo64(Gc.MEM_INFO_USAGE);
 
 		if (usedGc == gcMemory)
 		{
