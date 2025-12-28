@@ -79,7 +79,7 @@ class CrashHandler
 	#if (cpp || hl)
 	private static function onError(message:Dynamic):Void
 	{
-		final log:Array<String> = [];
+		var log:Array<String> = [];
 
 		if (message != null && message.length > 0)
 			log.push(message);
