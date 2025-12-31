@@ -10,6 +10,7 @@ using StringTools;
 class Project extends HXProject
 {
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
+	static final TITLE_MOBILE:String = "FNF': Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
 	static final VERSION:String = "0.4.2";
 	static final COMPANY:String = "FNF-SE";
@@ -146,7 +147,7 @@ class Project extends HXProject
 
 	function configureApp():Void
 	{
-		meta.title = TITLE;
+		meta.title = isMobile() ? TITLE_MOBILE : TITLE;
 		if (isIOS())
 			meta.title = ~/ /ig.replace(TITLE, "\u2002");
 		meta.version = VERSION;
