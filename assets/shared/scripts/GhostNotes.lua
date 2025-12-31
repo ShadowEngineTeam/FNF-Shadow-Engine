@@ -71,7 +71,7 @@ function createGhost(char)
     setProperty(ghostTag .. '.scale.y', getProperty(char .. '.scale.y'))
     setProperty(ghostTag .. '.flipX', getProperty(char .. '.flipX'))
 	setProperty(ghostTag .. '.antialiasing', getProperty(char .. '.antialiasing'))
-    if getProperty('inSilhouette') then
+    if getProperty('inSilhouette') then -- GHR leftover but whatever
         setProperty(ghostTag .. '.color', 0x000000)
     end
     setProperty(ghostTag .. '.alpha', getProperty(char .. '.alpha'))
