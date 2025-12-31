@@ -149,7 +149,7 @@ class Project extends HXProject
 	{
 		meta.title = isMobile() ? TITLE_MOBILE : TITLE;
 		if (isIOS())
-			meta.title = ~/ /ig.replace(TITLE, "\u2002");
+			meta.title = ~/ /ig.replace(TITLE_MOBILE, "\u2002");
 		meta.version = VERSION;
 		meta.company = COMPANY;
 		meta.packageName = PACKAGE;
