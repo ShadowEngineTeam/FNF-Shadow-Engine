@@ -56,18 +56,6 @@ jobs:
             assetType: ASTC
             artifactName: linuxBuild-arm64
             artifactPath: export/release/linux/bin/*
-          - name: macOS x86_64
-            os: macos-26
-            buildArgs: "mac -final -64 -D HXCPP_M64 -D officialBuild"
-            assetType: S3TC
-            artifactName: macOSBuild-x86_64
-            artifactPath: export/release/macos/bin/*
-          - name: macOS ARM64
-            os: macos-26
-            buildArgs: "mac -final -arm64 -D HXCPP_ARM64 -D officialBuild"
-            assetType: S3TC
-            artifactName: macOSBuild-arm64
-            artifactPath: export/release/macos/bin/*
           - name: Android
             os: macos-26
             buildArgs: "android -final -D officialBuild"
@@ -82,15 +70,77 @@ jobs:
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
     uses: ./.github/workflows/build.yml
     secrets:
-        SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
-        SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
+      SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
+      SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
     with:
-        name: ${{ matrix.name }}
-        os: ${{ matrix.os }}
-        buildArgs: ${{ matrix.buildArgs }}
-        assetType: ${{ matrix.assetType }}
-        artifactName: ${{ matrix.artifactName }}
-        artifactPath: ${{ matrix.artifactPath }}
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      buildArgs: ${{ matrix.buildArgs }}
+      assetType: ${{ matrix.assetType }}
+      artifactName: ${{ matrix.artifactName }}
+      artifactPath: ${{ matrix.artifactPath }}
+
+  Build-macOS-x86_64:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      name: macOS x86_64
+      os: macos-26
+      buildArgs: "mac -64 -D HXCPP_M64"
+      assetType: S3TC
+      artifactName: macOSBuild-x86_64
+      artifactPath: export/release/macos/bin/*
+
+  Build-macOS-ARM64:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      name: macOS ARM64
+      os: macos-26
+      buildArgs: "mac -arm64 -D HXCPP_ARM64"
+      assetType: S3TC
+      artifactName: macOSBuild-arm64
+      artifactPath: export/release/macos/bin/*
+
+  macOS-universal:
+    name: macOS Universal
+    runs-on: macos-26
+    needs: 
+      - Build-macOS-x86_64
+      - Build-macOS-ARM64
+    steps:
+      - name: Download x86_64 build
+        uses: actions/download-artifact@main
+        with:
+          name: macOSBuild-x86_64-S3TC
+          path: intel
+
+      - name: Download ARM64 build
+        uses: actions/download-artifact@main
+        with:
+          name: macOSBuild-arm64-S3TC
+          path: arm
+
+      - name: Remove ARM64 and x86_64 artifacts
+        uses: geekyeggo/delete-artifact@main
+        with:
+          name: macOSBuild-*
+
+      - name: Create Universal App Bundle
+        shell: bash
+        run: |
+          BIN="ShadowEngine.app/Contents/MacOS"
+          INTEL="intel/ShadowEngine.app/Contents/MacOS"
+          ARM="arm/ShadowEngine.app/Contents/MacOS"
+          cp -R intel/ShadowEngine.app ShadowEngine.app
+          lipo -create "$INTEL/ShadowEngine" "$ARM/ShadowEngine" -output "$BIN/ShadowEngine"
+          lipo -create "$INTEL/lime.ndll" "$ARM/lime.ndll" -output "$BIN/lime.ndll"
+
+      - name: Upload Universal macOS bundle
+        uses: actions/upload-artifact@main
+        with:
+          name: macOSBuild-Universal-S3TC
+          path: ShadowEngine.app
 
   Releaser:
     needs: [build]
@@ -159,27 +209,16 @@ jobs:
           cd /home/runner/linuxBuild-arm64
           tar czf "/home/runner/${{ env.PROJECT_NAME }}-ASTC-linux-arm64.tar" .
 
-      - name: Download macOS ARM64 Build
+      - name: Download macOS Universal Build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-arm64-S3TC
-          path: /home/runner/macOSBuild-arm64
-
-      - name: Tar macOS ARM64 Build For Release
-        run: |
-          cd /home/runner/macOSBuild-arm64
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-arm64.tar" .
-
-      - name: Download macOS x86_64 Build
-        uses: actions/download-artifact@main
-        with:
-          name: macOSBuild-x86_64-S3TC
-          path: /home/runner/macOSBuild-x86_64
+          name: macOSBuild-Universal-S3TC
+          path: /home/runner/macOSBuild-Universal
 
       - name: Tar macOS x86_64 Build For Release
         run: |
-          cd /home/runner/macOSBuild-x86_64
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-x86_64.tar" .
+          cd /home/runner/macOSBuild-Universal
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-Universal.tar" .
 
       - name: Download Windows i686 Build
         uses: actions/download-artifact@main

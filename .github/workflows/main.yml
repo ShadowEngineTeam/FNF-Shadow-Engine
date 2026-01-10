@@ -50,18 +50,6 @@ jobs:
             assetType: ASTC
             artifactName: linuxBuild-arm64
             artifactPath: export/release/linux/bin/*
-          - name: macOS x86_64
-            os: macos-26
-            buildArgs: "mac -64 -D HXCPP_M64"
-            assetType: S3TC
-            artifactName: macOSBuild-x86_64
-            artifactPath: export/release/macos/bin/*
-          - name: macOS ARM64
-            os: macos-26
-            buildArgs: "mac -arm64 -D HXCPP_ARM64"
-            assetType: S3TC
-            artifactName: macOSBuild-arm64
-            artifactPath: export/release/macos/bin/*
           - name: Android
             os: macos-26
             buildArgs: "android -ONLY_ARM64"
@@ -76,12 +64,74 @@ jobs:
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
     uses: ./.github/workflows/build.yml
     secrets:
-        SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
-        SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
+      SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
+      SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
     with:
-        name: ${{ matrix.name }}
-        os: ${{ matrix.os }}
-        buildArgs: ${{ matrix.buildArgs }}
-        assetType: ${{ matrix.assetType }}
-        artifactName: ${{ matrix.artifactName }}
-        artifactPath: ${{ matrix.artifactPath }}
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      buildArgs: ${{ matrix.buildArgs }}
+      assetType: ${{ matrix.assetType }}
+      artifactName: ${{ matrix.artifactName }}
+      artifactPath: ${{ matrix.artifactPath }}
+
+  Build-macOS-x86_64:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      name: macOS x86_64
+      os: macos-26
+      buildArgs: "mac -64 -D HXCPP_M64"
+      assetType: S3TC
+      artifactName: macOSBuild-x86_64
+      artifactPath: export/release/macos/bin/*
+
+  Build-macOS-ARM64:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      name: macOS ARM64
+      os: macos-26
+      buildArgs: "mac -arm64 -D HXCPP_ARM64"
+      assetType: S3TC
+      artifactName: macOSBuild-arm64
+      artifactPath: export/release/macos/bin/*
+
+  macOS-universal:
+    name: macOS Universal
+    runs-on: macos-26
+    needs: 
+      - Build-macOS-x86_64
+      - Build-macOS-ARM64
+    steps:
+      - name: Download x86_64 build
+        uses: actions/download-artifact@main
+        with:
+          name: macOSBuild-x86_64-S3TC
+          path: intel
+
+      - name: Download ARM64 build
+        uses: actions/download-artifact@main
+        with:
+          name: macOSBuild-arm64-S3TC
+          path: arm
+
+      - name: Remove ARM64 and x86_64 artifacts
+        uses: geekyeggo/delete-artifact@main
+        with:
+          name: macOSBuild-*
+
+      - name: Create Universal App Bundle
+        shell: bash
+        run: |
+          BIN="ShadowEngine.app/Contents/MacOS"
+          INTEL="intel/ShadowEngine.app/Contents/MacOS"
+          ARM="arm/ShadowEngine.app/Contents/MacOS"
+          cp -R intel/ShadowEngine.app ShadowEngine.app
+          lipo -create "$INTEL/ShadowEngine" "$ARM/ShadowEngine" -output "$BIN/ShadowEngine"
+          lipo -create "$INTEL/lime.ndll" "$ARM/lime.ndll" -output "$BIN/lime.ndll"
+
+      - name: Upload Universal macOS bundle
+        uses: actions/upload-artifact@main
+        with:
+          name: macOSBuild-Universal-S3TC
+          path: ShadowEngine.app
