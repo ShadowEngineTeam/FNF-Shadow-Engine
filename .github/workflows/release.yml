@@ -81,7 +81,7 @@ jobs:
       artifactPath: ${{ matrix.artifactPath }}
 
   Build-macOS-x86_64:
-    name: Build
+    name: Build (macOS x86_64)
     uses: ./.github/workflows/build.yml
     with:
       name: macOS x86_64
@@ -92,7 +92,7 @@ jobs:
       artifactPath: export/release/macos/bin/*
 
   Build-macOS-ARM64:
-    name: Build
+    name: Build (macOS ARM64)
     uses: ./.github/workflows/build.yml
     with:
       name: macOS ARM64
