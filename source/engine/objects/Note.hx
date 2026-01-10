@@ -346,12 +346,12 @@ class Note extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 		if (postfix == null)
 			postfix = '';
 
-		var skin:String = texture + postfix;
+		var skin:String = texture;
 		if (texture.length < 1)
 		{
 			skin = PlayState.SONG != null ? PlayState.SONG.playerArrowSkin : null;
 			if (skin == null || skin.length < 1)
-				skin = defaultNoteSkin + postfix;
+				skin = defaultNoteSkin;
 		}
 
 		var animName:String = null;
@@ -370,8 +370,6 @@ class Note extends #if MODCHARTS_ALLOWED FlxSkewedSprite #else FlxSprite #end
 
 		if (Paths.fileExists(fullPath + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || Paths.fileExists(fullPath + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
-		else
-			skinPostfix = '';
 
 		var graphic:FlxGraphic;
 
