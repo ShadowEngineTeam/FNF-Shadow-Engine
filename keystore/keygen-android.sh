@@ -77,7 +77,7 @@ keytool -genkeypair \
   -alias "$ALIAS" \
   -keyalg RSA \
   -keysize 4096 \
-  -validity 36500 \
+  -validity 365 \
   -storepass "$STOREPASS" \
   -keypass "$STOREPASS" \
   -dname "CN=$CN, OU=$OU, O=$O, L=$L, ST=$ST, C=$C" \

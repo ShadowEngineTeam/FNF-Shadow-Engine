@@ -58,7 +58,7 @@ keytool -genkeypair `
   -alias "$alias" `
   -keyalg RSA `
   -keysize 4096 `
-  -validity 36500 `
+  -validity 365 `
   -storepass "$storePass" `
   -keypass "$storePass" `
   -dname "CN=$CN, OU=$OU, O=$O, L=$L, ST=$ST, C=$C" `
