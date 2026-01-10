@@ -12,7 +12,7 @@ class Project extends HXProject
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.4.2";
+	static final VERSION:String = "0.4.3";
 	static final COMPANY:String = "FNF-SE";
 	static final PACKAGE:String = "com.fnfse.shadowengine";
 	static final MAIN_CLASS:String = "backend.Main";
