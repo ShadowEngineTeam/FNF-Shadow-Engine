@@ -201,7 +201,7 @@ class Main extends Sprite
 	{
 		if (event.shiftKey && event.keyCode == FlxKey.F5)
 		{
-			// maybe do some real hot reloading in the future...
+			// SHADOW TODO: maybe do some real hot reloading in the future...
 			FlxG.resetState();
 		}
 	}
