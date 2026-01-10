@@ -22,3 +22,6 @@ vs_Community.exe
 !.vscode/extensions.json
 art/build_html.bat
 art/build_html-debug.bat
+
+### Shadow Engine Keystore
+keystore/android

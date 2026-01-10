@@ -220,11 +220,57 @@ class Project extends HXProject
 
 		if (isAndroid() && !isDebug())
 		{
+			final keystoreDir = Path.join([Sys.getCwd(), "android"]);
+			final keystorePath = Path.join([keystoreDir, "key.keystore"]);
+			final jsonPath = Path.join([keystoreDir, "keystore.json"]);
+
+			if (!FileSystem.exists(keystorePath))
+			{
+				trace('[ERROR] Android keystore not found at: $keystorePath');
+				Sys.exit(1);
+			}
+
+			if (!FileSystem.exists(jsonPath))
+			{
+				trace('[ERROR] keystore.json not found at: $jsonPath');
+				Sys.exit(1);
+			}
+
+			var raw:String = '';
+			try
+			{
+				raw = File.getContent(jsonPath);
+			}
+			catch (e)
+			{
+				trace('[ERROR] Failed to read keystore.json');
+				Sys.exit(1);
+				return;
+			}
+
+			var data:Dynamic;
+			try
+			{
+				data = haxe.Json.parse(raw);
+			}
+			catch (e)
+			{
+				trace('[ERROR] keystore.json is not valid JSON');
+				Sys.exit(1);
+				return;
+			}
+
+			if (data == null || !Reflect.hasField(data, "alias") || !Reflect.hasField(data, "storepass") || !Reflect.hasField(data, "keypass"))
+			{
+				trace('[ERROR] keystore.json missing required fields (alias, storepass, keypass)');
+				Sys.exit(1);
+			}
+
 			keystore = new Keystore();
-			keystore.path = haxe.io.Path.join([Sys.getCwd(), "key.keystore"]);
-			keystore.alias = "fnfse";
-			keystore.password = "fnfshadow";
-			keystore.aliasPassword = "fnfshadow";
+			keystore.path = keystorePath;
+			keystore.alias = Std.string(data.alias);
+			keystore.password = Std.string(data.storepass);
+			keystore.aliasPassword = Std.string(data.keypass);
 		}
 
 		if (isIOS())
