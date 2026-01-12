@@ -637,13 +637,12 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 	public function startHScriptsNamed(scriptFile:String)
 	{
 		final lower:String = scriptFile.toLowerCase();
-		final filteredFucks:Array<String> = extensions.filter(ext -> lower.endsWith(ext));
+		final filteredFiles:Array<String> = extensions.filter(ext -> lower.endsWith(ext));
 
-		// ignore this I was upset and tired
 		var foundScripts:Array<String> = [];
-		for (i in 0...filteredFucks.length){
-			if (filteredFucks.length > 0) 
-				foundScripts.push(filteredFucks[i]);
+		for (i in 0...filteredFiles.length){
+			if (filteredFiles.length > 0) 
+				foundScripts.push(filteredFiles[i]);
 			else
 				foundScripts = extensions.map(ext -> scriptFile + ext);
 		}
