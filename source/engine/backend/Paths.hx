@@ -362,11 +362,13 @@ class Paths
 
 	public static function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false, ?library:String = null)
 	{
+		var path:String = getPath(key, type, library, false);
+
 		#if MODS_ALLOWED
 		if (!ignoreMods)
 		{
 			var modKey:String = key;
-			if (library == 'songs')
+			if (library == "songs")
 				modKey = 'songs/$key';
 
 			for (mod in Mods.getGlobalMods())
@@ -378,111 +380,95 @@ class Paths
 		}
 		#end
 
-		if (Assets.exists(getPath(key, type, library, false)))
-		{
-			return true;
-		}
-		return false;
+		return FileSystem.exists(path);
 	}
 
 	static public function getAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
-		var useMod = false;
 		var imageLoaded:FlxGraphic = image(key, library);
 
-		var myXml:Dynamic = getPath('images/$key.xml', TEXT, library, true);
-		if (Assets.exists(myXml) #if MODS_ALLOWED || (FileSystem.exists(myXml) && (useMod = true)) #end)
-		{
-			#if MODS_ALLOWED
-			return FlxAtlasFrames.fromSparrow(imageLoaded, (useMod ? File.getContent(myXml) : myXml));
-			#else
-			return FlxAtlasFrames.fromSparrow(imageLoaded, myXml);
-			#end
-		}
-		else
-		{
-			var myJson:Dynamic = getPath('images/$key.json', TEXT, library, true);
-			if (Assets.exists(myJson) #if MODS_ALLOWED || (FileSystem.exists(myJson) && (useMod = true)) #end)
-			{
-				#if MODS_ALLOWED
-				return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, (useMod ? File.getContent(myJson) : myJson));
-				#else
-				return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, myJson);
-				#end
-			}
-		}
+		var xmlPath:String = getPath('images/$key.xml', TEXT, library, true);
+		#if MODS_ALLOWED
+		var modXml:String = modsXml(key);
+		if (FileSystem.exists(modXml))
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
+		#end
+
+		if (FileSystem.exists(xmlPath))
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath));
+
+		var jsonPath:String = getPath('images/$key.json', TEXT, library, true);
+		#if MODS_ALLOWED
+		var modJson:String = modsImagesJson(key);
+		if (FileSystem.exists(modJson))
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
+		#end
+
+		if (FileSystem.exists(jsonPath))
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath));
+
 		return getPackerAtlas(key, library);
 	}
 
 	static public function getSparrowAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
+
 		#if MODS_ALLOWED
-		var xmlExists:Bool = false;
-
-		var xml:String = modsXml(key);
-		if (FileSystem.exists(xml))
-			xmlExists = true;
-
-		return FlxAtlasFrames.fromSparrow(imageLoaded, (xmlExists ? File.getContent(xml) : getPath('images/$key.xml', library)));
-		#else
-		return FlxAtlasFrames.fromSparrow(imageLoaded, getPath('images/$key.xml', library));
+		var modXml:String = modsXml(key);
+		if (FileSystem.exists(modXml))
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
 		#end
+
+		var xmlPath:String = getPath('images/$key.xml', library);
+		return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath));
 	}
 
 	static public function getPackerAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
+
 		#if MODS_ALLOWED
-		var txtExists:Bool = false;
-
-		var txt:String = modsTxt(key);
-		if (FileSystem.exists(txt))
-			txtExists = true;
-
-		return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, (txtExists ? File.getContent(txt) : getPath('images/$key.txt', library)));
-		#else
-		return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, getPath('images/$key.txt', library));
+		var modTxt:String = modsTxt(key);
+		if (FileSystem.exists(modTxt))
+			return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(modTxt));
 		#end
+
+		var txtPath:String = getPath('images/$key.txt', library);
+		return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(txtPath));
 	}
 
 	static public function getAsepriteAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
+
 		#if MODS_ALLOWED
-		var jsonExists:Bool = false;
-
-		var json:String = modsImagesJson(key);
-		if (FileSystem.exists(json))
-			jsonExists = true;
-
-		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, (jsonExists ? File.getContent(json) : getPath('images/$key.json', library)));
-		#else
-		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, getPath('images/$key.json', library));
+		var modJson:String = modsImagesJson(key);
+		if (FileSystem.exists(modJson))
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
 		#end
+
+		var jsonPath:String = getPath('images/$key.json', library);
+		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath));
 	}
 
 	public static function getTextureAtlas(key:String, ?library:String = null, ?settings:FlxAnimateSettings):FlxAnimateFrames
 	{
-		var animateFolder:String = getPath('images/$key', library);
-
 		if (settings == null)
 			settings = {};
 
 		if (settings.filterQuality == null && ClientPrefs.data.lowQuality)
 			settings.filterQuality = FilterQuality.LOW;
 
+		var animateFolder:String = getPath('images/$key', library);
+
 		#if MODS_ALLOWED
-		var modsExists:Bool = false;
-
-		var modsAnimate:String = modsImages(key);
-		if (FileSystem.exists(modsAnimate))
-			modsExists = true;
-
-		return FlxAnimateFrames.fromAnimate(modsExists ? modsAnimate : animateFolder, settings);
-		#else
-		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
+		var modFolder:String = modsImages(key);
+		if (FileSystem.exists(modFolder))
+			return FlxAnimateFrames.fromAnimate(modFolder, settings);
 		#end
+
+		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
 	}
 
 	static public function formatToSongPath(path:String)

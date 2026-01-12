@@ -180,25 +180,17 @@ class ExtraFunctions
 		// File management
 		funk.set("checkFileExists", function(filename:String, ?absolute:Bool = false)
 		{
-			#if MODS_ALLOWED
 			if (absolute)
-			{
 				return FileSystem.exists(filename);
-			}
 
-			var path:String = Paths.modFolders(filename);
-			if (FileSystem.exists(path))
-			{
+			#if MODS_ALLOWED
+			var modPath:String = Paths.modFolders(filename);
+			if (FileSystem.exists(modPath))
 				return true;
-			}
-			return FileSystem.exists(Paths.getPath('assets/$filename', TEXT));
-			#else
-			if (absolute)
-			{
-				return Assets.exists(filename);
-			}
-			return Assets.exists(Paths.getPath('assets/$filename', TEXT));
 			#end
+
+			var path = Paths.getPath('assets/$filename', TEXT);
+			return FileSystem.exists(path);
 		});
 		funk.set("saveFile", function(path:String, content:String, ?absolute:Bool = false)
 		{
@@ -206,13 +198,13 @@ class ExtraFunctions
 			{
 				#if MODS_ALLOWED
 				if (!absolute)
+				{
 					File.saveContent(Paths.mods(path), content);
-				else
-				#end
-				#if sys
-				File.saveContent(path, content);
+					return true;
+				}
 				#end
 
+				File.saveContent(path, content);
 				return true;
 			}
 			catch (e:Dynamic)
@@ -228,21 +220,19 @@ class ExtraFunctions
 				#if MODS_ALLOWED
 				if (!ignoreModFolders)
 				{
-					var lePath:String = Paths.modFolders(path);
-					if (FileSystem.exists(lePath))
+					var modPath = Paths.modFolders(path);
+					if (FileSystem.exists(modPath))
 					{
-						FileSystem.deleteFile(lePath);
+						FileSystem.deleteFile(modPath);
 						return true;
 					}
 				}
 				#end
 
-				var lePath:String = Paths.getPath(path, TEXT);
-				if (Assets.exists(lePath))
+				var realPath = Paths.getPath(path, TEXT);
+				if (FileSystem.exists(realPath))
 				{
-					#if sys
-					FileSystem.deleteFile(lePath);
-					#end
+					FileSystem.deleteFile(realPath);
 					return true;
 				}
 			}

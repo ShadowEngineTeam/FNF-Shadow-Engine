@@ -231,21 +231,20 @@ class LoadingState extends MusicBeatState
 			var json:Dynamic = null;
 
 			#if MODS_ALLOWED
-			var moddyFile:String = Paths.modsJson('$folder/preload');
-			if (FileSystem.exists(moddyFile))
-				json = Json.parse(File.getContent(moddyFile), moddyFile);
-			else
+			var modPath:String = Paths.modsJson('$folder/preload');
+			if (FileSystem.exists(modPath))
+				json = Json.parse(File.getContent(modPath), modPath);
+			else if (FileSystem.exists(path))
 				json = Json.parse(File.getContent(path), path);
 			#else
-			json = Json.parse(Assets.getText(path), path);
+			if (FileSystem.exists(path))
+				json = Json.parse(File.getContent(path), path);
 			#end
 
 			if (json != null)
 				prepare((!ClientPrefs.data.lowQuality || json.images_low) ? json.images : json.images_low, json.sounds, json.music);
 		}
-		catch (e:Dynamic)
-		{
-		}
+		catch (e:Dynamic) {}
 
 		if (song.stage == null || song.stage.length < 1)
 			song.stage = StageData.vanillaSongStage(folder);

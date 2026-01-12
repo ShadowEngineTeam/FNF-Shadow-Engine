@@ -794,26 +794,23 @@ class PlayState extends MusicBeatState
 	{
 		// Lua
 		#if LUA_ALLOWED
-		var doPush:Bool = false;
 		var luaFile:String = 'characters/$name.lua';
+		var doPush:Bool = false;
+
 		#if MODS_ALLOWED
-		var replacePath:String = Paths.modFolders(luaFile);
-		if (FileSystem.exists(replacePath))
+		var modPath:String = Paths.modFolders(luaFile);
+		if (FileSystem.exists(modPath))
 		{
-			luaFile = replacePath;
+			luaFile = modPath;
 			doPush = true;
 		}
 		else
+		#end
 		{
 			luaFile = Paths.getSharedPath(luaFile);
 			if (FileSystem.exists(luaFile))
 				doPush = true;
 		}
-		#else
-		luaFile = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaFile))
-			doPush = true;
-		#end
 
 		if (doPush)
 		{
@@ -832,42 +829,38 @@ class PlayState extends MusicBeatState
 
 		// HScript
 		#if HSCRIPT_ALLOWED
-		final baseScriptPath:String = 'characters/$name';
-		var doPush:Bool = false;
-		var scriptFile:Null<String> = null;
+		var baseScriptPath:String = 'characters/$name';
+		var scriptFile:String = null;
+		doPush = false;
 
-		for (ext in FunkinLua.getCurrentMusicState().hscriptExtensions)
+		for (dynamicExt in cast(FunkinLua.getCurrentMusicState().hscriptExtensions, Array<Dynamic>))
 		{
-			var origin:String = baseScriptPath + ext;
+			final ext:String = cast(dynamicExt, String);
+			var candidate:String = baseScriptPath + ext;
+
 			#if MODS_ALLOWED
-			var replacePath:String = Paths.modFolders(origin);
-			if (FileSystem.exists(replacePath))
+			var modCandidate:String = Paths.modFolders(candidate);
+			if (FileSystem.exists(modCandidate))
 			{
-				scriptFile = replacePath;
+				scriptFile = modCandidate;
 				doPush = true;
 				break;
 			}
 			else
 			#end
 			{
-				origin = Paths.getSharedPath(origin);
-				if (FileSystem.exists(origin))
+				candidate = Paths.getSharedPath(candidate);
+				if (FileSystem.exists(candidate))
 				{
-					scriptFile = origin;
+					scriptFile = candidate;
 					doPush = true;
 					break;
 				}
 			}
 		}
 
-		if (doPush)
-		{
-			if (SScript.global.exists(scriptFile))
-				doPush = false;
-
-			if (doPush)
-				FunkinLua.getCurrentMusicState().initHScript(scriptFile);
-		}
+		if (doPush && !SScript.global.exists(scriptFile))
+			FunkinLua.getCurrentMusicState().initHScript(scriptFile);
 		#end
 	}
 
@@ -3894,7 +3887,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public function initLuaShader(name:String)
+	public function initLuaShader(name:String):Bool
 	{
 		if (!ClientPrefs.data.shaders)
 			return false;
@@ -3906,63 +3899,46 @@ class PlayState extends MusicBeatState
 			return true;
 		}
 
+		var folders:Array<String> = [];
 		#if MODS_ALLOWED
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'shaders/'))
-		{
-			var frag:String = folder + name + '.frag';
-			var vert:String = folder + name + '.vert';
-			var found:Bool = false;
-			if (FileSystem.exists(frag))
-			{
-				frag = File.getContent(frag);
-				found = true;
-			}
-			else
-				frag = null;
+		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
+			folders.push(Paths.mods(Mods.currentModDirectory + '/shaders/'));
+		for (mod in Mods.getGlobalMods())
+			folders.push(Paths.mods(mod + '/shaders/'));
+		#end
+		folders.push(Paths.getSharedPath('shaders/'));
 
-			if (FileSystem.exists(vert))
+		for (folder in folders)
+		{
+			if (!FileSystem.exists(folder))
+				continue;
+
+			var fragPath = folder + name + '.frag';
+			var vertPath = folder + name + '.vert';
+
+			var frag:String = null;
+			var vert:String = null;
+			var found:Bool = false;
+
+			if (FileSystem.exists(fragPath))
 			{
-				vert = File.getContent(vert);
+				frag = File.getContent(fragPath);
 				found = true;
 			}
-			else
-				vert = null;
+
+			if (FileSystem.exists(vertPath))
+			{
+				vert = File.getContent(vertPath);
+				found = true;
+			}
 
 			if (found)
 			{
 				runtimeShaders.set(name, [frag, vert]);
-				// trace('Found shader $name!');
 				return true;
 			}
 		}
-		#else
-		final folder:String = Paths.getSharedPath('shaders/');
-		var frag:String = folder + name + '.frag';
-		var vert:String = folder + name + '.vert';
-		var found:Bool = false;
-		if (Assets.exists(frag))
-		{
-			frag = Assets.getText(frag);
-			found = true;
-		}
-		else
-			frag = null;
 
-		if (Assets.exists(vert))
-		{
-			vert = Assets.getText(vert);
-			found = true;
-		}
-		else
-			vert = null;
-
-		if (found)
-		{
-			runtimeShaders.set(name, [frag, vert]);
-			// trace('Found shader $name!');
-			return true;
-		}
-		#end
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		FunkinLua.getCurrentMusicState().addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
 		#else
@@ -3971,6 +3947,7 @@ class PlayState extends MusicBeatState
 		#else
 		FlxG.log.warn('This platform doesn\'t support Runtime Shaders!');
 		#end
+
 		return false;
 	}
 	#end

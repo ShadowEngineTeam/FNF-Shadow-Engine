@@ -92,9 +92,8 @@ class StageData
 
 	public static function getStageFile(stage:String):StageFile
 	{
-		var rawJson:String = null;
 		var path:String = Paths.getSharedPath('stages/' + stage + '.json');
-
+		var rawJson:String = null;
 		#if MODS_ALLOWED
 		var modPath:String = Paths.modFolders('stages/' + stage + '.json');
 		if (FileSystem.exists(modPath))
@@ -102,16 +101,10 @@ class StageData
 			path = modPath;
 			rawJson = File.getContent(modPath);
 		}
-		else if (FileSystem.exists(path))
-		{
-			rawJson = File.getContent(path);
-		}
-		#else
-		if (Assets.exists(path))
-		{
-			rawJson = Assets.getText(path);
-		}
+		else
 		#end
+		if (FileSystem.exists(path))
+			rawJson = File.getContent(path);
 
 		return cast Json.parse(rawJson, path);
 	}

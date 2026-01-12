@@ -328,39 +328,69 @@ class WeekEditorState extends MusicBeatState
 	function reloadBG()
 	{
 		bgSprite.visible = true;
-		var assetName:String = weekFile.weekBackground;
+		var assetName = weekFile.weekBackground;
+		var isMissing = true;
 
-		var isMissing:Bool = true;
 		if (assetName != null && assetName.length > 0)
 		{
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsImages('menubackgrounds/menu_' + assetName))
-				|| #end Assets.exists(Paths.getPath('images/menubackgrounds/menu_' + assetName + '.png', IMAGE), IMAGE))
+			#if MODS_ALLOWED
+			var modPath = Paths.modsImages('menubackgrounds/menu_' + assetName);
+			if (FileSystem.exists(modPath))
 			{
-				bgSprite.loadGraphic(Paths.image('menubackgrounds/menu_' + assetName));
+				bgSprite.loadGraphic(modPath);
 				isMissing = false;
+			}
+			else
+			#end
+			{
+				var basePath = Paths.getPath('images/menubackgrounds/menu_' + assetName + '.png', IMAGE);
+				if (FileSystem.exists(basePath))
+				{
+					bgSprite.loadGraphic(basePath);
+					isMissing = false;
+				}
 			}
 		}
 
 		if (isMissing)
-		{
 			bgSprite.visible = false;
-		}
 	}
 
 	function reloadWeekThing()
 	{
 		weekThing.visible = true;
 		missingFileText.visible = false;
-		var assetName:String = weekFileInputText.text.trim();
 
+		var assetName:String = weekFileInputText.text.trim();
 		var isMissing:Bool = true;
+
 		if (assetName != null && assetName.length > 0)
 		{
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsImages('storymenu/' + assetName))
-				|| #end Assets.exists(Paths.getPath('images/storymenu/' + assetName + '.png', IMAGE), IMAGE))
+			#if MODS_ALLOWED
+			var modPath:String = Paths.modsImages('storymenu/' + assetName);
+			if (FileSystem.exists(modPath))
 			{
-				weekThing.loadGraphic(Paths.image('storymenu/' + assetName));
+				weekThing.loadGraphic(modPath);
 				isMissing = false;
+			}
+			else
+			#end
+			{
+				var basePath:String = Paths.getPath('images/storymenu/' + assetName + '.png', IMAGE);
+				if (FileSystem.exists(basePath))
+				{
+					weekThing.loadGraphic(basePath);
+					isMissing = false;
+				}
+				else 
+				{
+					var baseGpuPath:String = Paths.getPath('images/storymenu/' + assetName + Paths.GPU_IMAGE_EXT, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
+					if (FileSystem.exists(baseGpuPath))
+					{
+						weekThing.loadGraphic(baseGpuPath);
+						isMissing = false;
+					}
+				}
 			}
 		}
 
@@ -370,11 +400,11 @@ class WeekEditorState extends MusicBeatState
 			missingFileText.visible = true;
 			missingFileText.text = 'MISSING FILE: images/storymenu/' + assetName + '.png';
 		}
+
 		recalculateStuffPosition();
 
 		#if DISCORD_ALLOWED
-		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Week Editor", "Editting: " + weekFileName);
+		DiscordClient.changePresence("Week Editor", "Editing: " + weekFileName);
 		#end
 	}
 

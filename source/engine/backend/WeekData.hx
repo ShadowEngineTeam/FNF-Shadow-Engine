@@ -117,9 +117,7 @@ class WeekData
 
 						#if MODS_ALLOWED
 						if (j >= originalLength)
-						{
 							weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length - 1);
-						}
 						#end
 
 						if (weekFile != null

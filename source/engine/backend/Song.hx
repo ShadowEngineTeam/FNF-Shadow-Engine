@@ -109,38 +109,34 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
 	{
-		var rawJson = null;
-		var path:String = "";
-
-		var formattedFolder:String = Paths.formatToSongPath(folder);
-		var formattedSong:String = Paths.formatToSongPath(jsonInput);
+		var formattedFolder:String  = Paths.formatToSongPath(folder);
+		var formattedSong:String  = Paths.formatToSongPath(jsonInput);
+		var path:String  = "";
+		var rawJson:String = null;
 		#if MODS_ALLOWED
-		var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
-		if (FileSystem.exists(moddyFile))
+		var modPath:String  = Paths.modsJson(formattedFolder + '/' + formattedSong);
+		if (FileSystem.exists(modPath))
 		{
-			path = moddyFile;
-			rawJson = File.getContent(moddyFile).trim();
+			path = modPath;
+			rawJson = File.getContent(modPath).trim();
 		}
 		#end
 
 		if (rawJson == null)
 		{
 			path = Paths.json(formattedFolder + '/' + formattedSong);
-			if (FileSystem.exists(path))
-				rawJson = File.getContent(path).trim();
-			else
-				rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();
+			rawJson = File.getContent(path).trim();
 		}
 
+		// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
 		while (!rawJson.endsWith("}"))
-		{
 			rawJson = rawJson.substr(0, rawJson.length - 1);
-			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
-		}
 
 		var songJson:Dynamic = parseJSONshit(rawJson, path);
-		if (!jsonInput.startsWith('events'))
+
+		if (!jsonInput.startsWith("events"))
 			StageData.loadDirectory(songJson);
+
 		onLoadJson(songJson);
 		return songJson;
 	}

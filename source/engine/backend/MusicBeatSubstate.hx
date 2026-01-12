@@ -492,16 +492,14 @@ class MusicBeatSubstate extends FlxSubState
 	#if LUA_ALLOWED
 	public function startLuasNamed(luaFile:String)
 	{
+		var luaToLoad:String = '';
 		#if MODS_ALLOWED
-		var luaToLoad:String = Paths.modFolders(luaFile);
+		luaToLoad = Paths.modFolders(luaFile);
 		if (!FileSystem.exists(luaToLoad))
+		#end
 			luaToLoad = Paths.getSharedPath(luaFile);
 
 		if (FileSystem.exists(luaToLoad))
-		#else
-		var luaToLoad:String = Paths.getSharedPath(luaFile);
-		if (openfl.Assets.exists(luaToLoad))
-		#end
 		{
 			for (script in luaArray)
 				if (script.scriptName == luaToLoad)
@@ -519,7 +517,7 @@ class MusicBeatSubstate extends FlxSubState
 	{
 		final lower:String = scriptFile.toLowerCase();
 		final filteredFiles:Array<String> = hscriptExtensions.filter(ext -> lower.endsWith(ext));
-		var foundScripts:Array<String> = []
+		var foundScripts:Array<String> = [];
 
 		if (filteredFiles.length > 0)
 			for (i in 0...filteredFiles.length)
@@ -529,15 +527,14 @@ class MusicBeatSubstate extends FlxSubState
 
 		for (file in foundScripts)
 		{
+			var scriptToLoad:String = '';
 			#if MODS_ALLOWED
-			var scriptToLoad:String = Paths.modFolders(file);
+			scriptToLoad = Paths.modFolders(file);
 			if (!FileSystem.exists(scriptToLoad))
-				scriptToLoad = Paths.getSharedPath(file);
-			#else
-			var scriptToLoad:String = Paths.getSharedPath(file);
 			#end
+				scriptToLoad = Paths.getSharedPath(file);
 
-			if (#if MODS_ALLOWED FileSystem.exists(scriptToLoad) #else openfl.Assets.exists(scriptToLoad) #end)
+			if (FileSystem.exists(scriptToLoad))
 			{
 				if (SScript.global.exists(scriptToLoad))
 					return false;
