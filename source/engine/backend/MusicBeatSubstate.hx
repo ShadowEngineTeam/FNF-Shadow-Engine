@@ -519,14 +519,13 @@ class MusicBeatSubstate extends FlxSubState
 	{
 		final lower:String = scriptFile.toLowerCase();
 		final filteredFiles:Array<String> = hscriptExtensions.filter(ext -> lower.endsWith(ext));
+		var foundScripts:Array<String> = []
 
-		var foundScripts:Array<String> = [];
-		for (i in 0...filteredFiles.length){
-			if (filteredFiles.length > 0) 
+		if (filteredFiles.length > 0)
+			for (i in 0...filteredFiles.length)
 				foundScripts.push(filteredFiles[i]);
-			else
-				foundScripts = hscriptExtensions.map(ext -> scriptFile + ext);
-		}
+		else
+			foundScripts.push(scriptFile);
 
 		for (file in foundScripts)
 		{
