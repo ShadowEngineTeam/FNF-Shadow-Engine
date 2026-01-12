@@ -970,12 +970,36 @@ class ChartingState extends MusicBeatState
 			for (file in FileSystem.readDirectory(folder))
 			{
 				var fileName:String = file.toLowerCase().trim();
-				var wordLen:Int = 4; // length of word ".lua" and ".txt";
-				if ((#if LUA_ALLOWED fileName.endsWith('.lua')
-					|| #end#if HSCRIPT_ALLOWED (fileName.endsWith('.hx') && (wordLen = 3) == 3) || #end fileName.endsWith('.txt'))
-					&& fileName != 'readme.txt')
+
+				var extLen:Int = 4; // default for ".lua" and ".txt"
+				var isValid:Bool = false;
+
+				#if LUA_ALLOWED
+				if (fileName.endsWith('.lua'))
+					isValid = true;
+				#end
+
+				#if HSCRIPT_ALLOWED
+				if (!isValid)
 				{
-					var fileToCheck:String = file.substr(0, file.length - wordLen);
+					for (ext in FunkinLua.getCurrentMusicState().hscriptExtensions)
+					{
+						if (fileName.endsWith(ext))
+						{
+							extLen = ext.length;
+							isValid = true;
+							break;
+						}
+					}
+				}
+				#end
+
+				if (!isValid && fileName.endsWith('.txt'))
+					isValid = true;
+
+				if (isValid && fileName != 'readme.txt')
+				{
+					var fileToCheck:String = file.substr(0, file.length - extLen);
 					if (!curNoteTypes.contains(fileToCheck))
 					{
 						curNoteTypes.push(fileToCheck);

@@ -760,9 +760,8 @@ class FunkinLua
 		set("addHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
 		{
 			#if HSCRIPT_ALLOWED
-			final extensions:Array<String> = [".hscript", ".hx", ".hxs", ".hxc"];
 			var foundScript:Null<String> = null;
-			for (ext in extensions)
+			for (ext in FunkinLua.getCurrentMusicState().hscriptExtensions)
 			{
 				foundScript = findScript(hscriptFile, ext);
 				if (foundScript != null)
@@ -812,7 +811,13 @@ class FunkinLua
 		set("removeHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
 		{
 			#if HSCRIPT_ALLOWED
-			var foundScript:String = findScript(hscriptFile, '.hx');
+			var foundScript:Null<String> = null;
+			for (ext in FunkinLua.getCurrentMusicState().hscriptExtensions)
+			{
+				foundScript = findScript(hscriptFile, ext);
+				if (foundScript != null)
+					break;
+			}
 			if (foundScript != null)
 			{
 				if (!ignoreAlreadyRunning)

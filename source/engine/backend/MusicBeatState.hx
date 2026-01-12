@@ -24,6 +24,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 	#if HSCRIPT_ALLOWED
 	public var hscriptArray:Array<HScript> = [];
+	public final hscriptExtensions:Array<String> = ['.hscript', '.hx', '.hxs', '.hxc'];
 	public var instancesExclude:Array<String> = [];
 	#end
 
@@ -43,10 +44,6 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
 	private var currentClassName:String;
-	#end
-	
-	#if HSCRIPT_ALLOWED
-	public final extensions:Array<String> = ['.hscript', '.hx', '.hxs', '.hxc'];
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -637,14 +634,14 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 	public function startHScriptsNamed(scriptFile:String)
 	{
 		final lower:String = scriptFile.toLowerCase();
-		final filteredFiles:Array<String> = extensions.filter(ext -> lower.endsWith(ext));
+		final filteredFiles:Array<String> = hscriptExtensions.filter(ext -> lower.endsWith(ext));
 
 		var foundScripts:Array<String> = [];
 		for (i in 0...filteredFiles.length){
 			if (filteredFiles.length > 0) 
 				foundScripts.push(filteredFiles[i]);
 			else
-				foundScripts = extensions.map(ext -> scriptFile + ext);
+				foundScripts = hscriptExtensions.map(ext -> scriptFile + ext);
 		}
 
 		for (file in foundScripts)
