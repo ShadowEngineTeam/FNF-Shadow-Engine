@@ -836,7 +836,7 @@ class PlayState extends MusicBeatState
 		var doPush:Bool = false;
 		var scriptFile:Null<String> = null;
 
-		for (ext in extensions)
+		for (ext in FunkinLua.getCurrentMusicState().hscriptExtensions)
 		{
 			var origin:String = baseScriptPath + ext;
 			#if MODS_ALLOWED
