@@ -44,6 +44,10 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 	private var luaDebugCam:FlxCamera;
 	private var currentClassName:String;
 	#end
+	
+	#if HSCRIPT_ALLOWED
+	public final extensions:Array<String> = ['.hscript', '.hx', '.hxs', '.hxc'];
+	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
@@ -632,18 +636,16 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 	#if HSCRIPT_ALLOWED
 	public function startHScriptsNamed(scriptFile:String)
 	{
+		final lower:String = scriptFile.toLowerCase();
+		final filteredFucks:Array<String> = extensions.filter(ext -> lower.endsWith(ext));
+
+		// ignore this I was upset and tired
 		var foundScripts:Array<String> = [];
-		// backwards compatibility
-		if (scriptFile.endsWith(".hx")
-			|| scriptFile.endsWith(".hscript")
-			|| scriptFile.endsWith(".hxs")
-			|| scriptFile.endsWith(".hxc"))
-			foundScripts.push(scriptFile);
-		else
-		{
-			foundScripts.push(scriptFile + ".hscript");
-			foundScripts.push(scriptFile + ".hxs");
-			foundScripts.push(scriptFile + ".hxc");
+		for (i in 0...filteredFucks.length){
+			if (filteredFucks.length > 0) 
+				foundScripts.push(filteredFucks[i]);
+			else
+				foundScripts = extensions.map(ext -> scriptFile + ext);
 		}
 
 		for (file in foundScripts)
