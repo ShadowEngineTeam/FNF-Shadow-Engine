@@ -424,8 +424,8 @@ class PlayState extends MusicBeatState
 				#end
 
 				#if HSCRIPT_ALLOWED
-				final filteredFuck = extensions.filter(ext -> file.toLowerCase().endsWith(ext));
-				for (fucker in filteredFuck)
+				final filteredFiles:Array<String> = extensions.filter(ext -> file.toLowerCase().endsWith(ext));
+				for (fucker in filteredFiles)
 					FunkinLua.getCurrentMusicState().initHScript(folder + fucker);
 				#end
 			}
@@ -638,8 +638,8 @@ class PlayState extends MusicBeatState
 				#end
 
 				#if HSCRIPT_ALLOWED
-				final filteredFuck = extensions.filter(ext -> file.toLowerCase().endsWith(ext));
-				for (fucker in filteredFuck)
+				final filteredFiles:Array<String> = extensions.filter(ext -> file.toLowerCase().endsWith(ext));
+				for (fucker in filteredFiles)
 					FunkinLua.getCurrentMusicState().initHScript(folder + fucker);
 				#end
 			}
