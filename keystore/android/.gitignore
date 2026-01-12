@@ -1,2 +1,4 @@
 key.keystore
 keystore.json
+!dummy/key.keystore
+!dummy/keystore.json

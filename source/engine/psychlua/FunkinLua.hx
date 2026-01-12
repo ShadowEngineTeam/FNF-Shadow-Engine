@@ -2079,12 +2079,18 @@ class FunkinLua
 		return false;
 	}
 
+	private static var lastMusicState:Dynamic = null;
 	public static function getCurrentMusicState():Dynamic
 	{
 		final s = FlxG.state;
+
+		if (Std.isOfType(s, CustomSubstate) || Std.isOfType(s.subState, CustomSubstate))
+			return lastMusicState;
+
 		if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
-			return cast(s.subState, MusicBeatSubstate);
-		return Std.isOfType(s, MusicBeatState) ? cast(s, MusicBeatState) : null;
+			return lastMusicState = cast(s.subState, MusicBeatSubstate);
+		
+		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : null;
 	}
 }
 

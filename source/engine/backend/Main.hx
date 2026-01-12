@@ -1,5 +1,8 @@
 package backend;
 
+import flixel.addons.transition.FlxTransitionableState;
+import states.MainMenuState;
+import flixel.input.keyboard.FlxKey;
 import debug.codename.Framerate;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
@@ -134,6 +137,8 @@ class Main extends Sprite
 
 		#if desktop
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, toggleFullScreen);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, emergencyEject);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, hotReload);
 		#end
 
 		#if DISCORD_ALLOWED
@@ -180,5 +185,24 @@ class Main extends Sprite
 	{
 		if (Controls.instance.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;
+	}
+
+	function emergencyEject(event:KeyboardEvent):Void
+	{
+		if (event.shiftKey && event.keyCode == FlxKey.F4)
+		{
+			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+			FlxG.switchState(new MainMenuState());
+			Paths.clearStoredMemory();
+		}
+	}
+
+	function hotReload(event:KeyboardEvent):Void
+	{
+		if (event.shiftKey && event.keyCode == FlxKey.F5)
+		{
+			// SHADOW TODO: maybe do some real hot reloading in the future...
+			FlxG.resetState();
+		}
 	}
 }

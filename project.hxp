@@ -9,10 +9,15 @@ using StringTools;
 
 class Project extends HXProject
 {
+	static final ESC = "\x1B";
+	static var COLOR_RESET = ESC + "[0m";
+	static var COLOR_WARNING = ESC + "[33m";
+	static var COLOR_ERROR = ESC + "[31m";
+
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.4.3";
+	static final VERSION:String = "0.4.4";
 	static final COMPANY:String = "FNF-SE";
 	static final PACKAGE:String = "com.fnfse.shadowengine";
 	static final MAIN_CLASS:String = "backend.Main";
@@ -41,6 +46,13 @@ class Project extends HXProject
 			if (!isDisplay())
 				Sys.println(v);
 		};
+
+		if (Sys.systemName().toLowerCase() != "windows" && Sys.getEnv('TERM') == null && Sys.getEnv('TERM') != "dumb")
+		{
+			COLOR_RESET = "";
+			COLOR_WARNING = "";
+			COLOR_ERROR = "";
+		}
 
 		trace("Configuring project...");
 		doWelcomeHeader();
@@ -220,57 +232,57 @@ class Project extends HXProject
 
 		if (isAndroid() && !isDebug())
 		{
-			final keystoreDir = Path.join([Sys.getCwd(), "android"]);
-			final keystorePath = Path.join([keystoreDir, "key.keystore"]);
-			final jsonPath = Path.join([keystoreDir, "keystore.json"]);
+			final keystoreDir = Path.join([Sys.getCwd(), "keystore/android"]);
+			var keystorePath = Path.join([keystoreDir, "key.keystore"]);
+			var jsonPath = Path.join([keystoreDir, "keystore.json"]);
+			var rawJson:String = '';
+			var keyData:Dynamic;
 
 			if (!FileSystem.exists(keystorePath))
 			{
-				trace('[ERROR] Android keystore not found at: $keystorePath');
-				Sys.exit(1);
+				warn('Android keystore not found at: $keystorePath, using dummy.');
+				keystorePath = Path.join([keystoreDir, "dummy", "key.keystore"]);
 			}
 
 			if (!FileSystem.exists(jsonPath))
 			{
-				trace('[ERROR] keystore.json not found at: $jsonPath');
-				Sys.exit(1);
+				warn('Keystore JSON file not found at: $jsonPath, using dummy.');
+				jsonPath = Path.join([keystoreDir, "dummy", "keystore.json"]);
 			}
 
-			var raw:String = '';
 			try
 			{
-				raw = File.getContent(jsonPath);
+				rawJson = File.getContent(jsonPath);
 			}
 			catch (e)
 			{
-				trace('[ERROR] Failed to read keystore.json');
+				error('Failed to read Keystore JSON file.');
 				Sys.exit(1);
 				return;
 			}
 
-			var data:Dynamic;
 			try
 			{
-				data = haxe.Json.parse(raw);
+				keyData = haxe.Json.parse(rawJson);
 			}
 			catch (e)
 			{
-				trace('[ERROR] keystore.json is not valid JSON');
+				error('Keystore JSON file is not valid JSON.');
 				Sys.exit(1);
 				return;
 			}
 
-			if (data == null || !Reflect.hasField(data, "alias") || !Reflect.hasField(data, "storepass") || !Reflect.hasField(data, "keypass"))
+			if (keyData == null || !Reflect.hasField(keyData, "alias") || !Reflect.hasField(keyData, "storepass") || !Reflect.hasField(keyData, "keypass"))
 			{
-				trace('[ERROR] keystore.json missing required fields (alias, storepass, keypass)');
+				error('Keystore JSON file missing required fields (alias, storepass, keypass)');
 				Sys.exit(1);
 			}
 
 			keystore = new Keystore();
 			keystore.path = keystorePath;
-			keystore.alias = Std.string(data.alias);
-			keystore.password = Std.string(data.storepass);
-			keystore.aliasPassword = Std.string(data.keypass);
+			keystore.alias = Std.string(keyData.alias);
+			keystore.password = Std.string(keyData.storepass);
+			keystore.aliasPassword = Std.string(keyData.keypass);
 		}
 
 		if (isIOS())
@@ -414,9 +426,9 @@ class Project extends HXProject
 		var targetPath = Path.addTrailingSlash(rename ?? path);
 
 		if (!FileSystem.exists(path))
-			trace('[ERROR] Path "${path}" was not found');
+			error('Path "${path}" was not found');
 		else if (!FileSystem.isDirectory(path))
-			trace('[ERROR] Path "${path}" needs to be a directory.');
+			error('Path "${path}" needs to be a directory.');
 
 		for (file in FileSystem.readDirectory(path))
 		{
@@ -562,6 +574,12 @@ class Project extends HXProject
 
 	public inline function unsetDefine(name:String):Void
 		defines.remove(name);
+
+	inline function warn(message:String):Void
+		trace('${COLOR_WARNING}[WARNING]${COLOR_RESET} ${message}');
+
+	inline function error(message:String):Void
+		trace('${COLOR_ERROR}[ERROR]${COLOR_RESET} ${message}');
 }
 
 class CompileFlag

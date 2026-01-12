@@ -32,7 +32,7 @@ class CustomSubstate extends MusicBeatSubstate
 					PlayState.instance.vocals.pause();
 			}
 		}
-		FunkinLua.getCurrentMusicState().openSubState(new CustomSubstate(name));
+		FunkinLua.getCurrentMusicState().openSubState(new CustomSubstate(name, FunkinLua.getCurrentMusicState()));
 		FunkinLua.getCurrentMusicState().setOnHScript('customSubstate', instance);
 		FunkinLua.getCurrentMusicState().setOnHScript('customSubstateName', name);
 	}
@@ -90,15 +90,16 @@ class CustomSubstate extends MusicBeatSubstate
 
 	override function create()
 	{
-		instance = this;
-
-		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateCreate', [name]);
+		parent.callOnScripts('onCustomSubstateCreate', [name]);
 		super.create();
-		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateCreatePost', [name]);
+		parent.callOnScripts('onCustomSubstateCreatePost', [name]);
 	}
 
-	public function new(name:String)
+	public var parent:Dynamic = null;
+	public function new(name:String, parent:Dynamic)
 	{
+		instance = this;
+		this.parent = parent;
 		CustomSubstate.name = name;
 		super();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
@@ -107,18 +108,19 @@ class CustomSubstate extends MusicBeatSubstate
 	override function update(elapsed:Float)
 	{
 		final args:Array<Dynamic> = [name, elapsed];
-		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateUpdate', args);
+		parent.callOnScripts('onCustomSubstateUpdate', args);
 		super.update(elapsed);
-		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateUpdatePost', args);
+		parent.callOnScripts('onCustomSubstateUpdatePost', args);
 	}
 
 	override function destroy()
 	{
-		FunkinLua.getCurrentMusicState().callOnScripts('onCustomSubstateDestroy', [name]);
+		parent.callOnScripts('onCustomSubstateDestroy', [name]);
 		name = 'unnamed';
 
-		FunkinLua.getCurrentMusicState().setOnHScript('customSubstate', null);
-		FunkinLua.getCurrentMusicState().setOnHScript('customSubstateName', name);
+		parent.setOnHScript('customSubstate', null);
+		parent.setOnHScript('customSubstateName', name);
+		parent = null;
 		super.destroy();
 	}
 }

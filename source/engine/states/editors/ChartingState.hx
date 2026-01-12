@@ -1217,7 +1217,7 @@ class ChartingState extends MusicBeatState
 		var tab_group_chart = new FlxUI(null, UI_box);
 		tab_group_chart.name = 'Charting';
 
-		#if (desktop || mobile)
+		#if lime_openal
 		if (FlxG.save.data.chart_waveformInst == null)
 			FlxG.save.data.chart_waveformInst = false;
 		if (FlxG.save.data.chart_waveformVoices == null)
@@ -1400,7 +1400,7 @@ class ChartingState extends MusicBeatState
 		tab_group_chart.add(disableAutoScrolling);
 		tab_group_chart.add(metronomeStepper);
 		tab_group_chart.add(metronomeOffsetStepper);
-		#if (desktop || mobile)
+		#if lime_openal
 		tab_group_chart.add(waveformUseInstrumental);
 		tab_group_chart.add(waveformUseVoices);
 		tab_group_chart.add(waveformUseOppVoices);
@@ -2076,17 +2076,22 @@ class ChartingState extends MusicBeatState
 				return;
 			}
 
-			if (touchPad.buttonZ.justPressed || FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL)
+			if (touchPad.buttonZ.justPressed || (FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL))
 			{
 				undo();
 			}
 
-			if (FlxG.keys.justPressed.Z || touchPad.buttonV.justPressed && curZoom > 0 && !FlxG.keys.pressed.CONTROL)
+			if (FlxG.keys.justPressed.Y && FlxG.keys.pressed.CONTROL)
+			{
+				redo();
+			}
+
+			if (((FlxG.keys.justPressed.Z && !FlxG.keys.pressed.CONTROL) || touchPad.buttonV.justPressed) && curZoom > 0)
 			{
 				--curZoom;
 				updateZoom();
 			}
-			if (FlxG.keys.justPressed.X || touchPad.buttonD.justPressed && curZoom < zoomList.length - 1)
+			if ((FlxG.keys.justPressed.X || touchPad.buttonD.justPressed) && curZoom < zoomList.length - 1)
 			{
 				curZoom++;
 				updateZoom();
@@ -2376,7 +2381,6 @@ class ChartingState extends MusicBeatState
 		if (touchPad.buttonG.justPressed || (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB)))
 			playbackSpeed = 1;
 
-
 		if (playbackSpeed <= 0.5)
 			playbackSpeed = 0.5;
 		if (playbackSpeed >= 3)
@@ -2450,13 +2454,6 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
-
-			// SHADOW TODO: no idea
-			/*if (note.mustPress) 
-				note.texture = _song.playerArrowSkin != null ? _song.playerArrowSkin : '';
-			else
-				note.texture = _song.opponentArrowSkin != null ? _song.opponentArrowSkin : '';
-			note.inEditor = true;*/
 		});
 
 		if (metronome.checked && lastConductorPos != Conductor.songPosition)
@@ -2518,7 +2515,7 @@ class ChartingState extends MusicBeatState
 		gridBG.scale.set(GRID_SIZE, GRID_SIZE);
 		gridBG.updateHitbox();
 
-		#if (desktop || mobile)
+		#if lime_openal
 		if (FlxG.save.data.chart_waveformInst || FlxG.save.data.chart_waveformVoices || FlxG.save.data.chart_waveformOppVoices)
 		{
 			updateWaveform();
@@ -2594,7 +2591,7 @@ class ChartingState extends MusicBeatState
 
 	function updateWaveform()
 	{
-		#if (desktop || mobile)
+		#if lime_openal
 		if (waveformPrinted)
 		{
 			var width:Int = Std.int(GRID_SIZE * 8);
@@ -2809,6 +2806,7 @@ class ChartingState extends MusicBeatState
 
 	function changeNoteSustain(value:Float):Void
 	{
+		saveState();
 		if (curSelectedNote != null)
 		{
 			if (curSelectedNote[2] != null)
@@ -2820,6 +2818,15 @@ class ChartingState extends MusicBeatState
 
 		updateNoteUI();
 		updateGrid();
+	}
+
+	function applyNoteSkin(note:Note, isPlayer:Bool)
+	{
+		var skinPath:String = isPlayer ? _song.playerArrowSkin : _song.opponentArrowSkin;
+		note.texture = skinPath;
+		note.setGraphicSize(GRID_SIZE, GRID_SIZE);
+		note.updateHitbox();
+		note.inEditor = true;
 	}
 
 	function recalculateSteps(add:Float = 0):Int
@@ -3072,6 +3079,8 @@ class ChartingState extends MusicBeatState
 			note.mustPress = _song.notes[curSec].mustHitSection;
 			if (i[1] > 3)
 				note.mustPress = !note.mustPress;
+
+			applyNoteSkin(note, note.mustPress);
 		}
 
 		// CURRENT EVENTS
@@ -3114,6 +3123,10 @@ class ChartingState extends MusicBeatState
 				{
 					nextRenderedSustains.add(setupSusNote(note, beats));
 				}
+
+				note.mustPress = _song.notes[curSec + 1].mustHitSection;
+				if (i[1] > 3) note.mustPress = !note.mustPress;
+				applyNoteSkin(note, note.mustPress);
 			}
 		}
 
@@ -3270,6 +3283,8 @@ class ChartingState extends MusicBeatState
 
 	function deleteNote(note:Note):Void
 	{
+		saveState();
+
 		var noteDataToCheck:Int = note.noteData;
 		if (noteDataToCheck > -1 && note.mustPress != _song.notes[curSec].mustHitSection)
 			noteDataToCheck += 4;
@@ -3344,6 +3359,8 @@ class ChartingState extends MusicBeatState
 
 	private function addNote(strum:Null<Float> = null, data:Null<Int> = null, type:Null<Int> = null):Void
 	{
+		saveState();
+
 		var noteStrum = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
 		var noteData = 0;
 		if (controls.mobileC)
@@ -3390,10 +3407,41 @@ class ChartingState extends MusicBeatState
 		updateNoteUI();
 	}
 
-	function redo() {}
+	function redo()
+	{
+		if (redos.length > 0)
+		{
+			undos.push(Json.stringify(_song));
+			_song = Json.parse(redos.pop());
+			updateGrid();
+			updateSectionUI();
+			updateNoteUI();
+			updateHeads();
+			updateWaveform();
+			changeSection(curSec, false);
+		}
+	}
 
 	function undo()
-		undos.pop();
+	{
+		if (undos.length > 0)
+		{
+			redos.push(Json.stringify(_song));
+			_song = Json.parse(undos.pop());
+			updateGrid();
+			updateSectionUI();
+			updateNoteUI();
+			updateHeads();
+			updateWaveform();
+			changeSection(curSec, false);
+		}
+	}
+
+	function saveState()
+	{
+		undos.push(Json.stringify(_song));
+		redos = [];
+	}
 
 	function getStrumTime(yPos:Float, doZoomCalc:Bool = true):Float
 	{
