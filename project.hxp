@@ -324,7 +324,7 @@ class Project extends HXProject
 	function configureAssets()
 	{
 		includeAssetLibrary("default", true, false);
-		// addAssetPath("assets/embed", null, true);
+		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
 		addAssetPath("assets/shared");
 
