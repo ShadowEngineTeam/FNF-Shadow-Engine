@@ -1,4 +1,5 @@
 - Switch SScript to RuleScript or hscript-improved(?) [in a nutshell screw SScript]
+- Switch Game Res from 720p to 1080p (?)
 - Add hxfmod
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Results Screen(?), Freeplay(?), Char Select(?) and Wide Screen Support
