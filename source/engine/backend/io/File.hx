@@ -158,7 +158,7 @@ class File
 		#if linux
 		actualSrc = getCaseInsensitivePath(actualSrc);
 		if (actualSrc == null)
-			actualSrc = actualSrc;
+			actualSrc = srcPath;
 		#end
 		SysFile.copy(actualSrc, dstPath);
 		#end
