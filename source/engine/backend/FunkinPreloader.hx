@@ -277,7 +277,7 @@ class FunkinPreloader extends FlxBasePreloader
 	#if TOUCH_HERE_TO_PLAY
 	function setupTouchHereToPlay():Void
 	{
-		final touchPath:String = Paths.getPath('preloader/touchHereToPlay.png', IMAGE, null);
+		final touchPath:String = Paths.getPath('images/preloader/touchHereToPlay.png', IMAGE, null);
 		final touchBitmapData:BitmapData = BitmapData.fromBytes(File.getBytes(touchPath));
 		touchHereToPlay = new Bitmap(touchBitmapData);
 		touchHereToPlay.alpha = 0.0;
