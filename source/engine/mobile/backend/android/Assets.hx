@@ -1,7 +1,7 @@
 package mobile.backend.android;
 
 // Code is mostly taken from SDL.
-// This class implements IO methods for the native android NDK AAsets_Manager to read bundled app assets.
+// This class implements IO methods for the native android NDK AAsset_Manager to read bundled app assets.
 
 #if android
 @:cppNamespaceCode('
@@ -21,11 +21,6 @@ struct LocalReferenceHolder
     const char *m_func;
 };
 
-// static int AtomicIncRef(a)
-// {
-// 	return __sync_fetch_and_add (a, 1)
-// }
-
 static struct LocalReferenceHolder LocalReferenceHolder_Setup(const char *func)
 {
     struct LocalReferenceHolder refholder;
@@ -42,7 +37,6 @@ static bool LocalReferenceHolder_Init(struct LocalReferenceHolder *refholder, JN
 		__android_log_print (ANDROID_LOG_ERROR, "Shadow Engine", "Failed to allocate enough JVM local references");
         return false;
     }
-    // AtomicIncRef(&s_active);
     refholder->m_env = env;
     return true;
 }
@@ -53,9 +47,9 @@ static void LocalReferenceHolder_Cleanup(struct LocalReferenceHolder *refholder)
     if (refholder->m_env) {
         JNIEnv *env = refholder->m_env;
         (*env).PopLocalFrame(NULL);
-        // AtomicIncRef(&s_active);
     }
 }
+
 static jmethodID midGetContext;
 static jclass mActivityClass;
 static AAssetManager *asset_manager = NULL;
@@ -65,7 +59,6 @@ class Assets
 {
 	@:functionCode('
 		JNIEnv* env = (JNIEnv*)(uintptr_t)a;
-        // JNIEnv *env = (JNIEnv *)JNI::GetEnv();
 
         jclass cls = env->FindClass("org/libsdl/app/SDLActivity");
 		mActivityClass = (jclass)((*env).NewGlobalRef(cls));
@@ -112,7 +105,6 @@ class Assets
 
 	@:functionCode('
 		JNIEnv* env = (JNIEnv*)(uintptr_t)a;
-    	// JNIEnv *env = (JNIEnv *)JNI::GetEnv();
 
     	if (asset_manager) {
         	(*env).DeleteGlobalRef(javaAssetManagerRef);
