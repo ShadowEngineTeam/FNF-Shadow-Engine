@@ -1755,14 +1755,12 @@ class PlayState extends MusicBeatState
 		super.openSubState(SubState);
 	}
 
-	public var canResync:Bool = true;
-
 	override function closeSubState()
 	{
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
 		if (paused)
 		{
-			if (FlxG.sound.music != null && !startingSong && canResync)
+			if (FlxG.sound.music != null && !startingSong)
 				resyncVocals();
 
 			FlxTimer.globalManager.forEach(function(tmr:FlxTimer) if (!tmr.finished)
@@ -1843,6 +1841,9 @@ class PlayState extends MusicBeatState
 			{
 				voc.time = FlxG.sound.music.time;
 				#if FLX_PITCH voc.pitch = playbackRate; #end
+				#if mobile
+				//FlxTween.tween(voc, {volume: 1}, 0.05, {ease: FlxEase.linear});
+				#end
 				voc.play();
 			}
 			else
@@ -2188,7 +2189,6 @@ class PlayState extends MusicBeatState
 
 	public function openChartEditor()
 	{
-		canResync = false;
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		paused = true;
@@ -2206,7 +2206,6 @@ class PlayState extends MusicBeatState
 
 	public function openCharacterEditor()
 	{
-		canResync = false;
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		paused = true;
@@ -2230,7 +2229,6 @@ class PlayState extends MusicBeatState
 				deathCounter++;
 
 				paused = true;
-				canResync = false;
 				canPause = false;
 				#if VIDEOS_ALLOWED
 				if (videoCutscene != null)
@@ -2732,7 +2730,6 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
-					canResync = false;
 					MusicBeatState.switchState(new StoryMenuState());
 
 					if (!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay'))
@@ -2759,7 +2756,6 @@ class PlayState extends MusicBeatState
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
 					FlxG.sound.music.stop();
 
-					canResync = false;
 					LoadingState.prepareToSong();
 					LoadingState.loadAndSwitchState(new PlayState(), false, false);
 				}
@@ -2770,7 +2766,6 @@ class PlayState extends MusicBeatState
 				Mods.loadTopMod();
 				#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
-				canResync = false;
 				MusicBeatState.switchState(new FreeplayState());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				changedDifficulty = false;
@@ -3711,7 +3706,11 @@ class PlayState extends MusicBeatState
 		if (SONG.needsVoices && FlxG.sound.music.time >= -ClientPrefs.data.noteOffset)
 		{
 			final timeSub:Float = Conductor.songPosition - Conductor.offset;
+			#if mobile
+			final syncTime:Float = 75 * playbackRate;
+			#else
 			final syncTime:Float = 20 * playbackRate;
+			#end
 			@:privateAccess
 			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals._sound != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
 				resyncVocals();

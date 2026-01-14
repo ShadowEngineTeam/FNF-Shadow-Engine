@@ -253,14 +253,15 @@ class EditorPlayState extends MusicBeatSubstate
 	{
 		if (PlayState.SONG.needsVoices && FlxG.sound.music.time >= -ClientPrefs.data.noteOffset)
 		{
-			var timeSub:Float = Conductor.songPosition - Conductor.offset;
-			var syncTime:Float = 20 * playbackRate;
-			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime
-				|| (vocals.length > 0 && Math.abs(vocals.time - timeSub) > syncTime)
-				|| (opponentVocals.length > 0 && Math.abs(opponentVocals.time - timeSub) > syncTime))
-			{
+			final timeSub:Float = Conductor.songPosition - Conductor.offset;
+			#if mobile
+			final syncTime:Float = 75 * playbackRate;
+			#else
+			final syncTime:Float = 20 * playbackRate;
+			#end
+			@:privateAccess
+			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals._sound != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
 				resyncVocals();
-			}
 		}
 		super.stepHit();
 

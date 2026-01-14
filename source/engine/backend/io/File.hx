@@ -17,10 +17,7 @@ class File
 {
 	inline static function cwd(path:String):String
 	{
-		if (path.startsWith(Sys.getCwd()) || path.startsWith(lime.system.System.applicationStorageDirectory) /*|| path.startsWith(Paths.mods())*/)
-			return path;
-		else
-			return Sys.getCwd() + path;
+		return path;
 	}
 
 	static function openflcwd(path:String):String
@@ -36,14 +33,17 @@ class File
 	public static function getContent(path:String):Null<String>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		if (SysFileSystem.exists(actualPath))
 			return SysFile.getContent(actualPath);
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			return SysFile.getContent(cwd(path));
+		#end
 		#end
 
 		if (Assets.exists(openflcwd(path)))
@@ -55,14 +55,17 @@ class File
 	public static function getBytes(path:String):Null<haxe.io.Bytes>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		if (SysFileSystem.exists(actualPath))
 			return SysFile.getBytes(actualPath);
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			return SysFile.getBytes(cwd(path));
+		#end
 		#end
 
 		if (Assets.exists(openflcwd(path)))
@@ -80,7 +83,7 @@ class File
 	public static function saveContent(path:String, content:String):Void
 	{
 		#if MODS_ALLOWED
-		SysFile.saveContent(cwd(path), content);
+		SysFile.saveContent(cwd(path), cwd(content));
 		#end
 	}
 
@@ -94,13 +97,15 @@ class File
 	public static function read(path:String, binary:Bool = true):Null<FileInput>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFile.read(actualPath, binary);
+		#else
+		return SysFile.read(cwd(path), binary);
+		#end
 		#else
 		return null;
 		#end
@@ -109,13 +114,15 @@ class File
 	public static function write(path:String, binary:Bool = true):Null<FileOutput>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFile.write(actualPath, binary);
+		#else
+		return SysFile.write(cwd(path), binary);
+		#end
 		#else
 		return null;
 		#end
@@ -124,13 +131,15 @@ class File
 	public static function append(path:String, binary:Bool = true):Null<FileOutput>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFile.append(actualPath, binary);
+		#else
+		return SysFile.append(cwd(path), binary);
+		#end
 		#else
 		return null;
 		#end
@@ -139,13 +148,15 @@ class File
 	public static function update(path:String, binary:Bool = true):Null<FileOutput>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFile.update(actualPath, binary);
+		#else
+		return SysFile.update(cwd(path), binary);
+		#end
 		#else
 		return null;
 		#end
@@ -154,13 +165,15 @@ class File
 	public static function copy(srcPath:String, dstPath:String):Void
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualSrc:String = cwd(srcPath);
-		#if linux
 		actualSrc = getCaseInsensitivePath(actualSrc);
 		if (actualSrc == null)
 			actualSrc = srcPath;
+		SysFile.copy(actualSrc, cwd(dstPath));
+		#else
+		SysFile.copy(srcPath, cwd(dstPath));
 		#end
-		SysFile.copy(actualSrc, dstPath);
 		#end
 	}
 

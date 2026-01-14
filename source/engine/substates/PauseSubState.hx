@@ -323,7 +323,6 @@ class PauseSubState extends MusicBeatSubstate
 				case 'Options':
 					PlayState.instance.paused = true; // For lua
 					PlayState.instance.vocals.volume = 0;
-					PlayState.instance.canResync = false;
 					MusicBeatState.switchState(new OptionsState());
 					if (ClientPrefs.data.pauseMusic != 'None')
 					{
@@ -337,7 +336,6 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
 
-					PlayState.instance.canResync = false;
 					Mods.loadTopMod();
 					if (PlayState.isStoryMode)
 						MusicBeatState.switchState(new states.StoryMenuState());

@@ -35,15 +35,19 @@ class FileSystem
 	public static function exists(path:String):Bool
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		if (SysFileSystem.exists(actualPath))
 			return true;
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			return true;
 		#end
+		#end
+
 		if (Assets.exists(openflcwd(path)))
 			return true;
 
@@ -53,27 +57,32 @@ class FileSystem
 	public static function rename(path:String, newPath:String):Void
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		if (SysFileSystem.exists(actualPath))
-			SysFileSystem.rename(actualPath, newPath);
+			SysFileSystem.rename(actualPath, cwd(newPath));
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			SysFileSystem.rename(cwd(path), cwd(newPath));
+		#end
 		#end
 	}
 
 	public static function stat(path:String):Null<FileStat>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFileSystem.stat(actualPath);
+		#else
+		return SysFileSystem.stat(cwd(path));
+		#end
 		#else
 		return null;
 		#end
@@ -82,13 +91,15 @@ class FileSystem
 	public static function fullPath(path:String):String
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFileSystem.fullPath(actualPath);
+		#else
+		return SysFileSystem.fullPath(cwd(path));
+		#end
 		#else
 		return path;
 		#end
@@ -97,13 +108,15 @@ class FileSystem
 	public static function absolutePath(path:String):String
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		return SysFileSystem.absolutePath(actualPath);
+		#else
+		return SysFileSystem.absolutePath(cwd(path));
+		#end
 		#else
 		return path;
 		#end
@@ -112,14 +125,17 @@ class FileSystem
 	public static function isDirectory(path:String):Bool
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
-		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
+		if (SysFileSystem.isDirectory(actualPath))
 			return true;
+		#else
+		if (SysFileSystem.isDirectory(cwd(path)))
+			return true;
+		#end
 		#end
 
 		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
@@ -136,42 +152,51 @@ class FileSystem
 	public static function deleteFile(path:String):Void
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
-		if (SysFileSystem.exists(actualPath) && !SysFileSystem.isDirectory(actualPath))
+		if (SysFileSystem.exists(actualPath))
 			SysFileSystem.deleteFile(actualPath);
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			SysFileSystem.deleteFile(cwd(path));
+		#end
 		#end
 	}
 
 	public static function deleteDirectory(path:String):Void
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
-		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
+		if (SysFileSystem.exists(actualPath))
 			SysFileSystem.deleteDirectory(actualPath);
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			SysFileSystem.deleteDirectory(cwd(path));
+		#end
 		#end
 	}
 
 	public static function readDirectory(path:String):Array<String>
 	{
 		#if MODS_ALLOWED
+		#if (linux && !DISABLE_LINUX_SHI)
 		var actualPath:String = cwd(path);
-		#if linux
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		#end
 		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
 			return SysFileSystem.readDirectory(actualPath);
+		#else
+		if (SysFileSystem.exists(cwd(path)) && SysFileSystem.isDirectory(cwd(path)))
+			return SysFileSystem.readDirectory(cwd(path)	);
+		#end
 		#end
 
 		var filteredList:Array<String> = Assets.list().filter(f -> f.startsWith(path));

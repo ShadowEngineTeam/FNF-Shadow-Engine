@@ -352,7 +352,7 @@ class StoryMenuState extends MusicBeatState
 		FunkinLua.getCurrentMusicState().callOnScripts('onChangeDifficulty');
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
-		var diff:String = Difficulty.getString(curDifficulty);
+		var diff:String = Difficulty.getString(curDifficulty).toLowerCase();
 		var diffPath:String = 'menudifficulties/' + Paths.formatToSongPath(diff);
 		var spriteSheetExists:Bool = Paths.fileExists('images/menudifficulties/$diff.xml', TEXT);
 
