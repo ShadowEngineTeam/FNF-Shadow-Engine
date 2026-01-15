@@ -150,7 +150,7 @@ class Project extends HXProject
 		trace(StringTools.lpad("", "=", width));
 		trace('');
 
-		if (targetPlatform.startsWith("Hashlink") || targetPlatform == "Unknown")
+		if (targetPlatform.startsWith("Web") || targetPlatform.startsWith("Hashlink") || targetPlatform == "Unknown")
 		{
 			trace('Unsupported platform: ${targetPlatform}');
 			Sys.exit(1);
