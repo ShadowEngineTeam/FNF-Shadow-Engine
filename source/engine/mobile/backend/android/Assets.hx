@@ -2,7 +2,7 @@ package mobile.backend.android;
 
 /**
  * The code for this class is mostly taken from SDL2.
- * This class implements IO methods for the native Android NDK's AAAssetManager to read bundled app assets.
+ * This class implements IO methods from the Android NDK's AAssetManager to read bundled app assets.
  */
 
 #if android
