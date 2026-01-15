@@ -189,7 +189,6 @@ class ModsMenuState extends MusicBeatState
 			txt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE);
 			add(txt);
 
-			FlxG.autoPause = false;
 			changeSelectedMod();
 			addTouchPad("NONE", "B");
 			return super.create();
