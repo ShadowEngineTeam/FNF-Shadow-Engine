@@ -1,7 +1,9 @@
 package mobile.backend.android;
 
-// Code is mostly taken from SDL.
-// This class implements IO methods for the native android NDK AAsset_Manager to read bundled app assets.
+/**
+ * The code for this class is mostly taken from SDL2.
+ * This class implements IO methods for the native Android NDK's AAAssetManager to read bundled app assets.
+ */
 
 #if android
 @:cppNamespaceCode('
@@ -73,11 +75,11 @@ class Assets
     	    return;
     	}
 
-    	/* context = SDLActivity.getContext(); */
+    	// context = SDLActivity.getContext();
 	   	midGetContext = (*env).GetStaticMethodID(mActivityClass, "getContext","()Landroid/content/Context;");
     	context = (*env).CallStaticObjectMethod(mActivityClass, midGetContext);
 
-    	/* javaAssetManager = context.getAssets(); */
+    	// javaAssetManager = context.getAssets();
     	mid = (*env).GetMethodID((*env).GetObjectClass(context),
     	        "getAssets", "()Landroid/content/res/AssetManager;");
     	javaAssetManager = (*env).CallObjectMethod(context, mid);
