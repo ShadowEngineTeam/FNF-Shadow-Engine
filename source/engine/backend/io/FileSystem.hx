@@ -23,6 +23,7 @@ class FileSystem
 		return path;
 	}
 
+	#if FILESYSTEM_OPENFL
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
@@ -32,6 +33,7 @@ class FileSystem
 
 		return path;
 	}
+	#end
 
 	public static function exists(path:String):Bool
 	{
@@ -49,10 +51,12 @@ class FileSystem
 		#end
 		#end
 
-		if (Assets.exists(openflcwd(path)))
+		#if FILESYSTEM_OPENFL
+		if (Assets.exists(openflcwd(path)) || Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
+		#end
 
-		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
+		return false;
 	}
 
 	public static function rename(path:String, newPath:String):Void
@@ -139,7 +143,12 @@ class FileSystem
 		#end
 		#end
 
-		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
+		#if FILESYSTEM_OPENFL
+		if (Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+			return true;
+		#end
+
+		return false;
 	}
 
 	public static function createDirectory(path:String):Void
@@ -186,44 +195,54 @@ class FileSystem
 
 	public static function readDirectory(path:String):Array<String>
 	{
+		var result:Array<String> = null;
+
 		#if MODS_ALLOWED
 		#if linux
-		var actualPath:String = cwd(path);
-		actualPath = getCaseInsensitivePath(path);
-		if (actualPath == null)
-			actualPath = path;
+		var actualPath = cwd(path);
+		actualPath = getCaseInsensitivePath(path) ?? path;
 		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
-			return SysFileSystem.readDirectory(actualPath);
+			result = SysFileSystem.readDirectory(actualPath);
 		#else
 		if (SysFileSystem.exists(cwd(path)) && SysFileSystem.isDirectory(cwd(path)))
-			return SysFileSystem.readDirectory(cwd(path)	);
+			result = SysFileSystem.readDirectory(cwd(path));
 		#end
 		#end
 
-		var filteredList:Array<String> = Assets.list().filter(f -> f.startsWith(path));
-		var results:Array<String> = [];
-		for (i in filteredList.copy())
+		#if FILESYSTEM_OPENFL
+		if (result == null)
 		{
-			var slashsCount:Int = path.split('/').length;
-			if (path.endsWith('/'))
-				slashsCount -= 1;
+			var filteredList = Assets.list().filter(f -> f.startsWith(path));
+			var results:Array<String> = [];
 
-			if (i.split('/').length - 1 != slashsCount)
-				filteredList.remove(i);
-		}
-		for (item in filteredList)
-		{
-			@:privateAccess
-			for (library in lime.utils.Assets.libraries.keys())
+			for (i in filteredList.copy())
 			{
-				var libPath:String = '$library:$item';
-				if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
-					results.push(libPath);
-				else if (Assets.exists(item) && !results.contains(item))
-					results.push(item);
+				var slashsCount = path.split('/').length;
+				if (path.endsWith('/'))
+					slashsCount--;
+
+				if (i.split('/').length - 1 != slashsCount)
+					filteredList.remove(i);
 			}
+
+			for (item in filteredList)
+			{
+				@:privateAccess
+				for (library in lime.utils.Assets.libraries.keys())
+				{
+					var libPath = '$library:$item';
+					if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
+						results.push(libPath);
+					else if (Assets.exists(item) && !results.contains(item))
+						results.push(item);
+				}
+			}
+
+			result = results.map(f -> f.substr(f.lastIndexOf("/") + 1));
 		}
-		return results.map(f -> f.substr(f.lastIndexOf("/") + 1));
+		#end
+
+		return result ?? [];
 	}
 
 	#if (linux && MODS_ALLOWED)

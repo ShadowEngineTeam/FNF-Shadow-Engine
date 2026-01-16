@@ -24,6 +24,7 @@ class File
 		return path;
 	}
 
+	#if FILESYSTEM_OPENFL
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
@@ -33,6 +34,7 @@ class File
 
 		return path;
 	}
+	#end
 
 	public static function getContent(path:String):Null<String>
 	{
@@ -50,8 +52,10 @@ class File
 		#end
 		#end
 
+		#if FILESYSTEM_OPENFL
 		if (Assets.exists(openflcwd(path)))
 			return Assets.getText(openflcwd(path));
+		#end
 
 		return null;
 	}
@@ -72,6 +76,7 @@ class File
 		#end
 		#end
 
+		#if FILESYSTEM_OPENFL
 		if (Assets.exists(openflcwd(path)))
 			switch (haxe.io.Path.extension(path).toLowerCase())
 			{
@@ -80,6 +85,7 @@ class File
 				default:
 					return Assets.getBytes(openflcwd(path));
 			}
+		#end
 
 		return null;
 	}
