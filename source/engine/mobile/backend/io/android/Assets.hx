@@ -224,27 +224,27 @@ class Assets
 		return Bytes.ofData(data);
 	}
 
-	@:native('mobile::backend::io::android::::Assets_obj::native_exists')
+	@:native('mobile::backend::io::android::Assets_obj::native_exists')
 	public static function exists(file:String):Bool
 		return false;
 
 	@:noCompletion
-	@:native('mobile::backend::io::android::::Assets_obj::native_init')
+	@:native('mobile::backend::io::android::Assets_obj::native_init')
 	private static function __init(jni_env:Dynamic):Void
 		return;
 
 	@:noCompletion
-	@:native('mobile::backend::io::android::::Assets_obj::native_destroy')
+	@:native('mobile::backend::io::android::Assets_obj::native_destroy')
 	private static function __destroy(jni_env:Dynamic):Void
 		return;
 
 	@:noCompletion
-	@:native('mobile::backend::io::android::::Assets_obj::native_getContent')
+	@:native('mobile::backend::io::android::Assets_obj::native_getContent')
 	public static function __getContent(file:String):String
 		return null;
 
 	@:noCompletion
-	@:native('mobile::backend::io::android::::Assets_obj::native_getBytes')
+	@:native('mobile::backend::io::android::Assets_obj::native_getBytes')
 	private static function __getBytes(file:String):Array<cpp.UInt8>
 		return null;
 }
