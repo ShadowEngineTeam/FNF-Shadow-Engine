@@ -17,6 +17,11 @@ package mobile.backend.android;
 #include <unistd.h>
 #include <dlfcn.h>
 
+static jmethodID midGetContext;
+static jclass mActivityClass;
+static AAssetManager *asset_manager = NULL;
+static jobject javaAssetManagerRef = 0;
+
 struct LocalReferenceHolder
 {
     JNIEnv *m_env;
@@ -52,86 +57,104 @@ static void LocalReferenceHolder_Cleanup(struct LocalReferenceHolder *refholder)
     }
 }
 
-static jmethodID midGetContext;
-static jclass mActivityClass;
-static AAssetManager *asset_manager = NULL;
-static jobject javaAssetManagerRef = 0;
+void Assets_obj::native_init(::Dynamic jni_env)
+{
+	JNIEnv* env = (JNIEnv*)(uintptr_t)jni_env;
+    jclass cls = env->FindClass("org/libsdl/app/SDLActivity");
+	mActivityClass = (jclass)((*env).NewGlobalRef(cls));
+   
+	struct LocalReferenceHolder refs = LocalReferenceHolder_Setup(__FUNCTION__);
+   	jmethodID mid;
+   	jobject context;
+   	jobject javaAssetManager;
+
+   	if (!LocalReferenceHolder_Init(&refs, env)) {
+   	    LocalReferenceHolder_Cleanup(&refs);
+   	    return;
+   	}
+
+   	// context = SDLActivity.getContext();
+   	midGetContext = (*env).GetStaticMethodID(mActivityClass, "getContext","()Landroid/content/Context;");
+   	context = (*env).CallStaticObjectMethod(mActivityClass, midGetContext);
+
+   	// javaAssetManager = context.getAssets();
+   	mid = (*env).GetMethodID((*env).GetObjectClass(context),
+   	        "getAssets", "()Landroid/content/res/AssetManager;");
+   	javaAssetManager = (*env).CallObjectMethod(context, mid);
+
+   	/**
+   	 * Given a Dalvik AssetManager object, obtain the corresponding native AAssetManager
+   	 * object.  Note that the caller is responsible for obtaining and holding a VM reference
+   	 * to the jobject to prevent its being garbage collected while the native object is
+   	 * in use.
+   	 */
+   	javaAssetManagerRef = (*env).NewGlobalRef(javaAssetManager);
+   	asset_manager = AAssetManager_fromJava(env, javaAssetManagerRef);
+
+   	if (asset_manager == NULL) {
+   	    (*env).DeleteGlobalRef(javaAssetManagerRef);
+		__android_log_print (ANDROID_LOG_DEBUG, "Shadow Engine", "Failed to create Android Assets Manager");
+   	}
+	
+   	LocalReferenceHolder_Cleanup(&refs);
+}
+
+void Assets_obj::native_destroy(::Dynamic jni_env)
+{
+	JNIEnv* env = (JNIEnv*)(uintptr_t)jni_env;
+
+    if (asset_manager) {
+       	(*env).DeleteGlobalRef(javaAssetManagerRef);
+       	asset_manager = NULL;
+    }
+}
+
+bool Assets_obj::native_exists(const char* file)
+{
+	AAsset* asset = AAssetManager_open(asset_manager, file, AASSET_MODE_UNKNOWN);
+	bool ret = asset != NULL;
+
+	if (ret)
+		AAsset_close(asset);
+
+	return ret;
+}
+')
+@:headerClassCode('
+static bool native_exists(const char* file);
+static void native_init(::Dynamic jni_env);
+static void native_destroy(::Dynamic jni_env);
 ')
 class Assets
 {
-	@:functionCode('
-		JNIEnv* env = (JNIEnv*)(uintptr_t)a;
-
-        jclass cls = env->FindClass("org/libsdl/app/SDLActivity");
-		mActivityClass = (jclass)((*env).NewGlobalRef(cls));
-    
-		struct LocalReferenceHolder refs = LocalReferenceHolder_Setup(__FUNCTION__);
-    	jmethodID mid;
-    	jobject context;
-    	jobject javaAssetManager;
-
-    	if (!LocalReferenceHolder_Init(&refs, env)) {
-    	    LocalReferenceHolder_Cleanup(&refs);
-    	    return;
-    	}
-
-    	// context = SDLActivity.getContext();
-	   	midGetContext = (*env).GetStaticMethodID(mActivityClass, "getContext","()Landroid/content/Context;");
-    	context = (*env).CallStaticObjectMethod(mActivityClass, midGetContext);
-
-    	// javaAssetManager = context.getAssets();
-    	mid = (*env).GetMethodID((*env).GetObjectClass(context),
-    	        "getAssets", "()Landroid/content/res/AssetManager;");
-    	javaAssetManager = (*env).CallObjectMethod(context, mid);
-
-    	/**
-    	 * Given a Dalvik AssetManager object, obtain the corresponding native AAssetManager
-    	 * object.  Note that the caller is responsible for obtaining and holding a VM reference
-    	 * to the jobject to prevent its being garbage collected while the native object is
-    	 * in use.
-    	 */
-    	javaAssetManagerRef = (*env).NewGlobalRef(javaAssetManager);
-    	asset_manager = AAssetManager_fromJava(env, javaAssetManagerRef);
-
-    	if (asset_manager == NULL) {
-    	    (*env).DeleteGlobalRef(javaAssetManagerRef);
-			__android_log_print (ANDROID_LOG_DEBUG, "Shadow Engine", "Failed to create Android Assets Manager");
-    	}
-
-    	LocalReferenceHolder_Cleanup(&refs);
-	')
-	public static function init(a:Dynamic):Void
+	public static function init():Void
 	{
-		return;
+		_init(lime.system.JNI.getEnv());
 	}
 
-	@:functionCode('
-		JNIEnv* env = (JNIEnv*)(uintptr_t)a;
-
-    	if (asset_manager) {
-        	(*env).DeleteGlobalRef(javaAssetManagerRef);
-        	asset_manager = NULL;
-    	}
-	')
-	public static function destroy(a:Dynamic):Void
+	public static function destroy():Void
 	{
-		return;
+		_destroy(lime.system.JNI.getEnv());
 	}
 
-	@:functionCode('
-		AAsset* asset = AAssetManager_open(asset_manager, file, AASSET_MODE_UNKNOWN);
-
-		bool ret = asset != NULL;
-
-		if (ret)
-			AAsset_close(asset);
-
-		return ret;
-	')
+	@:native('mobile::backend::android::Assets_obj::native_exists')
 	public static function exists(file:cpp.ConstCharStar):Bool
 	{
 		return false;
 	}
 
+	@:noCompletion
+	@:native('mobile::backend::android::Assets_obj::native_init')
+	private static function _init(jni_env:Dynamic):Void
+	{
+		return;
+	}
+
+	@:noCompletion
+	@:native('mobile::backend::android::Assets_obj::native_destroy')
+	private static function _destroy(jni_env:Dynamic):Void
+	{
+		return;
+	}
 }
 #end
