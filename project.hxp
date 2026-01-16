@@ -214,7 +214,7 @@ class Project extends HXProject
 		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
 		MODCHARTS_ALLOWED.integrate(/*DCEBUILD.isDisabled()*/false);
 		DCEBUILD.integrate(false);
-		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() || isMobile());
+		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled()/*|| isMobile()*/);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())

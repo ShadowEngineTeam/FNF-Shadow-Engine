@@ -24,7 +24,7 @@ class File
 		return path;
 	}
 
-	#if FILESYSTEM_OPENFL
+	#if USE_OPENFL_FILESYSTEM
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
@@ -52,7 +52,7 @@ class File
 		#end
 		#end
 
-		#if FILESYSTEM_OPENFL
+		#if USE_OPENFL_FILESYSTEM
 		if (Assets.exists(openflcwd(path)))
 			return Assets.getText(openflcwd(path));
 		#end
@@ -76,7 +76,7 @@ class File
 		#end
 		#end
 
-		#if FILESYSTEM_OPENFL
+		#if USE_OPENFL_FILESYSTEM
 		if (Assets.exists(openflcwd(path)))
 			switch (haxe.io.Path.extension(path).toLowerCase())
 			{

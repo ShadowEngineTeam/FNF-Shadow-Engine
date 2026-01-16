@@ -23,7 +23,7 @@ class FileSystem
 		return path;
 	}
 
-	#if FILESYSTEM_OPENFL
+	#if USE_OPENFL_FILESYSTEM
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
@@ -51,7 +51,7 @@ class FileSystem
 		#end
 		#end
 
-		#if FILESYSTEM_OPENFL
+		#if USE_OPENFL_FILESYSTEM
 		if (Assets.exists(openflcwd(path)) || Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
 		#end
@@ -143,7 +143,7 @@ class FileSystem
 		#end
 		#end
 
-		#if FILESYSTEM_OPENFL
+		#if USE_OPENFL_FILESYSTEM
 		if (Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
 		#end
@@ -209,7 +209,7 @@ class FileSystem
 		#end
 		#end
 
-		#if FILESYSTEM_OPENFL
+		#if USE_OPENFL_FILESYSTEM
 		if (result == null)
 		{
 			var filteredList = Assets.list().filter(f -> f.startsWith(path));
