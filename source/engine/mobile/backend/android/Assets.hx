@@ -103,9 +103,9 @@ void Assets_obj::native_destroy(::Dynamic jni_env)
     }
 }
 
-bool Assets_obj::native_exists(const char* file)
+bool Assets_obj::native_exists(::String file)
 {
-	AAsset* asset = AAssetManager_open(asset_manager, file, AASSET_MODE_UNKNOWN);
+	AAsset* asset = AAssetManager_open(asset_manager, file.__s, AASSET_MODE_UNKNOWN);
 	bool ret = asset != NULL;
 
 	if (ret)
@@ -113,11 +113,70 @@ bool Assets_obj::native_exists(const char* file)
 
 	return ret;
 }
+
+::String Assets_obj::native_getContent(::String file) {
+    std::vector<char> buffer;
+    
+    hx::EnterGCFreeZone();
+    AAsset* asset = AAssetManager_open(asset_manager, file.__s, AASSET_MODE_BUFFER);
+    
+    if (!asset) {
+        hx::ExitGCFreeZone();
+        return ::String(null());
+    }
+
+    int len = AAsset_getLength(asset);
+    if (len <= 0) {
+        AAsset_close(asset);
+        hx::ExitGCFreeZone();
+        return ::String::emptyString;
+    }
+
+    const char* src = (const char*)AAsset_getBuffer(asset);
+    
+    buffer.resize(len);
+    memcpy(&buffer[0], src, len);
+
+    AAsset_close(asset);
+    hx::ExitGCFreeZone();
+
+    return ::String::create(&buffer[0], buffer.size());
+}
+
+Array<unsigned char> Assets_obj::native_getBytes(::String file) {
+    hx::EnterGCFreeZone();
+    AAsset* asset = AAssetManager_open(asset_manager, file.__s, AASSET_MODE_BUFFER);
+    
+    if (!asset) {
+        hx::ExitGCFreeZone();
+        return null(); 
+    }
+
+    int len = AAsset_getLength(asset);
+    const unsigned char* src = (const unsigned char*)AAsset_getBuffer(asset);
+    hx::ExitGCFreeZone();
+
+    Array<unsigned char> buffer = Array_obj<unsigned char>::__new(len, len);
+    if (len > 0) {
+        hx::EnterGCFreeZone();
+        memcpy(buffer->getBase(), src, len);
+        AAsset_close(asset);
+        hx::ExitGCFreeZone();
+    } else {
+        hx::EnterGCFreeZone();
+        AAsset_close(asset);
+        hx::ExitGCFreeZone();
+    }
+
+    return buffer;
+}
 ')
 @:headerClassCode('
-static bool native_exists(const char* file);
 static void native_init(::Dynamic jni_env);
 static void native_destroy(::Dynamic jni_env);
+static bool native_exists(::String file);
+static ::String native_getContent(::String file);
+static Array<unsigned char> native_getBytes(::String file);
 ')
 class Assets
 {
@@ -131,8 +190,28 @@ class Assets
 		_destroy(lime.system.JNI.getEnv());
 	}
 
+	public static function getContent(file:String):String
+	{
+		var content:String = _getContent(file);
+
+		if (content == null)
+			throw 'file_contents, $file';
+
+		return content;
+	}
+
+	public static function getBytes(file:String):haxe.io.Bytes
+	{
+		var data:Array<cpp.UInt8> = _getBytes(file);
+
+		if (data == null || data.length <= 0)
+			throw 'file_contents, $file';
+
+		return haxe.io.Bytes.ofData(data);
+	}
+
 	@:native('mobile::backend::android::Assets_obj::native_exists')
-	public static function exists(file:cpp.ConstCharStar):Bool
+	public static function exists(file:String):Bool
 	{
 		return false;
 	}
@@ -149,6 +228,20 @@ class Assets
 	private static function _destroy(jni_env:Dynamic):Void
 	{
 		return;
+	}
+
+	@:noCompletion
+	@:native('mobile::backend::android::Assets_obj::native_getContent')
+	public static function _getContent(file:String):String
+	{
+		return null;
+	}
+
+	@:noCompletion
+	@:native('mobile::backend::android::Assets_obj::native_getBytes')
+	private static function _getBytes(file:String):Array<cpp.UInt8>
+	{
+		return null;
 	}
 }
 #end
