@@ -213,13 +213,13 @@ class CoolUtil
 			}
 		}
 
-		if (findAndRun("kdialog", ["--title", title, "--error", message]))
+		if (tryRun("kdialog", ["--title", title, "--error", message]))
 			return;
-		if (findAndRun("zenity", ["--error", "--title", title, "--text", message]))
+		if (tryRun("zenity", ["--error", "--title", title, "--text", message]))
 			return;
-		if (findAndRun("yad", ["--error", "--title", title, "--text", message, "--button=OK:0"]))
+		if (tryRun("yad", ["--error", "--title", title, "--text", message, "--button=OK:0"]))
 			return;
-		if (findAndRun("xmessage", ["-center", title + "\n\n" + message]))
+		if (tryRun("xmessage", ["-center", title + "\n\n" + message]))
 			return;
 
 		trace('$title\n$message\n');
