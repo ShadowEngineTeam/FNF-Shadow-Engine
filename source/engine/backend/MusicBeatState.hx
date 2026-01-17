@@ -14,6 +14,8 @@ import haxe.io.Path;
 
 class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else FlxUIState #end implements IMusicState
 {
+	public var stateInstance:FlxState = null;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -295,6 +297,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 	public function new()
 	{
+		stateInstance = this;
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this))).replace('states.', '').replace('.', '/');
 		#end

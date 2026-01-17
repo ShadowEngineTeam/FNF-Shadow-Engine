@@ -24,7 +24,7 @@ class CustomSubstate extends MusicBeatSubstate
 			FlxG.camera.followLerp = 0;
 			FunkinLua.getCurrentMusicState().persistentUpdate = false;
 			FunkinLua.getCurrentMusicState().persistentDraw = true;
-			FunkinLua.getCurrentMusicState().paused = true;
+			PlayState.instance.paused = true;
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();

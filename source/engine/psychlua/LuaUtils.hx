@@ -339,7 +339,7 @@ class LuaUtils
 
 	public static inline function getTargetInstance()
 	{
-		return FunkinLua.getCurrentMusicState() is PlayState ? PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance : FunkinLua.getCurrentMusicState();
+		return FunkinLua.getCurrentMusicState() is PlayState ? PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance : FunkinLua.getCurrentMusicState().stateInstance;
 	}
 
 	public static inline function getLowestCharacterGroup():FlxSpriteGroup

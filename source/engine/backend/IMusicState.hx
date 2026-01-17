@@ -1,5 +1,6 @@
 package backend;
 
+import flixel.FlxBasic;
 import flixel.FlxSubState;
 #if MODCHARTS_ALLOWED
 import modcharting.ModchartMusicBeatState;
@@ -13,6 +14,13 @@ import backend.PsychCamera;
 
 interface IMusicState
 {
+	public var stateInstance:FlxState;
+
+	public var members(default, null):Array<FlxBasic>;
+
+	public var persistentDraw:Bool;
+	public var persistentUpdate:Bool;
+
     private var curSection:Int;
 	private var stepsToDo:Int;
 
@@ -58,6 +66,8 @@ interface IMusicState
 	public var luaTouchPadCam:FlxCamera;
 	public var mobileControls:IMobileControls;
 	public var mobileControlsCam:FlxCamera;
+
+	public function remove(basic:FlxBasic, splice:Bool = false):FlxBasic;
 
 	public function addTouchPad(DPad:String, Action:String):Void;
 	public function removeTouchPad():Void;

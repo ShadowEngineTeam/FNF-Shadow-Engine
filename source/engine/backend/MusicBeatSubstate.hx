@@ -1,11 +1,13 @@
 package backend;
 
+import flixel.FlxState;
 import flixel.FlxSubState;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 
 class MusicBeatSubstate extends FlxSubState implements IMusicState
 {
+	public var stateInstance:FlxState = null;
 	public static var instance:MusicBeatSubstate;
 
 	private var curSection:Int = 0;
@@ -290,6 +292,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	public function new()
 	{
 		instance = this;
+		stateInstance = cast this;
+		
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
 			.replace('states.', '')
