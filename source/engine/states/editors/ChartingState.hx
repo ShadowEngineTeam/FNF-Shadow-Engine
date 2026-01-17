@@ -992,7 +992,7 @@ class ChartingState extends MusicBeatState
 				#if HSCRIPT_ALLOWED
 				if (!isValid)
 				{
-					for (dynamicExt in cast(FunkinLua.getCurrentMusicState().hscriptExtensions, Array<Dynamic>))
+					for (dynamicExt in cast(hscriptExtensions, Array<Dynamic>))
 					{
 						final ext:String = cast(dynamicExt, String);
 						if (fileName.endsWith(ext))

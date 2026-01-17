@@ -49,14 +49,14 @@ class Prompt extends MusicBeatSubstate
 		{
 			if (okc != null)
 				okc();
-			FunkinLua.getCurrentMusicState().callOnScripts('onOK');
+			callOnScripts('onOK');
 			close();
 		});
 		buttonNo = new FlxButton(633.3, 450, op2, function()
 		{
 			if (cancelc != null)
 				cancelc();
-			FunkinLua.getCurrentMusicState().callOnScripts('onNO');
+			callOnScripts('onNO');
 			close();
 		});
 		super();

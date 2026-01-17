@@ -142,7 +142,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 		if (week == -1)
 			icon.animation.curAnim.curFrame = confirmInt;
 
-		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelection');
+		callOnScripts('onChangeSelection');
 	}
 
 	override function destroy()

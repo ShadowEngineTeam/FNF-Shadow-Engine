@@ -22,7 +22,7 @@ class MusicBeatSubstate extends FlxSubState
 
 	#if HSCRIPT_ALLOWED
 	public var hscriptArray:Array<HScript> = [];
-	public final hscriptExtensions:Array<String> = ['.hx', '.hscript', '.hxs', '.hxc'];
+	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
 	public var instancesExclude:Array<String> = [];
 	#end
 

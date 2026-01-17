@@ -233,7 +233,7 @@ class TitleState extends MusicBeatState
 		spongebobCri.screenCenter(X);
 		spongebobCri.antialiasing = ClientPrefs.data.antialiasing;
 
-		FunkinLua.getCurrentMusicState().callOnScripts('onStartIntro');
+		callOnScripts('onStartIntro');
 
 		if (initialized)
 			skipIntro();
@@ -465,7 +465,7 @@ class TitleState extends MusicBeatState
 			remove(credGroup);
 			FlxG.camera.flash(FlxColor.WHITE, 4);
 			skippedIntro = true;
-			FunkinLua.getCurrentMusicState().callOnScripts('onSkipIntro');
+			callOnScripts('onSkipIntro');
 		}
 	}
 }

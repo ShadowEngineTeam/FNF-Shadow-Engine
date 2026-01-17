@@ -223,6 +223,7 @@ class Project extends HXProject
 		setHaxedef("message.reporting", "pretty");
 		setHaxedef("no-deprecation-warnings");
 		setHaxedef("lime_disable_assets_version");
+		setHaxedef("openfl_dpi_aware");
 
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");

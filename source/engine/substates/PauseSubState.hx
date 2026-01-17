@@ -396,7 +396,7 @@ class PauseSubState extends MusicBeatSubstate
 		if (curSelected >= menuItems.length)
 			curSelected = 0;
 
-		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelection');
+		callOnScripts('onChangeSelection');
 
 		var bullShit:Int = 0;
 

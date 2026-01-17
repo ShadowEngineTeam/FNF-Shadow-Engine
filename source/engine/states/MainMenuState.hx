@@ -195,7 +195,7 @@ class MainMenuState extends MusicBeatState
 		if (curSelected < 0)
 			curSelected = menuItems.length - 1;
 
-		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelection');
+		callOnScripts('onChangeSelection');
 
 		menuItems.members[curSelected].animation.play('selected');
 		menuItems.members[curSelected].centerOffsets();

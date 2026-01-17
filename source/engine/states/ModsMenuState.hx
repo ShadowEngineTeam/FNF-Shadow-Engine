@@ -628,7 +628,7 @@ class ModsMenuState extends MusicBeatState
 		else if (curSelectedButton > max)
 			curSelectedButton = max;
 
-		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelectedButton');
+		callOnScripts('onChangeSelectedButton');
 
 		var button = getButton();
 		button.ignoreCheck = button.onFocus = true;
@@ -691,7 +691,7 @@ class ModsMenuState extends MusicBeatState
 			curSelectedMod = max;
 			limited = true;
 		}
-		FunkinLua.getCurrentMusicState().callOnScripts('onChangeSelectedMod');
+		callOnScripts('onChangeSelectedMod');
 		if (!controls.mobileC && !isMouseWheel && limited && Math.abs(add) == 1)
 		{
 			if (add < 0) // pressed up on first mod
@@ -851,7 +851,7 @@ class ModsMenuState extends MusicBeatState
 
 	function reload()
 	{
-		FunkinLua.getCurrentMusicState().callOnScripts('onReloadMods');
+		callOnScripts('onReloadMods');
 		saveTxt();
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		FlxTransitionableState.skipNextTransIn = true;
