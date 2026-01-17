@@ -2,6 +2,9 @@ package backend;
 
 import flixel.util.FlxSave;
 import openfl.utils.Assets;
+#if linux
+import sys.io.Process;
+#end
 
 class CoolUtil
 {
@@ -194,8 +197,30 @@ class CoolUtil
 		/*#if android
 		AndroidTools.showAlertDialog(title, message, {name: "OK", func: null}, null);
 		#else*/
+		#if linux
+		function findAndRun(cmd:String, args:Array<String>):Bool
+		{
+			if (!FileSystem.exists(cmd))
+				return false;
+			var p:Process = new Process(cmd, args);
+			p.exitCode();
+			p.close();
+			return true;
+		}
+
+		if (findAndRun("/usr/bin/kdialog", ["--title", title, "--error", message]))
+			return;
+		if (findAndRun("/usr/bin/zenity", ["--error", "--title", title, "--text", message]))
+			return;
+		if (findAndRun("/usr/bin/yad", ["--error", "--title", title, "--text", message, "--button=OK:0"]))
+			return;
+		if (findAndRun("/usr/bin/xmessage", ["-center", title + "\n\n" + message]))
+			return;
+
+		trace('$title\n$message\n');
+		#else
 		FlxG.stage.window.alert(message, title);
-		//#end
+		#end
 	}
 
 	private static var sizeLabels:Array<String> = ["B", "KB", "MB", "GB", "TB"];
