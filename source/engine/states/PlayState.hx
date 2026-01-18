@@ -8,7 +8,6 @@ import backend.Section;
 import backend.Rating;
 import flixel.FlxBasic;
 import flixel.FlxObject;
-import flixel.FlxSubState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
@@ -32,11 +31,6 @@ import substates.ResultsScreen;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;
-#end
-#if MODCHARTS_ALLOWED
-import modcharting.ModchartFuncs;
-import modcharting.NoteMovement;
-import modcharting.PlayfieldRenderer;
 #end
 
 /**
@@ -529,12 +523,6 @@ class PlayState extends MusicBeatState
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
 		generateSong(SONG.song);
-
-		#if MODCHARTS_ALLOWED
-		playfieldRenderer = new PlayfieldRenderer(strumLineNotes, notes, this);
-		//playfieldRenderer.cameras = [camHUD];
-		noteGroup.add(playfieldRenderer);
-		#end
 
 		noteGroup.add(grpNoteSplashes);
 
@@ -1049,10 +1037,6 @@ class PlayState extends MusicBeatState
 				generateStaticArrows(1, SONG.opponentArrowSkin);
 				generateStaticArrows(0, SONG.playerArrowSkin);
 			}
-
-			#if MODCHARTS_ALLOWED
-			NoteMovement.getDefaultStrumPos(this);
-			#end
 
 			if (characterPlayingAsDad && !ClientPrefs.data.middleScroll)
 				for (i in 0...opponentStrums.members.length)

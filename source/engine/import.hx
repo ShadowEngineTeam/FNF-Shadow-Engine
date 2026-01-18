@@ -60,6 +60,8 @@ import states.LoadingState;
 import flixel.sound.FlxSound;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxState;
+import flixel.FlxSubState;
 import flixel.FlxCamera;
 import flixel.util.FlxDestroyUtil;
 import flixel.math.FlxMath;

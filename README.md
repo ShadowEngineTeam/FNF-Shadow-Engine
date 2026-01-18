@@ -20,7 +20,6 @@ Ready to be source-modded.
 - Uses our haxelib forks for backporting and fixing stuff
 - Uses latest Haxe
 - Uses some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (R.I.P.)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine)
-- Modcharting Support (see [FNF-Modcharting-Tools](https://github.com/FNF-SE/FNF-Modcharting-Tools))<br>[SIDE NOTE: it's disabled by default, enable it in `Project.xml`.]
 - Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) to [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
 - Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) to [`hxvlc`](https://github.com/FNF-SE/hxvlc) for better customizability in video cutscenes
 - Mobile Support (duh)

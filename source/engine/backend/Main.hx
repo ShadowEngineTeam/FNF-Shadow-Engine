@@ -6,7 +6,6 @@ import flixel.input.keyboard.FlxKey;
 import debug.codename.Framerate;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
-import flixel.FlxState;
 import haxe.io.Path;
 import openfl.Assets;
 import openfl.system.System;

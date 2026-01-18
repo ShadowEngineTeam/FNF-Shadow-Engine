@@ -9,7 +9,6 @@ class MasterEditorMenu extends MusicBeatState
 {
 	var options:Array<String> = [
 		'Chart Editor',
-		#if MODCHARTS_ALLOWED 'Modchart Editor', #end
 		'Character Editor',
 		'Week Editor',
 		'Menu Character Editor',
@@ -110,10 +109,6 @@ class MasterEditorMenu extends MusicBeatState
 			{
 				case 'Chart Editor': // felt it would be cool maybe
 					LoadingState.loadAndSwitchState(new ChartingState(), false);
-				#if MODCHARTS_ALLOWED
-				case 'Modchart Editor':
-					LoadingState.loadAndSwitchState(new modcharting.ModchartEditorState(), false);
-				#end
 				case 'Character Editor':
 					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				case 'Week Editor':

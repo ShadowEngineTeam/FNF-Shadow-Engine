@@ -2,7 +2,6 @@ package ui.components.text;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.ui.FlxUI.NamedString;
 import flixel.input.keyboard.FlxKey;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
@@ -1633,4 +1632,10 @@ class ShadowInputText extends FlxText
 		updateSelectionSprite();
 		return selectionColor;
 	}
+}
+
+typedef NamedString =
+{
+	name:String,
+	value:String
 }

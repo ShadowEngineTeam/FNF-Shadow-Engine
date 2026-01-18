@@ -1,7 +1,5 @@
 package backend;
 
-import flixel.FlxState;
-import flixel.FlxSubState;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 

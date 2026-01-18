@@ -1752,7 +1752,6 @@ class FunkinLua
 		DeprecatedFunctions.implement(this);
 		MobileFunctions.implement(this);
 		FlixelAnimateFunctions.implement(this);
-		#if MODCHARTS_ALLOWED modcharting.ModchartFuncs.loadLuaFunctions(this); #end
 		#if android AndroidFunctions.implement(this); #end
 
 		try

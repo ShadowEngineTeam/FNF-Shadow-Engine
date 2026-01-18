@@ -2,7 +2,6 @@ package backend;
 
 import flixel.FlxBasic;
 import flixel.FlxObject;
-import flixel.FlxSubState;
 import objects.Note.EventNote;
 import objects.Character;
 

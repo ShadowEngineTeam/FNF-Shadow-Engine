@@ -1,14 +1,7 @@
 package backend;
 
 import flixel.FlxBasic;
-import flixel.FlxSubState;
-#if MODCHARTS_ALLOWED
-import modcharting.ModchartMusicBeatState;
-#else
-import flixel.addons.ui.FlxUIState;
-#end
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.FlxState;
 import flixel.util.FlxSave;
 import backend.PsychCamera;
 
