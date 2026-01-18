@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.math.FlxPoint;
 import backend.Paths;
 import ui.ShadowStyle;
 import ui.components.text.ShadowLabel;
@@ -102,10 +103,14 @@ class ShadowList extends FlxSpriteGroup
 		super.update(elapsed);
 
 		#if FLX_MOUSE
-		if (FlxG.mouse.justPressed && FlxG.mouse.overlaps(bg, camera))
+		var mousePos:FlxPoint = FlxG.mouse.getWorldPosition(camera);
+		var localMouseX = mousePos.x - this.x;
+		var localMouseY = mousePos.y - this.y;
+		var isOverList = localMouseX >= 0 && localMouseX < _width && localMouseY >= 0 && localMouseY < _height;
+
+		if (FlxG.mouse.justPressed && isOverList)
 		{
-			var mouseY = FlxG.mouse.y - y;
-			var clickedIndex = Std.int((mouseY - 2) / itemHeight) + scrollOffset;
+			var clickedIndex = Std.int((localMouseY - 2) / itemHeight) + scrollOffset;
 
 			if (clickedIndex >= 0 && clickedIndex < items.length)
 			{
@@ -114,10 +119,8 @@ class ShadowList extends FlxSpriteGroup
 					callback(clickedIndex);
 			}
 		}
-		#end
 
-		#if FLX_MOUSE
-		if (FlxG.mouse.overlaps(bg, camera) && FlxG.mouse.wheel != 0)
+		if (isOverList && FlxG.mouse.wheel != 0)
 		{
 			scrollOffset -= FlxG.mouse.wheel;
 			if (scrollOffset < 0)
@@ -129,6 +132,8 @@ class ShadowList extends FlxSpriteGroup
 
 			refreshDisplay();
 		}
+		
+		mousePos.put();
 		#end
 	}
 
