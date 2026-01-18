@@ -562,7 +562,6 @@ class ChartingState extends MusicBeatState
 			updateHeads();
 		}, dropdownWidth);
 		player1DropDown.selectedIndex = characters.indexOf(_song.player1);
-		tab_group.add(player1DropDown);
 
 		tab_group.add(new ShadowLabel(pad + dropdownWidth + pad, row2, "Stage:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stageDropDown = new ShadowDropdown(pad + dropdownWidth + pad, row2 + labelOffset, stageList, function(index:Int)
@@ -662,8 +661,9 @@ class ChartingState extends MusicBeatState
 
 		// dropdowns
 		tab_group.add(stageDropDown);
-		tab_group.add(gfVersionDropDown);
 		tab_group.add(player2DropDown);
+		tab_group.add(gfVersionDropDown);
+		tab_group.add(player1DropDown);
 
 		initPsychCamera().follow(camPos, LOCKON, 999);
 
@@ -1174,7 +1174,6 @@ class ChartingState extends MusicBeatState
 				updateGrid();
 			}
 		}, 150);
-		tab_group.add(eventDropDown);
 
 		var btnX = pad + 160;
 		var removeButton = new ShadowButton(btnX, row0 + labelOffset, "-", function()
@@ -1262,6 +1261,9 @@ class ChartingState extends MusicBeatState
 		tab_group.add(new ShadowLabel(pad, row4, "Description:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		descText = new ShadowLabel(pad, row4 + labelOffset, eventStuff[0][1], ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		tab_group.add(descText);
+
+		// dropdown
+		tab_group.add(eventDropDown);
 	}
 
 	function changeEventSelected(change:Int = 0)
