@@ -19,55 +19,55 @@ jobs:
             buildArgs: "windows -final -32 -D HXCPP_M32 -D officialBuild"
             assetType: S3TC
             artifactName: windowsBuild-i686
-            artifactPath: export\release\windows\bin\*
+            artifactPath: export\final\windows\bin\*
           - name: Windows x86_64
             os: windows-2025
             buildArgs: "windows -final -64 -D HXCPP_M64 -D officialBuild"
             assetType: S3TC
             artifactName: windowsBuild-x86_64
-            artifactPath: export\release\windows\bin\*
+            artifactPath: export\final\windows\bin\*
           - name: Windows ARM64
             os: windows-2025
             buildArgs: "windows -final -arm64 -D HXCPP_ARM64 -D officialBuild"
             assetType: S3TC
             artifactName: windowsBuild-arm64
-            artifactPath: export\release\windows\bin\*
+            artifactPath: export\final\windows\bin\*
           - name: Linux i686
             os: ubuntu-24.04
             buildArgs: "linux -final -32 -D HXCPP_M32 -D officialBuild"
             assetType: S3TC
             artifactName: linuxBuild-i686
-            artifactPath: export/release/linux/bin/*
+            artifactPath: export/final/linux/bin/*
           - name: Linux x86_64
             os: ubuntu-24.04
             buildArgs: "linux -final -64 -D HXCPP_M64 -D officialBuild"
             assetType: S3TC
             artifactName: linuxBuild-x86_64
-            artifactPath: export/release/linux/bin/*
+            artifactPath: export/final/linux/bin/*
           - name: Linux ARMV7
             os: ubuntu-24.04-arm
             buildArgs: "linux -final -armv7 -D HXCPP_ARMV7 -D officialBuild"
             assetType: ASTC
             artifactName: linuxBuild-armv7
-            artifactPath: export/release/linux/bin/*
+            artifactPath: export/final/linux/bin/*
           - name: Linux ARM64
             os: ubuntu-24.04-arm
             buildArgs: "linux -final -arm64 -D HXCPP_ARM64 -D officialBuild"
             assetType: ASTC
             artifactName: linuxBuild-arm64
-            artifactPath: export/release/linux/bin/*
+            artifactPath: export/final/linux/bin/*
           - name: Android
             os: macos-26
             buildArgs: "android -final -D officialBuild"
             assetType: ASTC
             artifactName: androidBuild
-            artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
+            artifactPath: "export/final/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
             os: macos-26
             buildArgs: "ios -final -nosign -D officialBuild"
             assetType: ASTC
             artifactName: iOSBuild
-            artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
+            artifactPath: "export/final/ios/build/Release-iphoneos/*.ipa"
     uses: ./.github/workflows/build.yml
     secrets:
       SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}

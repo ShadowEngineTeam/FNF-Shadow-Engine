@@ -172,7 +172,7 @@ class Project extends HXProject
 		app.file = EXECUTABLE;
 		app.preloader = PRELOADER;
 
-		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}/';
+		var buildDir = 'export/${isDebug() ? 'debug' : isFinal() ? 'final' : 'release'}/';
 		app.path = buildDir;
 
 		sources = SOURCE_FOLDERS;
