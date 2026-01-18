@@ -104,7 +104,7 @@ class DialogueEditorState extends MusicBeatState
 		var tabs = [{name: 'Dialogue Line', label: 'Dialogue Line'}];
 		var margin = ShadowStyle.SPACING_LG;
 		var panelWidth = 350;
-		var panelHeight = 350;
+		var panelHeight = 320;
 		var panelX = FlxG.width - panelWidth - margin;
 		var panelY = margin;
 
