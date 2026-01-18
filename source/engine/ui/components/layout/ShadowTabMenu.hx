@@ -10,12 +10,14 @@ import backend.Paths;
 import ui.ShadowStyle;
 import ui.components.controls.ShadowDropdown;
 
-typedef TabDef = {
+typedef TabDef =
+{
 	var name:String;
 	var label:String;
 }
 
-class ShadowTabMenu extends FlxSpriteGroup {
+class ShadowTabMenu extends FlxSpriteGroup
+{
 	public var selectedTab(get, set):Int;
 	public var callback:Int->Void;
 
@@ -42,8 +44,8 @@ class ShadowTabMenu extends FlxSpriteGroup {
 	var _pressStartY:Float = 0;
 	var _pressTabIndex:Int = -1;
 
-
-	public function new(x:Float, y:Float, tabDefs:Array<TabDef>, width:Int = 400, height:Int = 300) {
+	public function new(x:Float, y:Float, tabDefs:Array<TabDef>, width:Int = 400, height:Int = 300)
+	{
 		super(x, y);
 		tabs = tabDefs;
 		_width = width;
@@ -65,8 +67,10 @@ class ShadowTabMenu extends FlxSpriteGroup {
 		accentLine.makeGraphic(_width, 2, ShadowStyle.ACCENT);
 		add(accentLine);
 
-		if (tabs.length > 0) {
-			for (i in 0...tabs.length) {
+		if (tabs.length > 0)
+		{
+			for (i in 0...tabs.length)
+			{
 				var tabBtn = createTabButton(i);
 				tabButtons.push(tabBtn);
 				add(tabBtn);
@@ -78,35 +82,42 @@ class ShadowTabMenu extends FlxSpriteGroup {
 				add(content);
 			}
 		}
-		
+
 		selectedTab = _selectedTab;
 		_initialized = true;
 	}
 
-	function drawPanel() {
+	function drawPanel()
+	{
 		var panelHeight = _height - ShadowStyle.HEIGHT_TAB;
 		panelBg.makeGraphic(_width, panelHeight, ShadowStyle.BG_DARK, true);
-		for (i in 0..._width) {
+		for (i in 0..._width)
+		{
 			panelBg.pixels.setPixel32(i, panelHeight - 1, ShadowStyle.BORDER_DARK);
 		}
-		for (i in 0...panelHeight) {
+		for (i in 0...panelHeight)
+		{
 			panelBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
 			panelBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
 		}
 	}
 
-	function drawTabBar() {
+	function drawTabBar()
+	{
 		tabBar.makeGraphic(_width, ShadowStyle.HEIGHT_TAB, ShadowStyle.BG_MEDIUM, true);
-		for (i in 0..._width) {
+		for (i in 0..._width)
+		{
 			tabBar.pixels.setPixel32(i, 0, ShadowStyle.BORDER_DARK);
 		}
-		for (i in 0...ShadowStyle.HEIGHT_TAB) {
+		for (i in 0...ShadowStyle.HEIGHT_TAB)
+		{
 			tabBar.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
 			tabBar.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
 		}
 	}
 
-	function createTabButton(index:Int):FlxSpriteGroup {
+	function createTabButton(index:Int):FlxSpriteGroup
+	{
 		var btn = new FlxSpriteGroup(index * _tabWidth, 0);
 
 		var bg = new FlxSprite();
@@ -123,27 +134,32 @@ class ShadowTabMenu extends FlxSpriteGroup {
 		return btn;
 	}
 
-	function updateTabVisuals() {
-		for (i in 0...tabButtons.length) {
+	function updateTabVisuals()
+	{
+		for (i in 0...tabButtons.length)
+		{
 			var btn = tabButtons[i];
 			var bg:FlxSprite = cast btn.members[0];
 			var txt:FlxText = cast btn.members[1];
 
-			if (i == _selectedTab) {
+			if (i == _selectedTab)
+			{
 				bg.makeGraphic(_tabWidth, ShadowStyle.HEIGHT_TAB - 2, ShadowStyle.BG_DARK);
 				txt.color = ShadowStyle.TEXT_PRIMARY;
-			} else {
+			}
+			else
+			{
 				bg.makeGraphic(_tabWidth, ShadowStyle.HEIGHT_TAB - 2, ShadowStyle.BG_MEDIUM);
 				txt.color = ShadowStyle.TEXT_SECONDARY;
 			}
 		}
 	}
 
-	function get_selectedTab():Int {
+	function get_selectedTab():Int
 		return _selectedTab;
-	}
 
-	function set_selectedTab(value:Int):Int {
+	function set_selectedTab(value:Int):Int
+	{
 		if (_initialized && value == _selectedTab)
 			return value;
 
@@ -151,14 +167,18 @@ class ShadowTabMenu extends FlxSpriteGroup {
 		ShadowDropdown.closeAllOpen();
 		updateTabVisuals();
 
-		if (tabs.length > 0) {
-			for (i in 0...tabs.length) {
+		if (tabs.length > 0)
+		{
+			for (i in 0...tabs.length)
+			{
 				var content = tabContents.get(tabs[i].name);
-				if (content != null) {
+				if (content != null)
+				{
 					var isActive = (i == _selectedTab);
 					content.visible = isActive;
 					content.active = isActive;
-					content.forEach(function(member:flixel.FlxBasic) {
+					content.forEach(function(member:flixel.FlxBasic)
+					{
 						content.visible = isActive;
 						member.active = isActive;
 					}, true);
@@ -168,17 +188,18 @@ class ShadowTabMenu extends FlxSpriteGroup {
 		return value;
 	}
 
-	public function getTabGroup(name:String):FlxSpriteGroup {
+	public function getTabGroup(name:String):FlxSpriteGroup
 		return tabContents.get(name);
-	}
 
-	public function addToTab(name:String, sprite:FlxSprite) {
+	public function addToTab(name:String, sprite:FlxSprite)
+	{
 		var group = tabContents.get(name);
 		if (group != null)
 			group.add(sprite);
 	}
 
-	override function update(elapsed:Float) {
+	override function update(elapsed:Float)
+	{
 		if (!visible || !active || !exists)
 			return;
 
@@ -194,17 +215,20 @@ class ShadowTabMenu extends FlxSpriteGroup {
 
 		var inTabBar = (mx >= left && mx <= right && my >= top && my <= tabBottom);
 
-		if (_dragging) {
-			if (FlxG.mouse.pressed) {
+		if (_dragging)
+		{
+			if (FlxG.mouse.pressed)
+			{
 				this.x = mx - _dragOffsetX;
 				this.y = my - _dragOffsetY;
 				return;
-			} else {
-				_dragging = false;
 			}
+			else
+				_dragging = false;
 		}
 
-		if (FlxG.mouse.justPressed) {
+		if (FlxG.mouse.justPressed)
+		{
 			if (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen())
 				return;
 
@@ -213,11 +237,14 @@ class ShadowTabMenu extends FlxSpriteGroup {
 			_pressStartY = my;
 			_pressTabIndex = -1;
 
-			if (inTabBar) {
-				for (i in 0...tabButtons.length) {
+			if (inTabBar)
+			{
+				for (i in 0...tabButtons.length)
+				{
 					var btn = tabButtons[i];
 					var bg:FlxSprite = cast btn.members[0];
-					if (FlxG.mouse.overlaps(bg, camera)) {
+					if (FlxG.mouse.overlaps(bg, camera))
+					{
 						_pressTabIndex = i;
 						break;
 					}
@@ -225,10 +252,12 @@ class ShadowTabMenu extends FlxSpriteGroup {
 			}
 		}
 
-		if (_pressing && !_dragging && FlxG.mouse.pressed) {
+		if (_pressing && !_dragging && FlxG.mouse.pressed)
+		{
 			var dx = mx - _pressStartX;
 			var dy = my - _pressStartY;
-			if ((dx * dx + dy * dy) >= 16) {
+			if ((dx * dx + dy * dy) >= 16)
+			{
 				_dragging = true;
 				_dragOffsetX = _pressStartX - this.x;
 				_dragOffsetY = _pressStartY - this.y;
@@ -236,9 +265,12 @@ class ShadowTabMenu extends FlxSpriteGroup {
 			}
 		}
 
-		if (_pressing && FlxG.mouse.justReleased) {
-			if (!_dragging && _pressTabIndex != -1) {
-				if (_pressTabIndex != _selectedTab) {
+		if (_pressing && FlxG.mouse.justReleased)
+		{
+			if (!_dragging && _pressTabIndex != -1)
+			{
+				if (_pressTabIndex != _selectedTab)
+				{
 					selectedTab = _pressTabIndex;
 					if (callback != null)
 						callback(_pressTabIndex);

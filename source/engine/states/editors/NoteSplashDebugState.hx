@@ -584,25 +584,20 @@ class NoteSplashDebugState extends MusicBeatState
 		var helpContent:String;
 		if (controls.mobileC)
 		{
-			helpContent = "Y - Reset/Play animation\n" +
-				"A (twice) - Save to loaded Note Splash PNG's folder\n" +
-				"Top LEFT/RIGHT - Change selected note\n" +
-				"Arrow Keys - Change offset\n" +
-				"W/S - Change animation\n" +
-				"X/E - Change frame\n" +
-				"C/V - Copy & Paste offsets\n" +
-				"BACK - Return to Editor Menu";
+			helpContent = "Y - Reset/Play animation\n" + "A (twice) - Save to loaded Note Splash PNG's folder\n" + "Top LEFT/RIGHT - Change selected note\n"
+				+ "Arrow Keys - Change offset\n" + "W/S - Change animation\n" + "X/E - Change frame\n" + "C/V - Copy & Paste offsets\n"
+				+ "BACK - Return to Editor Menu";
 		}
 		else
 		{
-			helpContent = "SPACE - Reset/Play animation\n" +
-				"ENTER (twice) - Save to loaded Note Splash PNG's folder\n" +
-				"A/D - Change selected note\n" +
-				"Arrow Keys - Change offset (Hold SHIFT for 10x)\n" +
-				"W/S - Change animation\n" +
-				"Q/E - Change frame\n" +
-				"Ctrl + C/V - Copy & Paste offsets\n" +
-				"ESCAPE - Return to Editor Menu";
+			helpContent = "SPACE - Reset/Play animation\n"
+				+ "ENTER (twice) - Save to loaded Note Splash PNG's folder\n"
+				+ "A/D - Change selected note\n"
+				+ "Arrow Keys - Change offset (Hold SHIFT for 10x)\n"
+				+ "W/S - Change animation\n"
+				+ "Q/E - Change frame\n"
+				+ "Ctrl + C/V - Copy & Paste offsets\n"
+				+ "ESCAPE - Return to Editor Menu";
 		}
 
 		var contentText = new FlxText(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG + 50, panelWidth - ShadowStyle.SPACING_LG * 2, helpContent);

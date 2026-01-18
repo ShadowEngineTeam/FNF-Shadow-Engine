@@ -191,7 +191,6 @@ class ChartingState extends MusicBeatState
 
 	public var quantizations:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 96, 192];
 
-
 	public static var vortex:Bool = false;
 
 	public var mouseQuant:Bool = false;
@@ -473,13 +472,13 @@ class ChartingState extends MusicBeatState
 		stageDirectories.push(Paths.getSharedPath('stages/'));
 		#end
 
-	var stageFile:Array<String> = Mods.mergeAllTextsNamed('data/stageList.txt', Paths.getSharedPath());
-	stageList = [];
+		var stageFile:Array<String> = Mods.mergeAllTextsNamed('data/stageList.txt', Paths.getSharedPath());
+		stageList = [];
 		for (stage in stageFile)
 		{
 			if (stage.trim().length > 0)
 			{
-			stageList.push(stage);
+				stageList.push(stage);
 			}
 			tempArray.push(stage);
 		}
@@ -497,14 +496,14 @@ class ChartingState extends MusicBeatState
 						if (stageToCheck.trim().length > 0 && !tempArray.contains(stageToCheck))
 						{
 							tempArray.push(stageToCheck);
-						stageList.push(stageToCheck);
+							stageList.push(stageToCheck);
 						}
 					}
 				}
 			}
 		}
-	if (stageList.length < 1)
-		stageList.push('stage');
+		if (stageList.length < 1)
+			stageList.push('stage');
 
 		var row0 = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Song Title:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
@@ -565,11 +564,11 @@ class ChartingState extends MusicBeatState
 
 		tab_group.add(new ShadowLabel(pad + dropdownWidth + pad, row2, "Stage:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stageDropDown = new ShadowDropdown(pad + dropdownWidth + pad, row2 + labelOffset, stageList, function(index:Int)
-			{
+		{
 			_song.stage = stageList[index];
-			}, dropdownWidth);
+		}, dropdownWidth);
 		stageDropDown.selectedIndex = stageList.indexOf(_song.stage);
-		
+
 		var row3 = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Girlfriend:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		var gfVersionDropDown = new ShadowDropdown(pad, row3 + labelOffset, characters, function(index:Int)
@@ -1013,7 +1012,7 @@ class ChartingState extends MusicBeatState
 		{
 			displayNameList[i] = i + '. ' + displayNameList[i];
 		}
-		
+
 		var row0 = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Sustain length:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stepperSusLength = new ShadowStepper(pad, row0 + labelOffset, Conductor.stepCrochet / 2, 0, 0, Conductor.stepCrochet * 64, 0, function(value:Float)
@@ -1074,10 +1073,11 @@ class ChartingState extends MusicBeatState
 
 		var row5 = row4 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row5, "Note Texture (Opponent):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin != null ? editorOpponentArrowSkin : '', function(text:String)
-		{
-			editorOpponentArrowSkin = text;
-		});
+		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin != null ? editorOpponentArrowSkin : '',
+			function(text:String)
+			{
+				editorOpponentArrowSkin = text;
+			});
 		tab_group.add(noteSkinInputText2);
 		registerBlockerInput(noteSkinInputText2);
 
@@ -1097,7 +1097,6 @@ class ChartingState extends MusicBeatState
 			updateGrid();
 		}, 90);
 		tab_group.add(reloadNotesButton);
-
 	}
 
 	var eventDropDown:ShadowDropdown;
@@ -1573,8 +1572,6 @@ class ChartingState extends MusicBeatState
 			});
 		tab_group.add(gameOverEndInputText);
 		registerBlockerInput(gameOverEndInputText);
-
-
 	}
 
 	function makeHelpUI()
@@ -1607,21 +1604,20 @@ class ChartingState extends MusicBeatState
 		var helpStr:String;
 		if (controls.mobileC)
 		{
-			helpStr = "Up/Down - Change Conductor's strum time\nLeft/Right - Go to the previous/next section\n" +
-				#if FLX_PITCH "G - Reset Song Playback Rate\n" + #end
-				"Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
+			helpStr = "Up/Down - Change Conductor's strum time\nLeft/Right - Go to the previous/next section\n"
+				+ #if FLX_PITCH "G - Reset Song Playback Rate\n"
+				+ #end "Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
 				"C - Test your chart inside Chart Editor\nA - Play your chart\n" +
 				"Up/Down (On The Right) - Decrease/Increase Note Sustain Length\nX - Stop/Resume Song";
 		}
 		else
 		{
-			helpStr = "W/S or Mouse Wheel - Change Conductor's strum time\nA/D - Go to the previous/next section\n" +
-				"Left/Right - Change Snap\nUp/Down - Change Conductor's Strum Time with Snapping\n" +
-				#if FLX_PITCH "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n" +
-				"ALT + Left Bracket / Right Bracket - Reset Song Playback Rate\n" + #end
-				"Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
-				"Esc - Test your chart inside Chart Editor\nEnter - Play your chart\n" +
-				"Q/E - Decrease/Increase Note Sustain Length\nSpace - Stop/Resume song";
+			helpStr = "W/S or Mouse Wheel - Change Conductor's strum time\nA/D - Go to the previous/next section\n"
+				+ "Left/Right - Change Snap\nUp/Down - Change Conductor's Strum Time with Snapping\n"
+				+ #if FLX_PITCH "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n"
+				+ "ALT + Left Bracket / Right Bracket - Reset Song Playback Rate\n"
+				+ #end "Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
+				"Esc - Test your chart inside Chart Editor\nEnter - Play your chart\n" + "Q/E - Decrease/Increase Note Sustain Length\nSpace - Stop/Resume song";
 		}
 
 		var helpText = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
@@ -2824,7 +2820,8 @@ class ChartingState extends MusicBeatState
 	{
 		var skinPath:String = isPlayer ? editorPlayerArrowSkin : editorOpponentArrowSkin;
 		// Fallback for old charts / nulls
-		if (skinPath == null) skinPath = '';
+		if (skinPath == null)
+			skinPath = '';
 		note.texture = skinPath;
 		note.setGraphicSize(GRID_SIZE, GRID_SIZE);
 		note.updateHitbox();
@@ -3001,7 +2998,8 @@ class ChartingState extends MusicBeatState
 				{
 					currentType = curNoteTypes.indexOf(curSelectedNote[3]);
 					// ShadowDropdown's label is read-only; drive it via selectedIndex.
-					if (currentType < 0) currentType = 0;
+					if (currentType < 0)
+						currentType = 0;
 					noteTypeDropDown.selectedIndex = currentType;
 				}
 			}
@@ -3009,7 +3007,8 @@ class ChartingState extends MusicBeatState
 			{
 				var evName:String = curSelectedNote[1][curEventSelected][0];
 				var idx:Int = leEvents.indexOf(evName);
-				if (idx < 0) idx = 0;
+				if (idx < 0)
+					idx = 0;
 				eventDropDown.selectedIndex = idx;
 				if (idx >= 0 && idx < eventStuff.length)
 					descText.text = eventStuff[idx][1];

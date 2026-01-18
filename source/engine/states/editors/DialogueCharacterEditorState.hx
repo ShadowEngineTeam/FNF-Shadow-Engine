@@ -33,7 +33,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 	var ghostIdle:DialogueCharacter;
 
 	var curAnim:Int = 0;
-	
+
 	inline static final TAB_ANIMATIONS:Int = 0;
 	inline static final TAB_CHARACTER:Int = 1;
 
@@ -167,7 +167,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 	function addEditorBox()
 	{
 		var typeTabs:Array<{name:String, label:String}> = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(FlxG.width - editorTypeWidth - ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG, typeTabs, editorTypeWidth, editorTypeHeight);
+		UI_typebox = new ShadowTabMenu(FlxG.width - editorTypeWidth - ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG, typeTabs, editorTypeWidth,
+			editorTypeHeight);
 		UI_typebox.scrollFactor.set();
 		UI_typebox.cameras = [camHUD];
 		addTypeUI();
@@ -177,7 +178,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 			{name: 'Animations', label: 'Animations'},
 			{name: 'Character', label: 'Character'},
 		];
-		UI_mainbox = new ShadowTabMenu(UI_typebox.x - editorMainWidth - ShadowStyle.SPACING_MD, ShadowStyle.SPACING_LG, mainTabs, editorMainWidth, editorMainHeight);
+		UI_mainbox = new ShadowTabMenu(UI_typebox.x - editorMainWidth - ShadowStyle.SPACING_MD, ShadowStyle.SPACING_LG, mainTabs, editorMainWidth,
+			editorMainHeight);
 		UI_mainbox.scrollFactor.set();
 		UI_mainbox.cameras = [camHUD];
 		addAnimationsUI();
@@ -338,7 +340,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			var lastIndex = animationDropDown.selectedIndex;
 			reloadAnimationsDropDown();
 			if (animationArray.length > 0)
-			animationDropDown.selectedIndex = Std.int(Math.min(lastIndex, animationArray.length - 1));
+				animationDropDown.selectedIndex = Std.int(Math.min(lastIndex, animationArray.length - 1));
 		}, 110);
 		var removeUpdateButton = new ShadowButton(pad + addUpdateButton.width + ShadowStyle.SPACING_MD, buttonY, "Remove", function()
 		{
@@ -392,7 +394,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		{
 			animationDropDown.setOptions(animationArray);
 			if (animationArray.length > 0)
-			animationDropDown.selectedIndex = Std.int(Math.min(animationDropDown.selectedIndex, animationArray.length - 1));
+				animationDropDown.selectedIndex = Std.int(Math.min(animationDropDown.selectedIndex, animationArray.length - 1));
 			else
 				animationDropDown.selectedIndex = 0;
 			if (animationArray.length > 0 && animationDropDown.callback != null)
@@ -724,8 +726,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 			}
 			if (FlxG.keys.justPressed.H || touchPad.buttonY.justPressed)
 			{
-			if (UI_mainbox.selectedTab == TAB_ANIMATIONS)
-			{
+				if (UI_mainbox.selectedTab == TAB_ANIMATIONS)
+				{
 					currentGhosts++;
 					if (currentGhosts > 2)
 						currentGhosts = 0;
