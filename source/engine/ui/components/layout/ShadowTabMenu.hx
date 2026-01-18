@@ -33,6 +33,11 @@ class ShadowTabMenu extends FlxSpriteGroup {
 	var _initialized:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
 
+	var _dragging:Bool = false;
+	var _dragOffsetX:Float = 0;
+	var _dragOffsetY:Float = 0;
+
+
 	public function new(x:Float, y:Float, tabDefs:Array<TabDef>, width:Int = 400, height:Int = 300) {
 		super(x, y);
 		tabs = tabDefs;
@@ -175,13 +180,35 @@ class ShadowTabMenu extends FlxSpriteGroup {
 		super.update(elapsed);
 
 		if (FlxG.mouse.justPressed) {
+			// don't steal clicks from dropdowns
+			if (!ShadowDropdown.isClickCaptured() && !ShadowDropdown.isAnyOpen()) {
+				if (FlxG.mouse.overlaps(panelBg, camera) || FlxG.mouse.overlaps(tabBar, camera) || FlxG.mouse.overlaps(accentLine, camera)) {
+					_dragging = true;
+					_dragOffsetX = FlxG.mouse.screenX - this.x;
+					_dragOffsetY = FlxG.mouse.screenY - this.y;
+					return;
+				}
+			}
+		}
+
+		if (_dragging) {
+			if (FlxG.mouse.pressed) {
+				this.x = FlxG.mouse.screenX - _dragOffsetX;
+				this.y = FlxG.mouse.screenY - _dragOffsetY;
+				return; // while dragging, ignore tab switching
+			} else {
+				_dragging = false;
+			}
+		}
+		
+		if (FlxG.mouse.justPressed) {
 			if (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen())
 				return;
+
 			for (i in 0...tabButtons.length) {
 				var btn = tabButtons[i];
 				var bg:FlxSprite = cast btn.members[0];
 				if (FlxG.mouse.overlaps(bg, camera)) {
-					// Only switch if different tab
 					if (i != _selectedTab) {
 						selectedTab = i;
 						if (callback != null)

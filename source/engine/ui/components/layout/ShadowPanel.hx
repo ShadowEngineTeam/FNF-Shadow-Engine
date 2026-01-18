@@ -11,6 +11,11 @@ class ShadowPanel extends FlxSpriteGroup {
 	var _width:Int;
 	var _height:Int;
 
+	var _dragging:Bool = false;
+	var _dragOffsetX:Float = 0;
+	var _dragOffsetY:Float = 0;
+
+
 	public function new(x:Float, y:Float, width:Int = 300, height:Int = 200, ?bgColor:FlxColor, ?borderColor:FlxColor) {
 		super(x, y);
 		_width = width;
@@ -43,4 +48,29 @@ class ShadowPanel extends FlxSpriteGroup {
 		var border = borderColor != null ? borderColor : ShadowStyle.BORDER_DARK;
 		drawBackground(fill, border);
 	}
+
+	override function update(elapsed:Float) {
+		if (!visible || !active || !exists)
+			return;
+
+		super.update(elapsed);
+
+		if (flixel.FlxG.mouse.justPressed) {
+			if (flixel.FlxG.mouse.overlaps(bg, camera)) {
+				_dragging = true;
+				_dragOffsetX = flixel.FlxG.mouse.screenX - this.x;
+				_dragOffsetY = flixel.FlxG.mouse.screenY - this.y;
+			}
+		}
+		
+		if (_dragging) {
+			if (flixel.FlxG.mouse.pressed) {
+				this.x = flixel.FlxG.mouse.screenX - _dragOffsetX;
+				this.y = flixel.FlxG.mouse.screenY - _dragOffsetY;
+			} else {
+				_dragging = false;
+			}
+		}
+	}
+
 }
