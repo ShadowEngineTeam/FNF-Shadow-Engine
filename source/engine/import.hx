@@ -72,6 +72,23 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.system.FlxAssets.FlxShader;
 
+// ui
+import ui.ShadowStyle;
+// ui controls
+import ui.components.controls.ShadowButton;
+import ui.components.controls.ShadowCheckbox;
+import ui.components.controls.ShadowStepper;
+import ui.components.controls.ShadowDropdown;
+import ui.components.controls.ShadowList;
+import ui.components.controls.ShadowSlider;
+// ui text
+import ui.components.text.ShadowLabel;
+import ui.components.text.ShadowInputText;
+import ui.components.text.ShadowTextInput;
+// ui layout
+import ui.components.layout.ShadowPanel;
+import ui.components.layout.ShadowTabMenu;
+
 // flixel-animate
 import animate.FlxAnimate;
 
