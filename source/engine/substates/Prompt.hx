@@ -145,13 +145,13 @@ class Prompt extends MusicBeatSubstate
 		if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
 		{
 			selected = 0;
-			FlxG.sound.play(Paths.sound('scrollMenu'));
+			//FlxG.sound.play(Paths.sound('scrollMenu'));
 			updateSelection();
 		}
 		else if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D)
 		{
 			selected = 1;
-			FlxG.sound.play(Paths.sound('scrollMenu'));
+			//FlxG.sound.play(Paths.sound('scrollMenu'));
 			updateSelection();
 		}
 
@@ -185,7 +185,7 @@ class Prompt extends MusicBeatSubstate
 
 	function confirm()
 	{
-		FlxG.sound.play(Paths.sound('confirmMenu'));
+		//FlxG.sound.play(Paths.sound('confirmMenu'));
 
 		if (selected == 0)
 		{
