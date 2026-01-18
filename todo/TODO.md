@@ -5,7 +5,6 @@
 - Add V-Slice Menus(?) and Wide Screen Support
 - Add editors for V-Slice Menus(?)
 - Add Base Game Files
-- Add our UI for editors
 - Add multikey support(?)
 - Rewrite the Input System(?)
 - Refactor/Redo Scriptable States Support(?)
