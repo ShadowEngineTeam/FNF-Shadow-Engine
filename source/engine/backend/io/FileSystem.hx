@@ -216,7 +216,7 @@ class FileSystem
 
 		#if MODS_ALLOWED
 		#if linux
-		var actualPath = cwd(path);
+		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path) ?? path;
 		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
 			result = SysFileSystem.readDirectory(actualPath);
