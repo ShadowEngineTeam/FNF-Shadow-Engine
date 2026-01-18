@@ -871,7 +871,7 @@ class PlayState extends MusicBeatState
 		char.y += char.positionArray[1];
 	}
 
-	public var videoCutscene:VideoSprite = null;
+	public var videoCutscene:VideoSprite = null;import lime.utils.Log;
 	public function startVideo(name:String, forMidSong:Bool = false, canSkip:Bool = true, loop:Bool = false, playOnLoad:Bool = true)
 	{
 		#if VIDEOS_ALLOWED
@@ -2307,7 +2307,7 @@ class PlayState extends MusicBeatState
 				if (value != 0)
 				{
 					if (dad.curCharacter.startsWith('gf')) // Tutorial GF is actually Dad, what on my life I'm doing..-
-					{ 
+					{
 						dad.playAnim('cheer', true);
 						dad.specialAnim = true;
 						dad.heyTimer = flValue2;

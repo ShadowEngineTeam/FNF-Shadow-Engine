@@ -9,7 +9,8 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import ui.ShadowStyle;
 
-class ShadowButton extends FlxSpriteGroup {
+class ShadowButton extends FlxSpriteGroup
+{
 	public var bg:FlxSprite;
 	public var label:FlxText;
 	public var callback:Void->Void;
@@ -20,7 +21,8 @@ class ShadowButton extends FlxSpriteGroup {
 	var _pressed:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(x:Float, y:Float, text:String, ?onClick:Void->Void, width:Int = 100, height:Int = 28) {
+	public function new(x:Float, y:Float, text:String, ?onClick:Void->Void, width:Int = 100, height:Int = 28)
+	{
 		super(x, y);
 		_width = width;
 		_height = height;
@@ -37,23 +39,28 @@ class ShadowButton extends FlxSpriteGroup {
 		add(label);
 	}
 
-	function drawBackground(fillColor:FlxColor, borderColor:FlxColor) {
+	function drawBackground(fillColor:FlxColor, borderColor:FlxColor)
+	{
 		bg.makeGraphic(_width, _height, fillColor, true);
-		for (i in 0..._width) {
+		for (i in 0..._width)
+		{
 			bg.pixels.setPixel32(i, 0, borderColor);
 			bg.pixels.setPixel32(i, _height - 1, borderColor);
 		}
-		for (i in 0..._height) {
+		for (i in 0..._height)
+		{
 			bg.pixels.setPixel32(0, i, borderColor);
 			bg.pixels.setPixel32(_width - 1, i, borderColor);
 		}
 	}
 
-	inline function isMouseOver():Bool {
+	inline function isMouseOver():Bool
+	{
 		return FlxG.mouse.overlaps(bg, camera);
 	}
 
-	override function update(elapsed:Float) {
+	override function update(elapsed:Float)
+	{
 		if (!visible || !active || !exists)
 			return;
 
@@ -64,29 +71,36 @@ class ShadowButton extends FlxSpriteGroup {
 		var mousePressed = FlxG.mouse.pressed;
 		var mouseJustPressed = FlxG.mouse.justPressed;
 
-		if (mouseOver && !_hovered) {
+		if (mouseOver && !_hovered)
+		{
 			_hovered = true;
 			drawBackground(ShadowStyle.BG_LIGHT, ShadowStyle.ACCENT);
-		} else if (!mouseOver && _hovered) {
+		}
+		else if (!mouseOver && _hovered)
+		{
 			_hovered = false;
 			drawBackground(ShadowStyle.BG_MEDIUM, ShadowStyle.BORDER_DARK);
 		}
 
-		if (!inputBlocked && mouseOver && mouseJustPressed) {
+		if (!inputBlocked && mouseOver && mouseJustPressed)
+		{
 			_pressed = true;
 			drawBackground(ShadowStyle.BG_DARK, ShadowStyle.ACCENT);
 		}
 
-		if (_pressed && !mousePressed) {
+		if (_pressed && !mousePressed)
+		{
 			_pressed = false;
-			if (mouseOver && callback != null) {
+			if (mouseOver && callback != null)
+			{
 				callback();
 			}
 			drawBackground(mouseOver ? ShadowStyle.BG_LIGHT : ShadowStyle.BG_MEDIUM, mouseOver ? ShadowStyle.ACCENT : ShadowStyle.BORDER_DARK);
 		}
 	}
 
-	public function setText(text:String) {
+	public function setText(text:String)
+	{
 		label.text = text;
 		label.y = (_height - label.height) / 2;
 	}

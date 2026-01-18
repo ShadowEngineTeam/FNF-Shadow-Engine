@@ -788,10 +788,10 @@ class CharacterEditorState extends MusicBeatState
 
 		flipXCheckBox = new ShadowCheckbox(leftX + leftStepperWidth + colGap, controlY3 + checkboxOffset, "Flip X", character.originalFlipX,
 			function(checked:Bool)
-		{
-			character.originalFlipX = checked;
-			character.flipX = (character.originalFlipX != character.isPlayer);
-		});
+			{
+				character.originalFlipX = checked;
+				character.flipX = (character.originalFlipX != character.isPlayer);
+			});
 
 		noAntialiasingCheckBox = new ShadowCheckbox(leftX + leftStepperWidth + colGap, controlY4 + checkboxOffset, "No Antialiasing",
 			character.noAntialiasing, function(checked:Bool)
@@ -807,17 +807,16 @@ class CharacterEditorState extends MusicBeatState
 		}, rightStepperWidth);
 		positionYStepper = new ShadowStepper(rightX + rightStepperWidth + rightStepperGap, controlY3, 10, character.positionArray[1], -9000, 9000, 0,
 			function(value:Float)
-		{
-			character.positionArray[1] = value;
-			updateCharacterPositions();
-		}, rightStepperWidth);
-
-		positionCameraXStepper = new ShadowStepper(rightX, controlY4, 10, character.cameraPosition[0], -9000, 9000, 0,
-			function(value:Float)
 			{
-				character.cameraPosition[0] = value;
-				updatePointerPos();
+				character.positionArray[1] = value;
+				updateCharacterPositions();
 			}, rightStepperWidth);
+
+		positionCameraXStepper = new ShadowStepper(rightX, controlY4, 10, character.cameraPosition[0], -9000, 9000, 0, function(value:Float)
+		{
+			character.cameraPosition[0] = value;
+			updatePointerPos();
+		}, rightStepperWidth);
 		positionCameraYStepper = new ShadowStepper(rightX + rightStepperWidth + rightStepperGap, controlY4, 10, character.cameraPosition[1], -9000, 9000, 0,
 			function(value:Float)
 			{
@@ -830,12 +829,11 @@ class CharacterEditorState extends MusicBeatState
 			saveCharacter();
 		}, rightColWidth);
 
-		healthColorStepperR = new ShadowStepper(leftX, controlY5, 20, character.healthColorArray[0], 0, 255, 0,
-			function(value:Float)
-			{
-				character.healthColorArray[0] = Math.round(value);
-				updateHealthBar();
-			}, colorStepperWidth);
+		healthColorStepperR = new ShadowStepper(leftX, controlY5, 20, character.healthColorArray[0], 0, 255, 0, function(value:Float)
+		{
+			character.healthColorArray[0] = Math.round(value);
+			updateHealthBar();
+		}, colorStepperWidth);
 		healthColorStepperG = new ShadowStepper(leftX + colorStepperWidth + colorGap, controlY5, 20, character.healthColorArray[1], 0, 255, 0,
 			function(value:Float)
 			{
@@ -888,7 +886,7 @@ class CharacterEditorState extends MusicBeatState
 		UI_animListPanel.cameras = [camHUD];
 		UI_animListPanel.scrollFactor.set();
 		add(UI_animListPanel);
-		
+
 		var titleLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Animation List", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
 		UI_animListPanel.add(titleLabel);
 
@@ -898,8 +896,10 @@ class CharacterEditorState extends MusicBeatState
 		var listHeight = panelHeight - listY - ShadowStyle.SPACING_MD;
 
 		UI_animList = new ShadowList(listX, listY, listWidth, listHeight, []);
-		UI_animList.callback = function(index:Int) {
-			if (index >= 0 && index < anims.length) {
+		UI_animList.callback = function(index:Int)
+		{
+			if (index >= 0 && index < anims.length)
+			{
 				curAnim = index;
 				character.playAnim(anims[curAnim].anim, true);
 				updateAnimationInfo();
@@ -1087,8 +1087,10 @@ class CharacterEditorState extends MusicBeatState
 				camOther.visible = false;
 				FlxG.mouse.enabled = true;
 
-				if (helpBg != null) helpBg.visible = false;
-				if (helpTexts != null) helpTexts.visible = false;
+				if (helpBg != null)
+					helpBg.visible = false;
+				if (helpTexts != null)
+					helpTexts.visible = false;
 			}
 			return;
 		}
@@ -1347,8 +1349,10 @@ class CharacterEditorState extends MusicBeatState
 			FlxG.mouse.enabled = false; // Disable mouse input
 
 			// Hide old help elements
-			if (helpBg != null) helpBg.visible = false;
-			if (helpTexts != null) helpTexts.visible = false;
+			if (helpBg != null)
+				helpBg.visible = false;
+			if (helpTexts != null)
+				helpTexts.visible = false;
 		}
 		else if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
 		{

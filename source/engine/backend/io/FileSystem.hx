@@ -196,7 +196,7 @@ class FileSystem
 			return SysFileSystem.readDirectory(actualPath);
 		#else
 		if (SysFileSystem.exists(cwd(path)) && SysFileSystem.isDirectory(cwd(path)))
-			return SysFileSystem.readDirectory(cwd(path)	);
+			return SysFileSystem.readDirectory(cwd(path));
 		#end
 		#end
 

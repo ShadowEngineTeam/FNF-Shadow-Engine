@@ -293,7 +293,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		instance = this;
 		stateInstance = cast this;
-		
+
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
 			.replace('states.', '')

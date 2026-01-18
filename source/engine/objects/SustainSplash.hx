@@ -293,6 +293,6 @@ class SustainSplash extends FlxSprite
 	}
 
 	@:noCompletion
-    override function set_angle(value:Float):Float
-        return value;
+	override function set_angle(value:Float):Float
+		return value;
 }

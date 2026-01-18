@@ -3,6 +3,7 @@
 #if DISCORD_ALLOWED
 import backend.Discord;
 #end
+import haxe.Json;
 // Psych
 #if LUA_ALLOWED
 import hxluajit.*;
@@ -72,27 +73,22 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.system.FlxAssets.FlxShader;
 
-// ui
+// flixel-animate
+import animate.FlxAnimate;
+
+// ShadowUI
 import ui.ShadowStyle;
-// ui controls
 import ui.components.controls.ShadowButton;
 import ui.components.controls.ShadowCheckbox;
 import ui.components.controls.ShadowStepper;
 import ui.components.controls.ShadowDropdown;
 import ui.components.controls.ShadowList;
 import ui.components.controls.ShadowSlider;
-// ui text
 import ui.components.text.ShadowLabel;
 import ui.components.text.ShadowInputText;
 import ui.components.text.ShadowTextInput;
-// ui layout
 import ui.components.layout.ShadowPanel;
 import ui.components.layout.ShadowTabMenu;
-
-// flixel-animate
-import animate.FlxAnimate;
-
-import haxe.Json;
 
 using StringTools;
 #end

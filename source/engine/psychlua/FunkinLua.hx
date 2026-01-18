@@ -764,7 +764,8 @@ class FunkinLua
 		set("addHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
 		{
 			#if HSCRIPT_ALLOWED
-			FunkinLua.getCurrentMusicState().startHScriptsNamed(hscriptFile, function(file:String) {
+			FunkinLua.getCurrentMusicState().startHScriptsNamed(hscriptFile, function(file:String)
+			{
 				var scriptToLoad:String = '';
 				#if MODS_ALLOWED
 				scriptToLoad = Paths.modFolders(file);
@@ -1205,6 +1206,7 @@ class FunkinLua
 			game.modchartSprites.set(tag, leSprite);
 			leSprite.active = true;
 		});
+
 		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = "sparrow", swfMode:Bool = false, cacheOnLoad:Bool = false)
 		{
 			tag = tag.replace('.', '');
@@ -2071,7 +2073,7 @@ class FunkinLua
 
 		if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
 			return lastMusicState = cast(s.subState, MusicBeatSubstate);
-		
+
 		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : null;
 	}
 }

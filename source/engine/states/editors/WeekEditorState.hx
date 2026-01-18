@@ -12,7 +12,8 @@ import objects.MenuItem;
 import states.editors.MasterEditorMenu;
 import flixel.addons.transition.FlxTransitionableState;
 
-class WeekEditorState extends MusicBeatState {
+class WeekEditorState extends MusicBeatState
+{
 	var txtWeekTitle:FlxText;
 	var bgSprite:FlxSprite;
 	var lock:FlxSprite;
@@ -23,7 +24,8 @@ class WeekEditorState extends MusicBeatState {
 
 	var weekFile:WeekFile = null;
 
-	public function new(weekFile:WeekFile = null) {
+	public function new(weekFile:WeekFile = null)
+	{
 		super();
 		this.weekFile = WeekData.createWeekFile();
 		if (weekFile != null)
@@ -32,7 +34,8 @@ class WeekEditorState extends MusicBeatState {
 			weekFileName = 'week1';
 	}
 
-	override function create() {
+	override function create()
+	{
 		txtWeekTitle = new FlxText(FlxG.width * 0.7, 10, 0, "", 32);
 		txtWeekTitle.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
@@ -66,7 +69,8 @@ class WeekEditorState extends MusicBeatState {
 		add(missingFileText);
 
 		var charArray:Array<String> = weekFile.weekCharacters;
-		for (char in 0...3) {
+		for (char in 0...3)
+		{
 			var weekCharacterThing:MenuCharacter = new MenuCharacter((FlxG.width * 0.25) * (1 + char) - 150, charArray[char]);
 			weekCharacterThing.y += 70;
 			grpWeekCharacters.add(weekCharacterThing);
@@ -99,7 +103,8 @@ class WeekEditorState extends MusicBeatState {
 	var UI_box:ShadowTabMenu;
 	var blockPressWhileTypingOn:Array<ShadowTextInput> = [];
 
-	function addEditorBox() {
+	function addEditorBox()
+	{
 		var tabs:Array<TabDef> = [{name: 'Week', label: 'Week'}, {name: 'Other', label: 'Other'}];
 		UI_box = new ShadowTabMenu(FlxG.width - 260, FlxG.height - 385, tabs, 250, 375);
 		UI_box.scrollFactor.set();
@@ -109,20 +114,23 @@ class WeekEditorState extends MusicBeatState {
 
 		add(UI_box);
 
-		var loadWeekButton = new ShadowButton(0, 650, "Load Week", function() {
+		var loadWeekButton = new ShadowButton(0, 650, "Load Week", function()
+		{
 			loadWeek();
 		}, 90);
 		loadWeekButton.screenCenter(X);
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
 
-		var freeplayButton = new ShadowButton(0, 650, "Freeplay", function() {
+		var freeplayButton = new ShadowButton(0, 650, "Freeplay", function()
+		{
 			MusicBeatState.switchState(new WeekEditorFreeplayState(weekFile));
 		}, 90);
 		freeplayButton.screenCenter(X);
 		add(freeplayButton);
 
-		var saveWeekButton = new ShadowButton(0, 650, "Save Week", function() {
+		var saveWeekButton = new ShadowButton(0, 650, "Save Week", function()
+		{
 			saveWeek(weekFile);
 		}, 90);
 		saveWeekButton.screenCenter(X);
@@ -142,13 +150,16 @@ class WeekEditorState extends MusicBeatState {
 
 	public static var weekFileName:String = 'week1';
 
-	function addWeekUI() {
+	function addWeekUI()
+	{
 		var tab = UI_box.getTabGroup("Week");
-		if (tab == null) return;
+		if (tab == null)
+			return;
 
 		tab.add(new ShadowLabel(10, 12, "Songs:"));
 		songsInputText = new ShadowTextInput(10, 30, 220, '');
-		songsInputText.callback = function(text) {
+		songsInputText.callback = function(text)
+		{
 			var splittedText:Array<String> = text.trim().split(',');
 			for (i in 0...splittedText.length)
 				splittedText[i] = splittedText[i].trim();
@@ -156,12 +167,15 @@ class WeekEditorState extends MusicBeatState {
 			while (splittedText.length < weekFile.songs.length)
 				weekFile.songs.pop();
 
-			for (i in 0...splittedText.length) {
+			for (i in 0...splittedText.length)
+			{
 				if (i >= weekFile.songs.length)
 					weekFile.songs.push([splittedText[i], 'dad', [146, 113, 253]]);
-				else {
+				else
+				{
 					weekFile.songs[i][0] = splittedText[i];
-					if (weekFile.songs[i][1] == null || weekFile.songs[i][1]) {
+					if (weekFile.songs[i][1] == null || weekFile.songs[i][1])
+					{
 						weekFile.songs[i][1] = 'dad';
 						weekFile.songs[i][2] = [146, 113, 253];
 					}
@@ -174,7 +188,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 62, "Characters:"));
 		opponentInputText = new ShadowTextInput(10, 80, 70, '');
-		opponentInputText.callback = function(text) {
+		opponentInputText.callback = function(text)
+		{
 			weekFile.weekCharacters[0] = text.trim();
 			updateText();
 		};
@@ -182,7 +197,8 @@ class WeekEditorState extends MusicBeatState {
 		tab.add(opponentInputText);
 
 		boyfriendInputText = new ShadowTextInput(85, 80, 70, '');
-		boyfriendInputText.callback = function(text) {
+		boyfriendInputText.callback = function(text)
+		{
 			weekFile.weekCharacters[1] = text.trim();
 			updateText();
 		};
@@ -190,7 +206,8 @@ class WeekEditorState extends MusicBeatState {
 		tab.add(boyfriendInputText);
 
 		girlfriendInputText = new ShadowTextInput(160, 80, 70, '');
-		girlfriendInputText.callback = function(text) {
+		girlfriendInputText.callback = function(text)
+		{
 			weekFile.weekCharacters[2] = text.trim();
 			updateText();
 		};
@@ -199,7 +216,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 112, "Background Asset:"));
 		backgroundInputText = new ShadowTextInput(10, 130, 120, '');
-		backgroundInputText.callback = function(text) {
+		backgroundInputText.callback = function(text)
+		{
 			weekFile.weekBackground = text.trim();
 			reloadBG();
 		};
@@ -208,7 +226,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 172, "Display Name:"));
 		displayNameInputText = new ShadowTextInput(10, 190, 220, '');
-		displayNameInputText.callback = function(text) {
+		displayNameInputText.callback = function(text)
+		{
 			weekFile.storyName = text.trim();
 			updateText();
 		};
@@ -217,7 +236,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 222, "Week Name (Reset Score Menu):"));
 		weekNameInputText = new ShadowTextInput(10, 240, 150, '');
-		weekNameInputText.callback = function(text) {
+		weekNameInputText.callback = function(text)
+		{
 			weekFile.weekName = text.trim();
 		};
 		blockPressWhileTypingOn.push(weekNameInputText);
@@ -225,14 +245,16 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 272, "Week File:"));
 		weekFileInputText = new ShadowTextInput(10, 290, 100, '');
-		weekFileInputText.callback = function(text) {
+		weekFileInputText.callback = function(text)
+		{
 			weekFileName = text.trim();
 			reloadWeekThing();
 		};
 		blockPressWhileTypingOn.push(weekFileInputText);
 		tab.add(weekFileInputText);
 
-		hideCheckbox = new ShadowCheckbox(10, 325, "Hide from Story Mode?", false, function(checked) {
+		hideCheckbox = new ShadowCheckbox(10, 325, "Hide from Story Mode?", false, function(checked)
+		{
 			weekFile.hideStoryMode = checked;
 		});
 		tab.add(hideCheckbox);
@@ -245,18 +267,22 @@ class WeekEditorState extends MusicBeatState {
 	var lockedCheckbox:ShadowCheckbox;
 	var hiddenUntilUnlockCheckbox:ShadowCheckbox;
 
-	function addOtherUI() {
+	function addOtherUI()
+	{
 		var tab = UI_box.getTabGroup("Other");
-		if (tab == null) return;
+		if (tab == null)
+			return;
 
-		lockedCheckbox = new ShadowCheckbox(10, 15, "Week starts Locked", false, function(checked) {
+		lockedCheckbox = new ShadowCheckbox(10, 15, "Week starts Locked", false, function(checked)
+		{
 			weekFile.startUnlocked = !checked;
 			lock.visible = checked;
 			hiddenUntilUnlockCheckbox.alpha = 0.4 + 0.6 * (checked ? 1 : 0);
 		});
 		tab.add(lockedCheckbox);
 
-		hiddenUntilUnlockCheckbox = new ShadowCheckbox(10, 40, "Hidden until Unlocked", false, function(checked) {
+		hiddenUntilUnlockCheckbox = new ShadowCheckbox(10, 40, "Hidden until Unlocked", false, function(checked)
+		{
 			weekFile.hiddenUntilUnlocked = checked;
 		});
 		hiddenUntilUnlockCheckbox.alpha = 0.4;
@@ -264,7 +290,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 75, "Week to finish for Unlock:"));
 		weekBeforeInputText = new ShadowTextInput(10, 95, 100, '');
-		weekBeforeInputText.callback = function(text) {
+		weekBeforeInputText.callback = function(text)
+		{
 			weekFile.weekBefore = text.trim();
 		};
 		blockPressWhileTypingOn.push(weekBeforeInputText);
@@ -272,7 +299,8 @@ class WeekEditorState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 135, "Difficulties:"));
 		difficultiesInputText = new ShadowTextInput(10, 155, 200, '');
-		difficultiesInputText.callback = function(text) {
+		difficultiesInputText.callback = function(text)
+		{
 			weekFile.difficulties = text.trim();
 		};
 		blockPressWhileTypingOn.push(difficultiesInputText);
@@ -281,7 +309,8 @@ class WeekEditorState extends MusicBeatState {
 		tab.add(new ShadowLabel(10, 190, "Default: Easy, Normal, Hard", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 	}
 
-	function reloadAllShit() {
+	function reloadAllShit()
+	{
 		var weekString:String = weekFile.songs[0][0];
 		for (i in 1...weekFile.songs.length)
 			weekString += ', ' + weekFile.songs[i][0];
@@ -314,7 +343,8 @@ class WeekEditorState extends MusicBeatState {
 		updateText();
 	}
 
-	function updateText() {
+	function updateText()
+	{
 		for (i in 0...grpWeekCharacters.length)
 			grpWeekCharacters.members[i].changeCharacter(weekFile.weekCharacters[i]);
 
@@ -334,22 +364,27 @@ class WeekEditorState extends MusicBeatState {
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
 	}
 
-	function reloadBG() {
+	function reloadBG()
+	{
 		bgSprite.visible = true;
 		var assetName = weekFile.weekBackground;
 		var isMissing = true;
 
-		if (assetName != null && assetName.length > 0) {
+		if (assetName != null && assetName.length > 0)
+		{
 			#if MODS_ALLOWED
 			var modPath = Paths.modsImages('menubackgrounds/menu_' + assetName);
-			if (FileSystem.exists(modPath)) {
+			if (FileSystem.exists(modPath))
+			{
 				bgSprite.loadGraphic(modPath);
 				isMissing = false;
-			} else
+			}
+			else
 			#end
 			{
 				var basePath = Paths.getPath('images/menubackgrounds/menu_' + assetName + '.png', IMAGE);
-				if (FileSystem.exists(basePath)) {
+				if (FileSystem.exists(basePath))
+				{
 					bgSprite.loadGraphic(basePath);
 					isMissing = false;
 				}
@@ -360,29 +395,37 @@ class WeekEditorState extends MusicBeatState {
 			bgSprite.visible = false;
 	}
 
-	function reloadWeekThing() {
+	function reloadWeekThing()
+	{
 		weekThing.visible = true;
 		missingFileText.visible = false;
 
 		var assetName:String = weekFileInputText.text.trim();
 		var isMissing:Bool = true;
 
-		if (assetName != null && assetName.length > 0) {
+		if (assetName != null && assetName.length > 0)
+		{
 			#if MODS_ALLOWED
 			var modPath:String = Paths.modsImages('storymenu/' + assetName);
-			if (FileSystem.exists(modPath)) {
+			if (FileSystem.exists(modPath))
+			{
 				weekThing.loadGraphic(modPath);
 				isMissing = false;
-			} else
+			}
+			else
 			#end
 			{
 				var basePath:String = Paths.getPath('images/storymenu/' + assetName + '.png', IMAGE);
-				if (FileSystem.exists(basePath)) {
+				if (FileSystem.exists(basePath))
+				{
 					weekThing.loadGraphic(basePath);
 					isMissing = false;
-				} else {
+				}
+				else
+				{
 					var baseGpuPath:String = Paths.getPath('images/storymenu/' + assetName + Paths.GPU_IMAGE_EXT, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
-					if (FileSystem.exists(baseGpuPath)) {
+					if (FileSystem.exists(baseGpuPath))
+					{
 						weekThing.loadGraphic(baseGpuPath);
 						isMissing = false;
 					}
@@ -390,7 +433,8 @@ class WeekEditorState extends MusicBeatState {
 			}
 		}
 
-		if (isMissing) {
+		if (isMissing)
+		{
 			weekThing.visible = false;
 			missingFileText.visible = true;
 			missingFileText.text = 'MISSING FILE: images/storymenu/' + assetName + '.png';
@@ -403,16 +447,20 @@ class WeekEditorState extends MusicBeatState {
 		#end
 	}
 
-	override function update(elapsed:Float) {
-		if (loadedWeek != null) {
+	override function update(elapsed:Float)
+	{
+		if (loadedWeek != null)
+		{
 			weekFile = loadedWeek;
 			loadedWeek = null;
 			reloadAllShit();
 		}
 
 		var blockInput:Bool = false;
-		for (inputText in blockPressWhileTypingOn) {
-			if (inputText.hasFocus()) {
+		for (inputText in blockPressWhileTypingOn)
+		{
+			if (inputText.hasFocus())
+			{
 				ClientPrefs.toggleVolumeKeys(false);
 				blockInput = true;
 
@@ -422,9 +470,11 @@ class WeekEditorState extends MusicBeatState {
 			}
 		}
 
-		if (!blockInput) {
+		if (!blockInput)
+		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed) {
+			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
+			{
 				MusicBeatState.switchState(new MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
@@ -436,14 +486,16 @@ class WeekEditorState extends MusicBeatState {
 		missingFileText.y = weekThing.y + 36;
 	}
 
-	function recalculateStuffPosition() {
+	function recalculateStuffPosition()
+	{
 		weekThing.screenCenter(X);
 		lock.x = weekThing.width + 10 + weekThing.x;
 	}
 
 	private static var _file:FileReference;
 
-	public static function loadWeek() {
+	public static function loadWeek()
+	{
 		#if mobile
 		var fileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
@@ -462,12 +514,15 @@ class WeekEditorState extends MusicBeatState {
 	public static var loadedWeek:WeekFile = null;
 	public static var loadError:Bool = false;
 
-	private static function onLoadComplete(#if mobile file:haxe.io.Bytes #else _ #end):Void {
+	private static function onLoadComplete(#if mobile file:haxe.io.Bytes #else _ #end):Void
+	{
 		#if mobile
-		if (file != null && file.length > 0) {
+		if (file != null && file.length > 0)
+		{
 			var jsonStr:String = file.getString(0, file.length);
 			loadedWeek = cast Json.parse(jsonStr);
-			if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null) {
+			if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
+			{
 				trace("Successfully loaded file.");
 				loadError = false;
 				weekFileName = '';
@@ -484,11 +539,14 @@ class WeekEditorState extends MusicBeatState {
 		if (_file.__path != null)
 			fullPath = _file.__path;
 
-		if (fullPath != null) {
+		if (fullPath != null)
+		{
 			var rawJson:String = File.getContent(fullPath);
-			if (rawJson != null) {
+			if (rawJson != null)
+			{
 				loadedWeek = cast Json.parse(rawJson, fullPath);
-				if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null) {
+				if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
+				{
 					var cutName:String = _file.name.substr(0, _file.name.length - 5);
 					trace("Successfully loaded file: " + cutName);
 					loadError = false;
@@ -506,7 +564,8 @@ class WeekEditorState extends MusicBeatState {
 		#end
 	}
 
-	private static function onLoadCancel(_):Void {
+	private static function onLoadCancel(_):Void
+	{
 		#if !mobile
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
@@ -516,7 +575,8 @@ class WeekEditorState extends MusicBeatState {
 		trace("Cancelled file loading.");
 	}
 
-	private static function onLoadError(_):Void {
+	private static function onLoadError(_):Void
+	{
 		#if !mobile
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
@@ -526,9 +586,11 @@ class WeekEditorState extends MusicBeatState {
 		trace("Problem loading file");
 	}
 
-	public static function saveWeek(weekFile:WeekFile) {
+	public static function saveWeek(weekFile:WeekFile)
+	{
 		var data:String = Json.stringify(weekFile, "\t");
-		if (data.length > 0) {
+		if (data.length > 0)
+		{
 			#if mobile
 			var fileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
@@ -544,7 +606,8 @@ class WeekEditorState extends MusicBeatState {
 		}
 	}
 
-	private static function onSaveComplete(_):Void {
+	private static function onSaveComplete(_):Void
+	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
@@ -552,14 +615,16 @@ class WeekEditorState extends MusicBeatState {
 		FlxG.log.notice("Successfully saved file.");
 	}
 
-	private static function onSaveCancel(_):Void {
+	private static function onSaveCancel(_):Void
+	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 	}
 
-	private static function onSaveError(_):Void {
+	private static function onSaveError(_):Void
+	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
@@ -568,10 +633,12 @@ class WeekEditorState extends MusicBeatState {
 	}
 }
 
-class WeekEditorFreeplayState extends MusicBeatState {
+class WeekEditorFreeplayState extends MusicBeatState
+{
 	var weekFile:WeekFile = null;
 
-	public function new(weekFile:WeekFile = null) {
+	public function new(weekFile:WeekFile = null)
+	{
 		super();
 		this.weekFile = WeekData.createWeekFile();
 		if (weekFile != null)
@@ -584,7 +651,8 @@ class WeekEditorFreeplayState extends MusicBeatState {
 
 	var curSelected = 0;
 
-	override function create() {
+	override function create()
+	{
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = FlxColor.WHITE;
@@ -593,7 +661,8 @@ class WeekEditorFreeplayState extends MusicBeatState {
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 
-		for (i in 0...weekFile.songs.length) {
+		for (i in 0...weekFile.songs.length)
+		{
 			var songText:Alphabet = new Alphabet(90, 320, weekFile.songs[i][0], true);
 			songText.isMenuItem = true;
 			songText.targetY = i;
@@ -616,7 +685,8 @@ class WeekEditorFreeplayState extends MusicBeatState {
 	var UI_box:ShadowTabMenu;
 	var blockPressWhileTypingOn:Array<ShadowTextInput> = [];
 
-	function addEditorBox() {
+	function addEditorBox()
+	{
 		var tabs:Array<TabDef> = [{name: 'Freeplay', label: 'Freeplay'}];
 		UI_box = new ShadowTabMenu(FlxG.width - 360, FlxG.height - 270, tabs, 250, 200);
 		UI_box.scrollFactor.set();
@@ -628,20 +698,23 @@ class WeekEditorFreeplayState extends MusicBeatState {
 		blackBlack.alpha = 0.6;
 		add(blackBlack);
 
-		var loadWeekButton = new ShadowButton(0, 685, "Load Week", function() {
+		var loadWeekButton = new ShadowButton(0, 685, "Load Week", function()
+		{
 			WeekEditorState.loadWeek();
 		}, 90);
 		loadWeekButton.screenCenter(X);
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
 
-		var storyModeButton = new ShadowButton(0, 685, "Story Mode", function() {
+		var storyModeButton = new ShadowButton(0, 685, "Story Mode", function()
+		{
 			MusicBeatState.switchState(new WeekEditorState(weekFile));
 		}, 90);
 		storyModeButton.screenCenter(X);
 		add(storyModeButton);
 
-		var saveWeekButton = new ShadowButton(0, 685, "Save Week", function() {
+		var saveWeekButton = new ShadowButton(0, 685, "Save Week", function()
+		{
 			WeekEditorState.saveWeek(weekFile);
 		}, 90);
 		saveWeekButton.screenCenter(X);
@@ -654,39 +727,58 @@ class WeekEditorFreeplayState extends MusicBeatState {
 	var bgColorStepperB:ShadowStepper;
 	var iconInputText:ShadowTextInput;
 
-	function addFreeplayUI() {
+	function addFreeplayUI()
+	{
 		var tab = UI_box.getTabGroup("Freeplay");
-		if (tab == null) return;
+		if (tab == null)
+			return;
 
 		tab.add(new ShadowLabel(10, 12, "Background Color R/G/B:"));
 
-		bgColorStepperR = new ShadowStepper(10, 32, 20, 255, 0, 255, 0, function(v) { updateBG(); }, 55);
+		bgColorStepperR = new ShadowStepper(10, 32, 20, 255, 0, 255, 0, function(v)
+		{
+			updateBG();
+		}, 55);
 		tab.add(bgColorStepperR);
 
-		bgColorStepperG = new ShadowStepper(70, 32, 20, 255, 0, 255, 0, function(v) { updateBG(); }, 55);
+		bgColorStepperG = new ShadowStepper(70, 32, 20, 255, 0, 255, 0, function(v)
+		{
+			updateBG();
+		}, 55);
 		tab.add(bgColorStepperG);
 
-		bgColorStepperB = new ShadowStepper(130, 32, 20, 255, 0, 255, 0, function(v) { updateBG(); }, 55);
+		bgColorStepperB = new ShadowStepper(130, 32, 20, 255, 0, 255, 0, function(v)
+		{
+			updateBG();
+		}, 55);
 		tab.add(bgColorStepperB);
 
-		var copyColor = new ShadowButton(10, 65, "Copy", function() {
+		var copyColor = new ShadowButton(10, 65, "Copy", function()
+		{
 			Clipboard.text = bg.color.red + ',' + bg.color.green + ',' + bg.color.blue;
 		}, 60);
 		tab.add(copyColor);
 
-		var pasteColor = new ShadowButton(75, 65, "Paste", function() {
-			if (Clipboard.text != null) {
+		var pasteColor = new ShadowButton(75, 65, "Paste", function()
+		{
+			if (Clipboard.text != null)
+			{
 				var leColor:Array<Int> = [];
 				var splitted:Array<String> = Clipboard.text.trim().split(',');
-				for (i in 0...splitted.length) {
+				for (i in 0...splitted.length)
+				{
 					var toPush:Int = Std.parseInt(splitted[i]);
-					if (!Math.isNaN(toPush)) {
-						if (toPush > 255) toPush = 255;
-						else if (toPush < 0) toPush *= -1;
+					if (!Math.isNaN(toPush))
+					{
+						if (toPush > 255)
+							toPush = 255;
+						else if (toPush < 0)
+							toPush *= -1;
 						leColor.push(toPush);
 					}
 				}
-				if (leColor.length > 2) {
+				if (leColor.length > 2)
+				{
 					bgColorStepperR.value = leColor[0];
 					bgColorStepperG.value = leColor[1];
 					bgColorStepperB.value = leColor[2];
@@ -698,27 +790,31 @@ class WeekEditorFreeplayState extends MusicBeatState {
 
 		tab.add(new ShadowLabel(10, 100, "Selected icon:"));
 		iconInputText = new ShadowTextInput(10, 118, 100, '');
-		iconInputText.callback = function(text) {
+		iconInputText.callback = function(text)
+		{
 			weekFile.songs[curSelected][1] = text;
 			iconArray[curSelected].changeIcon(text);
 		};
 		blockPressWhileTypingOn.push(iconInputText);
 		tab.add(iconInputText);
 
-		var hideFreeplayCheckbox = new ShadowCheckbox(10, 152, "Hide from Freeplay?", weekFile.hideFreeplay, function(checked) {
+		var hideFreeplayCheckbox = new ShadowCheckbox(10, 152, "Hide from Freeplay?", weekFile.hideFreeplay, function(checked)
+		{
 			weekFile.hideFreeplay = checked;
 		});
 		tab.add(hideFreeplayCheckbox);
 	}
 
-	function updateBG() {
+	function updateBG()
+	{
 		weekFile.songs[curSelected][2][0] = Math.round(bgColorStepperR.value);
 		weekFile.songs[curSelected][2][1] = Math.round(bgColorStepperG.value);
 		weekFile.songs[curSelected][2][2] = Math.round(bgColorStepperB.value);
 		bg.color = FlxColor.fromRGB(weekFile.songs[curSelected][2][0], weekFile.songs[curSelected][2][1], weekFile.songs[curSelected][2][2]);
 	}
 
-	function changeSelection(change:Int = 0) {
+	function changeSelection(change:Int = 0)
+	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
@@ -734,7 +830,8 @@ class WeekEditorFreeplayState extends MusicBeatState {
 
 		iconArray[curSelected].alpha = 1;
 
-		for (item in grpSongs.members) {
+		for (item in grpSongs.members)
+		{
 			item.targetY = bullShit - curSelected;
 			bullShit++;
 			item.alpha = 0.6;
@@ -749,8 +846,10 @@ class WeekEditorFreeplayState extends MusicBeatState {
 		updateBG();
 	}
 
-	override function update(elapsed:Float) {
-		if (WeekEditorState.loadedWeek != null) {
+	override function update(elapsed:Float)
+	{
+		if (WeekEditorState.loadedWeek != null)
+		{
 			super.update(elapsed);
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
@@ -760,8 +859,10 @@ class WeekEditorFreeplayState extends MusicBeatState {
 		}
 
 		var blockInput = false;
-		for (inputText in blockPressWhileTypingOn) {
-			if (inputText.hasFocus()) {
+		for (inputText in blockPressWhileTypingOn)
+		{
+			if (inputText.hasFocus())
+			{
 				ClientPrefs.toggleVolumeKeys(false);
 				blockInput = true;
 				if (FlxG.keys.justPressed.ENTER)
@@ -770,9 +871,11 @@ class WeekEditorFreeplayState extends MusicBeatState {
 			}
 		}
 
-		if (!blockInput) {
+		if (!blockInput)
+		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed) {
+			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
+			{
 				MusicBeatState.switchState(new MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}

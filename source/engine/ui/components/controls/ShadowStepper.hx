@@ -9,7 +9,8 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import ui.ShadowStyle;
 
-class ShadowStepper extends FlxSpriteGroup {
+class ShadowStepper extends FlxSpriteGroup
+{
 	public var value(get, set):Float;
 	public var callback:Float->Void;
 
@@ -33,12 +34,8 @@ class ShadowStepper extends FlxSpriteGroup {
 	var _scrollSpeed:Float = 40;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(
-		x:Float, y:Float, stepSize:Float = 1, 
-		defaultValue:Float = 0, minValue:Float = -999, 
-		maxValue:Float = 999, decimalPlaces:Int = 0, 
-		?onChange:Float->Void, width:Int = 64) {
-		
+	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0, ?onChange:Float->Void, width:Int = 64)
+	{
 		super(x, y);
 
 		step = stepSize;
@@ -72,31 +69,38 @@ class ShadowStepper extends FlxSpriteGroup {
 		value = defaultValue;
 	}
 
-	function drawBackground() {
+	function drawBackground()
+	{
 		bg.makeGraphic(_width, _height, ShadowStyle.BG_INPUT, true);
-		for (i in 0..._width) {
+		for (i in 0..._width)
+		{
 			bg.pixels.setPixel32(i, 0, ShadowStyle.BORDER_DARK);
 			bg.pixels.setPixel32(i, _height - 1, ShadowStyle.BORDER_DARK);
 		}
-		for (i in 0..._height) {
+		for (i in 0..._height)
+		{
 			bg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
 			bg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
 			bg.pixels.setPixel32(_width - _arrowWidth - 1, i, ShadowStyle.BORDER_DARK);
 		}
-		
+
 		var midY = Std.int(_height / 2);
-		for (i in (_width - _arrowWidth)..._width) {
+		for (i in (_width - _arrowWidth)..._width)
+		{
 			bg.pixels.setPixel32(i, midY, ShadowStyle.BORDER_DARK);
 		}
 	}
 
-	function drawUpArrow(color:FlxColor, arrowHeight:Int) {
+	function drawUpArrow(color:FlxColor, arrowHeight:Int)
+	{
 		upArrow.makeGraphic(_arrowWidth, arrowHeight, ShadowStyle.BG_MEDIUM, true);
 		var cx = Std.int(_arrowWidth / 2);
 		var cy = Std.int(arrowHeight / 2);
 		// Draw upward pointing triangle
-		for (row in 0...4) {
-			for (col in 0...(row * 2 + 1)) {
+		for (row in 0...4)
+		{
+			for (col in 0...(row * 2 + 1))
+			{
 				var px = cx - row + col;
 				var py = cy + row - 1;
 				if (px >= 0 && px < _arrowWidth && py >= 0 && py < arrowHeight)
@@ -105,13 +109,16 @@ class ShadowStepper extends FlxSpriteGroup {
 		}
 	}
 
-	function drawDownArrow(color:FlxColor, arrowHeight:Int) {
+	function drawDownArrow(color:FlxColor, arrowHeight:Int)
+	{
 		downArrow.makeGraphic(_arrowWidth, arrowHeight, ShadowStyle.BG_MEDIUM, true);
 		var cx = Std.int(_arrowWidth / 2);
 		var cy = Std.int(arrowHeight / 2);
 		// Draw downward pointing triangle
-		for (row in 0...4) {
-			for (col in 0...(row * 2 + 1)) {
+		for (row in 0...4)
+		{
+			for (col in 0...(row * 2 + 1))
+			{
 				var px = cx - row + col;
 				var py = cy - row + 1;
 				if (px >= 0 && px < _arrowWidth && py >= 0 && py < arrowHeight)
@@ -120,13 +127,14 @@ class ShadowStepper extends FlxSpriteGroup {
 		}
 	}
 
-	function get_value():Float {
+	function get_value():Float
 		return _value;
-	}
 
-	function set_value(v:Float):Float {
+	function set_value(v:Float):Float
+	{
 		_value = Math.max(min, Math.min(max, v));
-		if (valueText != null) {
+		if (valueText != null)
+		{
 			if (decimals > 0)
 				valueText.text = Std.string(Math.round(_value * Math.pow(10, decimals)) / Math.pow(10, decimals));
 			else
@@ -136,11 +144,11 @@ class ShadowStepper extends FlxSpriteGroup {
 		return _value;
 	}
 
-	inline function isMouseOver(sprite:FlxSprite):Bool {
+	inline function isMouseOver(sprite:FlxSprite):Bool
 		return FlxG.mouse.overlaps(sprite, camera);
-	}
 
-	function getTextOverflow():Float {
+	function getTextOverflow():Float
+	{
 		if (valueText == null || valueText.textField == null)
 			return 0;
 		var textW = valueText.textField.textWidth;
@@ -150,7 +158,8 @@ class ShadowStepper extends FlxSpriteGroup {
 		return 0;
 	}
 
-	override function update(elapsed:Float) {
+	override function update(elapsed:Float)
+	{
 		if (!visible || !active || !exists)
 			return;
 
@@ -162,39 +171,49 @@ class ShadowStepper extends FlxSpriteGroup {
 		var overDown = !inputBlocked && isMouseOver(downArrow);
 		var overBg = !inputBlocked && isMouseOver(bg);
 
-		if (overUp && !_upHovered) {
+		if (overUp && !_upHovered)
+		{
 			_upHovered = true;
 			drawUpArrow(ShadowStyle.ACCENT, arrowHeight);
-		} else if (!overUp && _upHovered) {
+		}
+		else if (!overUp && _upHovered)
+		{
 			_upHovered = false;
 			drawUpArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		}
 
-		if (overDown && !_downHovered) {
+		if (overDown && !_downHovered)
+		{
 			_downHovered = true;
 			drawDownArrow(ShadowStyle.ACCENT, arrowHeight);
-		} else if (!overDown && _downHovered) {
+		}
+		else if (!overDown && _downHovered)
+		{
 			_downHovered = false;
 			drawDownArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		}
 
-		if (FlxG.mouse.justPressed && !inputBlocked) {
-			if (overUp) {
+		if (FlxG.mouse.justPressed && !inputBlocked)
+		{
+			if (overUp)
+			{
 				value += step;
 				if (callback != null)
 					callback(_value);
-			} else if (overDown) {
+			}
+			else if (overDown)
+			{
 				value -= step;
 				if (callback != null)
 					callback(_value);
 			}
 		}
 
-		if (valueText != null && valueText.textField != null) {
+		if (valueText != null && valueText.textField != null)
 			valueText.textField.scrollH = Std.int(_textScroll);
-		}
 
-		if (overBg && FlxG.mouse.wheel != 0 && !inputBlocked) {
+		if (overBg && FlxG.mouse.wheel != 0 && !inputBlocked)
+		{
 			var multiplier = FlxG.keys.pressed.SHIFT ? 10 : 1;
 			value += step * FlxG.mouse.wheel * multiplier;
 			if (callback != null)

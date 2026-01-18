@@ -272,8 +272,10 @@ class ShadowInputText extends FlxText
 				mouseWorldPos.put();
 
 				var newIndex:Int = getCharIndexAtPoint(localX, localY);
-				if (newIndex < 0) newIndex = 0;
-				if (newIndex > textLen) newIndex = textLen;
+				if (newIndex < 0)
+					newIndex = 0;
+				if (newIndex > textLen)
+					newIndex = textLen;
 
 				if (FlxG.keys.pressed.SHIFT && hadFocus)
 					_selectionAnchor = oldCaret;
@@ -338,76 +340,74 @@ class ShadowInputText extends FlxText
 				return;
 
 			case LEFT:
-					var movedCaret:Bool = false;
-					if (!shiftPressed && collapseSelection(true))
-					{
-						scrollToCaret();
-						traceScrollState("LEFT", textLen);
-						return;
-					}
-					if (caretIndex > 0)
-					{
-						var oldCaret = caretIndex;
-						var newIndex = caretIndex - 1;
-
-						if (shiftPressed && textLen > 0)
-						{
-							if (_selectionAnchor == oldCaret)
-								_selectionAnchor = oldCaret;
-						}
-						else
-						{
-							_selectionAnchor = newIndex;
-						}
-
-						setCaretIndexSilent(newIndex);
-						movedCaret = true;
-						scrollToCaret();
-					}
-					if (!movedCaret)
-					{
-						// Already at start; don't scroll the view.
-						traceScrollState("LEFT", textLen);
-						return;
-					}
+				var movedCaret:Bool = false;
+				if (!shiftPressed && collapseSelection(true))
+				{
+					scrollToCaret();
 					traceScrollState("LEFT", textLen);
+					return;
+				}
+				if (caretIndex > 0)
+				{
+					var oldCaret = caretIndex;
+					var newIndex = caretIndex - 1;
 
+					if (shiftPressed && textLen > 0)
+					{
+						if (_selectionAnchor == oldCaret)
+							_selectionAnchor = oldCaret;
+					}
+					else
+					{
+						_selectionAnchor = newIndex;
+					}
+
+					setCaretIndexSilent(newIndex);
+					movedCaret = true;
+					scrollToCaret();
+				}
+				if (!movedCaret)
+				{
+					// Already at start; don't scroll the view.
+					traceScrollState("LEFT", textLen);
+					return;
+				}
+				traceScrollState("LEFT", textLen);
 
 			case RIGHT:
-					var movedCaretR:Bool = false;
-					if (!shiftPressed && collapseSelection(false))
-					{
-						scrollToCaret();
-						traceScrollState("RIGHT", textLen);
-						return;
-					}
-					if (caretIndex < textLen)
-					{
-						var oldCaret = caretIndex;
-						var newIndex = caretIndex + 1;
-
-						if (shiftPressed && textLen > 0)
-						{
-							if (_selectionAnchor == oldCaret)
-								_selectionAnchor = oldCaret;
-						}
-						else
-						{
-							_selectionAnchor = newIndex;
-						}
-
-						setCaretIndexSilent(newIndex);
-						movedCaretR = true;
-						scrollToCaret();
-					}
-					if (!movedCaretR)
-					{
-						// Already at end; don't scroll the view.
-						traceScrollState("RIGHT", textLen);
-						return;
-					}
+				var movedCaretR:Bool = false;
+				if (!shiftPressed && collapseSelection(false))
+				{
+					scrollToCaret();
 					traceScrollState("RIGHT", textLen);
+					return;
+				}
+				if (caretIndex < textLen)
+				{
+					var oldCaret = caretIndex;
+					var newIndex = caretIndex + 1;
 
+					if (shiftPressed && textLen > 0)
+					{
+						if (_selectionAnchor == oldCaret)
+							_selectionAnchor = oldCaret;
+					}
+					else
+					{
+						_selectionAnchor = newIndex;
+					}
+
+					setCaretIndexSilent(newIndex);
+					movedCaretR = true;
+					scrollToCaret();
+				}
+				if (!movedCaretR)
+				{
+					// Already at end; don't scroll the view.
+					traceScrollState("RIGHT", textLen);
+					return;
+				}
+				traceScrollState("RIGHT", textLen);
 
 			case END:
 				if (!shiftPressed)
@@ -998,7 +998,8 @@ class ShadowInputText extends FlxText
 	private function scrollToCaret():Void
 	{
 		#if !js
-		if (textField == null) return;
+		if (textField == null)
+			return;
 
 		var textLen:Int = (text != null) ? text.length : 0;
 		if (textLen == 0)
@@ -1009,8 +1010,10 @@ class ShadowInputText extends FlxText
 		}
 
 		var targetIndex = caretIndex;
-		if (targetIndex < 0) targetIndex = 0;
-		if (targetIndex > textLen) targetIndex = textLen;
+		if (targetIndex < 0)
+			targetIndex = 0;
+		if (targetIndex > textLen)
+			targetIndex = textLen;
 
 		var boundary:Rectangle = null;
 
@@ -1020,7 +1023,8 @@ class ShadowInputText extends FlxText
 		else if (targetIndex >= 0 && targetIndex < textLen)
 			boundary = getCharBoundaries(targetIndex);
 
-		if (boundary == null) return;
+		if (boundary == null)
+			return;
 
 		var visibleWidth:Float = textField.width - 4;
 		var maxScroll:Int = Std.int(textField.textWidth - visibleWidth);
@@ -1046,7 +1050,7 @@ class ShadowInputText extends FlxText
 			lastScroll = newScroll;
 
 			redrawTextForScroll();
-			
+
 			var oldSuppress = _suppressCaretScroll;
 			_suppressCaretScroll = true;
 			set_caretIndex(caretIndex);
@@ -1056,7 +1060,6 @@ class ShadowInputText extends FlxText
 		}
 		#end
 	}
-
 
 	private function scrollViewInDirection(direction:Int):Void
 	{

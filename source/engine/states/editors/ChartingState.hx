@@ -3162,7 +3162,8 @@ class ChartingState extends MusicBeatState
 				}
 
 				note.mustPress = _song.notes[curSec + 1].mustHitSection;
-				if (i[1] > 3) note.mustPress = !note.mustPress;
+				if (i[1] > 3)
+					note.mustPress = !note.mustPress;
 				applyNoteSkin(note, note.mustPress);
 			}
 		}

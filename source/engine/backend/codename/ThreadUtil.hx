@@ -1,5 +1,6 @@
 package backend.codename;
 
+import lime.utils.Log;
 #if (target.threaded)
 import sys.thread.Deque;
 import sys.thread.Thread;
@@ -7,7 +8,6 @@ import sys.thread.Mutex;
 #else
 private typedef Thread = Dynamic;
 #end
-import lime.utils.Log;
 
 final class ThreadUtil
 {
