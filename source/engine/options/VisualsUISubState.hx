@@ -3,6 +3,7 @@ package options;
 import lime.ui.WindowVSyncMode;
 import objects.Note;
 import objects.StrumNote;
+import ui.ShadowStyle;
 
 class VisualsUISubState extends BaseOptionsMenu
 {
@@ -65,6 +66,11 @@ class VisualsUISubState extends BaseOptionsMenu
 
 		var option:Option = new Option('Hide HUD', 'If checked, hides most HUD elements.', 'hideHud', 'bool');
 		addOption(option);
+
+		var themeOptions:Array<String> = [ShadowStyle.ShadowTHEME_DARK, ShadowStyle.ShadowTHEME_LIGHT];
+		var option:Option = new Option('UI Theme:', 'Choose between the light and dark Shadow UI themes.', 'uiTheme', 'string', themeOptions);
+		addOption(option);
+		option.onChange = onChangeUITheme;
 
 		var option:Option = new Option('Time Bar:', "What should the Time Bar display?", 'timeBarType', 'string',
 			['Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
@@ -157,6 +163,11 @@ class VisualsUISubState extends BaseOptionsMenu
 			note.centerOffsets();
 			note.centerOrigin();
 		});
+	}
+
+	function onChangeUITheme()
+	{
+		ShadowStyle.applySavedTheme();
 	}
 
 	function changeNoteSkin(note:StrumNote)
