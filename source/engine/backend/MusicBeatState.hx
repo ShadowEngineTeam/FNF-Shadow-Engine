@@ -1,12 +1,11 @@
 package backend;
 
 import flixel.addons.transition.FlxTransitionableState;
-
 import flixel.util.FlxSave;
 import backend.PsychCamera;
 import haxe.io.Path;
 
-class MusicBeatState extends FlxState implements IMusicState
+class MusicBeatState extends FlxTransitionableState implements IMusicState
 {
 	public var stateInstance:FlxState = null;
 
