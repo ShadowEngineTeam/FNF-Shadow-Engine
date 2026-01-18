@@ -1,5 +1,6 @@
 package psychlua;
 
+import backend.IMusicState;
 import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
@@ -2061,7 +2062,7 @@ class FunkinLua
 	}
 
 	private static var lastMusicState:Dynamic = null;
-	public static function getCurrentMusicState():Dynamic
+	public static function getCurrentMusicState():IMusicState
 	{
 		final s = FlxG.state;
 

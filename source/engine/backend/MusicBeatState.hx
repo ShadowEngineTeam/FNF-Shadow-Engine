@@ -12,8 +12,10 @@ import flixel.util.FlxSave;
 import backend.PsychCamera;
 import haxe.io.Path;
 
-class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else FlxUIState #end
+class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else FlxUIState #end implements IMusicState
 {
+	public var stateInstance:FlxState = null;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -295,6 +297,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 
 	public function new()
 	{
+		stateInstance = this;
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this))).replace('states.', '').replace('.', '/');
 		#end
@@ -559,7 +562,7 @@ class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else 
 				func(stage);
 	}
 
-	function getBeatsOnSection()
+	public function getBeatsOnSection()
 	{
 		var val:Null<Float> = 4;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)

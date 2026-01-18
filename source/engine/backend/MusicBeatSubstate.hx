@@ -1,11 +1,13 @@
 package backend;
 
+import flixel.FlxState;
 import flixel.FlxSubState;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 
-class MusicBeatSubstate extends FlxSubState
+class MusicBeatSubstate extends FlxSubState implements IMusicState
 {
+	public var stateInstance:FlxState = null;
 	public static var instance:MusicBeatSubstate;
 
 	private var curSection:Int = 0;
@@ -46,9 +48,9 @@ class MusicBeatSubstate extends FlxSubState
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
-	private var controls(get, never):Controls;
+	public var controls(get, never):Controls;
 
-	inline function get_controls():Controls
+	private function get_controls():Controls
 		return Controls.instance;
 
 	public var touchPad:TouchPad;
@@ -290,6 +292,8 @@ class MusicBeatSubstate extends FlxSubState
 	public function new()
 	{
 		instance = this;
+		stateInstance = cast this;
+		
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
 			.replace('states.', '')
@@ -443,7 +447,7 @@ class MusicBeatSubstate extends FlxSubState
 		callOnScripts('onSectionHit');
 	}
 
-	function getBeatsOnSection()
+	public function getBeatsOnSection()
 	{
 		var val:Null<Float> = 4;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
