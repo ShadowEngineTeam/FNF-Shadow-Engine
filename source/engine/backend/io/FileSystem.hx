@@ -1,7 +1,13 @@
 package backend.io;
 
-import openfl.Assets;
-#if sys
+#if USE_OPENFL_FILESYSTEM
+import lime.utils.Assets as LimeAssets;
+import openfl.Assets as OpenFLAssets;
+#end
+#if mobile
+import mobile.backend.io.Assets as MobileAssets;
+#end
+#if (sys && MODS_ALLOWED)
 import sys.FileSystem as SysFileSystem;
 import sys.FileStat;
 #end
@@ -27,8 +33,8 @@ class FileSystem
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
-		for (library in lime.utils.Assets.libraries.keys())
-			if (Assets.exists('$library:$path') && !path.startsWith('$library:'))
+		for (library in LimeAssets.libraries.keys())
+			if (OpenFLAssets.exists('$library:$path') && !path.startsWith('$library:'))
 				return '$library:$path';
 
 		return path;
@@ -51,8 +57,13 @@ class FileSystem
 		#end
 		#end
 
+		#if mobile
+		if (MobileAssets.exists(path))
+			return true;
+		#end
+
 		#if USE_OPENFL_FILESYSTEM
-		if (Assets.exists(openflcwd(path)) || Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
 		#end
 
@@ -88,9 +99,11 @@ class FileSystem
 		#else
 		return SysFileSystem.stat(cwd(path));
 		#end
-		#else
-		return null;
 		#end
+		#if mobile
+		// SHADOW TODO
+		#end
+		return null;
 	}
 
 	public static function fullPath(path:String):String
@@ -143,8 +156,12 @@ class FileSystem
 		#end
 		#end
 
+		#if mobile
+		// SHADOW TODO
+		#end
+
 		#if USE_OPENFL_FILESYSTEM
-		if (Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
 		#end
 
@@ -209,10 +226,14 @@ class FileSystem
 		#end
 		#end
 
+		#if mobile
+		// SHADOW TODO
+		#end
+
 		#if USE_OPENFL_FILESYSTEM
 		if (result == null)
 		{
-			var filteredList = Assets.list().filter(f -> f.startsWith(path));
+			var filteredList = OpenFLAssets.list().filter(f -> f.startsWith(path));
 			var results:Array<String> = [];
 
 			for (i in filteredList.copy())
@@ -228,12 +249,12 @@ class FileSystem
 			for (item in filteredList)
 			{
 				@:privateAccess
-				for (library in lime.utils.Assets.libraries.keys())
+				for (library in LimeAssets.libraries.keys())
 				{
 					var libPath = '$library:$item';
-					if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
+					if (library != 'default' && OpenFLAssets.exists(libPath) && !results.contains(libPath))
 						results.push(libPath);
-					else if (Assets.exists(item) && !results.contains(item))
+					else if (OpenFLAssets.exists(item) && !results.contains(item))
 						results.push(item);
 				}
 			}
