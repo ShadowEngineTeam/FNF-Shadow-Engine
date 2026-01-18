@@ -38,16 +38,14 @@ class MenuCharacterEditorState extends MusicBeatState
 			flipX: false
 		};
 
-		camEditor = new FlxCamera();
+		camEditor = initPsychCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
 		camOther = new FlxCamera();
 		camOther.bgColor.alpha = 0;
 
-		FlxG.cameras.reset(camEditor);
 		FlxG.cameras.add(camHUD, false);
 		FlxG.cameras.add(camOther, false);
-		FlxG.cameras.setDefaultDrawTarget(camEditor, true);
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
