@@ -605,7 +605,7 @@ class NoteSplashDebugState extends MusicBeatState
 		contentText.scrollFactor.set();
 		UI_help.add(contentText);
 
-		var closeText = new FlxText(0, panelHeight - 40, panelWidth, "Press F1 or ESCAPE to close");
+		var closeText = new FlxText(0, panelHeight - 40, panelWidth, "Press F1 or ESC to close");
 		closeText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
 		closeText.scrollFactor.set();
 		UI_help.add(closeText);
