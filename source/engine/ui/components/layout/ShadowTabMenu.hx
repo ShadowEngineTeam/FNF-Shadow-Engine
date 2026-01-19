@@ -224,7 +224,11 @@ class ShadowTabMenu extends FlxSpriteGroup
 				return;
 			}
 			else
+			{
 				_dragging = false;
+				_pressing = false;
+				_pressTabIndex = -1;
+			}
 		}
 
 		if (FlxG.mouse.justPressed)
