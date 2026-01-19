@@ -58,14 +58,14 @@ class File
 		#end
 		#end
 
-		#if mobile
-		if (MobileAssets.exists(path))
-			return MobileAssets.getContent(path);
-		#end
-
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
 			return OpenFLAssets.getText(openflcwd(path));
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.getContent(path);
 		#end
 
 		return null;
@@ -87,11 +87,6 @@ class File
 		#end
 		#end
 
-		#if mobile
-		if (MobileAssets.exists(path))
-			return MobileAssets.getBytes(path);
-		#end
-
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
 			switch (haxe.io.Path.extension(path).toLowerCase())
@@ -101,6 +96,11 @@ class File
 				default:
 					return OpenFLAssets.getBytes(openflcwd(path));
 			}
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.getBytes(path);
 		#end
 
 		return null;

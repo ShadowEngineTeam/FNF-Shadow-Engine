@@ -57,13 +57,13 @@ class FileSystem
 		#end
 		#end
 
-		#if mobile
-		if (MobileAssets.exists(path))
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
 		#end
 
-		#if USE_OPENFL_FILESYSTEM
-		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+		#if mobile
+		if (MobileAssets.exists(path))
 			return true;
 		#end
 
@@ -95,13 +95,16 @@ class FileSystem
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		return SysFileSystem.stat(actualPath);
+		if (SysFileSystem.exists(actualPath))
+			return SysFileSystem.stat(actualPath);
 		#else
-		return SysFileSystem.stat(cwd(path));
+		if (SysFileSystem.exists(cwd(path)))
+			return SysFileSystem.stat(cwd(path));
 		#end
 		#end
 		#if mobile
-		// SHADOW TODO
+		if (MobileAssets.exists(path))
+			return MobileAssets.stat(path);
 		#end
 		return null;
 	}
@@ -156,12 +159,13 @@ class FileSystem
 		#end
 		#end
 
-		#if mobile
-		// SHADOW TODO
-		#end
-
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+			return true;
+		#end
+
+		#if mobile
+		if (MobileAssets.isDirectory(path))
 			return true;
 		#end
 
@@ -226,14 +230,10 @@ class FileSystem
 		#end
 		#end
 
-		#if mobile
-		// SHADOW TODO
-		#end
-
 		#if USE_OPENFL_FILESYSTEM
 		if (result == null)
 		{
-			var filteredList = OpenFLAssets.list().filter(f -> f.startsWith(path));
+			var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path));
 			var results:Array<String> = [];
 
 			for (i in filteredList.copy())
@@ -261,6 +261,11 @@ class FileSystem
 
 			result = results.map(f -> f.substr(f.lastIndexOf("/") + 1));
 		}
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path) && MobileAssets.isDirectory(path))
+			result = MobileAssets.readDirectory(path);
 		#end
 
 		return result ?? [];
