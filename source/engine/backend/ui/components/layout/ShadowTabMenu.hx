@@ -20,6 +20,10 @@ class ShadowTabMenu extends FlxSpriteGroup
 {
 	public var selectedTab(get, set):Int;
 	public var callback:Int->Void;
+	public var collapsed(default, set):Bool = false;
+	public var showCloseButton:Bool = true;
+	public var showMinimizeButton:Bool = true;
+	public var onClose:Void->Void;
 
 	var tabs:Array<TabDef>;
 	var tabButtons:Array<FlxSpriteGroup>;
@@ -27,10 +31,13 @@ class ShadowTabMenu extends FlxSpriteGroup
 	var panelBg:FlxSprite;
 	var tabBar:FlxSprite;
 	var accentLine:FlxSprite;
+	var closeBtn:FlxSprite;
+	var minimizeBtn:FlxSprite;
 
 	var _width:Int;
 	var _height:Int;
 	var _tabWidth:Int;
+	var _tabAreaWidth:Int;
 	var _selectedTab:Int = 0;
 	var _initialized:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
@@ -44,13 +51,20 @@ class ShadowTabMenu extends FlxSpriteGroup
 	var _pressStartY:Float = 0;
 	var _pressTabIndex:Int = -1;
 
+	var _closeBtnHover:Bool = false;
+	var _minimizeBtnHover:Bool = false;
+
 	public function new(x:Float, y:Float, tabDefs:Array<TabDef>, width:Int = 400, height:Int = 300)
 	{
 		super(x, y);
 		tabs = tabDefs;
 		_width = width;
 		_height = height;
-		_tabWidth = tabs.length > 0 ? Std.int(_width / tabs.length) : _width;
+
+		// Calculate tab area width (leave space for buttons)
+		var buttonSpace = (ShadowStyle.SIZE_HEADER_BTN + 3) * 2 + 4;
+		_tabAreaWidth = _width - buttonSpace;
+		_tabWidth = tabs.length > 0 ? Std.int(_tabAreaWidth / tabs.length) : _tabAreaWidth;
 
 		tabContents = new Map();
 		tabButtons = [];
@@ -66,6 +80,20 @@ class ShadowTabMenu extends FlxSpriteGroup
 		accentLine = new FlxSprite(0, ShadowStyle.HEIGHT_TAB - 2);
 		accentLine.makeGraphic(_width, 2, ShadowStyle.ACCENT);
 		add(accentLine);
+
+		// Create close button
+		closeBtn = new FlxSprite();
+		drawCloseButton(false);
+		closeBtn.x = _width - ShadowStyle.SIZE_HEADER_BTN - 3;
+		closeBtn.y = (ShadowStyle.HEIGHT_TAB - ShadowStyle.SIZE_HEADER_BTN) / 2;
+		add(closeBtn);
+
+		// Create minimize button
+		minimizeBtn = new FlxSprite();
+		drawMinimizeButton(false);
+		minimizeBtn.x = _width - (ShadowStyle.SIZE_HEADER_BTN + 3) * 2;
+		minimizeBtn.y = (ShadowStyle.HEIGHT_TAB - ShadowStyle.SIZE_HEADER_BTN) / 2;
+		add(minimizeBtn);
 
 		if (tabs.length > 0)
 		{
@@ -85,6 +113,64 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		selectedTab = _selectedTab;
 		_initialized = true;
+	}
+
+	function drawCloseButton(hover:Bool)
+	{
+		var size = ShadowStyle.SIZE_HEADER_BTN;
+		var bgColor = hover ? ShadowStyle.ACCENT : ShadowStyle.BG_LIGHT;
+		closeBtn.makeGraphic(size, size, bgColor, true);
+
+		// Draw X symbol
+		var lineColor = ShadowStyle.TEXT_PRIMARY;
+		var padding = 4;
+		for (i in 0...(size - padding * 2))
+		{
+			// Top-left to bottom-right diagonal
+			closeBtn.pixels.setPixel32(padding + i, padding + i, lineColor);
+			// Top-right to bottom-left diagonal
+			closeBtn.pixels.setPixel32(size - padding - 1 - i, padding + i, lineColor);
+			// Make lines thicker
+			if (i > 0)
+			{
+				closeBtn.pixels.setPixel32(padding + i - 1, padding + i, lineColor);
+				closeBtn.pixels.setPixel32(size - padding - i, padding + i, lineColor);
+			}
+		}
+	}
+
+	function drawMinimizeButton(hover:Bool)
+	{
+		var size = ShadowStyle.SIZE_HEADER_BTN;
+		var bgColor = hover ? ShadowStyle.BG_LIGHT : ShadowStyle.BG_LIGHT;
+		if (hover)
+			bgColor = ShadowStyle.brighten(ShadowStyle.BG_LIGHT, 0.1);
+		minimizeBtn.makeGraphic(size, size, bgColor, true);
+
+		var lineColor = ShadowStyle.TEXT_PRIMARY;
+		var padding = 4;
+
+		if (collapsed)
+		{
+			// Draw restore symbol (square)
+			for (i in padding...(size - padding))
+			{
+				minimizeBtn.pixels.setPixel32(i, padding, lineColor);
+				minimizeBtn.pixels.setPixel32(i, size - padding - 1, lineColor);
+				minimizeBtn.pixels.setPixel32(padding, i, lineColor);
+				minimizeBtn.pixels.setPixel32(size - padding - 1, i, lineColor);
+			}
+		}
+		else
+		{
+			// Draw minimize symbol (underscore)
+			var lineY = size - padding - 2;
+			for (i in padding...(size - padding))
+			{
+				minimizeBtn.pixels.setPixel32(i, lineY, lineColor);
+				minimizeBtn.pixels.setPixel32(i, lineY + 1, lineColor);
+			}
+		}
 	}
 
 	function drawPanel()
@@ -155,6 +241,32 @@ class ShadowTabMenu extends FlxSpriteGroup
 		}
 	}
 
+	function set_collapsed(value:Bool):Bool
+	{
+		if (collapsed == value)
+			return value;
+		collapsed = value;
+
+		panelBg.visible = !collapsed;
+		accentLine.visible = !collapsed;
+
+		// Hide/show tab contents
+		for (i in 0...tabs.length)
+		{
+			var content = tabContents.get(tabs[i].name);
+			if (content != null)
+			{
+				content.visible = !collapsed && (i == _selectedTab);
+				content.active = !collapsed && (i == _selectedTab);
+			}
+		}
+
+		// Redraw minimize button to show correct icon
+		drawMinimizeButton(_minimizeBtnHover);
+
+		return value;
+	}
+
 	function get_selectedTab():Int
 		return _selectedTab;
 
@@ -174,7 +286,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 				var content = tabContents.get(tabs[i].name);
 				if (content != null)
 				{
-					var isActive = (i == _selectedTab);
+					var isActive = (i == _selectedTab) && !collapsed;
 					content.visible = isActive;
 					content.active = isActive;
 					content.forEach(function(member:flixel.FlxBasic)
@@ -208,6 +320,29 @@ class ShadowTabMenu extends FlxSpriteGroup
 		var mx = FlxG.mouse.screenX;
 		var my = FlxG.mouse.screenY;
 
+		var mx = FlxG.mouse.screenX;
+		var my = FlxG.mouse.screenY;
+
+		// Check button hovers using overlaps for accurate detection
+		var overCloseBtn = showCloseButton && FlxG.mouse.overlaps(closeBtn, camera);
+		var overMinimizeBtn = showMinimizeButton && FlxG.mouse.overlaps(minimizeBtn, camera);
+
+		// Update hover states
+		if (overCloseBtn != _closeBtnHover)
+		{
+			_closeBtnHover = overCloseBtn;
+			drawCloseButton(_closeBtnHover);
+		}
+		if (overMinimizeBtn != _minimizeBtnHover)
+		{
+			_minimizeBtnHover = overMinimizeBtn;
+			drawMinimizeButton(_minimizeBtnHover);
+		}
+
+		// Update button visibility
+		closeBtn.visible = showCloseButton;
+		minimizeBtn.visible = showMinimizeButton;
+
 		var left = this.x;
 		var top = this.y;
 		var right = this.x + _width;
@@ -233,6 +368,21 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		if (FlxG.mouse.justPressed)
 		{
+			// Check button clicks first
+			if (overCloseBtn)
+			{
+				if (onClose != null)
+					onClose();
+				this.visible = false;
+				return;
+			}
+
+			if (overMinimizeBtn)
+			{
+				collapsed = !collapsed;
+				return;
+			}
+
 			if (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen())
 				return;
 
