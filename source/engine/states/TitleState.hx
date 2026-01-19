@@ -12,7 +12,7 @@ import openfl.Assets;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import shaders.ColorSwap;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 import states.StoryMenuState;
 import states.MainMenuState;
 

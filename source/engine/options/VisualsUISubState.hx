@@ -3,7 +3,7 @@ package options;
 import lime.ui.WindowVSyncMode;
 import objects.Note;
 import objects.StrumNote;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 
 class VisualsUISubState extends BaseOptionsMenu
 {

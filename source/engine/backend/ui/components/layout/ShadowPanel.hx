@@ -1,9 +1,9 @@
-package ui.components.layout;
+package backend.ui.components.layout;
 
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 
 class ShadowPanel extends FlxSpriteGroup
 {

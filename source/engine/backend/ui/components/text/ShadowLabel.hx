@@ -1,9 +1,9 @@
-package ui.components.text;
+package backend.ui.components.text;
 
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import backend.Paths;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 
 class ShadowLabel extends FlxText
 {

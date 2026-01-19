@@ -4,7 +4,7 @@ import states.MainMenuState;
 import backend.StageData;
 import flixel.addons.transition.FlxTransitionableState;
 import mobile.substates.MobileControlSelectSubState;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;

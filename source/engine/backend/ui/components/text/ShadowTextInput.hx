@@ -1,13 +1,13 @@
-package ui.components.text;
+package backend.ui.components.text;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import backend.Paths;
-import ui.ShadowStyle;
-import ui.components.text.ShadowInputText;
-import ui.components.controls.ShadowDropdown;
+import backend.ui.ShadowStyle;
+import backend.ui.components.text.ShadowInputText;
+import backend.ui.components.controls.ShadowDropdown;
 
 class ShadowTextInput extends FlxSpriteGroup
 {

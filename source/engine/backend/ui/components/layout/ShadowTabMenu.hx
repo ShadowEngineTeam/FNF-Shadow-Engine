@@ -1,4 +1,4 @@
-package ui.components.layout;
+package backend.ui.components.layout;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -7,8 +7,8 @@ import flixel.math.FlxPoint;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import backend.Paths;
-import ui.ShadowStyle;
-import ui.components.controls.ShadowDropdown;
+import backend.ui.ShadowStyle;
+import backend.ui.components.controls.ShadowDropdown;
 
 typedef TabDef =
 {

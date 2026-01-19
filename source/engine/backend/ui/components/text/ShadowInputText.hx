@@ -1,4 +1,4 @@
-package ui.components.text;
+package backend.ui.components.text;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -15,7 +15,7 @@ import openfl.errors.Error;
 import openfl.events.KeyboardEvent;
 import openfl.geom.Matrix;
 import openfl.geom.Rectangle;
-import ui.components.controls.ShadowDropdown;
+import backend.ui.components.controls.ShadowDropdown;
 
 class ShadowInputText extends FlxText
 {

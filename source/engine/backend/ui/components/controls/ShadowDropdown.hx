@@ -1,4 +1,4 @@
-package ui.components.controls;
+package backend.ui.components.controls;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -8,7 +8,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.FlxCamera;
 import backend.Paths;
-import ui.ShadowStyle;
+import backend.ui.ShadowStyle;
 
 class ShadowDropdown extends FlxSpriteGroup
 {

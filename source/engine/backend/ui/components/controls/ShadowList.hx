@@ -1,4 +1,4 @@
-package ui.components.controls;
+package backend.ui.components.controls;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -7,8 +7,8 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import backend.Paths;
-import ui.ShadowStyle;
-import ui.components.text.ShadowLabel;
+import backend.ui.ShadowStyle;
+import backend.ui.components.text.ShadowLabel;
 
 class ShadowList extends FlxSpriteGroup
 {

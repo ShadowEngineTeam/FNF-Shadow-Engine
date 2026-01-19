@@ -1,4 +1,4 @@
-package ui;
+package backend.ui;
 
 import flixel.util.FlxColor;
 import backend.ClientPrefs;
