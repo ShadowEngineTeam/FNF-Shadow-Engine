@@ -60,7 +60,6 @@ class DialogueEditorState extends MusicBeatState
 		box.updateHitbox();
 		add(box);
 
-		addEditorBox();
 		FlxG.mouse.visible = true;
 
 		var lineTxt:String;
@@ -92,8 +91,11 @@ class DialogueEditorState extends MusicBeatState
 		daText = new TypedAlphabet(DialogueBoxPsych.DEFAULT_TEXT_X, DialogueBoxPsych.DEFAULT_TEXT_Y, DEFAULT_TEXT);
 		daText.setScale(0.7);
 		add(daText);
+		
+		addEditorBox();
 		changeText();
 		addTouchPad("LEFT_FULL", "A_B_X_Y");
+
 		super.create();
 	}
 
@@ -105,8 +107,8 @@ class DialogueEditorState extends MusicBeatState
 		var margin = ShadowStyle.SPACING_LG;
 		var panelWidth = 350;
 		var panelHeight = 320;
-		var panelX = FlxG.width - panelWidth - margin;
-		var panelY = margin;
+		var panelX = margin;
+		var panelY = margin * 5;
 
 		UI_box = new ShadowTabMenu(panelX, panelY, tabs, panelWidth, panelHeight);
 		UI_box.scrollFactor.set();

@@ -2,6 +2,7 @@ package states.editors;
 
 import haxe.format.JsonParser;
 import haxe.io.Bytes;
+import flixel.FlxCamera;
 import flixel.FlxObject;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup;
@@ -96,6 +97,8 @@ class ChartingState extends MusicBeatState
 	var UI_help:ShadowPanel;
 	var UI_helpOverlay:FlxSprite;
 	var UI_infoPanel:ShadowPanel;
+
+	private var camMain:FlxCamera;
 	private var camOther:FlxCamera;
 
 	public static var goToPlayState:Bool = false;
@@ -283,23 +286,6 @@ class ChartingState extends MusicBeatState
 		if (curSec >= _song.notes.length)
 			curSec = _song.notes.length - 1;
 
-		var infoPanelW = 200;
-		var infoPanelH = 150;
-		UI_infoPanel = new ShadowPanel(ShadowStyle.SPACING_LG, 0, infoPanelW, infoPanelH);
-		UI_infoPanel.y = (FlxG.height - UI_infoPanel.height) - ShadowStyle.SPACING_LG;
-		UI_infoPanel.scrollFactor.set();
-		add(UI_infoPanel);
-
-		zoomTxt = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM, infoPanelW - ShadowStyle.SPACING_SM * 2, "Zoom: 1 / 1", 16);
-		zoomTxt.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
-		zoomTxt.scrollFactor.set();
-		UI_infoPanel.add(zoomTxt);
-
-		bpmTxt = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM + 22, infoPanelW - ShadowStyle.SPACING_SM * 2, "", 16);
-		bpmTxt.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_SECONDARY);
-		bpmTxt.scrollFactor.set();
-		UI_infoPanel.add(bpmTxt);
-
 		strumLine = new FlxSprite(0, 50).makeGraphic(Std.int(GRID_SIZE * 9), 4);
 		add(strumLine);
 
@@ -330,6 +316,21 @@ class ChartingState extends MusicBeatState
 		dummyArrow.antialiasing = ClientPrefs.data.antialiasing;
 		add(dummyArrow);
 
+		var infoPanelW = 200;
+		var infoPanelH = 150;
+		UI_infoPanel = new ShadowPanel(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG, infoPanelW, infoPanelH);
+		UI_infoPanel.scrollFactor.set();
+
+		zoomTxt = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM, infoPanelW - ShadowStyle.SPACING_SM * 2, "Zoom: 1 / 1", 16);
+		zoomTxt.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
+		zoomTxt.scrollFactor.set();
+		UI_infoPanel.add(zoomTxt);
+
+		bpmTxt = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM + 26, infoPanelW - ShadowStyle.SPACING_SM * 2, "", 16);
+		bpmTxt.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_SECONDARY);
+		bpmTxt.scrollFactor.set();
+		UI_infoPanel.add(bpmTxt);
+
 		var tabs = [
 			{name: "Song", label: 'Song'},
 			{name: "Section", label: 'Section'},
@@ -346,7 +347,7 @@ class ChartingState extends MusicBeatState
 		UI_box.y = ShadowStyle.SPACING_LG;
 		UI_box.scrollFactor.set();
 
-		add(UI_box);
+		UI_infoPanel.x = (FlxG.width - UI_infoPanel.width - UI_box.width) - (ShadowStyle.SPACING_LG * 2);
 
 		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(controls.mobileC) ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
@@ -354,7 +355,6 @@ class ChartingState extends MusicBeatState
 		tipText.scrollFactor.set();
 		tipText.borderSize = 1;
 		tipText.active = false;
-		add(tipText);
 
 		addSongUI();
 		addSectionUI();
@@ -372,6 +372,10 @@ class ChartingState extends MusicBeatState
 		add(curRenderedNoteType);
 		add(nextRenderedSustains);
 		add(nextRenderedNotes);
+
+		add(UI_infoPanel);
+		add(UI_box);
+		add(tipText);
 
 		if (lastSong != currentSongName)
 		{

@@ -82,17 +82,16 @@ class MenuCharacterEditorState extends MusicBeatState
 	function makeOffsetUI()
 	{
 		var panelWidth = 160;
-		var panelHeight = 60;
-		var panelX = 20;
-		var panelY = 10;
+		var panelHeight = 80;
+		var panelX = (FlxG.width - panelWidth) / 2;
+		var panelY = FlxG.height - 180;
 
-		UI_offsetPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
+		UI_offsetPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Position Offset");
 		UI_offsetPanel.cameras = [camHUD];
+		UI_offsetPanel.showCloseButton = false;
+		UI_offsetPanel.showMinimizeButton = false;
 
-		var titleLabel = new ShadowLabel(10, 8, "Position Offset", ShadowStyle.FONT_SIZE_SM);
-		UI_offsetPanel.add(titleLabel);
-
-		UI_offsetLabel = new ShadowLabel(10, 30, "[0, 0]", ShadowStyle.FONT_SIZE_LG);
+		UI_offsetLabel = new ShadowLabel(10, ShadowStyle.HEIGHT_HEADER + 10, "[0, 0]", ShadowStyle.FONT_SIZE_LG);
 		UI_offsetPanel.add(UI_offsetLabel);
 
 		add(UI_offsetPanel);
@@ -112,12 +111,11 @@ class MenuCharacterEditorState extends MusicBeatState
 		UI_helpOverlay.visible = false;
 		add(UI_helpOverlay);
 
-		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
+		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Menu Character Editor Help");
 		UI_help.cameras = [camOther];
 		UI_help.visible = false;
-
-		var titleLabel = new ShadowLabel(panelWidth / 2 - 100, 15, "Menu Character Editor Help", ShadowStyle.FONT_SIZE_LG);
-		UI_help.add(titleLabel);
+		UI_help.showCloseButton = false;
+		UI_help.showMinimizeButton = false;
 
 		var helpText = "Arrow Keys - Change Offset (Hold Shift for 10x speed)\n\n" +
 			"Space - Play 'Start Press' animation (Boyfriend only)\n\n" +
@@ -125,7 +123,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			"ESC - Exit to Editor Menu\n\n\n" +
 			"Press F1 or ESC to close";
 
-		var helpContent = new ShadowLabel(20, 55, helpText, ShadowStyle.FONT_SIZE_MD);
+		var helpContent = new ShadowLabel(20, ShadowStyle.HEIGHT_HEADER + 15, helpText, ShadowStyle.FONT_SIZE_MD);
 		UI_help.add(helpContent);
 
 		add(UI_help);
@@ -133,27 +131,34 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addEditorBox()
 	{
+		// Character Type panel - bottom left
 		var typeWidth = 150;
-		var typeHeight = 160;
+		var typeHeight = 180;
 		var tabs = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(20, FlxG.height - typeHeight - 20, tabs, typeWidth, typeHeight);
+		UI_typebox = new ShadowTabMenu(130, FlxG.height - typeHeight - 80, tabs, typeWidth, typeHeight);
 		UI_typebox.cameras = [camHUD];
+		UI_typebox.showCloseButton = false;
+		UI_typebox.showMinimizeButton = false;
 		addTypeUI();
 		add(UI_typebox);
 
-		var charWidth = 280;
+		// Character panel - bottom right
+		var charWidth = 260;
 		var charHeight = 220;
 		var tabs = [{name: 'Character', label: 'Character'}];
-		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, FlxG.height - charHeight - 20, tabs, charWidth, charHeight);
+		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 130, FlxG.height - charHeight - 80, tabs, charWidth, charHeight);
 		UI_mainbox.cameras = [camHUD];
+		UI_mainbox.showCloseButton = false;
+		UI_mainbox.showMinimizeButton = false;
 		addCharacterUI();
 		add(UI_mainbox);
 
+		// Load/Save buttons - centered at bottom
 		var buttonWidth = 140;
 		var buttonSpacing = 12;
 		var totalWidth = buttonWidth * 2 + buttonSpacing;
 		var baseX = (FlxG.width - totalWidth) / 2;
-		var buttonY = FlxG.height - 55;
+		var buttonY = FlxG.height - 75;
 
 		var loadButton = new ShadowButton(baseX, buttonY, "Load Character", function()
 		{
@@ -169,9 +174,12 @@ class MenuCharacterEditorState extends MusicBeatState
 		saveButton.cameras = [camHUD];
 		add(saveButton);
 
-		var helpHint = new ShadowLabel(FlxG.width - 120, 15, "F1 - Help", ShadowStyle.FONT_SIZE_SM);
-		helpHint.cameras = [camHUD];
-		add(helpHint);
+		// Help tip - top right
+		var tipText = new FlxText(FlxG.width - 100, 15, 80, "F1 - Help", ShadowStyle.FONT_SIZE_SM);
+		tipText.setFormat(null, ShadowStyle.FONT_SIZE_SM, FlxColor.WHITE, RIGHT);
+		tipText.scrollFactor.set();
+		tipText.cameras = [camHUD];
+		add(tipText);
 	}
 
 	var opponentCheckbox:ShadowCheckbox;

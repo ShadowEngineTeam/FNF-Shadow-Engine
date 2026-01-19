@@ -190,7 +190,7 @@ class NoteSplashDebugState extends MusicBeatState
 		UI_infoPanel.add(offsetsText);
 
 		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, "Press F1 for Help", 16);
-		tipText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
+		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
 		tipText.scrollFactor.set();
 		add(tipText);
 

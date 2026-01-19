@@ -101,6 +101,8 @@ class ShadowStyle
 	public static var HEIGHT_BUTTON:Int = DARK_ShadowTHEME.heightButton;
 	public static var HEIGHT_TAB:Int = DARK_ShadowTHEME.heightTab;
 	public static var HEIGHT_CHECKBOX:Int = DARK_ShadowTHEME.heightCheckbox;
+	public static var HEIGHT_HEADER:Int = 24;
+	public static var SIZE_HEADER_BTN:Int = 18;
 
 	// Font
 	public static var FONT_SIZE_SM:Int = DARK_ShadowTHEME.fontSizeSm;
