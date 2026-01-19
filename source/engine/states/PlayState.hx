@@ -520,10 +520,7 @@ class PlayState extends MusicBeatState
 
 		var splash:NoteSplash = new NoteSplash(100, 100);
 		grpNoteSplashes.add(splash);
-
 		SustainSplash.init(grpHoldSplashes, Conductor.stepCrochet * 1.25 / 1000 / playbackRate, Math.floor(24 / 100 * PlayState.SONG.bpm));
-		grpHoldSplashes.cameras = [camHUD];
-		add(grpHoldSplashes);
 
 		opponentStrums = new FlxTypedGroup<StrumNote>();
 		playerStrums = new FlxTypedGroup<StrumNote>();
@@ -537,6 +534,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		noteGroup.add(grpNoteSplashes);
+		noteGroup.add(grpHoldSplashes);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollow.setPosition(camPos.x, camPos.y);
