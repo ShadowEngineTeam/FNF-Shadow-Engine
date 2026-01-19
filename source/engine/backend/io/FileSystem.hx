@@ -216,60 +216,62 @@ class FileSystem
 
 	public static function readDirectory(path:String):Array<String>
 	{
-		var result:Array<String> = null;
-
 		#if MODS_ALLOWED
 		#if linux
 		var actualPath:String = cwd(path);
-		actualPath = getCaseInsensitivePath(path) ?? path;
+		actualPath = getCaseInsensitivePath(path);
+		if (actualPath == null)
+			actualPath = path;
 		if (SysFileSystem.exists(actualPath) && SysFileSystem.isDirectory(actualPath))
-			result = SysFileSystem.readDirectory(actualPath);
+			return SysFileSystem.readDirectory(actualPath);
 		#else
 		if (SysFileSystem.exists(cwd(path)) && SysFileSystem.isDirectory(cwd(path)))
-			result = SysFileSystem.readDirectory(cwd(path));
+			return SysFileSystem.readDirectory(cwd(path));
 		#end
 		#end
 
 		#if USE_OPENFL_FILESYSTEM
-		if (result == null)
-		{
-			var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path));
-			var results:Array<String> = [];
-
-			for (i in filteredList.copy())
-			{
-				var slashsCount = path.split('/').length;
-				if (path.endsWith('/'))
-					slashsCount--;
-
-				if (i.split('/').length - 1 != slashsCount)
-					filteredList.remove(i);
-			}
-
-			for (item in filteredList)
-			{
-				@:privateAccess
-				for (library in LimeAssets.libraries.keys())
-				{
-					var libPath = '$library:$item';
-					if (library != 'default' && OpenFLAssets.exists(libPath) && !results.contains(libPath))
-						results.push(libPath);
-					else if (OpenFLAssets.exists(item) && !results.contains(item))
-						results.push(item);
-				}
-			}
-
-			result = results.map(f -> f.substr(f.lastIndexOf("/") + 1));
-		}
+		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+			return openflReadDirectory(path);
 		#end
 
 		#if mobile
 		if (MobileAssets.exists(path) && MobileAssets.isDirectory(path))
-			result = MobileAssets.readDirectory(path);
+			return MobileAssets.readDirectory(path);
 		#end
 
-		return result ?? [];
+		return null;
 	}
+
+	#if USE_OPENFL_FILESYSTEM
+	static function openflReadDirectory(path:String):Array<String>
+	{
+		var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path));
+		var results:Array<String> = [];
+		for (i in filteredList.copy())
+		{
+			var slashsCount:Int = path.split('/').length;
+			if (path.endsWith('/'))
+				slashsCount -= 1;
+
+			if (i.split('/').length - 1 != slashsCount)
+				filteredList.remove(i);
+		}
+		for (item in filteredList)
+		{
+			@:privateAccess
+			for (library in LimeAssets.libraries.keys())
+			{
+				var libPath:String = '$library:$item';
+				if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
+					results.push(libPath);
+				else if (OpenFLAssets.exists(item) && !results.contains(item))
+					results.push(item);
+			}
+		}
+		return results.map(f -> f.substr(f.lastIndexOf("/") + 1));
+	}
+	#end
 
 	#if (linux && MODS_ALLOWED)
 	static function getCaseInsensitivePath(path:String):String
