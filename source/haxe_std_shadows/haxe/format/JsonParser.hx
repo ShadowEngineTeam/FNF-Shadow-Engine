@@ -362,11 +362,11 @@ class JsonParser
 	function invalidChar()
 	{
 		pos--; // rewind
-		throw(file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " at position " + pos;
+		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " at position " + pos;
 	}
 
 	function invalidNumber(start:Int)
 	{
-		throw(file != null && file != '' ? 'at JSON file: $file\n' : '') + "Invalid number at position " + start + ": " + str.substr(start, pos - start);
+		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid number at position " + start + ": " + str.substr(start, pos - start);
 	}
 }

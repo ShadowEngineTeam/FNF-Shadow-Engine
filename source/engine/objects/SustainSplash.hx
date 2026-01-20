@@ -213,7 +213,10 @@ class SustainSplash extends FlxSprite
 	{
 		if (strumNote != null)
 		{
-			alpha = strumNote.alpha * ClientPrefs.data.splashAlpha;
+			if (animation.curAnim.name != 'end')
+				alpha = strumNote.alpha;
+			else
+				alpha = ClientPrefs.data.splashAlpha;
 			setPosition(strumNote.x, strumNote.y);
 		}
 
@@ -285,7 +288,7 @@ class SustainSplash extends FlxSprite
 	{
 		if (strumNote != null)
 		{
-			alpha = strumNote.alpha * ClientPrefs.data.splashAlpha;
+			alpha = strumNote.alpha;
 			setPosition(strumNote.x, strumNote.y);
 		}
 

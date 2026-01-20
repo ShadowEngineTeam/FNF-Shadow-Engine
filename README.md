@@ -36,6 +36,7 @@ Ready to be source-modded.
 - Stripped to only have Test song and some characters<br>(TBD to re-add, see [TODO](./todo/TODO.md))
 - Kade Engine Note Timing (man I feel old), VSync and Pop Up Score Option
 - Includes all classes as possible into source
-- Scriptable Classes Support!! (ig idk honestly if I [Homura] did good job)
+- Scriptable States Support!! (ig idk honestly if I [Homura] did good job)
+- Supports `.hscript`, `.hxs` and `.hxc` extensions<br>[SIDE NOTE: `.hxc` added as an alias, we don't have scriptable classes support]
 
 Discord server: https://discord.gg/krFK9WWYHg
