@@ -79,7 +79,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS x86_64
-      os: macos-26
+      os: macos-15
       buildArgs: "mac -64 -D HXCPP_M64"
       assetType: S3TC
       artifactName: macOSBuild-x86_64
@@ -90,7 +90,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS ARM64
-      os: macos-26
+      os: macos-15
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
       assetType: S3TC
       artifactName: macOSBuild-arm64
