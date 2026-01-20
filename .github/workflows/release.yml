@@ -33,25 +33,25 @@ jobs:
             artifactName: windowsBuild-arm64
             artifactPath: export\final\windows\bin\*
           - name: Linux i686
-            os: ubuntu-24.04
+            os: ubuntu-22.04
             buildArgs: "linux -final -32 -D HXCPP_M32 -D officialBuild"
             assetType: S3TC
             artifactName: linuxBuild-i686
             artifactPath: export/final/linux/bin/*
           - name: Linux x86_64
-            os: ubuntu-24.04
+            os: ubuntu-22.04
             buildArgs: "linux -final -64 -D HXCPP_M64 -D officialBuild"
             assetType: S3TC
             artifactName: linuxBuild-x86_64
             artifactPath: export/final/linux/bin/*
           - name: Linux ARMV7
-            os: ubuntu-24.04-arm
+            os: ubuntu-22.04-arm
             buildArgs: "linux -final -armv7 -D HXCPP_ARMV7 -D officialBuild"
             assetType: ASTC
             artifactName: linuxBuild-armv7
             artifactPath: export/final/linux/bin/*
           - name: Linux ARM64
-            os: ubuntu-24.04-arm
+            os: ubuntu-22.04-arm
             buildArgs: "linux -final -arm64 -D HXCPP_ARM64 -D officialBuild"
             assetType: ASTC
             artifactName: linuxBuild-arm64
@@ -63,7 +63,7 @@ jobs:
             artifactName: androidBuild
             artifactPath: "export/final/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
-            os: macos-26
+            os: macos-15
             buildArgs: "ios -final -nosign -D officialBuild"
             assetType: ASTC
             artifactName: iOSBuild
