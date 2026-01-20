@@ -86,13 +86,6 @@
       "dir": null,
       "ref": null,
       "url": "https://github.com/FNF-SE/flixel-animate"
-	},
-	{
-      "name": "fnf-modcharting-tools",
-      "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/FNF-Modcharting-Tools"
-    }
+	}
   ]
 }
