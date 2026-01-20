@@ -18,15 +18,15 @@
       "name": "flixel",
       "type": "git",
       "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/flixel"
+      "ref": "c8e79d2a42f9c11c639519ef2a6fd7ef2379a8aa",
+      "url": "https://github.com/FunkinCrew/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
       "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/flixel-addons"
+      "ref": "6fa30b3f5209146c852c25f3d1003e08898083e2",
+      "url": "https://github.com/FunkinCrew/flixel-addons"
     },
     {
       "name": "flixel-ui",

@@ -3,7 +3,6 @@ package states.editors;
 import flixel.FlxObject;
 import flixel.graphics.FlxGraphic;
 import flixel.animation.FlxAnimation;
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.*;
 import flixel.ui.FlxButton;
@@ -16,6 +15,9 @@ import lime.system.Clipboard;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
+
+@:bitmap("assets/images/debugger/cursorCross.png")
+private class GraphicCursorCross extends openfl.display.BitmapData {}
 
 class CharacterEditorState extends MusicBeatState
 {
