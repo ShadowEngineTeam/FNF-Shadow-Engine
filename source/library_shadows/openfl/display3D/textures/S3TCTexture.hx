@@ -51,7 +51,7 @@ import openfl.Lib;
 			__getImageSize(data);
 			__getImageDimensions(data);
 			var textureFromat = __getTextureFormat(data);
-			
+
 			var formatName = 'COMPRESSED_RGBA_S3TC_${textureFromat}_EXT';
 			if (!Reflect.fields(dxtExtension).contains(formatName))
 			{
