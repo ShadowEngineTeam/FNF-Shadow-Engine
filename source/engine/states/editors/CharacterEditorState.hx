@@ -1,7 +1,6 @@
 package states.editors;
 
 import flixel.graphics.FlxGraphic;
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -9,6 +8,9 @@ import flixel.FlxCamera;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
+
+@:bitmap("assets/images/debugger/cursorCross.png")
+private class GraphicCursorCross extends openfl.display.BitmapData {}
 
 class CharacterEditorState extends MusicBeatState
 {

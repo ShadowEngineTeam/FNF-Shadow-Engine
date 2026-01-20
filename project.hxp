@@ -23,7 +23,7 @@ class Project extends HXProject
 	static final MAIN_CLASS:String = "backend.Main";
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
-	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
+	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows", "source/library_shadows"];
 
 	static final MODS_ALLOWED:CompileFlag = CompileFlag.get("MODS_ALLOWED");
 	static final HSCRIPT_ALLOWED:CompileFlag = CompileFlag.get("HSCRIPT_ALLOWED");
