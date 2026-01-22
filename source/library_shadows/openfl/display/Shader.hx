@@ -593,6 +593,13 @@ class Shader
 			gl.uniform1i(input.index, textureCount);
 			textureCount++;
 		}
+
+		#if lime
+		if (__context.__context.type == OPENGL && textureCount > 0)
+		{
+			gl.enable(gl.TEXTURE_2D);
+		}
+		#end
 	}
 
 	@:noCompletion private function __init():Void
@@ -613,6 +620,7 @@ class Shader
 		var extensions = "";
 
 		var extList = (isFragment ? __glFragmentExtensions : __glVertexExtensions);
+
 		for (ext in extList)
 		{
 			extensions += "#extension " + ext.name + " : " + ext.behavior + "\n";
@@ -620,14 +628,28 @@ class Shader
 
 		var complexBlendsSupported = OpenGLRenderer.__complexBlendsSupported && isFragment;
 
+		#if lime
+		if (__context.__context.type == OPENGL)
+		{
+			complexBlendsSupported = complexBlendsSupported && (__glVersion == "150" || !StringTools.startsWith(__glVersion, "1"));
+		}
+		else if (__context.__context.type == OPENGLES)
+		{
+			complexBlendsSupported = complexBlendsSupported && !StringTools.startsWith(__glVersion, "1");
+		}
+		#end
+
 		if (complexBlendsSupported)
 		{
 			extensions += "#extension GL_KHR_blend_equation_advanced : enable\n";
 
-			#if desktop
-			// compiling without this gives the error
-			// 'gl_SampleID' : required extension not requested: GL_ARB_sample_shading
-			extensions += "#extension GL_ARB_sample_shading : enable\n";
+			#if lime
+			if (__context.__context.type == OPENGL)
+			{
+				// compiling without this gives the error
+				// 'gl_SampleID' : required extension not requested: GL_ARB_sample_shading
+				extensions += "#extension GL_ARB_sample_shading : enable\n";
+			}
 			#end
 		}
 
