@@ -1,7 +1,5 @@
 package openfl.display;
 
-package openfl.display;
-
 #if !flash
 #if !openfljs
 /**
