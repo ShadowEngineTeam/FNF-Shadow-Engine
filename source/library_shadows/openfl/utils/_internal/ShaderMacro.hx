@@ -137,7 +137,7 @@ class ShaderMacro
 		var localClass = Context.getLocalClass().get();
 		var superClass = localClass.superClass != null ? localClass.superClass.t.get() : null;
 		var parent = superClass;
-		var parentFields;
+		var parentFields:Array<ClassField>;
 
 		while (parent != null)
 		{
