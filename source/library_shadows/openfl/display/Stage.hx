@@ -1239,6 +1239,8 @@ class Stage extends DisplayObjectContainer #if lime implements IModule #end
 
 		if (__renderer != null)
 		{
+			__renderer.__clear();
+
 			__renderer.__allowSmoothing = (quality != LOW);
 			__renderer.__pixelRatio = #if openfl_disable_hdpi 1 #else window.scale #end;
 			__renderer.__worldTransform = __displayMatrix;

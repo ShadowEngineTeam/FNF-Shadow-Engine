@@ -27,6 +27,10 @@ class ApplicationMain
     {
         lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
+		#if android
+        lime.system.System.setHint('ANDROID_DRAW_SCALE', (sys.FileSystem.exists(lime.system.System.applicationStorageDirectory + 'scaleSize.txt') ? sys.io.File.getContent(lime.system.System.applicationStorageDirectory + 'scaleSize.txt') : "1"));
+        #end
+
         #if (js && html5)
         #if (munit || (utest && openfl_enable_utest_legacy_mode))
         lime.system.System.embed("::APP_FILE::", null, ::WIN_WIDTH::, ::WIN_HEIGHT::);

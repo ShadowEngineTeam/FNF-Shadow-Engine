@@ -92,7 +92,12 @@ import states.TitleState;
 	public var loadingScreen:Bool = true;
 
 	public var popUpRating:Bool = true;
+	#if native
 	public var vsync:Bool = false;
+	#if android
+	public var downscaleGame:Bool = false;
+	#end
+	#end
 	public var showNoteTiming:Bool = false;
 }
 

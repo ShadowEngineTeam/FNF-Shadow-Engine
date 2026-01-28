@@ -9,7 +9,7 @@ import options.OptionsState;
 
 class MainMenuState extends MusicBeatState
 {
-	public static var shadowEngineVersion:String = '0.4.5'; // This is also used for Discord RPC
+	public static var shadowEngineVersion:String = '0.5.5'; // This is also used for Discord RPC
 	public static var psychEngineVersion:String = '0.7.3';
 	public static var curSelected:Int = 0;
 

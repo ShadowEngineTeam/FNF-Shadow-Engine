@@ -27,6 +27,7 @@ import openfl.Lib;
 	public static inline final IMAGE_DATA_OFFSET = 128;
 
 	public var supported:Bool = true;
+	public var usingANGLEExtension:Bool = false;
 	public var imageSize(default, null):Int = 0;
 
 	@:noCompletion private function new(context:Context3D, data:ByteArray)
@@ -37,13 +38,20 @@ import openfl.Lib;
 
 		if (dxtExtension == null)
 		{
+			// fallback to ANGLE extension
+			dxtExtension = gl.getExtension("ANGLE_texture_compression_dxt5");
+			usingANGLEExtension = true;
+		}
+
+		if (dxtExtension == null)
+		{
 			if (!__warned)
 			{
 				Lib.current.stage.window.alert("S3TC compression is not available on this device.", "Rendering Error!");
 				__warned = true;
 			}
 
-			supported = false;
+			usingANGLEExtension = supported = false;
 		}
 
 		if (supported)
@@ -52,7 +60,7 @@ import openfl.Lib;
 			__getImageDimensions(data);
 			var textureFromat = __getTextureFormat(data);
 
-			var formatName = 'COMPRESSED_RGBA_S3TC_${textureFromat}_EXT';
+			var formatName = 'COMPRESSED_RGBA_S3TC_${textureFromat}_${usingANGLEExtension ? "ANGLE" : "EXT"}';
 			if (!Reflect.fields(dxtExtension).contains(formatName))
 			{
 				trace('[ERROR] format: $formatName is invalid!');

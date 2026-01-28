@@ -83,7 +83,6 @@ class Assets
 		/*if (id != null && StringTools.endsWith(id, 'png') && type == null || type == IMAGE)
 		{
 			if (LimeAssets.exists(id.substr(0, id.length - 3) + 'astc', BINARY)) return true;
-			if (LimeAssets.exists(id.substr(0, id.length - 3) + 'ktx', BINARY)) return true;
 			if (LimeAssets.exists(id.substr(0, id.length - 3) + 'dds', BINARY)) return true;
 		}*/
 		return LimeAssets.exists(id, cast type);
@@ -136,7 +135,7 @@ class Assets
 			}
 		}
 
-		for (ext in ['astc', 'ktx', 'dds'])
+		for (ext in ['astc', 'dds'])
 		{
 			final textureName:String = haxe.io.Path.withoutExtension(id) + '.$ext';
 
@@ -145,7 +144,6 @@ class Assets
 				final texture = switch (ext)
 				{
 					case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(Assets.getBytes(textureName));
-					case 'ktx': openfl.Lib.current.stage.context3D.createETC2Texture(Assets.getBytes(textureName));
 					case 'dds': openfl.Lib.current.stage.context3D.createS3TCTexture(Assets.getBytes(textureName));
 					default: null;
 				}
