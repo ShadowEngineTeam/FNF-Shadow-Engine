@@ -27,25 +27,25 @@ jobs:
             artifactName: windowsBuild-arm64
             artifactPath: export\release\windows\bin\*
           - name: Linux i686
-            os: ubuntu-24.04
+            os: ubuntu-22.04
             buildArgs: "linux -32 -D HXCPP_M32"
             assetType: S3TC
             artifactName: linuxBuild-i686
             artifactPath: export/release/linux/bin/*
           - name: Linux x86_64
-            os: ubuntu-24.04
+            os: ubuntu-22.04
             buildArgs: "linux -64 -D HXCPP_M64"
             assetType: S3TC
             artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
           - name: Linux ARMV7
-            os: ubuntu-24.04-arm
+            os: ubuntu-22.04-arm
             buildArgs: "linux -armv7 -D HXCPP_ARMV7"
             assetType: ASTC
             artifactName: linuxBuild-armv7
             artifactPath: export/release/linux/bin/*
           - name: Linux ARM64
-            os: ubuntu-24.04-arm
+            os: ubuntu-22.04-arm
             buildArgs: "linux -arm64 -D HXCPP_ARM64"
             assetType: ASTC
             artifactName: linuxBuild-arm64
@@ -57,7 +57,7 @@ jobs:
             artifactName: androidBuild
             artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
-            os: macos-26
+            os: macos-15
             buildArgs: "ios -nosign"
             assetType: ASTC
             artifactName: iOSBuild
@@ -79,7 +79,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS x86_64
-      os: macos-26
+      os: macos-15
       buildArgs: "mac -64 -D HXCPP_M64"
       assetType: S3TC
       artifactName: macOSBuild-x86_64
@@ -90,7 +90,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS ARM64
-      os: macos-26
+      os: macos-15
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
       assetType: S3TC
       artifactName: macOSBuild-arm64

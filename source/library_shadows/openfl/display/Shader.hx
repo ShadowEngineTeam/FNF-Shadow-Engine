@@ -544,7 +544,8 @@ class Shader
 		{
 			input.__disableGL(__context, textureCount);
 			textureCount++;
-			if (textureCount == gl.MAX_TEXTURE_IMAGE_UNITS) break;
+			if (textureCount == gl.MAX_TEXTURE_IMAGE_UNITS)
+				break;
 		}
 
 		for (parameter in __paramBool)
@@ -593,6 +594,13 @@ class Shader
 			gl.uniform1i(input.index, textureCount);
 			textureCount++;
 		}
+
+		#if lime
+		if (__context.__context.type == OPENGL && textureCount > 0)
+		{
+			gl.enable(gl.TEXTURE_2D);
+		}
+		#end
 	}
 
 	@:noCompletion private function __init():Void
@@ -618,23 +626,10 @@ class Shader
 			extensions += "#extension " + ext.name + " : " + ext.behavior + "\n";
 		}
 
-		var complexBlendsSupported = OpenGLRenderer.__complexBlendsSupported && isFragment;
-
-		if (complexBlendsSupported)
-		{
-			extensions += "#extension GL_KHR_blend_equation_advanced : enable\n";
-
-			#if desktop
-			// compiling without this gives the error
-			// 'gl_SampleID' : required extension not requested: GL_ARB_sample_shading
-			extensions += "#extension GL_ARB_sample_shading : enable\n";
-			#end
-		}
-
 		// #version must be the first directive and cannot be repeated,
 		// while #extension directives must be before any non-preprocessor tokens.
 
-		var prefix = "#version "
+		return "#version "
 			+ __glVersion
 			+ "
       "
@@ -650,13 +645,6 @@ class Shader
 			+ "
 				#endif
 				";
-
-		if (complexBlendsSupported)
-		{
-			prefix += "#ifdef GL_KHR_blend_equation_advanced\nlayout (blend_support_all_equations) out;\n#endif\n";
-		}
-
-		return prefix;
 	}
 
 	@:noCompletion private function __initGL():Void
@@ -933,7 +921,8 @@ class Shader
 						parameter.type = parameterType;
 						parameter.__arrayLength = arrayLength;
 						#if lime
-						if (arrayLength > 0) parameter.__uniformMatrix = new Float32Array(arrayLength * arrayLength);
+						if (arrayLength > 0)
+							parameter.__uniformMatrix = new Float32Array(arrayLength * arrayLength);
 						#end
 						parameter.__isFloat = true;
 						parameter.__isUniform = isUniform;

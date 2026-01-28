@@ -96,10 +96,18 @@ class VisualsUISubState extends BaseOptionsMenu
 
 		#if native
 		var option:Option = new Option('VSync',
-			'If checked, Enables VSync fixing any screen tearing at the cost of capping the FPS to screen refresh rate.\n(Must restart the game to have an effect)',
+			'If checked, Enables VSync fixing any screen tearing at the cost of capping the FPS to screen refresh rate.',
 			'vsync', 'bool');
 		option.onChange = onChangeVSync;
 		addOption(option);
+
+		#if android
+		var option:Option = new Option('Downscale Game',
+			'If checked, Renders the game at a lower resolution (near 0.67x) for better performance.\n(Must restart the game to have an effect)',
+			'downscaleGame', 'bool');
+		option.onChange = onChangeScaleSize;
+		addOption(option);
+		#end
 		#end
 
 		var option:Option = new Option('Pause Screen Song:', "Which song do you prefer for the Pause Screen?", 'pauseMusic', 'string', pauseMusics);
@@ -192,5 +200,10 @@ class VisualsUISubState extends BaseOptionsMenu
 	#if native
 	function onChangeVSync()
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
+
+	#if android
+	function onChangeScaleSize()
+		File.saveContent(lime.system.System.applicationStorageDirectory + 'scaleSize.txt', (ClientPrefs.data.downscaleGame ? '${(720 / 1.5) / 720}' : '1'));
+	#end
 	#end
 }
