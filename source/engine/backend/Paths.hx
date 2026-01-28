@@ -16,7 +16,7 @@ import animate.FlxAnimateFrames;
 class Paths
 {
 	public static var IMAGE_EXT:String = "png";
-	public static var GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif ETC2 "ktx" #elseif S3TC "dds" #else IMAGE_EXT #end;
+	public static var GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif S3TC "dds" #else IMAGE_EXT #end;
 	#if VIDEOS_ALLOWED
 	public static var VIDEO_EXT = "mp4";
 	#end
