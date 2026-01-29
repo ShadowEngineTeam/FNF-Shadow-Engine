@@ -84,11 +84,10 @@ class MenuCharacterEditorState extends MusicBeatState
 		var panelWidth = 160;
 		var panelHeight = 80;
 		var panelX = (FlxG.width - panelWidth) / 2;
-		var panelY = FlxG.height - 180;
+		var panelY = 470;
 
 		UI_offsetPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Position Offset");
 		UI_offsetPanel.cameras = [camHUD];
-		UI_offsetPanel.showCloseButton = false;
 		UI_offsetPanel.showMinimizeButton = false;
 
 		UI_offsetLabel = new ShadowLabel(10, ShadowStyle.HEIGHT_HEADER + 10, "[0, 0]", ShadowStyle.FONT_SIZE_LG);
@@ -114,8 +113,6 @@ class MenuCharacterEditorState extends MusicBeatState
 		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Menu Character Editor Help");
 		UI_help.cameras = [camOther];
 		UI_help.visible = false;
-		UI_help.showCloseButton = false;
-		UI_help.showMinimizeButton = false;
 
 		var helpText = "Arrow Keys - Change Offset (Hold Shift for 10x speed)\n\n" +
 			"Space - Play 'Start Press' animation (Boyfriend only)\n\n" +
@@ -131,34 +128,27 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addEditorBox()
 	{
-		// Character Type panel - bottom left
 		var typeWidth = 150;
 		var typeHeight = 180;
 		var tabs = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(130, FlxG.height - typeHeight - 80, tabs, typeWidth, typeHeight);
+		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
 		UI_typebox.cameras = [camHUD];
-		UI_typebox.showCloseButton = false;
-		UI_typebox.showMinimizeButton = false;
 		addTypeUI();
 		add(UI_typebox);
 
-		// Character panel - bottom right
-		var charWidth = 260;
+		var charWidth = 280;
 		var charHeight = 220;
 		var tabs = [{name: 'Character', label: 'Character'}];
-		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 130, FlxG.height - charHeight - 80, tabs, charWidth, charHeight);
+		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, 460, tabs, charWidth, charHeight);
 		UI_mainbox.cameras = [camHUD];
-		UI_mainbox.showCloseButton = false;
-		UI_mainbox.showMinimizeButton = false;
 		addCharacterUI();
 		add(UI_mainbox);
 
-		// Load/Save buttons - centered at bottom
 		var buttonWidth = 140;
 		var buttonSpacing = 12;
 		var totalWidth = buttonWidth * 2 + buttonSpacing;
 		var baseX = (FlxG.width - totalWidth) / 2;
-		var buttonY = FlxG.height - 75;
+		var buttonY = 570;
 
 		var loadButton = new ShadowButton(baseX, buttonY, "Load Character", function()
 		{
@@ -174,7 +164,6 @@ class MenuCharacterEditorState extends MusicBeatState
 		saveButton.cameras = [camHUD];
 		add(saveButton);
 
-		// Help tip - top right
 		var tipText = new FlxText(FlxG.width - 100, 15, 80, "F1 - Help", ShadowStyle.FONT_SIZE_SM);
 		tipText.setFormat(null, ShadowStyle.FONT_SIZE_SM, FlxColor.WHITE, RIGHT);
 		tipText.scrollFactor.set();
