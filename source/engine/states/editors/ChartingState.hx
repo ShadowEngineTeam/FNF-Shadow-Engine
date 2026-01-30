@@ -375,8 +375,11 @@ class ChartingState extends MusicBeatState
 		add(nextRenderedSustains);
 		add(nextRenderedNotes);
 
-		add(UI_infoPanel);
+		
 		add(UI_box);
+
+		// RAAAHH ⚔💀🛡 -- mrchaoss
+		add(UI_infoPanel);
 		add(tipText);
 
 		if (lastSong != currentSongName)

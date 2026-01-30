@@ -692,7 +692,6 @@ class WeekEditorFreeplayState extends MusicBeatState
 		UI_box.scrollFactor.set();
 
 		addFreeplayUI();
-		add(UI_box);
 
 		var blackBlack:FlxSprite = new FlxSprite(0, 670).makeGraphic(FlxG.width, 50, FlxColor.BLACK);
 		blackBlack.alpha = 0.6;
@@ -720,6 +719,8 @@ class WeekEditorFreeplayState extends MusicBeatState
 		saveWeekButton.screenCenter(X);
 		saveWeekButton.x += 120;
 		add(saveWeekButton);
+
+		add(UI_box);
 	}
 
 	var bgColorStepperR:ShadowStepper;

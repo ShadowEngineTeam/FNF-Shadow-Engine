@@ -89,21 +89,6 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addEditorBox()
 	{
-		var typeWidth = 150;
-		var typeHeight = 180;
-		var tabs = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
-		UI_typebox.cameras = [camHUD];
-		addTypeUI();
-		add(UI_typebox);
-
-		var charWidth = 280;
-		var charHeight = 220;
-		var tabs = [{name: 'Character', label: 'Character'}];
-		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, 460, tabs, charWidth, charHeight);
-		UI_mainbox.cameras = [camHUD];
-		addCharacterUI();
-		add(UI_mainbox);
 
 		var buttonWidth = 140;
 		var buttonSpacing = 12;
@@ -124,6 +109,22 @@ class MenuCharacterEditorState extends MusicBeatState
 		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
 		saveButton.cameras = [camHUD];
 		add(saveButton);
+
+		var typeWidth = 150;
+		var typeHeight = 180;
+		var tabs = [{name: 'Character Type', label: 'Character Type'}];
+		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
+		UI_typebox.cameras = [camHUD];
+		addTypeUI();
+		add(UI_typebox);
+
+		var charWidth = 280;
+		var charHeight = 220;
+		var tabs = [{name: 'Character', label: 'Character'}];
+		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, 460, tabs, charWidth, charHeight);
+		UI_mainbox.cameras = [camHUD];
+		addCharacterUI();
+		add(UI_mainbox);
 	}
 
 	var opponentCheckbox:ShadowCheckbox;
