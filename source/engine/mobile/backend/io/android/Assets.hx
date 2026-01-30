@@ -128,7 +128,7 @@ bool Assets_obj::native_exists(::String path)
     }
 
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
-	if (AAssetDir_getNextFileName(dir) != NULL)
+	if (dir && AAssetDir_getNextFileName(dir) != NULL)
 	{
         AAssetDir_close(dir);
 		hx::ExitGCFreeZone();

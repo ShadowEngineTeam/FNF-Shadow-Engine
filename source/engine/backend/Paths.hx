@@ -1,5 +1,6 @@
 package backend;
 
+import haxe.io.Path;
 import lime.media.AudioBuffer;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -253,10 +254,10 @@ class Paths
 				localTrackedAssets.push(file);
 				return currentTrackedAssets.get(file);
 			}
-			else if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
-				bitmap = Assets.getBitmapData(file);
+			else if (FileSystem.exists(file))
+				bitmap = getBitmapData(file);
 
-			if (Assets.exists(getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library), getImageAssetType(IMAGE_EXT)))
+			if (FileSystem.exists(getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library)))
 			{
 				file = getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library);
 				if (currentTrackedAssets.exists(file))
@@ -264,7 +265,7 @@ class Paths
 					localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
-				bitmap = Assets.getBitmapData(file);
+				bitmap = getBitmapData(file);
 			}
 		}
 
@@ -279,12 +280,22 @@ class Paths
 		return null;
 	}
 
+	static public function getBitmapData(file:String):BitmapData
+	{
+		var bytes = File.getBytes(file);
+		return switch (Path.extension(file)) {
+			case 'astc': BitmapData.fromTexture(FlxG.stage.context3D.createASTCTexture(bytes));	
+			case 'dds': BitmapData.fromTexture(FlxG.stage.context3D.createS3TCTexture(bytes));	
+			default: BitmapData.fromBytes(bytes);
+		}
+	}
+
 	static public function cacheBitmap(file:String, ?bitmap:BitmapData = null)
 	{
 		if (bitmap == null)
 		{
 			if (FileSystem.exists(file))
-				bitmap = BitmapData.fromBytes(File.getBytes(file));
+				bitmap = getBitmapData(file);
 			else
 			{
 				if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
@@ -497,8 +508,8 @@ class Paths
 		{
 			var retKey:String = (path != null) ? '$path/$key' : key;
 			retKey = getPath('$retKey.ogg', SOUND, library);
-			if (Assets.exists(retKey, SOUND))
-				currentTrackedSounds.set(gottenPath, Assets.getSound(retKey));
+			if (FileSystem.exists(retKey))
+				currentTrackedSounds.set(gottenPath, Sound.fromAudioBuffer(AudioBuffer.fromBytes(File.getBytes(retKey))));
 		}
 		localTrackedAssets.push(gottenPath);
 		return currentTrackedSounds.get(gottenPath);
