@@ -231,7 +231,6 @@ class ShadowPanel extends FlxSpriteGroup
 			}
 			else
 			{
-				trace('ShadowPanel drag ended at (' + Std.string(this.x) + ', ' + Std.string(this.y) + ')');
 				_dragging = false;
 				_pressing = false;
 			}
