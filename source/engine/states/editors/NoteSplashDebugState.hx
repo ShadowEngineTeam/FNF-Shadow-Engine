@@ -76,6 +76,11 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
+		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, "Press F1 for Help", 16);
+		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
+		tipText.scrollFactor.set();
+		add(tipText);
+
 		var settingsPanelW = 400;
 		var settingsPanelH = 200;
 		UI_settingsPanel = new ShadowPanel((FlxG.width - settingsPanelW) / 2, FlxG.height - settingsPanelH - ShadowStyle.SPACING_LG, settingsPanelW, settingsPanelH);
@@ -167,11 +172,6 @@ class NoteSplashDebugState extends MusicBeatState
 			}
 		};
 		UI_settingsPanel.add(nameInputText);
-
-		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, "Press F1 for Help", 16);
-		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
-		tipText.scrollFactor.set();
-		add(tipText);
 
 		var infoPanelW = 500;
 		var infoPanelH = 90;

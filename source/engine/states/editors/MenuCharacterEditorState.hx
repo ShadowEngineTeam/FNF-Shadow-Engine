@@ -56,6 +56,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		add(grpWeekCharacters);
 
 		addEditorBox();
+		makeOffsetUI();
 
 		FlxG.mouse.visible = true;
 		updateCharTypeBox();
@@ -111,14 +112,6 @@ class MenuCharacterEditorState extends MusicBeatState
 		saveButton.cameras = [camHUD];
 		add(saveButton);
 
-		var typeWidth = 150;
-		var typeHeight = 180;
-		var tabs = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
-		UI_typebox.cameras = [camHUD];
-		addTypeUI();
-		add(UI_typebox);
-
 		var charWidth = 280;
 		var charHeight = 220;
 		var tabs = [{name: 'Character', label: 'Character'}];
@@ -126,6 +119,14 @@ class MenuCharacterEditorState extends MusicBeatState
 		UI_mainbox.cameras = [camHUD];
 		addCharacterUI();
 		add(UI_mainbox);
+
+		var typeWidth = 150;
+		var typeHeight = 180;
+		var tabs = [{name: 'Character Type', label: 'Character Type'}];
+		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
+		UI_typebox.cameras = [camHUD];
+		addTypeUI();
+		add(UI_typebox);
 	}
 
 	var opponentCheckbox:ShadowCheckbox;
