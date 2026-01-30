@@ -127,6 +127,9 @@ bool Assets_obj::native_exists(::String path)
         return true;
     }
 
+	if (file)
+        AAsset_close(file);
+
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
 	if (dir && AAssetDir_getNextFileName(dir) != NULL)
 	{
@@ -135,12 +138,10 @@ bool Assets_obj::native_exists(::String path)
         return true;
     }
 
-	if (file)
-        AAsset_close(file);
-
 	if (dir)
         AAssetDir_close(dir);
 
+	hx::ExitGCFreeZone();
 	return false;
 }
 
