@@ -112,8 +112,6 @@ class WeekEditorState extends MusicBeatState
 		addWeekUI();
 		addOtherUI();
 
-		add(UI_box);
-
 		var loadWeekButton = new ShadowButton(0, 650, "Load Week", function()
 		{
 			loadWeek();
@@ -136,6 +134,8 @@ class WeekEditorState extends MusicBeatState
 		saveWeekButton.screenCenter(X);
 		saveWeekButton.x += 120;
 		add(saveWeekButton);
+
+		add(UI_box);
 	}
 
 	var songsInputText:ShadowTextInput;

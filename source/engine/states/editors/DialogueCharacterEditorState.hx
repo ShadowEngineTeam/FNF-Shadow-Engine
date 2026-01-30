@@ -172,7 +172,6 @@ class DialogueCharacterEditorState extends MusicBeatState
 		UI_typebox.scrollFactor.set();
 		UI_typebox.cameras = [camHUD];
 		addTypeUI();
-		add(UI_typebox);
 
 		var mainTabs:Array<{name:String, label:String}> = [
 			{name: 'Animations', label: 'Animations'},
@@ -185,6 +184,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		addAnimationsUI();
 		addCharacterUI();
 		add(UI_mainbox);
+		add(UI_typebox);
 		UI_mainbox.selectedTab = TAB_CHARACTER;
 		lastTab = TAB_CHARACTER;
 	}

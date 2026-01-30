@@ -55,11 +55,12 @@ class MenuCharacterEditorState extends MusicBeatState
 		add(new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51));
 		add(grpWeekCharacters);
 
-		makeOffsetUI();
 		addEditorBox();
 
 		FlxG.mouse.visible = true;
 		updateCharTypeBox();
+
+		makeOffsetUI();
 
 		addTouchPad("MENU_CHARACTER", "MENU_CHARACTER");
 
