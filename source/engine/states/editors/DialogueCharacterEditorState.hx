@@ -167,7 +167,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 	function addEditorBox()
 	{
 		var typeTabs:Array<{name:String, label:String}> = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(FlxG.width - editorTypeWidth - ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG, typeTabs, editorTypeWidth,
+		UI_typebox = new ShadowTabMenu(290, 55, typeTabs, editorTypeWidth,
 			editorTypeHeight);
 		UI_typebox.scrollFactor.set();
 		UI_typebox.cameras = [camHUD];
@@ -178,7 +178,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			{name: 'Animations', label: 'Animations'},
 			{name: 'Character', label: 'Character'},
 		];
-		UI_mainbox = new ShadowTabMenu(UI_typebox.x - editorMainWidth - ShadowStyle.SPACING_MD, ShadowStyle.SPACING_LG, mainTabs, editorMainWidth,
+		UI_mainbox = new ShadowTabMenu(13, 55, mainTabs, editorMainWidth,
 			editorMainHeight);
 		UI_mainbox.scrollFactor.set();
 		UI_mainbox.cameras = [camHUD];

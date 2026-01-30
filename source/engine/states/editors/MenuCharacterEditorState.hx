@@ -18,14 +18,9 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	var camEditor:FlxCamera;
 	var camHUD:FlxCamera;
-	var camOther:FlxCamera;
 
 	var UI_offsetPanel:ShadowPanel;
 	var UI_offsetLabel:ShadowLabel;
-	
-	var UI_helpOverlay:FlxSprite;
-	var UI_help:ShadowPanel;
-	var showHelp:Bool = false;
 
 	override function create()
 	{
@@ -41,11 +36,8 @@ class MenuCharacterEditorState extends MusicBeatState
 		camEditor = initPsychCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
-		camOther = new FlxCamera();
-		camOther.bgColor.alpha = 0;
 
 		FlxG.cameras.add(camHUD, false);
-		FlxG.cameras.add(camOther, false);
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
@@ -65,7 +57,6 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		makeOffsetUI();
 		addEditorBox();
-		makeHelpUI();
 
 		FlxG.mouse.visible = true;
 		updateCharTypeBox();
@@ -94,36 +85,6 @@ class MenuCharacterEditorState extends MusicBeatState
 		UI_offsetPanel.add(UI_offsetLabel);
 
 		add(UI_offsetPanel);
-	}
-
-	function makeHelpUI()
-	{
-		var panelWidth = 500;
-		var panelHeight = 280;
-		var panelX = (FlxG.width - panelWidth) / 2;
-		var panelY = (FlxG.height - panelHeight) / 2;
-
-		UI_helpOverlay = new FlxSprite();
-		UI_helpOverlay.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		UI_helpOverlay.alpha = 0.3;
-		UI_helpOverlay.cameras = [camOther];
-		UI_helpOverlay.visible = false;
-		add(UI_helpOverlay);
-
-		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Menu Character Editor Help");
-		UI_help.cameras = [camOther];
-		UI_help.visible = false;
-
-		var helpText = "Arrow Keys - Change Offset (Hold Shift for 10x speed)\n\n" +
-			"Space - Play 'Start Press' animation (Boyfriend only)\n\n" +
-			"F1 - Toggle this help menu\n\n" +
-			"ESC - Exit to Editor Menu\n\n\n" +
-			"Press F1 or ESC to close";
-
-		var helpContent = new ShadowLabel(20, ShadowStyle.HEIGHT_HEADER + 15, helpText, ShadowStyle.FONT_SIZE_MD);
-		UI_help.add(helpContent);
-
-		add(UI_help);
 	}
 
 	function addEditorBox()
@@ -163,12 +124,6 @@ class MenuCharacterEditorState extends MusicBeatState
 		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
 		saveButton.cameras = [camHUD];
 		add(saveButton);
-
-		var tipText = new FlxText(FlxG.width - 100, 15, 80, "F1 - Help", ShadowStyle.FONT_SIZE_SM);
-		tipText.setFormat(null, ShadowStyle.FONT_SIZE_SM, FlxColor.WHITE, RIGHT);
-		tipText.scrollFactor.set();
-		tipText.cameras = [camHUD];
-		add(tipText);
 	}
 
 	var opponentCheckbox:ShadowCheckbox;
@@ -329,28 +284,6 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		// Handle help UI toggle
-		if (FlxG.keys.justPressed.F1)
-		{
-			showHelp = !showHelp;
-			UI_help.visible = showHelp;
-			UI_helpOverlay.visible = showHelp;
-			FlxG.mouse.enabled = !showHelp;
-		}
-
-		// If help is open, only allow closing it
-		if (showHelp)
-		{
-			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
-			{
-				showHelp = false;
-				UI_help.visible = false;
-				UI_helpOverlay.visible = false;
-				FlxG.mouse.enabled = true;
-			}
-			super.update(elapsed);
-			return;
-		}
 
 		var blockInput:Bool = false;
 		for (inputText in blockPressWhileTypingOn)

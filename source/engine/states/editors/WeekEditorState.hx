@@ -106,7 +106,7 @@ class WeekEditorState extends MusicBeatState
 	function addEditorBox()
 	{
 		var tabs:Array<TabDef> = [{name: 'Week', label: 'Week'}, {name: 'Other', label: 'Other'}];
-		UI_box = new ShadowTabMenu(FlxG.width - 260, FlxG.height - 385, tabs, 250, 375);
+		UI_box = new ShadowTabMenu(FlxG.width - 260, FlxG.height - 395, tabs, 250, 385);
 		UI_box.scrollFactor.set();
 
 		addWeekUI();

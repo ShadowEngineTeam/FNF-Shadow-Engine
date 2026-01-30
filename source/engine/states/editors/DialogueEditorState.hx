@@ -107,10 +107,8 @@ class DialogueEditorState extends MusicBeatState
 		var margin = ShadowStyle.SPACING_LG;
 		var panelWidth = 350;
 		var panelHeight = 320;
-		var panelX = margin;
-		var panelY = margin * 5;
 
-		UI_box = new ShadowTabMenu(panelX, panelY, tabs, panelWidth, panelHeight);
+		UI_box = new ShadowTabMenu(12, 103, tabs, panelWidth, panelHeight);
 		UI_box.scrollFactor.set();
 		addDialogueLineUI();
 		add(UI_box);

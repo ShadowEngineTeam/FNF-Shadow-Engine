@@ -80,7 +80,7 @@ class ShadowPanel extends FlxSpriteGroup
 		var rightX = bg.x + (_width - _headerRightPad - ShadowStyle.SIZE_HEADER_BTN);
 
 		if (showMinimizeButton)
-			minimizeBtn.x += rightX;
+			minimizeBtn.x = rightX;
 		else
 			minimizeBtn.x += 0;
 
@@ -231,6 +231,7 @@ class ShadowPanel extends FlxSpriteGroup
 			}
 			else
 			{
+				trace('ShadowPanel drag ended at (' + Std.string(this.x) + ', ' + Std.string(this.y) + ')');
 				_dragging = false;
 				_pressing = false;
 			}

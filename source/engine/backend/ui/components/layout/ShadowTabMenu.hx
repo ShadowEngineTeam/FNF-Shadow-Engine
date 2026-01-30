@@ -385,6 +385,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 			}
 			else
 			{
+				trace('ShadowTabMenu drag ended at (' + Std.string(this.x) + ', ' + Std.string(this.y) + ')');
 				_dragging = false;
 				_pressing = false;
 				_pressTabIndex = -1;
