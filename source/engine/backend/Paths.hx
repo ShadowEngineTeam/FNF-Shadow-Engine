@@ -1,5 +1,6 @@
 package backend;
 
+import lime.media.AudioBuffer;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
@@ -283,7 +284,7 @@ class Paths
 		if (bitmap == null)
 		{
 			if (FileSystem.exists(file))
-				bitmap = BitmapData.fromFile(file);
+				bitmap = BitmapData.fromBytes(File.getBytes(file));
 			else
 			{
 				if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
@@ -478,7 +479,7 @@ class Paths
 		{
 			if (!currentTrackedSounds.exists(file))
 			{
-				currentTrackedSounds.set(file, Sound.fromFile(file));
+				currentTrackedSounds.set(file, Sound.fromAudioBuffer(AudioBuffer.fromBytes(File.getBytes(file))));
 				// trace('precached mod sound: $file');
 			}
 			localTrackedAssets.push(file);

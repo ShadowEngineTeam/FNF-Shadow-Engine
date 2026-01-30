@@ -18,6 +18,7 @@ import sys.FileStat;
 #include <jni.h>
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
+#include <unistd.h>
 
 static jmethodID midGetContext;
 static jclass mActivityClass;
@@ -126,7 +127,6 @@ bool Assets_obj::native_exists(::String path)
         return true;
     }
 
-	hx::EnterGCFreeZone();
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
 	if (AAssetDir_getNextFileName(dir) != NULL)
 	{
@@ -134,6 +134,12 @@ bool Assets_obj::native_exists(::String path)
 		hx::ExitGCFreeZone();
         return true;
     }
+
+	if (file)
+        AAsset_close(file);
+
+	if (dir)
+        AAssetDir_close(dir);
 
 	return false;
 }
@@ -179,23 +185,41 @@ Array<unsigned char> Assets_obj::native_getBytes(::String file) {
 		return null(); 
 	}
 
-	int len = AAsset_getLength(asset);
-	Array<unsigned char> buffer = Array_obj<unsigned char>::__new(len, len);
+	int fd;
+	off_t outStart;
+	off_t outLength;
+	fd = AAsset_openFileDescriptor (asset, &outStart, &outLength);
 
-	if (len > 0)
-	{
-		const int chunkSize = 8192;
-		int bytesRead = 0;
-		while (bytesRead < len)
-		{
-			int toRead = (len - bytesRead > chunkSize) ? chunkSize : (len - bytesRead);
-			int result = AAsset_read(asset, buffer->getBase() + bytesRead, toRead);
-			if (result <= 0)
-				break;
-			bytesRead += result;
-		}
-	}
-	
+	if (fd < 0) {
+		AAsset_close(asset);
+		hx::ExitGCFreeZone();
+        return null();
+    }
+
+	Array<unsigned char> buffer = Array_obj<unsigned char>::__new(outLength, outLength);
+
+	if (lseek(fd, outStart, SEEK_SET) == -1) {
+        close(fd);
+		AAsset_close(asset);
+		hx::ExitGCFreeZone();
+        return null();
+    }
+
+	int totalRead = 0;
+    while (totalRead < outLength) {
+        int bytesRead = read(fd, buffer->getBase() + totalRead, outLength - totalRead);
+
+        if (bytesRead <= 0) {
+            close(fd);
+			AAsset_close(asset);
+			hx::ExitGCFreeZone();
+	        return null();
+        }
+		
+        totalRead += bytesRead;
+    }
+
+    close(fd);
 	AAsset_close(asset);
 	hx::ExitGCFreeZone();
 	return buffer;
@@ -206,13 +230,17 @@ bool Assets_obj::native_isDirectory(::String path)
 	hx::EnterGCFreeZone();
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
 
-	if (AAssetDir_getNextFileName(dir) != NULL)
+	if (dir && AAssetDir_getNextFileName(dir) != NULL)
 	{
 		AAssetDir_close(dir);
 		hx::ExitGCFreeZone();
 		return true;
 	}
 
+	if (dir)
+		AAssetDir_close(dir);
+
+	hx::ExitGCFreeZone();
 	return false;
 }
 
