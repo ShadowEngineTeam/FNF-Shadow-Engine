@@ -23,7 +23,8 @@ class Project extends HXProject
 	static final MAIN_CLASS:String = "backend.Main";
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
-	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows", "source/library_shadows"];
+	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "float_deltatime", "gpu_textures", "original_blend_modes"];
 
 	static final MODS_ALLOWED:CompileFlag = CompileFlag.get("MODS_ALLOWED");
 	static final HSCRIPT_ALLOWED:CompileFlag = CompileFlag.get("HSCRIPT_ALLOWED");
@@ -173,6 +174,9 @@ class Project extends HXProject
 
 		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}/';
 		app.path = buildDir;
+
+		for (shadowName in LIBRARY_SHADOWS_LIST)
+			SOURCE_FOLDERS.push('source/library_shadows/${shadowName}')
 
 		sources = SOURCE_FOLDERS;
 		templatePaths.push("templates");
