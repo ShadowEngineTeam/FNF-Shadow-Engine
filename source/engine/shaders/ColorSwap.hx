@@ -47,6 +47,9 @@ class ColorSwapShader extends FlxShader
 		uniform vec2 openfl_TextureSize;
 		uniform sampler2D bitmap;
 
+		// remove this if #version 100
+		out vec4 openfl_FragColor;
+
 		uniform bool hasTransform;
 		uniform bool hasColorTransform;
 		uniform bool isTexture;
