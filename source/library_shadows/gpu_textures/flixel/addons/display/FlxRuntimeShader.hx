@@ -42,8 +42,8 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	// These variables got copied from openfl.display.GraphicsShader
 	// and from flixel.graphics.tile.FlxGraphicsShader.
 
-    static final pragmaHeaderKeyword:EReg = ~/^[ \t]*#pragma[ \t]+header[ \t]*$/gm;
-    static final pragmaBodyKeyword:EReg = ~/^[ \t]*#pragma[ \t]+body[ \t]*$/gm;
+    static final pragmaHeaderKeyword:EReg = ~/^[ \t]*#pragma[ \t]+header[ \t]*\r?$/m;
+	static final pragmaBodyKeyword:EReg = ~/^[ \t]*#pragma[ \t]+body[ \t]*\r?$/m;
     static final attributeKeyword:EReg = ~/\battribute\s+([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
     static final varyingKeyword:EReg = ~/\bvarying\s+(?:lowp|mediump|highp\s+)?([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
     static final texture2DKeyword:EReg = ~/\btexture2D\b/g;

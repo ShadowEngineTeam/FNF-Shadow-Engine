@@ -488,7 +488,14 @@ class Shader
 		if (failingLine != null) message = '\nFailed to simplify log:"$failingLine"\n$infoLog\n$source';
 
 		var typeName = (type == __context.gl.VERTEX_SHADER) ? "vertex" : "fragment";
-		if (isError) #if !macro openfl.Lib.application.window.alert('Error compiling $typeName shader $message', 'Shader Compile Error!') #else Log.error('Error compiling $typeName shader $message') #end;
+		if (isError)
+		{
+			#if !macro
+			backend.CoolUtil.showPopUp('Error compiling $typeName shader $message\n\nSource:\n$source', 'Shader Compile Error!');
+			#else
+			Log.error('Error compiling $typeName shader $message\n\nSource:\n$source');
+			#end
+		}
 		else
 			Log.debug('Info compiling $typeName shader $message');
 	}
