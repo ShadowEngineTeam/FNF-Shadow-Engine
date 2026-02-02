@@ -22,8 +22,8 @@ Ready to be source-modded.
 - Uses [ANGLE](https://github.com/google/angle) to run Shadow Engine inside [Vulkan](https://en.wikipedia.org/wiki/Vulkan)<br>(Also possibly fixing black boxes in low end? ([with a hack](https://github.com/FNF-SE/angle-build-modified/blob/main/patches/0001-Bend-ANGLE-rules-for-MAX_TEXTURE_SIZE-unconditionally.patch)))
 - Uses some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (R.I.P.)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine)
 - Modcharting Support (see [FNF-Modcharting-Tools](https://github.com/FNF-SE/FNF-Modcharting-Tools))<br>[SIDE NOTE: it's disabled by default, enable it in `Project.xml`.]
-- Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) to [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
-- Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) to [`hxvlc`](https://github.com/FNF-SE/hxvlc) for better customizability in video cutscenes
+- Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) with [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
+- Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) with [`hxvlc`](https://github.com/FNF-SE/hxvlc) for better customizability in video cutscenes
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
