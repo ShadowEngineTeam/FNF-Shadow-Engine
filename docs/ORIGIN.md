@@ -5,7 +5,7 @@ For a while, it was just a modified PE build, until I started shadowing OpenFL a
 Time passed, and I eventually decided to make the engine public. I thought the name was kind of lame or cringy at first, but it stuck and people in my Discord server actually liked it, which motivated me to keep fixing bugs and improving it.  
 
 After two or three days of development, a couple of people came up with an idea for the icon (accidentally), and it was hilarious but it just fit.  
-![](.images/iconorigin.png)
+![](./images/iconorigin.png)
 
 I couldn’t believe how well the name and icon matched in the end.
 Huge thanks to;
