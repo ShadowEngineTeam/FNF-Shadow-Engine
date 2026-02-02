@@ -406,7 +406,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 			}
 		}
 
-		if (FlxG.mouse.justPressed)
+		if (FlxG.mouse.justReleased)
 		{
 			if (overMinimizeBtn)
 			{
@@ -414,7 +414,10 @@ class ShadowTabMenu extends FlxSpriteGroup
 				ShadowStyle.setFocus(this);
 				return;
 			}
+		}
 
+		if (FlxG.mouse.justPressed)
+		{
 			if (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen())
 				return;
 

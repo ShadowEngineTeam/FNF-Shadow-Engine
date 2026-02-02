@@ -251,7 +251,7 @@ class ShadowPanel extends FlxSpriteGroup
 			}
 		}
 
-		if (FlxG.mouse.justPressed)
+		if (FlxG.mouse.justReleased)
 		{
 			if (overMinimizeBtn)
 			{
@@ -259,7 +259,10 @@ class ShadowPanel extends FlxSpriteGroup
 				ShadowStyle.setFocus(this);
 				return;
 			}
+		}
 
+		if (FlxG.mouse.justPressed)
+		{
 			if (inHeader)
 			{
 				_pressing = true;
