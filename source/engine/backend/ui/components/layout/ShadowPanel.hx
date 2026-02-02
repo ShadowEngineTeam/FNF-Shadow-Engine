@@ -78,13 +78,13 @@ class ShadowPanel extends FlxSpriteGroup
 
 	inline function headerButtonsWidth():Int
 	{
-		if (!showMinimizeButton) return 0;
+		if (!showMinimizeButton)
+			return 0;
 		return ShadowStyle.SIZE_HEADER_BTN + _headerRightPad;
 	}
 
 	function updateHeaderLayout()
 	{
-
 		var rightX = bg.x + (_width - _headerRightPad - ShadowStyle.SIZE_HEADER_BTN);
 
 		if (showMinimizeButton)
@@ -96,7 +96,8 @@ class ShadowPanel extends FlxSpriteGroup
 
 		var reservedRight = headerButtonsWidth();
 		titleText.fieldWidth = _width - ShadowStyle.SPACING_SM * 2 - reservedRight;
-		if (titleText.fieldWidth < 10) titleText.fieldWidth = 10;
+		if (titleText.fieldWidth < 10)
+			titleText.fieldWidth = 10;
 	}
 
 	function drawHeaderBar()
@@ -235,7 +236,7 @@ class ShadowPanel extends FlxSpriteGroup
 				collapsed = !collapsed;
 			_wantsMinimizeToggle = false;
 		}
-		
+
 		if (_dragging)
 		{
 			if (FlxG.mouse.pressed && ShadowStyle.hasFocus(this))

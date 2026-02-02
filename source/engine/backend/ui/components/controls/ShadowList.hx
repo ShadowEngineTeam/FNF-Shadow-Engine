@@ -132,7 +132,7 @@ class ShadowList extends FlxSpriteGroup
 
 			refreshDisplay();
 		}
-		
+
 		mousePos.put();
 		#end
 	}

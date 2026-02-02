@@ -124,28 +124,34 @@ class ShadowTabMenu extends FlxSpriteGroup
 		var reservedRight = headerButtonsWidth();
 
 		_tabAreaWidth = _width - reservedRight;
-		if (_tabAreaWidth < 0) _tabAreaWidth = 0;
+		if (_tabAreaWidth < 0)
+			_tabAreaWidth = 0;
 
 		if (tabs.length <= 1)
 		{
 			_tabWidth = _tabAreaWidth;
-			if (_tabWidth < 1) _tabWidth = 1;
+			if (_tabWidth < 1)
+				_tabWidth = 1;
 			return;
 		}
 
 		_tabWidth = Std.int(_tabAreaWidth / tabs.length);
-		if (_tabWidth < 1) _tabWidth = 1;
+		if (_tabWidth < 1)
+			_tabWidth = 1;
 	}
 
 	inline function tabButtonWidth(index:Int):Int
 	{
-		if (tabs.length <= 0) return _tabAreaWidth;
+		if (tabs.length <= 0)
+			return _tabAreaWidth;
+
 		if (index == tabs.length - 1)
 		{
 			var used = index * _tabWidth;
 			var rem = _tabAreaWidth - used;
 			return (rem > 0) ? rem : _tabWidth;
 		}
+
 		return _tabWidth;
 	}
 
