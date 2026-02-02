@@ -32,6 +32,7 @@ class ShadowPanel extends FlxSpriteGroup
 	var _pressStartY:Float = 0;
 
 	var _minimizeBtnHover:Bool = false;
+	var _wantsMinimizeToggle:Bool = false;
 
 	var _headerRightPad:Int = 3;
 
@@ -66,6 +67,13 @@ class ShadowPanel extends FlxSpriteGroup
 		add(bg);
 
 		updateHeaderLayout();
+	}
+
+	override public function destroy():Void
+	{
+		if (ShadowStyle.hasFocus(this))
+			ShadowStyle.clearFocus();
+		super.destroy();
 	}
 
 	inline function headerButtonsWidth():Int
@@ -221,9 +229,16 @@ class ShadowPanel extends FlxSpriteGroup
 		var headerBottom = this.y + ShadowStyle.HEIGHT_HEADER;
 		var inHeader = mx >= headerLeft && mx <= headerRight && my >= headerTop && my <= headerBottom;
 
+		if (_wantsMinimizeToggle)
+		{
+			if (ShadowStyle.hasFocus(this))
+				collapsed = !collapsed;
+			_wantsMinimizeToggle = false;
+		}
+		
 		if (_dragging)
 		{
-			if (FlxG.mouse.pressed)
+			if (FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 			{
 				this.x = mx - _dragOffsetX;
 				this.y = my - _dragOffsetY;
@@ -240,7 +255,8 @@ class ShadowPanel extends FlxSpriteGroup
 		{
 			if (overMinimizeBtn)
 			{
-				collapsed = !collapsed;
+				_wantsMinimizeToggle = true;
+				ShadowStyle.setFocus(this);
 				return;
 			}
 
@@ -249,10 +265,12 @@ class ShadowPanel extends FlxSpriteGroup
 				_pressing = true;
 				_pressStartX = mx;
 				_pressStartY = my;
+				ShadowStyle.setFocus(this);
 			}
 		}
 
-		if (_pressing && !_dragging && FlxG.mouse.pressed)
+		// Only start dragging if we have focus
+		if (_pressing && !_dragging && FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 		{
 			var dx = mx - _pressStartX;
 			var dy = my - _pressStartY;

@@ -1,10 +1,34 @@
 package backend.ui;
 
+import flixel.FlxG;
+import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import backend.ClientPrefs;
 
 class ShadowStyle
 {
+	private static var _focusedPanel:FlxSpriteGroup = null;
+
+	public static function setFocus(panel:FlxSpriteGroup):Void
+	{
+		_focusedPanel = panel;
+	}
+
+	public static function hasFocus(panel:FlxSpriteGroup):Bool
+	{
+		return _focusedPanel == panel;
+	}
+
+	public static function clearFocus():Void
+	{
+		_focusedPanel = null;
+	}
+
+	public static function getFocusedPanel():FlxSpriteGroup
+	{
+		return _focusedPanel;
+	}
+
 	public static var antialiasing(get, never):Bool;
 
 	static function get_antialiasing():Bool

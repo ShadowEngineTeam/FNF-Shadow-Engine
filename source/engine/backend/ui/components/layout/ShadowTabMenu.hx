@@ -52,6 +52,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 	var _pressTabIndex:Int = -1;
 
 	var _minimizeBtnHover:Bool = false;
+	var _wantsMinimizeToggle:Bool = false;
 
 	public function new(x:Float, y:Float, tabDefs:Array<TabDef>, width:Int = 400, height:Int = 300)
 	{
@@ -102,6 +103,13 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		selectedTab = _selectedTab;
 		_initialized = true;
+	}
+
+	override public function destroy():Void
+	{
+		if (ShadowStyle.hasFocus(this))
+			ShadowStyle.clearFocus();
+		super.destroy();
 	}
 
 	inline function headerButtonsWidth():Int
@@ -375,9 +383,16 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		var inTabBar = FlxG.mouse.overlaps(tabBar, camera) && !overMinimizeBtn;
 
+		if (_wantsMinimizeToggle)
+		{
+			if (ShadowStyle.hasFocus(this))
+				collapsed = !collapsed;
+			_wantsMinimizeToggle = false;
+		}
+
 		if (_dragging)
 		{
-			if (FlxG.mouse.pressed)
+			if (FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 			{
 				this.x = mx - _dragOffsetX;
 				this.y = my - _dragOffsetY;
@@ -395,7 +410,8 @@ class ShadowTabMenu extends FlxSpriteGroup
 		{
 			if (overMinimizeBtn)
 			{
-				collapsed = !collapsed;
+				_wantsMinimizeToggle = true;
+				ShadowStyle.setFocus(this);
 				return;
 			}
 
@@ -409,6 +425,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 			if (inTabBar)
 			{
+				ShadowStyle.setFocus(this);
 				for (i in 0...tabButtons.length)
 				{
 					var btn = tabButtons[i];
@@ -422,7 +439,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 			}
 		}
 
-		if (_pressing && !_dragging && FlxG.mouse.pressed)
+		if (_pressing && !_dragging && FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 		{
 			var dx = mx - _pressStartX;
 			var dy = my - _pressStartY;
@@ -437,7 +454,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		if (_pressing && FlxG.mouse.justReleased)
 		{
-			if (!_dragging && _pressTabIndex != -1)
+			if (!_dragging && _pressTabIndex != -1 && ShadowStyle.hasFocus(this))
 			{
 				if (_pressTabIndex != _selectedTab)
 				{
