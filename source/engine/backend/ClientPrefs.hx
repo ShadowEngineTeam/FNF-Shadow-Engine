@@ -305,8 +305,8 @@ class ClientPrefs
 
 	public static function toggleVolumeKeys(?turnOn:Bool = true)
 	{
-		FlxG.sound.muteKeys = turnOn ? TitleState.muteKeys : [];
-		FlxG.sound.volumeDownKeys = turnOn ? TitleState.volumeDownKeys : [];
-		FlxG.sound.volumeUpKeys = turnOn ? TitleState.volumeUpKeys : [];
+		FlxG.sound.muteKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.muteKeys : [];
+		FlxG.sound.volumeDownKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeDownKeys : [];
+		FlxG.sound.volumeUpKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeUpKeys : [];
 	}
 }

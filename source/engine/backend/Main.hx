@@ -151,12 +151,14 @@ class Main extends Sprite
 		#end
 
 		#if android
-		FlxG.android.preventDefaultKeys = [BACK];
+		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
 		#end
 
 		#if native
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
+
+		FlxSprite.defaultAntialiasing = true;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
