@@ -373,15 +373,15 @@ class ShadowTabMenu extends FlxSpriteGroup
 		var mx = FlxG.mouse.screenX;
 		var my = FlxG.mouse.screenY;
 
-		var overMinimizeBtn = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
+		var justReleased = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
 
-		if (overMinimizeBtn != _minimizeBtnHover)
+		if (justReleased != _minimizeBtnHover)
 		{
-			_minimizeBtnHover = overMinimizeBtn;
+			_minimizeBtnHover = justReleased;
 			drawMinimizeButton(_minimizeBtnHover);
 		}
 
-		var inTabBar = FlxG.mouse.overlaps(tabBar, camera) && !overMinimizeBtn;
+		var inTabBar = FlxG.mouse.overlaps(tabBar, camera) && !justReleased;
 
 		if (_wantsMinimizeToggle)
 		{
@@ -408,7 +408,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		if (FlxG.mouse.justPressed)
 		{
-			if (overMinimizeBtn)
+			if (justReleased)
 			{
 				_wantsMinimizeToggle = true;
 				ShadowStyle.setFocus(this);

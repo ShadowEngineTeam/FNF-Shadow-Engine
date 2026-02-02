@@ -215,11 +215,11 @@ class ShadowPanel extends FlxSpriteGroup
 
 		updateHeaderLayout();
 
-		var overMinimizeBtn = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
+		var justReleased = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
 
-		if (overMinimizeBtn != _minimizeBtnHover)
+		if (justReleased != _minimizeBtnHover)
 		{
-			_minimizeBtnHover = overMinimizeBtn;
+			_minimizeBtnHover = justReleased;
 			drawMinimizeButton(_minimizeBtnHover);
 		}
 
@@ -253,7 +253,7 @@ class ShadowPanel extends FlxSpriteGroup
 
 		if (FlxG.mouse.justPressed)
 		{
-			if (overMinimizeBtn)
+			if (justReleased)
 			{
 				_wantsMinimizeToggle = true;
 				ShadowStyle.setFocus(this);
