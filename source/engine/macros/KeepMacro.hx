@@ -39,11 +39,8 @@ class KeepMacro
 			"flixel.addons.text",
 			"flixel.addons.tile",
 			"flixel.addons.transition",
-			"flixel.addons.ui",
 			"flixel.addons.util",
 			"flixel.addons.weapon",
-			// FLIXEL UI
-			"flixel.addons.ui.interfaces",
 			// MOBILE
 			"mobile",
 			#if android "android", #end

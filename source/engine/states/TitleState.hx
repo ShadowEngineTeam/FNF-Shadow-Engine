@@ -12,6 +12,7 @@ import openfl.Assets;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import shaders.ColorSwap;
+import backend.ui.ShadowStyle;
 import states.StoryMenuState;
 import states.MainMenuState;
 
@@ -74,6 +75,7 @@ class TitleState extends MusicBeatState
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
 		ClientPrefs.loadPrefs();
+		ShadowStyle.applySavedTheme();
 
 		Highscore.load();
 

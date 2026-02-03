@@ -126,16 +126,16 @@ class SystemInfo extends FramerateCategory
 			#elseif linux
 			var process = new Process("lscpu", []);
 			if (process.exitCode() != 0)
-			    throw 'Could not fetch CPU information';
-			
+				throw 'Could not fetch CPU information';
+
 			for (line in process.stdout.readAll().toString().split("\n"))
 			{
-			    var trimmedLine = line.trim();
-			    if (trimmedLine.startsWith("Model name:"))
-			    {
-			        cpuName = trimmedLine.substr(trimmedLine.indexOf(":") + 1).trim();
-			        break;
-			    }
+				var trimmedLine = line.trim();
+				if (trimmedLine.startsWith("Model name:"))
+				{
+					cpuName = trimmedLine.substr(trimmedLine.indexOf(":") + 1).trim();
+					break;
+				}
 			}
 			#elseif android
 			cpuName = (VERSION.SDK_INT >= VERSION_CODES.S) ? Build.SOC_MODEL : Build.HARDWARE;

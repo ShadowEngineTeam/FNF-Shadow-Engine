@@ -1,17 +1,10 @@
 package states.editors;
 
-import flixel.FlxObject;
 import flixel.graphics.FlxGraphic;
-import flixel.animation.FlxAnimation;
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.addons.ui.*;
-import flixel.ui.FlxButton;
-import flixel.util.FlxDestroyUtil;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import openfl.utils.Assets;
-import lime.system.Clipboard;
+import flixel.FlxCamera;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
@@ -46,13 +39,20 @@ class CharacterEditorState extends MusicBeatState
 
 	var anims = null;
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
-	var curAnim = 0;
+	var curAnim:Int = 0;
 
 	private var camEditor:FlxCamera;
 	private var camHUD:FlxCamera;
+	private var camOther:FlxCamera;
 
-	var UI_box:FlxUITabMenu;
-	var UI_characterbox:FlxUITabMenu;
+	var UI_box:ShadowTabMenu;
+	var UI_characterbox:ShadowTabMenu;
+	var UI_animListPanel:ShadowPanel;
+	var UI_animList:ShadowList;
+	var UI_healthPanel:ShadowPanel;
+	var UI_healthColorRect:FlxSprite;
+	var UI_help:ShadowPanel;
+	var UI_helpOverlay:FlxSprite;
 
 	public function new(char:String = null, goToPlayState:Bool = true)
 	{
@@ -74,6 +74,11 @@ class CharacterEditorState extends MusicBeatState
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
+
+		camOther = new FlxCamera();
+		camOther.bgColor.alpha = 0;
+		camOther.visible = false;
+		FlxG.cameras.add(camOther, false);
 
 		loadBG();
 
@@ -145,7 +150,7 @@ class CharacterEditorState extends MusicBeatState
 		frameAdvanceText.cameras = [camHUD];
 		add(frameAdvanceText);
 
-		addHelpScreen();
+		// addHelpScreen(); // Replaced with makeHelpUI()
 		FlxG.mouse.visible = true;
 		FlxG.camera.zoom = 1;
 
@@ -212,7 +217,7 @@ class CharacterEditorState extends MusicBeatState
 		helpBg.active = helpBg.visible = false;
 		add(helpBg);
 
-		var arr = str.split('\n');
+		var arr:Array<String> = str.split('\n');
 		helpTexts = new FlxSpriteGroup();
 		helpTexts.cameras = [camHUD];
 		for (i in 0...arr.length)
@@ -245,7 +250,7 @@ class CharacterEditorState extends MusicBeatState
 			character.destroy();
 		}
 
-		var isPlayer = (reload ? character.isPlayer : !predictCharacterIsNotPlayer(_char));
+		var isPlayer:Bool = (reload ? character.isPlayer : !predictCharacterIsNotPlayer(_char));
 		character = new Character(0, 0, _char, isPlayer);
 		if (!reload && character.editorIsPlayer != null && isPlayer != character.editorIsPlayer)
 		{
@@ -268,26 +273,27 @@ class CharacterEditorState extends MusicBeatState
 
 	function makeUIMenu()
 	{
-		var tabs = [{name: 'Ghost', label: 'Ghost'}, {name: 'Settings', label: 'Settings'}];
+		var mainTabs:Array<TabDef> = [{name: 'Ghost', label: 'Ghost'}, {name: 'Settings', label: 'Settings'}];
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var topWidth:Int = 300;
+		var topHeight:Int = 145;
+		var bottomWidth:Int = 420;
+		var bottomHeight:Int = 365;
+		var topX:Int = FlxG.width - topWidth - margin;
+		var topY:Int = margin;
+		var bottomX:Int = FlxG.width - bottomWidth - margin;
+		var bottomY:Int = topY + topHeight + margin;
 
-		UI_box = new FlxUITabMenu(null, tabs, true);
+		UI_box = new ShadowTabMenu(topX, topY, mainTabs, topWidth, topHeight);
 		UI_box.cameras = [camHUD];
-
-		UI_box.resize(250, 120);
-		UI_box.x = FlxG.width - 275;
-		UI_box.y = 25;
 		UI_box.scrollFactor.set();
 
-		var tabs = [
+		var characterTabs:Array<TabDef> = [
 			{name: 'Character', label: 'Character'},
 			{name: 'Animations', label: 'Animations'},
 		];
-		UI_characterbox = new FlxUITabMenu(null, tabs, true);
+		UI_characterbox = new ShadowTabMenu(bottomX, bottomY, characterTabs, bottomWidth, bottomHeight);
 		UI_characterbox.cameras = [camHUD];
-
-		UI_characterbox.resize(350, 280);
-		UI_characterbox.x = UI_box.x - 100;
-		UI_characterbox.y = UI_box.y + UI_box.height;
 		UI_characterbox.scrollFactor.set();
 		add(UI_characterbox);
 		add(UI_box);
@@ -297,19 +303,35 @@ class CharacterEditorState extends MusicBeatState
 		addAnimationsUI();
 		addCharacterUI();
 
-		UI_box.selected_tab_id = 'Settings';
-		UI_characterbox.selected_tab_id = 'Character';
+		makeAnimListUI();
+		makeHealthIconUI();
+		makeHelpUI();
+
+		reloadAnimList();
+
+		UI_box.selectedTab = 1;
+		UI_characterbox.selectedTab = 0;
 	}
 
 	var ghostAlpha:Float = 0.6;
 
 	function addGhostUI()
 	{
-		var tab_group = new FlxUI(null, UI_box);
-		tab_group.name = "Ghost";
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Ghost");
+		if (tab_group == null)
+			return;
 
-		// var hideGhostButton:FlxButton = null;
-		var makeGhostButton:FlxButton = new FlxButton(25, 15, "Make Ghost", function()
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_BUTTON + rowGap;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_BUTTON - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var buttonWidth:Int = 110;
+		var stepperWidth:Int = 100;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+
+		var makeGhostButton:ShadowButton = new ShadowButton(pad, row0, "Make Ghost", function()
 		{
 			var anim = anims[curAnim];
 			if (!character.isAnimationNull())
@@ -369,21 +391,12 @@ class CharacterEditorState extends MusicBeatState
 					hideGhostButton.alpha = 1; */
 				trace('created ghost image');
 			}
-		});
+		}, buttonWidth);
 
-		/*hideGhostButton = new FlxButton(20 + makeGhostButton.width, makeGhostButton.y, "Hide Ghost", function() {
-				ghost.visible = false;
-				hideGhostButton.active = false;
-				hideGhostButton.alpha = 0.6;
-			});
-			hideGhostButton.active = false;
-			hideGhostButton.alpha = 0.6; */
-
-		var highlightGhost:FlxUICheckBox = new FlxUICheckBox(20 + makeGhostButton.x + makeGhostButton.width, makeGhostButton.y, null, null, "Highlight Ghost",
-			100);
-		highlightGhost.callback = function()
+		var highlightGhost:ShadowCheckbox = new ShadowCheckbox(makeGhostButton.x + buttonWidth + ShadowStyle.SPACING_MD, makeGhostButton.y + checkboxOffset,
+			"Highlight Ghost", false, function(checked:Bool)
 		{
-			var value = highlightGhost.checked ? 125 : 0;
+			var value:Int = checked ? 125 : 0;
 			ghost.colorTransform.redOffset = value;
 			ghost.colorTransform.greenOffset = value;
 			ghost.colorTransform.blueOffset = value;
@@ -393,54 +406,65 @@ class CharacterEditorState extends MusicBeatState
 				animateGhost.colorTransform.greenOffset = value;
 				animateGhost.colorTransform.blueOffset = value;
 			}
-		};
+		});
 
-		var ghostAlphaSlider:FlxUISlider = new FlxUISlider(this, 'ghostAlpha', 10, makeGhostButton.y + 25, 0, 1, 210, #if !hl null #else 0 #end, 5,
-			FlxColor.WHITE, FlxColor.BLACK);
-		ghostAlphaSlider.nameLabel.text = 'Opacity:';
-		ghostAlphaSlider.decimals = 2;
-		ghostAlphaSlider.callback = function(relativePos:Float)
+		var ghostAlphaLabel:ShadowLabel = new ShadowLabel(pad, row1, "Opacity:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var ghostAlphaStepper:ShadowStepper = new ShadowStepper(pad, row1 + labelOffset, 0.05, ghostAlpha, 0, 1, 2, function(value:Float)
 		{
+			ghostAlpha = value;
 			ghost.alpha = ghostAlpha;
 			if (animateGhost != null)
 				animateGhost.alpha = ghostAlpha;
-		};
-		ghostAlphaSlider.value = ghostAlpha;
+		}, stepperWidth);
 
 		tab_group.add(makeGhostButton);
-		// tab_group.add(hideGhostButton);
 		tab_group.add(highlightGhost);
-		tab_group.add(ghostAlphaSlider);
-		UI_box.addGroup(tab_group);
+		tab_group.add(ghostAlphaLabel);
+		tab_group.add(ghostAlphaStepper);
 	}
 
-	var check_player:FlxUICheckBox;
-	var charDropDown:FlxUIDropDownMenu;
+	var check_player:ShadowCheckbox;
+	var charDropDown:ShadowDropdown;
 
 	function addSettingsUI()
 	{
-		var tab_group = new FlxUI(null, UI_box);
-		tab_group.name = "Settings";
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Settings");
+		if (tab_group == null)
+			return;
 
-		check_player = new FlxUICheckBox(10, 60, null, null, "Playable Character", 100);
-		check_player.checked = character.isPlayer;
-		check_player.callback = function()
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_box.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 120;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+
+		check_player = new ShadowCheckbox(leftX, controlY1 + checkboxOffset, "Playable Character", character.isPlayer, function(checked:Bool)
 		{
-			character.isPlayer = !character.isPlayer;
-			character.flipX = !character.flipX;
+			character.isPlayer = checked;
+			character.flipX = (character.originalFlipX != character.isPlayer);
 			updateCharacterPositions();
 			updatePointerPos(false);
-		};
+		});
 
-		var reloadCharacter:FlxButton = new FlxButton(140, 20, "Reload Char", function()
+		var reloadCharacter:ShadowButton = new ShadowButton(rightX, controlY0, "Reload Char", function()
 		{
 			addCharacter(true);
 			updatePointerPos();
 			reloadCharacterOptions();
 			reloadCharacterDropDown();
-		});
+		}, rightColWidth);
 
-		var templateCharacter:FlxButton = new FlxButton(140, 50, "Load Template", function()
+		var templateCharacter:ShadowButton = new ShadowButton(rightX, controlY1, "Load Template", function()
 		{
 			final _template:CharacterFile = {
 				animations: [
@@ -471,13 +495,11 @@ class CharacterEditorState extends MusicBeatState
 			updatePointerPos();
 			reloadCharacterDropDown();
 			updateHealthBar();
-		});
-		templateCharacter.color = FlxColor.RED;
-		templateCharacter.label.color = FlxColor.WHITE;
+		}, rightColWidth);
 
-		charDropDown = new FlxUIDropDownMenu(10, 30, FlxUIDropDownMenu.makeStrIdLabelArray([''], true), function(index:String)
+		charDropDown = new ShadowDropdown(leftX, controlY0, [''], function(index:Int)
 		{
-			var intended = characterList[Std.parseInt(index)];
+			var intended:String = characterList[index];
 			if (intended == null || intended.length < 1)
 				return;
 
@@ -486,7 +508,6 @@ class CharacterEditorState extends MusicBeatState
 			if (FileSystem.exists(path))
 			{
 				_char = intended;
-				check_player.checked = character.isPlayer;
 				addCharacter();
 				reloadCharacterOptions();
 				reloadCharacterDropDown();
@@ -497,42 +518,71 @@ class CharacterEditorState extends MusicBeatState
 				reloadCharacterDropDown();
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 			}
-		});
+		}, leftW);
 		reloadCharacterDropDown();
-		charDropDown.selectedLabel = _char;
 
-		tab_group.add(new FlxText(charDropDown.x, charDropDown.y - 18, 0, 'Character:'));
+		tab_group.add(new ShadowLabel(leftX, row0, "Character:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		tab_group.add(check_player);
 		tab_group.add(reloadCharacter);
 		tab_group.add(templateCharacter);
 		tab_group.add(charDropDown);
-		UI_box.addGroup(tab_group);
 	}
 
-	var animationDropDown:FlxUIDropDownMenu;
-	var animationInputText:FlxUIInputText;
-	var animationFrameLabelCheckBox:FlxUICheckBox;
-	var animationNameInputText:FlxUIInputText;
-	var animationIndicesInputText:FlxUIInputText;
-	var animationFramerate:FlxUINumericStepper;
-	var animationLoopCheckBox:FlxUICheckBox;
+	var animationDropDown:ShadowDropdown;
+	var animationInputText:ShadowTextInput;
+	var animationFrameLabelCheckBox:ShadowCheckbox;
+	var animationNameInputText:ShadowTextInput;
+	var animationIndicesInputText:ShadowTextInput;
+	var animationFramerate:ShadowStepper;
+	var animationLoopCheckBox:ShadowCheckbox;
+	var animationInfoLabel:ShadowLabel;
 
 	function addAnimationsUI()
 	{
-		var tab_group = new FlxUI(null, UI_box);
-		tab_group.name = "Animations";
+		var tab_group:FlxSpriteGroup = UI_characterbox.getTabGroup("Animations");
+		if (tab_group == null)
+			return;
 
-		animationInputText = new FlxUIInputText(15, 85, 80, '', 8);
-		animationFrameLabelCheckBox = new FlxUICheckBox(15 + 170, animationInputText.y - 55, null, null, "Frame Label (Textuer Atlas):", 200);
-		animationNameInputText = new FlxUIInputText(animationInputText.x, animationInputText.y + 35, 150, '', 8);
-		animationIndicesInputText = new FlxUIInputText(animationNameInputText.x, animationNameInputText.y + 40, 250, '', 8);
-		animationFramerate = new FlxUINumericStepper(animationInputText.x + 170, animationInputText.y, 1, 24, 0, 240, 0);
-		animationLoopCheckBox = new FlxUICheckBox(animationNameInputText.x + 170, animationNameInputText.y - 1, null, null, "Should it Loop?", 100);
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_characterbox.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 180;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var fullW:Int = panelWidth - pad * 2;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var row2:Int = row1 + rowStep;
+		var row3:Int = row2 + rowStep;
+		var row4:Int = row3 + rowStep;
+		var row5:Int = row4 + rowStep;
+		var row6:Int = row5 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var controlY2:Int = row2 + labelOffset;
+		var controlY3:Int = row3 + labelOffset;
+		var controlY4:Int = row4 + labelOffset;
+		var controlY5:Int = row5 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var buttonWidth:Int = 120;
+		var buttonGap:Int = ShadowStyle.SPACING_SM;
 
-		animationDropDown = new FlxUIDropDownMenu(15, animationInputText.y - 55, FlxUIDropDownMenu.makeStrIdLabelArray([''], true), function(pressed:String)
+		animationInputText = new ShadowTextInput(leftX, controlY1, leftW, "");
+		animationFrameLabelCheckBox = new ShadowCheckbox(rightX, controlY0 + checkboxOffset, "Frame Label (Textuer Atlas)");
+		animationNameInputText = new ShadowTextInput(leftX, controlY2, leftW, "");
+		animationIndicesInputText = new ShadowTextInput(leftX, controlY3, fullW, "");
+		animationFramerate = new ShadowStepper(leftX, controlY4, 1, 24, 0, 240, 0, null, 70);
+		animationLoopCheckBox = new ShadowCheckbox(rightX, controlY4 + checkboxOffset, "Should it Loop?");
+
+		animationDropDown = new ShadowDropdown(leftX, controlY0, [''], function(index:Int)
 		{
-			var selectedAnimation:Int = Std.parseInt(pressed);
-			var anim:AnimArray = character.animationsArray[selectedAnimation];
+			var anim:AnimArray = character.animationsArray[index];
+			if (anim == null)
+				return;
 			animationInputText.text = anim.anim;
 			animationFrameLabelCheckBox.checked = anim.isFrameLabel;
 			animationNameInputText.text = anim.name;
@@ -541,9 +591,9 @@ class CharacterEditorState extends MusicBeatState
 
 			var indicesStr:String = anim.indices.toString();
 			animationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
-		});
+		}, leftW);
 
-		var addUpdateButton:FlxButton = new FlxButton(70, animationIndicesInputText.y + 60, "Add/Update", function()
+		var addUpdateButton:ShadowButton = new ShadowButton(leftX, controlY5, "Add/Update", function()
 		{
 			var indices:Array<Int> = [];
 			var indicesStr:Array<String> = animationIndicesInputText.text.trim().split(',');
@@ -583,9 +633,9 @@ class CharacterEditorState extends MusicBeatState
 			@:arrayAccess curAnim = Std.int(Math.max(0, character.animationsArray.indexOf(addedAnim)));
 			character.playAnim(addedAnim.anim, true);
 			trace('Added/Updated animation: ' + animationInputText.text);
-		});
+		}, buttonWidth);
 
-		var removeButton:FlxButton = new FlxButton(180, animationIndicesInputText.y + 60, "Remove", function()
+		var removeButton:ShadowButton = new ShadowButton(leftX + buttonWidth + buttonGap, controlY5, "Remove", function()
 		{
 			for (anim in character.animationsArray)
 				if (animationInputText.text == anim.anim)
@@ -610,15 +660,14 @@ class CharacterEditorState extends MusicBeatState
 					trace('Removed animation: ' + animationInputText.text);
 					break;
 				}
-		});
+		}, buttonWidth);
 		reloadAnimList();
-		animationDropDown.selectedLabel = anims[0] != null ? anims[0].anim : '';
 
-		tab_group.add(new FlxText(animationDropDown.x, animationDropDown.y - 18, 0, 'Animations:'));
-		tab_group.add(new FlxText(animationInputText.x, animationInputText.y - 18, 0, 'Animation name:'));
-		tab_group.add(new FlxText(animationFramerate.x, animationFramerate.y - 18, 0, 'Framerate:'));
-		tab_group.add(new FlxText(animationNameInputText.x, animationNameInputText.y - 18, 0, 'Animation Symbol Name/Tag:'));
-		tab_group.add(new FlxText(animationIndicesInputText.x, animationIndicesInputText.y - 18, 0, 'ADVANCED - Animation Indices:'));
+		tab_group.add(new ShadowLabel(leftX, row0, "Animations:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row1, "Animation name:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row2, "Animation Symbol Name/Tag:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row3, "ADVANCED - Animation Indices:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row4, "Framerate:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 
 		tab_group.add(animationInputText);
 		tab_group.add(animationFrameLabelCheckBox);
@@ -629,106 +678,185 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(addUpdateButton);
 		tab_group.add(removeButton);
 		tab_group.add(animationDropDown);
-		UI_characterbox.addGroup(tab_group);
+		animationInfoLabel = new ShadowLabel(leftX, row6, "Animation: None | Offset: (0, 0)", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY, fullW);
+		tab_group.add(animationInfoLabel);
+		updateAnimationInfo();
 	}
 
-	var imageInputText:FlxUIInputText;
-	var healthIconInputText:FlxUIInputText;
-	var vocalsInputText:FlxUIInputText;
+	var imageInputText:ShadowTextInput;
+	var healthIconInputText:ShadowTextInput;
+	var vocalsInputText:ShadowTextInput;
 
-	var singDurationStepper:FlxUINumericStepper;
-	var scaleStepper:FlxUINumericStepper;
-	var positionXStepper:FlxUINumericStepper;
-	var positionYStepper:FlxUINumericStepper;
-	var positionCameraXStepper:FlxUINumericStepper;
-	var positionCameraYStepper:FlxUINumericStepper;
+	var singDurationStepper:ShadowStepper;
+	var scaleStepper:ShadowStepper;
+	var positionXStepper:ShadowStepper;
+	var positionYStepper:ShadowStepper;
+	var positionCameraXStepper:ShadowStepper;
+	var positionCameraYStepper:ShadowStepper;
 
-	var flipXCheckBox:FlxUICheckBox;
-	var noAntialiasingCheckBox:FlxUICheckBox;
+	var flipXCheckBox:ShadowCheckbox;
+	var noAntialiasingCheckBox:ShadowCheckbox;
 
-	var healthColorStepperR:FlxUINumericStepper;
-	var healthColorStepperG:FlxUINumericStepper;
-	var healthColorStepperB:FlxUINumericStepper;
+	var healthColorStepperR:ShadowStepper;
+	var healthColorStepperG:ShadowStepper;
+	var healthColorStepperB:ShadowStepper;
 
 	function addCharacterUI()
 	{
-		var tab_group = new FlxUI(null, UI_box);
-		tab_group.name = "Character";
+		var tab_group:FlxSpriteGroup = UI_characterbox.getTabGroup("Character");
+		if (tab_group == null)
+			return;
 
-		imageInputText = new FlxUIInputText(15, 30, 200, character.imageFile, 8);
-		var reloadImage:FlxButton = new FlxButton(imageInputText.x + 210, imageInputText.y - 3, "Reload Image", function()
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_characterbox.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 140;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var row2:Int = row1 + rowStep;
+		var row3:Int = row2 + rowStep;
+		var row4:Int = row3 + rowStep;
+		var row5:Int = row4 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var controlY2:Int = row2 + labelOffset;
+		var controlY3:Int = row3 + labelOffset;
+		var controlY4:Int = row4 + labelOffset;
+		var controlY5:Int = row5 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var leftStepperWidth:Int = 70;
+		var rightStepperGap:Int = ShadowStyle.SPACING_SM;
+		var rightStepperWidth:Int = Std.int((rightColWidth - rightStepperGap) / 2);
+		var colorStepperWidth:Int = 55;
+		var colorGap:Int = ShadowStyle.SPACING_SM;
+
+		imageInputText = new ShadowTextInput(leftX, controlY0, leftW, character.imageFile, function(text:String)
 		{
-			var lastAnim = character.getAnimationName();
+			character.imageFile = text;
+		});
+		var reloadImage:ShadowButton = new ShadowButton(rightX, controlY0, "Reload Image", function()
+		{
+			var lastAnim:String = character.getAnimationName();
 			character.imageFile = imageInputText.text;
 			reloadCharacterImage();
 			if (!character.isAnimationNull())
 			{
 				character.playAnim(lastAnim, true);
 			}
-		});
+		}, rightColWidth);
 
-		var decideIconColor:FlxButton = new FlxButton(reloadImage.x, reloadImage.y + 30, "Get Icon Color", function()
+		var decideIconColor:ShadowButton = new ShadowButton(rightX, controlY1, "Get Icon Color", function()
 		{
 			var coolColor:FlxColor = FlxColor.fromInt(CoolUtil.dominantColor(healthIcon));
 			character.healthColorArray[0] = coolColor.red;
 			character.healthColorArray[1] = coolColor.green;
 			character.healthColorArray[2] = coolColor.blue;
 			updateHealthBar();
+		}, rightColWidth);
+
+		healthIconInputText = new ShadowTextInput(leftX, controlY1, leftW, healthIcon.getCharacter(), function(text:String)
+		{
+			var lastIcon:String = healthIcon.getCharacter();
+			healthIcon.changeIcon(text);
+			character.healthIcon = text;
+			if (lastIcon != healthIcon.getCharacter())
+				updatePresence();
 		});
 
-		healthIconInputText = new FlxUIInputText(15, imageInputText.y + 35, 75, healthIcon.getCharacter(), 8);
-
-		vocalsInputText = new FlxUIInputText(15, healthIconInputText.y + 35, 75, character.vocalsFile != null ? character.vocalsFile : '', 8);
-
-		singDurationStepper = new FlxUINumericStepper(15, vocalsInputText.y + 45, 0.1, 4, 0, 999, 1);
-
-		scaleStepper = new FlxUINumericStepper(15, singDurationStepper.y + 40, 0.1, 1, 0.05, 10, 1);
-
-		flipXCheckBox = new FlxUICheckBox(singDurationStepper.x + 80, singDurationStepper.y, null, null, "Flip X", 50);
-		flipXCheckBox.checked = character.flipX;
-		if (character.isPlayer)
-			flipXCheckBox.checked = !flipXCheckBox.checked;
-		flipXCheckBox.callback = function()
+		vocalsInputText = new ShadowTextInput(leftX, controlY2, leftW, character.vocalsFile != null ? character.vocalsFile : '', function(text:String)
 		{
-			character.originalFlipX = !character.originalFlipX;
-			character.flipX = (character.originalFlipX != character.isPlayer);
-		};
+			character.vocalsFile = text;
+		});
 
-		noAntialiasingCheckBox = new FlxUICheckBox(flipXCheckBox.x, flipXCheckBox.y + 40, null, null, "No Antialiasing", 80);
-		noAntialiasingCheckBox.checked = character.noAntialiasing;
-		noAntialiasingCheckBox.callback = function()
+		singDurationStepper = new ShadowStepper(leftX, controlY3, 0.1, 4, 0, 999, 1, function(value:Float)
 		{
-			character.antialiasing = false;
-			if (!noAntialiasingCheckBox.checked && ClientPrefs.data.antialiasing)
+			character.singDuration = value;
+		}, leftStepperWidth);
+
+		scaleStepper = new ShadowStepper(leftX, controlY4, 0.1, 1, 0.05, 10, 1, function(value:Float)
+		{
+			reloadCharacterImage();
+			character.jsonScale = value;
+			character.scale.set(character.jsonScale, character.jsonScale);
+			character.updateHitbox();
+			updatePointerPos(false);
+		}, leftStepperWidth);
+
+		flipXCheckBox = new ShadowCheckbox(leftX + leftStepperWidth + colGap, controlY3 + checkboxOffset, "Flip X", character.originalFlipX,
+			function(checked:Bool)
 			{
-				character.antialiasing = true;
-			}
-			character.noAntialiasing = noAntialiasingCheckBox.checked;
-		};
+				character.originalFlipX = checked;
+				character.flipX = (character.originalFlipX != character.isPlayer);
+			});
 
-		positionXStepper = new FlxUINumericStepper(flipXCheckBox.x + 110, flipXCheckBox.y, 10, character.positionArray[0], -9000, 9000, 0);
-		positionYStepper = new FlxUINumericStepper(positionXStepper.x + 60, positionXStepper.y, 10, character.positionArray[1], -9000, 9000, 0);
+		noAntialiasingCheckBox = new ShadowCheckbox(leftX + leftStepperWidth + colGap, controlY4 + checkboxOffset, "No Antialiasing",
+			character.noAntialiasing, function(checked:Bool)
+		{
+			character.antialiasing = !checked && ClientPrefs.data.antialiasing;
+			character.noAntialiasing = checked;
+		});
 
-		positionCameraXStepper = new FlxUINumericStepper(positionXStepper.x, positionXStepper.y + 40, 10, character.cameraPosition[0], -9000, 9000, 0);
-		positionCameraYStepper = new FlxUINumericStepper(positionYStepper.x, positionYStepper.y + 40, 10, character.cameraPosition[1], -9000, 9000, 0);
+		positionXStepper = new ShadowStepper(rightX, controlY3, 10, character.positionArray[0], -9000, 9000, 0, function(value:Float)
+		{
+			character.positionArray[0] = value;
+			updateCharacterPositions();
+		}, rightStepperWidth);
+		positionYStepper = new ShadowStepper(rightX + rightStepperWidth + rightStepperGap, controlY3, 10, character.positionArray[1], -9000, 9000, 0,
+			function(value:Float)
+			{
+				character.positionArray[1] = value;
+				updateCharacterPositions();
+			}, rightStepperWidth);
 
-		var saveCharacterButton:FlxButton = new FlxButton(reloadImage.x, noAntialiasingCheckBox.y + 40, "Save Character", function()
+		positionCameraXStepper = new ShadowStepper(rightX, controlY4, 10, character.cameraPosition[0], -9000, 9000, 0, function(value:Float)
+		{
+			character.cameraPosition[0] = value;
+			updatePointerPos();
+		}, rightStepperWidth);
+		positionCameraYStepper = new ShadowStepper(rightX + rightStepperWidth + rightStepperGap, controlY4, 10, character.cameraPosition[1], -9000, 9000, 0,
+			function(value:Float)
+			{
+				character.cameraPosition[1] = value;
+				updatePointerPos();
+			}, rightStepperWidth);
+
+		var saveCharacterButton:ShadowButton = new ShadowButton(rightX, controlY5, "Save Character", function()
 		{
 			saveCharacter();
-		});
+		}, rightColWidth);
 
-		healthColorStepperR = new FlxUINumericStepper(singDurationStepper.x, saveCharacterButton.y, 20, character.healthColorArray[0], 0, 255, 0);
-		healthColorStepperG = new FlxUINumericStepper(singDurationStepper.x + 65, saveCharacterButton.y, 20, character.healthColorArray[1], 0, 255, 0);
-		healthColorStepperB = new FlxUINumericStepper(singDurationStepper.x + 130, saveCharacterButton.y, 20, character.healthColorArray[2], 0, 255, 0);
+		healthColorStepperR = new ShadowStepper(leftX, controlY5, 20, character.healthColorArray[0], 0, 255, 0, function(value:Float)
+		{
+			character.healthColorArray[0] = Math.round(value);
+			updateHealthBar();
+		}, colorStepperWidth);
+		healthColorStepperG = new ShadowStepper(leftX + colorStepperWidth + colorGap, controlY5, 20, character.healthColorArray[1], 0, 255, 0,
+			function(value:Float)
+			{
+				character.healthColorArray[1] = Math.round(value);
+				updateHealthBar();
+			}, colorStepperWidth);
+		healthColorStepperB = new ShadowStepper(leftX + (colorStepperWidth + colorGap) * 2, controlY5, 20, character.healthColorArray[2], 0, 255, 0,
+			function(value:Float)
+			{
+				character.healthColorArray[2] = Math.round(value);
+				updateHealthBar();
+			}, colorStepperWidth);
 
-		tab_group.add(new FlxText(15, imageInputText.y - 18, 0, 'Image file name:'));
-		tab_group.add(new FlxText(15, healthIconInputText.y - 18, 0, 'Health icon name:'));
-		tab_group.add(new FlxText(15, vocalsInputText.y - 18, 0, 'Vocals File Postfix:'));
-		tab_group.add(new FlxText(15, singDurationStepper.y - 18, 0, 'Sing Animation length:'));
-		tab_group.add(new FlxText(15, scaleStepper.y - 18, 0, 'Scale:'));
-		tab_group.add(new FlxText(positionXStepper.x, positionXStepper.y - 18, 0, 'Character X/Y:'));
-		tab_group.add(new FlxText(positionCameraXStepper.x, positionCameraXStepper.y - 18, 0, 'Camera X/Y:'));
-		tab_group.add(new FlxText(healthColorStepperR.x, healthColorStepperR.y - 18, 0, 'Health bar R/G/B:'));
+		tab_group.add(new ShadowLabel(leftX, row0, "Image file name:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row1, "Health icon name:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row2, "Vocals File Postfix:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row3, "Sing Animation length:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row4, "Scale:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(rightX, row3, "Character X/Y:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(rightX, row4, "Camera X/Y:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		tab_group.add(new ShadowLabel(leftX, row5, "Health bar R/G/B:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		tab_group.add(imageInputText);
 		tab_group.add(reloadImage);
 		tab_group.add(decideIconColor);
@@ -746,79 +874,128 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(healthColorStepperG);
 		tab_group.add(healthColorStepperB);
 		tab_group.add(saveCharacterButton);
-		UI_characterbox.addGroup(tab_group);
 	}
 
-	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
+	function makeAnimListUI()
 	{
-		if (id != FlxUIInputText.CHANGE_EVENT && id != FlxUINumericStepper.CHANGE_EVENT)
-			return;
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var panelWidth:Int = 280;
+		var panelHeight:Int = 450;
+		var panelX:Int = margin;
+		var panelY:Int = margin;
 
-		if (sender is FlxUIInputText)
+		UI_animListPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
+		UI_animListPanel.cameras = [camHUD];
+		UI_animListPanel.scrollFactor.set();
+		add(UI_animListPanel);
+
+		var titleLabel:ShadowLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Animation List", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		UI_animListPanel.add(titleLabel);
+
+		var listX:Int = ShadowStyle.SPACING_MD;
+		var listY:Int = ShadowStyle.SPACING_MD + 30;
+		var listWidth:Int = panelWidth - (ShadowStyle.SPACING_MD * 2);
+		var listHeight:Int = panelHeight - listY - ShadowStyle.SPACING_MD;
+
+		UI_animList = new ShadowList(listX, listY, listWidth, listHeight, []);
+		UI_animList.callback = function(index:Int)
 		{
-			if (sender == healthIconInputText)
+			if (index >= 0 && index < anims.length)
 			{
-				var lastIcon = healthIcon.getCharacter();
-				healthIcon.changeIcon(healthIconInputText.text);
-				character.healthIcon = healthIconInputText.text;
-				if (lastIcon != healthIcon.getCharacter())
-					updatePresence();
+				curAnim = index;
+				character.playAnim(anims[curAnim].anim, true);
+				updateAnimationInfo();
 			}
-			else if (sender == vocalsInputText)
-				character.vocalsFile = vocalsInputText.text;
-			else if (sender == imageInputText)
-				character.imageFile = imageInputText.text;
-		}
-		else if (sender is FlxUINumericStepper)
+		};
+		UI_animListPanel.add(UI_animList);
+	}
+
+	function makeHealthIconUI()
+	{
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var panelWidth:Int = 280;
+		var panelHeight:Int = 120;
+		var panelX:Int = margin;
+		var panelY:Int = margin + 450 + ShadowStyle.SPACING_MD;
+
+		UI_healthPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
+		UI_healthPanel.cameras = [camHUD];
+		UI_healthPanel.scrollFactor.set();
+		add(UI_healthPanel);
+
+		var titleLabel:ShadowLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Character Icon", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		UI_healthPanel.add(titleLabel);
+
+		if (healthIcon != null)
 		{
-			if (sender == scaleStepper)
-			{
-				reloadCharacterImage();
-				character.jsonScale = sender.value;
-				character.scale.set(character.jsonScale, character.jsonScale);
-				character.updateHitbox();
-				updatePointerPos(false);
-			}
-			else if (sender == positionXStepper)
-			{
-				character.positionArray[0] = positionXStepper.value;
-				updateCharacterPositions();
-			}
-			else if (sender == positionYStepper)
-			{
-				character.positionArray[1] = positionYStepper.value;
-				updateCharacterPositions();
-			}
-			else if (sender == singDurationStepper)
-			{
-				character.singDuration = singDurationStepper.value;
-			}
-			else if (sender == positionCameraXStepper)
-			{
-				character.cameraPosition[0] = positionCameraXStepper.value;
-				updatePointerPos();
-			}
-			else if (sender == positionCameraYStepper)
-			{
-				character.cameraPosition[1] = positionCameraYStepper.value;
-				updatePointerPos();
-			}
-			else if (sender == healthColorStepperR)
-			{
-				character.healthColorArray[0] = Math.round(healthColorStepperR.value);
-				updateHealthBar();
-			}
-			else if (sender == healthColorStepperG)
-			{
-				character.healthColorArray[1] = Math.round(healthColorStepperG.value);
-				updateHealthBar();
-			}
-			else if (sender == healthColorStepperB)
-			{
-				character.healthColorArray[2] = Math.round(healthColorStepperB.value);
-				updateHealthBar();
-			}
+			remove(healthIcon);
+			healthIcon.setPosition(-10, 5);
+			healthIcon.scale.set(0.7, 0.7);
+			UI_healthPanel.add(healthIcon);
 		}
+
+		var offsetWX:Int = 30;
+
+		var colorX:Int = ShadowStyle.SPACING_MD + 90 + offsetWX;
+		var colorY:Int = ShadowStyle.SPACING_MD + 40;
+		var colorWidth:Int = 170 - offsetWX;
+		var colorHeight:Int = 50;
+
+		UI_healthColorRect = new FlxSprite(colorX - 5, colorY);
+		UI_healthColorRect.makeGraphic(colorWidth, colorHeight, FlxColor.WHITE);
+		UI_healthPanel.add(UI_healthColorRect);
+
+		var colorLabel:ShadowLabel = new ShadowLabel(colorX - 5, colorY - 18, "Health Bar Color", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		UI_healthPanel.add(colorLabel);
+
+		if (healthBar != null)
+		{
+			healthBar.visible = false;
+		}
+	}
+
+	function makeHelpUI()
+	{
+		UI_helpOverlay = new FlxSprite();
+		UI_helpOverlay.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		UI_helpOverlay.alpha = 0.3;
+		UI_helpOverlay.cameras = [camOther];
+		UI_helpOverlay.scrollFactor.set();
+		UI_helpOverlay.visible = false;
+		add(UI_helpOverlay);
+
+		var panelWidth:Int = 600;
+		var panelHeight:Int = 400;
+		var panelX:Float = (FlxG.width - panelWidth) / 2;
+		var panelY:Float = (FlxG.height - panelHeight) / 2;
+
+		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
+		UI_help.cameras = [camOther];
+		UI_help.scrollFactor.set();
+		UI_help.visible = false;
+		UI_help.active = false;
+		add(UI_help);
+
+		var pad:Int = ShadowStyle.SPACING_LG;
+
+		var titleLabel:ShadowLabel = new ShadowLabel(pad, pad, "Controls Help", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		UI_help.add(titleLabel);
+
+		var str:String;
+		if (controls.mobileC)
+		{
+			str = "CAMERA\nX/Y - Camera Zoom In/Out\nZ - Reset Camera Zoom\n\nCHARACTER\nA - Reset Current Offset\nV/D - Previous/Next Animation\nArrow Buttons - Move Offset\n\nOTHER\nS - Toggle Silhouettes\nHold C - Move Offsets 10x faster and Camera 4x faster";
+		}
+		else
+		{
+			str = "CAMERA\nE/Q - Camera Zoom In/Out\nJ/K/L/I - Move Camera\nR - Reset Camera Zoom\n\nCHARACTER\nCtrl + R - Reset Current Offset\nCtrl + C - Copy Current Offset\nCtrl + V - Paste Copied Offset on Current Animation\nCtrl + Z - Undo Last Paste or Reset\nW/S - Previous/Next Animation\nSpace - Replay Animation\nArrow Keys/Mouse & Right Click - Move Offset\nA/D - Frame Advance (Back/Forward)\n\nOTHER\nF12 - Toggle Silhouettes\nHold Shift - Move Offsets 10x faster and Camera 4x faster\nHold Control - Move camera 4x slower";
+		}
+
+		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 30, str, ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
+		UI_help.add(helpText);
+
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		UI_help.add(closeText);
 	}
 
 	function reloadCharacterImage()
@@ -891,8 +1068,41 @@ class CharacterEditorState extends MusicBeatState
 	{
 		super.update(elapsed);
 
-		if (animationInputText.hasFocus || animationNameInputText.hasFocus || animationIndicesInputText.hasFocus || imageInputText.hasFocus
-			|| healthIconInputText.hasFocus || vocalsInputText.hasFocus)
+		if (UI_help != null && UI_help.visible)
+		{
+			ClientPrefs.toggleVolumeKeys(false);
+			FlxG.mouse.enabled = false;
+
+			if ((FlxG.keys.justPressed.F1 || touchPad.buttonF.justPressed) || FlxG.keys.justPressed.ESCAPE)
+			{
+				if (controls.mobileC)
+				{
+					touchPad.forEachAlive(function(button:TouchButton)
+					{
+						if (button.tag != 'F')
+							button.visible = !button.visible;
+					});
+				}
+				UI_help.visible = false;
+				UI_help.active = false;
+				UI_helpOverlay.visible = false;
+				camOther.visible = false;
+				FlxG.mouse.enabled = true;
+
+				if (helpBg != null)
+					helpBg.visible = false;
+				if (helpTexts != null)
+					helpTexts.visible = false;
+			}
+			return;
+		}
+
+		if ((animationInputText != null && animationInputText.hasFocus())
+			|| (animationNameInputText != null && animationNameInputText.hasFocus())
+			|| (animationIndicesInputText != null && animationIndicesInputText.hasFocus())
+			|| (imageInputText != null && imageInputText.hasFocus())
+			|| (healthIconInputText != null && healthIconInputText.hasFocus())
+			|| (vocalsInputText != null && vocalsInputText.hasFocus()))
 		{
 			ClientPrefs.toggleVolumeKeys(false);
 			return;
@@ -920,7 +1130,7 @@ class CharacterEditorState extends MusicBeatState
 		if (FlxG.keys.pressed.I)
 			FlxG.camera.scroll.y -= elapsed * 500 * shiftMult * ctrlMult;
 
-		var lastZoom = FlxG.camera.zoom;
+		var lastZoom:Float = FlxG.camera.zoom;
 		if (FlxG.keys.justPressed.R && !FlxG.keys.pressed.CONTROL || touchPad.buttonZ.justPressed)
 			FlxG.camera.zoom = 1;
 		else if ((FlxG.keys.pressed.E || touchPad.buttonX.pressed) && FlxG.camera.zoom < 3)
@@ -937,7 +1147,7 @@ class CharacterEditorState extends MusicBeatState
 		}
 
 		if (lastZoom != FlxG.camera.zoom)
-			cameraZoomText.text = 'Zoom: ' + FlxMath.roundDecimal(FlxG.camera.zoom, 2) + 'x';
+			cameraZoomText.text = 'Zoom:' + " " + FlxMath.roundDecimal(FlxG.camera.zoom, 2) + 'x';
 
 		// CHARACTER CONTROLS
 		var changedAnim:Bool = false;
@@ -954,10 +1164,11 @@ class CharacterEditorState extends MusicBeatState
 				curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
 				character.playAnim(anims[curAnim].anim, true);
 				updateTextColors();
+				updateAnimationInfo();
 			}
 		}
 
-		var changedOffset = false;
+		var changedOffset:Bool = false;
 		var moveKeysP;
 		var moveKeys;
 		if (controls.mobileC)
@@ -1064,13 +1275,18 @@ class CharacterEditorState extends MusicBeatState
 			anim.offsets[0] = Std.int(character.offset.x);
 			anim.offsets[1] = Std.int(character.offset.y);
 
-			var myText:FlxText = animsTxtGroup.members[curAnim];
-			myText.text = anim.anim + ": " + anim.offsets;
+			// Update just this item in the list
+			if (UI_animList != null)
+			{
+				UI_animList.updateItem(curAnim, anim.anim + ": " + anim.offsets);
+			}
+
 			character.addOffset(anim.anim, character.offset.x, character.offset.y);
+			updateAnimationInfo();
 		}
 
-		var txt = 'ERROR: No Animation Found';
-		var clr = FlxColor.RED;
+		var txt:String = 'ERROR: No Animation Found';
+		var clr:FlxColor = FlxColor.RED;
 		if (!character.isAnimationNull())
 		{
 			if (FlxG.keys.pressed.A || FlxG.keys.pressed.D)
@@ -1092,7 +1308,7 @@ class CharacterEditorState extends MusicBeatState
 
 			if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5)
 			{
-				var isLeft = false;
+				var isLeft:Bool = false;
 				if ((holdingFrameTime > 0.5 && FlxG.keys.pressed.A) || FlxG.keys.justPressed.A)
 					isLeft = true;
 				character.animPaused = true;
@@ -1117,7 +1333,8 @@ class CharacterEditorState extends MusicBeatState
 		if (FlxG.keys.justPressed.F12 || touchPad.buttonS.justPressed)
 			silhouettes.visible = !silhouettes.visible;
 
-		if ((FlxG.keys.justPressed.F1 || touchPad.buttonF.justPressed) || (helpBg.visible && FlxG.keys.justPressed.ESCAPE))
+		// Open help (closing is handled at the top of update)
+		if (FlxG.keys.justPressed.F1 || touchPad.buttonF.justPressed)
 		{
 			if (controls.mobileC)
 			{
@@ -1127,8 +1344,17 @@ class CharacterEditorState extends MusicBeatState
 						button.visible = !button.visible;
 				});
 			}
-			helpBg.visible = !helpBg.visible;
-			helpTexts.visible = helpBg.visible;
+			UI_help.visible = true;
+			UI_help.active = true;
+			UI_helpOverlay.visible = true;
+			camOther.visible = true;
+			FlxG.mouse.enabled = false; // Disable mouse input
+
+			// Hide old help elements
+			if (helpBg != null)
+				helpBg.visible = false;
+			if (helpTexts != null)
+				helpTexts.visible = false;
 		}
 		else if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
 		{
@@ -1189,9 +1415,17 @@ class CharacterEditorState extends MusicBeatState
 		healthColorStepperR.value = character.healthColorArray[0];
 		healthColorStepperG.value = character.healthColorArray[1];
 		healthColorStepperB.value = character.healthColorArray[2];
-		healthBar.leftBar.color = healthBar.rightBar.color = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1],
-			character.healthColorArray[2]);
+
+		var healthColor:FlxColor = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
+		healthBar.leftBar.color = healthBar.rightBar.color = healthColor;
 		healthIcon.changeIcon(character.healthIcon);
+
+		// Update UI health color preview
+		if (UI_healthColorRect != null)
+		{
+			UI_healthColorRect.color = healthColor;
+		}
+
 		updatePresence();
 	}
 
@@ -1210,40 +1444,70 @@ class CharacterEditorState extends MusicBeatState
 			character.playAnim(anims[0].anim, true);
 		curAnim = 0;
 
-		for (text in animsTxtGroup)
-			text.kill();
-
-		var daLoop = 0;
-		for (anim in anims)
+		// Update the ShadowList with animation names and offsets
+		if (UI_animList != null)
 		{
-			var text:FlxText = animsTxtGroup.recycle(FlxText);
-			text.x = 10;
-			text.y = 32 + (20 * daLoop);
-			text.fieldWidth = 400;
-			text.fieldHeight = 20;
-			text.text = anim.anim + ": " + anim.offsets;
-			text.setFormat(null, 16, FlxColor.WHITE, LEFT, OUTLINE_FAST, FlxColor.BLACK);
-			text.scrollFactor.set();
-			text.borderSize = 1;
-			animsTxtGroup.add(text);
+			var animStrings:Array<String> = [];
+			for (anim in anims)
+				animStrings.push(anim.anim + ": " + anim.offsets);
 
-			daLoop++;
+			UI_animList.setItems(animStrings);
+			UI_animList.selectedIndex = curAnim;
 		}
-		updateTextColors();
+
+		// Hide old animation text group
+		for (text in animsTxtGroup)
+		{
+			text.visible = false;
+			text.active = false;
+		}
+
+		updateAnimationInfo();
 		if (animationDropDown != null)
 			reloadAnimationDropDown();
 	}
 
 	inline function updateTextColors()
 	{
-		var daLoop = 0;
-		for (text in animsTxtGroup)
+		// Update selected index in ShadowList
+		if (UI_animList != null)
 		{
-			text.color = FlxColor.WHITE;
-			if (daLoop == curAnim)
-				text.color = FlxColor.LIME;
-			daLoop++;
+			UI_animList.selectedIndex = curAnim;
 		}
+	}
+
+	inline function updateAnimationInfo()
+	{
+		if (animationInfoLabel == null)
+			return;
+
+		var animName:String = 'None';
+		var offsetX:Int = 0;
+		var offsetY:Int = 0;
+		if (anims != null && curAnim >= 0 && curAnim < anims.length)
+		{
+			var currentAnim = anims[curAnim];
+			if (currentAnim != null)
+			{
+				animName = currentAnim.anim;
+				if (currentAnim.offsets != null && currentAnim.offsets.length > 1)
+				{
+					offsetX = Std.int(currentAnim.offsets[0]);
+					offsetY = Std.int(currentAnim.offsets[1]);
+				}
+			}
+		}
+
+		var framesInfo:String = '';
+		if (!character.isAnimationNull() && character.animation.curAnim != null)
+		{
+			var frameCur:Int = character.animation.curAnim.curFrame;
+			var totalFrames:Int = character.animation.curAnim.numFrames;
+			if (totalFrames > 0)
+				framesInfo = ' | Frame: ' + frameCur + ' / ' + (totalFrames - 1);
+		}
+
+		animationInfoLabel.text = 'Animation: ' + animName + ' | Offset: (' + offsetX + ', ' + offsetY + ')' + framesInfo;
 	}
 
 	inline function updateCharacterPositions()
@@ -1325,8 +1589,12 @@ class CharacterEditorState extends MusicBeatState
 				}
 		if (characterList.length < 1)
 			characterList.push('');
-		charDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(characterList, true));
-		charDropDown.selectedLabel = _char;
+		if (charDropDown != null)
+		{
+			charDropDown.setOptions(characterList);
+			var selectedIndex:Int = characterList.indexOf(_char);
+			charDropDown.selectedIndex = selectedIndex > -1 ? selectedIndex : 0;
+		}
 	}
 
 	function reloadAnimationDropDown()
@@ -1337,7 +1605,12 @@ class CharacterEditorState extends MusicBeatState
 		if (animList.length < 1)
 			animList.push('NO ANIMATIONS'); // Prevents crash
 
-		animationDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(animList, true));
+		if (animationDropDown != null)
+		{
+			animationDropDown.setOptions(animList);
+			var selectedIndex:Int = Std.int(Math.max(0, Math.min(animList.length - 1, curAnim)));
+			animationDropDown.selectedIndex = selectedIndex;
+		}
 	}
 
 	// save
@@ -1408,7 +1681,7 @@ class CharacterEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, '$_char' + ".json", null, "*/*");

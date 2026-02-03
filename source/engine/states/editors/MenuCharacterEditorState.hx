@@ -1,11 +1,9 @@
 package states.editors;
 
-import flixel.addons.ui.FlxUI;
-import flixel.addons.ui.FlxUICheckBox;
-import flixel.addons.ui.FlxUIInputText;
-import flixel.addons.ui.FlxUINumericStepper;
-import flixel.addons.ui.FlxUITabMenu;
-import flixel.ui.FlxButton;
+import flixel.FlxCamera;
+import flixel.FlxG;
+import flixel.FlxSprite;
+import flixel.util.FlxColor;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -16,8 +14,13 @@ class MenuCharacterEditorState extends MusicBeatState
 {
 	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
 	var characterFile:MenuCharacterFile = null;
-	var txtOffsets:FlxText;
 	var defaultCharacters:Array<String> = ['dad', 'bf', 'gf'];
+
+	var camEditor:FlxCamera;
+	var camHUD:FlxCamera;
+
+	var UI_offsetPanel:ShadowPanel;
+	var UI_offsetLabel:ShadowLabel;
 
 	override function create()
 	{
@@ -29,8 +32,14 @@ class MenuCharacterEditorState extends MusicBeatState
 			confirm_anim: 'M Dad Idle',
 			flipX: false
 		};
+
+		camEditor = initPsychCamera();
+		camHUD = new FlxCamera();
+		camHUD.bgColor.alpha = 0;
+
+		FlxG.cameras.add(camHUD, false);
+
 		#if DISCORD_ALLOWED
-		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
 		#end
 
@@ -46,167 +55,199 @@ class MenuCharacterEditorState extends MusicBeatState
 		add(new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51));
 		add(grpWeekCharacters);
 
-		txtOffsets = new FlxText(20, 10, 0, "[0, 0]", 32);
-		txtOffsets.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
-		txtOffsets.alpha = 0.7;
-		add(txtOffsets);
-
-		var tipText:FlxText = new FlxText(0, 540, FlxG.width, "Arrow Keys - Change Offset (Hold shift for 10x speed)
-			\nSpace - Play \"Start Press\" animation (Boyfriend Character Type)", 16);
-		tipText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
-		tipText.scrollFactor.set();
-		add(tipText);
-
 		addEditorBox();
+		makeOffsetUI();
+
 		FlxG.mouse.visible = true;
 		updateCharTypeBox();
+
+		makeOffsetUI();
 
 		addTouchPad("MENU_CHARACTER", "MENU_CHARACTER");
 
 		super.create();
 	}
 
-	var UI_typebox:FlxUITabMenu;
-	var UI_mainbox:FlxUITabMenu;
-	var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
+	var UI_typebox:ShadowTabMenu;
+	var UI_mainbox:ShadowTabMenu;
+	var blockPressWhileTypingOn:Array<ShadowTextInput> = [];
+
+	function makeOffsetUI()
+	{
+		var panelWidth:Int = 160;
+		var panelHeight:Int = 80;
+		var panelX:Float = (FlxG.width - panelWidth) / 2;
+		var panelY:Int = 470;
+
+		UI_offsetPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Position Offset");
+		UI_offsetPanel.cameras = [camHUD];
+		UI_offsetPanel.showMinimizeButton = false;
+
+		UI_offsetLabel = new ShadowLabel(10, ShadowStyle.HEIGHT_HEADER + 10, "[0, 0]", ShadowStyle.FONT_SIZE_LG);
+		UI_offsetPanel.add(UI_offsetLabel);
+
+		add(UI_offsetPanel);
+	}
 
 	function addEditorBox()
 	{
-		var tabs = [{name: 'Character Type', label: 'Character Type'},];
-		UI_typebox = new FlxUITabMenu(null, tabs, true);
-		UI_typebox.resize(120, 180);
-		UI_typebox.x = 100;
-		UI_typebox.y = FlxG.height - UI_typebox.height - 50;
-		UI_typebox.scrollFactor.set();
-		addTypeUI();
-		add(UI_typebox);
+		var buttonWidth:Int = 140;
+		var buttonSpacing:Int = 12;
+		var totalWidth:Int = buttonWidth * 2 + buttonSpacing;
+		var baseX:Float = (FlxG.width - totalWidth) / 2;
+		var buttonY:Int = 570;
 
-		var tabs = [{name: 'Character', label: 'Character'},];
-		UI_mainbox = new FlxUITabMenu(null, tabs, true);
-		UI_mainbox.resize(240, 180);
-		UI_mainbox.x = FlxG.width - UI_mainbox.width - 100;
-		UI_mainbox.y = FlxG.height - UI_mainbox.height - 50;
-		UI_mainbox.scrollFactor.set();
+		var loadButton:ShadowButton = new ShadowButton(baseX, buttonY, "Load Character", function()
+		{
+			loadCharacter();
+		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
+		loadButton.cameras = [camHUD];
+		add(loadButton);
+
+		var saveButton:ShadowButton = new ShadowButton(baseX + buttonWidth + buttonSpacing, buttonY, "Save Character", function()
+		{
+			saveCharacter();
+		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
+		saveButton.cameras = [camHUD];
+		add(saveButton);
+
+		var charWidth:Int = 280;
+		var charHeight:Int = 220;
+		var tabs = [{name: 'Character', label: 'Character'}];
+		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, 460, tabs, charWidth, charHeight);
+		UI_mainbox.cameras = [camHUD];
 		addCharacterUI();
 		add(UI_mainbox);
 
-		var loadButton:FlxButton = new FlxButton(0, 480, "Load Character", function()
-		{
-			loadCharacter();
-		});
-		loadButton.screenCenter(X);
-		loadButton.x -= 60;
-		add(loadButton);
-
-		var saveButton:FlxButton = new FlxButton(0, 480, "Save Character", function()
-		{
-			saveCharacter();
-		});
-		saveButton.screenCenter(X);
-		saveButton.x += 60;
-		add(saveButton);
+		var typeWidth:Int = 150;
+		var typeHeight:Int = 180;
+		var tabs = [{name: 'Character Type', label: 'Character Type'}];
+		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
+		UI_typebox.cameras = [camHUD];
+		addTypeUI();
+		add(UI_typebox);
 	}
 
-	var opponentCheckbox:FlxUICheckBox;
-	var boyfriendCheckbox:FlxUICheckBox;
-	var girlfriendCheckbox:FlxUICheckBox;
+	var opponentCheckbox:ShadowCheckbox;
+	var boyfriendCheckbox:ShadowCheckbox;
+	var girlfriendCheckbox:ShadowCheckbox;
 	var curTypeSelected:Int = 0; // 0 = Dad, 1 = BF, 2 = GF
 
 	function addTypeUI()
 	{
-		var tab_group = new FlxUI(null, UI_typebox);
-		tab_group.name = "Character Type";
+		var tab_group:FlxSpriteGroup = UI_typebox.getTabGroup("Character Type");
 
-		opponentCheckbox = new FlxUICheckBox(10, 20, null, null, "Opponent", 100);
-		opponentCheckbox.callback = function()
+		opponentCheckbox = new ShadowCheckbox(10, 20, "Opponent", false, function(_)
 		{
-			curTypeSelected = 0;
-			updateCharTypeBox();
-		};
+			selectCharacterType(0);
+		});
 
-		boyfriendCheckbox = new FlxUICheckBox(opponentCheckbox.x, opponentCheckbox.y + 40, null, null, "Boyfriend", 100);
-		boyfriendCheckbox.callback = function()
+		boyfriendCheckbox = new ShadowCheckbox(opponentCheckbox.x, opponentCheckbox.y + 40, "Boyfriend", false, function(_)
 		{
-			curTypeSelected = 1;
-			updateCharTypeBox();
-		};
+			selectCharacterType(1);
+		});
 
-		girlfriendCheckbox = new FlxUICheckBox(boyfriendCheckbox.x, boyfriendCheckbox.y + 40, null, null, "Girlfriend", 100);
-		girlfriendCheckbox.callback = function()
+		girlfriendCheckbox = new ShadowCheckbox(boyfriendCheckbox.x, boyfriendCheckbox.y + 40, "Girlfriend", false, function(_)
 		{
-			curTypeSelected = 2;
-			updateCharTypeBox();
-		};
+			selectCharacterType(2);
+		});
 
 		tab_group.add(opponentCheckbox);
 		tab_group.add(boyfriendCheckbox);
 		tab_group.add(girlfriendCheckbox);
-		UI_typebox.addGroup(tab_group);
 	}
 
-	var imageInputText:FlxUIInputText;
-	var idleInputText:FlxUIInputText;
-	var confirmInputText:FlxUIInputText;
-	var scaleStepper:FlxUINumericStepper;
-	var flipXCheckbox:FlxUICheckBox;
+	var imageInputText:ShadowTextInput;
+	var idleInputText:ShadowTextInput;
+	var confirmInputText:ShadowTextInput;
+	var scaleStepper:ShadowStepper;
+	var flipXCheckbox:ShadowCheckbox;
 
 	function addCharacterUI()
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
-		tab_group.name = "Character";
+		var tab_group:FlxSpriteGroup = UI_mainbox.getTabGroup("Character");
+		var pad:Int = 10;
+		var inputWidth:Int = 160;
+		var rowHeight:Int = 45;
 
-		imageInputText = new FlxUIInputText(10, 20, 80, characterFile.image, 8);
+		// Row 1: Image file name + Scale
+		var row1Y:Int = 20;
+		tab_group.add(new ShadowLabel(pad, row1Y, 'Image file name:', ShadowStyle.FONT_SIZE_SM));
+		imageInputText = new ShadowTextInput(pad, row1Y + 18, inputWidth, characterFile.image, function(text)
+		{
+			characterFile.image = text;
+		});
 		blockPressWhileTypingOn.push(imageInputText);
-		idleInputText = new FlxUIInputText(10, imageInputText.y + 35, 100, characterFile.idle_anim, 8);
+
+		tab_group.add(new ShadowLabel(pad + inputWidth + 15, row1Y, 'Scale:', ShadowStyle.FONT_SIZE_SM));
+		scaleStepper = new ShadowStepper(pad + inputWidth + 15, row1Y + 18, 0.05, characterFile.scale, 0.1, 30, 2, function(value)
+		{
+			characterFile.scale = value;
+			reloadSelectedCharacter();
+		}, 80);
+
+		// Row 2: Idle animation
+		var row2Y:Int = row1Y + rowHeight;
+		tab_group.add(new ShadowLabel(pad, row2Y, 'Idle animation (.XML):', ShadowStyle.FONT_SIZE_SM));
+		idleInputText = new ShadowTextInput(pad, row2Y + 18, inputWidth, characterFile.idle_anim, function(text)
+		{
+			characterFile.idle_anim = text;
+		});
 		blockPressWhileTypingOn.push(idleInputText);
-		confirmInputText = new FlxUIInputText(10, idleInputText.y + 35, 100, characterFile.confirm_anim, 8);
+
+		// Row 3: Confirm animation
+		var row3Y:Int = row2Y + rowHeight;
+		tab_group.add(new ShadowLabel(pad, row3Y, 'Start Press animation (.XML):', ShadowStyle.FONT_SIZE_SM));
+		confirmInputText = new ShadowTextInput(pad, row3Y + 18, inputWidth, characterFile.confirm_anim, function(text)
+		{
+			characterFile.confirm_anim = text;
+		});
 		blockPressWhileTypingOn.push(confirmInputText);
 
-		flipXCheckbox = new FlxUICheckBox(10, confirmInputText.y + 30, null, null, "Flip X", 100);
-		flipXCheckbox.callback = function()
+		// Row 4: Flip X checkbox + Reload button
+		var row4Y:Int = row3Y + rowHeight;
+		flipXCheckbox = new ShadowCheckbox(pad, row4Y + 5, "Flip X", characterFile.flipX, function(value)
 		{
-			grpWeekCharacters.members[curTypeSelected].flipX = flipXCheckbox.checked;
-			characterFile.flipX = flipXCheckbox.checked;
-		};
-
-		var reloadImageButton:FlxButton = new FlxButton(140, confirmInputText.y + 30, "Reload Char", function()
-		{
-			reloadSelectedCharacter();
+			grpWeekCharacters.members[curTypeSelected].flipX = value;
+			characterFile.flipX = value;
 		});
 
-		scaleStepper = new FlxUINumericStepper(140, imageInputText.y, 0.05, 1, 0.1, 30, 2);
+		var reloadImageButton:ShadowButton = new ShadowButton(pad + inputWidth + 15, row4Y, "Reload Char", function()
+		{
+			reloadSelectedCharacter();
+		}, 90, ShadowStyle.HEIGHT_BUTTON);
 
-		var confirmDescText = new FlxText(10, confirmInputText.y - 18, 0, 'Start Press animation on the .XML:');
-		tab_group.add(new FlxText(10, imageInputText.y - 18, 0, 'Image file name:'));
-		tab_group.add(new FlxText(10, idleInputText.y - 18, 0, 'Idle animation on the .XML:'));
-		tab_group.add(new FlxText(scaleStepper.x, scaleStepper.y - 18, 0, 'Scale:'));
-		tab_group.add(flipXCheckbox);
-		tab_group.add(reloadImageButton);
-		tab_group.add(confirmDescText);
 		tab_group.add(imageInputText);
+		tab_group.add(scaleStepper);
 		tab_group.add(idleInputText);
 		tab_group.add(confirmInputText);
-		tab_group.add(scaleStepper);
-		UI_mainbox.addGroup(tab_group);
+		tab_group.add(flipXCheckbox);
+		tab_group.add(reloadImageButton);
 	}
 
 	function updateCharTypeBox()
 	{
-		opponentCheckbox.checked = false;
-		boyfriendCheckbox.checked = false;
-		girlfriendCheckbox.checked = false;
+		opponentCheckbox.setChecked(false);
+		boyfriendCheckbox.setChecked(false);
+		girlfriendCheckbox.setChecked(false);
 
 		switch (curTypeSelected)
 		{
 			case 0:
-				opponentCheckbox.checked = true;
+				opponentCheckbox.setChecked(true);
 			case 1:
-				boyfriendCheckbox.checked = true;
+				boyfriendCheckbox.setChecked(true);
 			case 2:
-				girlfriendCheckbox.checked = true;
+				girlfriendCheckbox.setChecked(true);
 		}
 
 		updateCharacters();
+	}
+
+	function selectCharacterType(index:Int)
+	{
+		curTypeSelected = index;
+		updateCharTypeBox();
 	}
 
 	function updateCharacters()
@@ -243,45 +284,18 @@ class MenuCharacterEditorState extends MusicBeatState
 		#end
 	}
 
-	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
-	{
-		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
-		{
-			if (sender == imageInputText)
-			{
-				characterFile.image = imageInputText.text;
-			}
-			else if (sender == idleInputText)
-			{
-				characterFile.idle_anim = idleInputText.text;
-			}
-			else if (sender == confirmInputText)
-			{
-				characterFile.confirm_anim = confirmInputText.text;
-			}
-		}
-		else if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
-		{
-			if (sender == scaleStepper)
-			{
-				characterFile.scale = scaleStepper.value;
-				reloadSelectedCharacter();
-			}
-		}
-	}
-
 	override function update(elapsed:Float)
 	{
 		var blockInput:Bool = false;
 		for (inputText in blockPressWhileTypingOn)
 		{
-			if (inputText.hasFocus)
+			if (inputText.hasFocus())
 			{
 				ClientPrefs.toggleVolumeKeys(false);
 				blockInput = true;
 
 				if (FlxG.keys.justPressed.ENTER)
-					inputText.hasFocus = false;
+					inputText.setFocus(false);
 				break;
 			}
 		}
@@ -339,7 +353,8 @@ class MenuCharacterEditorState extends MusicBeatState
 	{
 		var char:MenuCharacter = grpWeekCharacters.members[curTypeSelected];
 		char.offset.set(characterFile.position[0], characterFile.position[1]);
-		txtOffsets.text = '' + characterFile.position;
+		if (UI_offsetLabel != null)
+			UI_offsetLabel.text = '[' + characterFile.position[0] + ', ' + characterFile.position[1] + ']';
 	}
 
 	var _file:FileReference = null;
@@ -347,7 +362,7 @@ class MenuCharacterEditorState extends MusicBeatState
 	function loadCharacter()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -374,8 +389,8 @@ class MenuCharacterEditorState extends MusicBeatState
 				characterFile = loadedChar;
 				reloadSelectedCharacter();
 				imageInputText.text = characterFile.image;
-				idleInputText.text = characterFile.image;
-				confirmInputText.text = characterFile.image;
+				idleInputText.text = characterFile.idle_anim;
+				confirmInputText.text = characterFile.confirm_anim;
 				scaleStepper.value = characterFile.scale;
 				updateOffset();
 				return;
@@ -404,8 +419,8 @@ class MenuCharacterEditorState extends MusicBeatState
 					characterFile = loadedChar;
 					reloadSelectedCharacter();
 					imageInputText.text = characterFile.image;
-					idleInputText.text = characterFile.image;
-					confirmInputText.text = characterFile.image;
+					idleInputText.text = characterFile.idle_anim;
+					confirmInputText.text = characterFile.confirm_anim;
 					scaleStepper.value = characterFile.scale;
 					updateOffset();
 					_file = null;
@@ -456,7 +471,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[splittedImage.length - 1].toLowerCase().replace(' ', '');
 
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, characterName + ".json", null, "*/*");

@@ -265,7 +265,6 @@ class Alphabet extends FlxSpriteGroup
 }
 
 /* ALPHABET LETTERS, SYMBOLS AND NUMBERS */
-
 typedef Letter =
 {
 	?anim:Null<String>,

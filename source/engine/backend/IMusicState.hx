@@ -1,14 +1,7 @@
 package backend;
 
 import flixel.FlxBasic;
-import flixel.FlxSubState;
-#if MODCHARTS_ALLOWED
-import modcharting.ModchartMusicBeatState;
-#else
-import flixel.addons.ui.FlxUIState;
-#end
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.FlxState;
 import flixel.util.FlxSave;
 import backend.PsychCamera;
 
@@ -21,7 +14,7 @@ interface IMusicState
 	public var persistentDraw:Bool;
 	public var persistentUpdate:Bool;
 
-    private var curSection:Int;
+	private var curSection:Int;
 	private var stepsToDo:Int;
 
 	private var curStep:Int;
@@ -42,7 +35,7 @@ interface IMusicState
 	public var modchartSounds:Map<String, FlxSound>;
 	public var modchartTexts:Map<String, FlxText>;
 	public var modchartSaves:Map<String, FlxSave>;
-	public var modchartCameras:Map<String, FlxCamera> ;
+	public var modchartCameras:Map<String, FlxCamera>;
 
 	#if LUA_ALLOWED
 	public var luaArray:Array<FunkinLua>;
@@ -115,7 +108,7 @@ interface IMusicState
 
 	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 		excludeValues:Array<Dynamic> = null):Dynamic;
-	
+
 	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
 		excludeValues:Array<Dynamic> = null):Dynamic;
 

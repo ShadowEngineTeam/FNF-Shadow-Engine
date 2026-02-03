@@ -1,12 +1,5 @@
 package states.editors;
 
-import flixel.addons.ui.FlxUI;
-import flixel.addons.ui.FlxUICheckBox;
-import flixel.addons.ui.FlxUIInputText;
-import flixel.addons.ui.FlxUINumericStepper;
-import flixel.addons.ui.FlxUIDropDownMenu;
-import flixel.addons.ui.FlxUITabMenu;
-import flixel.ui.FlxButton;
 import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
@@ -40,6 +33,9 @@ class DialogueCharacterEditorState extends MusicBeatState
 	var ghostIdle:DialogueCharacter;
 
 	var curAnim:Int = 0;
+
+	inline static final TAB_ANIMATIONS:Int = 0;
+	inline static final TAB_CHARACTER:Int = 1;
 
 	override function create()
 	{
@@ -161,116 +157,150 @@ class DialogueCharacterEditorState extends MusicBeatState
 		super.create();
 	}
 
-	var UI_typebox:FlxUITabMenu;
-	var UI_mainbox:FlxUITabMenu;
+	var UI_typebox:ShadowTabMenu;
+	var UI_mainbox:ShadowTabMenu;
+	var editorTypeWidth:Int = 160;
+	var editorTypeHeight:Int = 180;
+	var editorMainWidth:Int = 270;
+	var editorMainHeight:Int = 305;
 
 	function addEditorBox()
 	{
-		var tabs = [{name: 'Character Type', label: 'Character Type'},];
-		UI_typebox = new FlxUITabMenu(null, tabs, true);
-		UI_typebox.resize(120, 180);
-		UI_typebox.x = 900;
-		UI_typebox.y = FlxG.height - UI_typebox.height - 50;
-		UI_typebox.scrollFactor.set();
-		UI_typebox.camera = camHUD;
-		addTypeUI();
-		add(UI_typebox);
-
-		var tabs = [
+		var mainTabs:Array<TabDef> = [
 			{name: 'Animations', label: 'Animations'},
 			{name: 'Character', label: 'Character'},
 		];
-		UI_mainbox = new FlxUITabMenu(null, tabs, true);
-		UI_mainbox.resize(200, 250);
-		UI_mainbox.x = UI_typebox.x + UI_typebox.width;
-		UI_mainbox.y = FlxG.height - UI_mainbox.height - 50;
+		UI_mainbox = new ShadowTabMenu(13, 55, mainTabs, editorMainWidth,
+			editorMainHeight);
 		UI_mainbox.scrollFactor.set();
-		UI_mainbox.camera = camHUD;
+		UI_mainbox.cameras = [camHUD];
 		addAnimationsUI();
 		addCharacterUI();
 		add(UI_mainbox);
-		UI_mainbox.selected_tab_id = 'Character';
-		lastTab = UI_mainbox.selected_tab_id;
+		add(UI_typebox);
+		UI_mainbox.selectedTab = TAB_CHARACTER;
+		lastTab = TAB_CHARACTER;
+
+		var typeTabs:Array<TabDef> = [{name: 'Character Type', label: 'Character Type'}];
+		UI_typebox = new ShadowTabMenu(290, 55, typeTabs, editorTypeWidth,
+			editorTypeHeight);
+		UI_typebox.scrollFactor.set();
+		UI_typebox.cameras = [camHUD];
+		addTypeUI();
+		add(UI_typebox);
 	}
 
-	var leftCheckbox:FlxUICheckBox;
-	var centerCheckbox:FlxUICheckBox;
-	var rightCheckbox:FlxUICheckBox;
+	var leftCheckbox:ShadowCheckbox;
+	var centerCheckbox:ShadowCheckbox;
+	var rightCheckbox:ShadowCheckbox;
 
 	function addTypeUI()
 	{
-		var tab_group = new FlxUI(null, UI_typebox);
-		tab_group.name = "Character Type";
+		var tab:FlxSpriteGroup = UI_typebox.getTabGroup("Character Type");
+		if (tab == null)
+			return;
 
-		leftCheckbox = new FlxUICheckBox(10, 20, null, null, "Left", 100);
-		leftCheckbox.callback = function()
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowDelta:Int = ShadowStyle.HEIGHT_CHECKBOX + ShadowStyle.SPACING_SM;
+
+		leftCheckbox = new ShadowCheckbox(pad, pad, "Left", false, function(checked:Bool)
 		{
 			character.jsonFile.dialogue_pos = 'left';
 			updateCharTypeBox();
-		};
+		});
+		tab.add(leftCheckbox);
 
-		centerCheckbox = new FlxUICheckBox(leftCheckbox.x, leftCheckbox.y + 40, null, null, "Center", 100);
-		centerCheckbox.callback = function()
+		centerCheckbox = new ShadowCheckbox(pad, pad + rowDelta, "Center", false, function(checked:Bool)
 		{
 			character.jsonFile.dialogue_pos = 'center';
 			updateCharTypeBox();
-		};
+		});
+		tab.add(centerCheckbox);
 
-		rightCheckbox = new FlxUICheckBox(centerCheckbox.x, centerCheckbox.y + 40, null, null, "Right", 100);
-		rightCheckbox.callback = function()
+		rightCheckbox = new ShadowCheckbox(pad, pad + rowDelta * 2, "Right", false, function(checked:Bool)
 		{
 			character.jsonFile.dialogue_pos = 'right';
 			updateCharTypeBox();
-		};
-
-		tab_group.add(leftCheckbox);
-		tab_group.add(centerCheckbox);
-		tab_group.add(rightCheckbox);
-		UI_typebox.addGroup(tab_group);
+		});
+		tab.add(rightCheckbox);
 	}
 
 	var curSelectedAnim:String;
 	var animationArray:Array<String> = [];
-	var animationDropDown:FlxUIDropDownMenu;
-	var animationInputText:FlxUIInputText;
-	var loopInputText:FlxUIInputText;
-	var idleInputText:FlxUIInputText;
+	var animationDropDown:ShadowDropdown;
+	var animationInputText:ShadowTextInput;
+	var loopInputText:ShadowTextInput;
+	var idleInputText:ShadowTextInput;
 
 	function addAnimationsUI()
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
-		tab_group.name = "Animations";
+		var tab:FlxSpriteGroup = UI_mainbox.getTabGroup("Animations");
+		if (tab == null)
+			return;
 
-		animationDropDown = new FlxUIDropDownMenu(10, 30, FlxUIDropDownMenu.makeStrIdLabelArray([''], true), function(animation:String)
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var labelHeight:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var dropdownWidth:Int = editorMainWidth - pad * 2;
+
+		var y:Int = pad;
+		tab.add(new ShadowLabel(pad, y, "Animations:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
+
+		animationDropDown = new ShadowDropdown(pad, y, animationArray.length > 0 ? animationArray : [''], function(index:Int)
 		{
-			var anim:String = animationArray[Std.parseInt(animation)];
+			if (index < 0 || index >= animationArray.length)
+				return;
+			var anim:String = animationArray[index];
 			if (character.dialogueAnimations.exists(anim))
 			{
 				ghostLoop.playAnim(anim);
 				ghostIdle.playAnim(anim, true);
 
 				curSelectedAnim = anim;
-				var animShit:DialogueAnimArray = character.dialogueAnimations.get(curSelectedAnim);
-				offsetLoopText.text = 'Loop: ' + animShit.loop_offsets;
-				offsetIdleText.text = 'Idle: ' + animShit.idle_offsets;
+				var animData:DialogueAnimArray = character.dialogueAnimations.get(curSelectedAnim);
+				if (animData != null)
+				{
+					offsetLoopText.text = 'Loop: ' + animData.loop_offsets;
+					offsetIdleText.text = 'Idle: ' + animData.idle_offsets;
 
-				animationInputText.text = animShit.anim;
-				loopInputText.text = animShit.loop_name;
-				idleInputText.text = animShit.idle_name;
+					animationInputText.text = animData.anim;
+					loopInputText.text = animData.loop_name;
+					idleInputText.text = animData.idle_name;
+				}
 			}
-		});
+		}, dropdownWidth, 8);
+		tab.add(animationDropDown);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
 
-		animationInputText = new FlxUIInputText(15, 85, 80, '', 8);
+		tab.add(new ShadowLabel(pad, y, "Animation name:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
+		animationInputText = new ShadowTextInput(pad, y, dropdownWidth, '');
+		tab.add(animationInputText);
 		blockPressWhileTypingOn.push(animationInputText);
-		loopInputText = new FlxUIInputText(animationInputText.x, animationInputText.y + 35, 150, '', 8);
-		blockPressWhileTypingOn.push(loopInputText);
-		idleInputText = new FlxUIInputText(loopInputText.x, loopInputText.y + 40, 150, '', 8);
-		blockPressWhileTypingOn.push(idleInputText);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
 
-		var addUpdateButton:FlxButton = new FlxButton(10, idleInputText.y + 30, "Add/Update", function()
+		tab.add(new ShadowLabel(pad, y, "Loop name on .XML file:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
+		loopInputText = new ShadowTextInput(pad, y, dropdownWidth, '');
+		tab.add(loopInputText);
+		blockPressWhileTypingOn.push(loopInputText);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
+
+		tab.add(new ShadowLabel(pad, y, "Idle/Finished name on .XML file:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
+		idleInputText = new ShadowTextInput(pad, y, dropdownWidth, '');
+		tab.add(idleInputText);
+		blockPressWhileTypingOn.push(idleInputText);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
+
+		var buttonY:Int = y;
+		var addUpdateButton:ShadowButton = new ShadowButton(pad, buttonY, "Add/Update", function()
 		{
 			var theAnim:String = animationInputText.text.trim();
-			if (character.dialogueAnimations.exists(theAnim)) // Update
+			if (theAnim.length == 0)
+				return;
+
+			if (character.dialogueAnimations.exists(theAnim))
 			{
 				for (i in 0...character.jsonFile.animations.length)
 				{
@@ -292,7 +322,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 					ghostIdle.playAnim(theAnim, true);
 				}
 			}
-			else // Add
+			else
 			{
 				var newAnim:DialogueAnimArray = {
 					anim: theAnim,
@@ -300,57 +330,53 @@ class DialogueCharacterEditorState extends MusicBeatState
 					loop_offsets: [0, 0],
 					idle_name: idleInputText.text,
 					idle_offsets: [0, 0]
-				}
+				};
 				character.jsonFile.animations.push(newAnim);
 
-				var lastSelected:String = animationDropDown.selectedLabel;
 				character.reloadAnimations();
 				ghostLoop.reloadAnimations();
 				ghostIdle.reloadAnimations();
-				reloadAnimationsDropDown();
-				animationDropDown.selectedLabel = lastSelected;
 			}
-		});
 
-		var removeUpdateButton:FlxButton = new FlxButton(100, addUpdateButton.y, "Remove", function()
+			var lastIndex:Int = animationDropDown.selectedIndex;
+			reloadAnimationsDropDown();
+			if (animationArray.length > 0)
+				animationDropDown.selectedIndex = Std.int(Math.min(lastIndex, animationArray.length - 1));
+		}, 110);
+		var removeUpdateButton:ShadowButton = new ShadowButton(pad + addUpdateButton.width + ShadowStyle.SPACING_MD, buttonY, "Remove", function()
 		{
+			var targetAnim:String = animationInputText.text.trim();
 			for (i in 0...character.jsonFile.animations.length)
 			{
 				var animArray:DialogueAnimArray = character.jsonFile.animations[i];
-				if (animArray != null && animArray.anim.trim() == animationInputText.text.trim())
+				if (animArray != null && animArray.anim.trim() == targetAnim)
 				{
-					var lastSelected:String = animationDropDown.selectedLabel;
+					var lastIndex = animationDropDown.selectedIndex;
 					character.jsonFile.animations.remove(animArray);
 					character.reloadAnimations();
 					ghostLoop.reloadAnimations();
 					ghostIdle.reloadAnimations();
 					reloadAnimationsDropDown();
-					if (character.jsonFile.animations.length > 0 && lastSelected == animArray.anim.trim())
+					if (animationArray.length > 0)
 					{
-						var animToPlay:String = character.jsonFile.animations[0].anim;
-						ghostLoop.playAnim(animToPlay);
-						ghostIdle.playAnim(animToPlay, true);
+						animationDropDown.selectedIndex = Std.int(Math.max(0, Math.min(lastIndex, animationArray.length - 1)));
+						var nextAnim:String = animationArray[animationDropDown.selectedIndex];
+						if (character.dialogueAnimations.exists(nextAnim))
+						{
+							ghostLoop.playAnim(nextAnim);
+							ghostIdle.playAnim(nextAnim, true);
+						}
 					}
-					animationDropDown.selectedLabel = lastSelected;
 					animationInputText.text = '';
 					loopInputText.text = '';
 					idleInputText.text = '';
 					break;
 				}
 			}
-		});
+		}, 90);
 
-		tab_group.add(new FlxText(animationDropDown.x, animationDropDown.y - 18, 0, 'Animations:'));
-		tab_group.add(new FlxText(animationInputText.x, animationInputText.y - 18, 0, 'Animation name:'));
-		tab_group.add(new FlxText(loopInputText.x, loopInputText.y - 18, 0, 'Loop name on .XML file:'));
-		tab_group.add(new FlxText(idleInputText.x, idleInputText.y - 18, 0, 'Idle/Finished name on .XML file:'));
-		tab_group.add(animationInputText);
-		tab_group.add(loopInputText);
-		tab_group.add(idleInputText);
-		tab_group.add(addUpdateButton);
-		tab_group.add(removeUpdateButton);
-		tab_group.add(animationDropDown);
-		UI_mainbox.addGroup(tab_group);
+		tab.add(addUpdateButton);
+		tab.add(removeUpdateButton);
 		reloadAnimationsDropDown();
 	}
 
@@ -364,60 +390,94 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 		if (animationArray.length < 1)
 			animationArray = [''];
-		animationDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(animationArray, true));
+
+		if (animationDropDown != null)
+		{
+			animationDropDown.setOptions(animationArray);
+			if (animationArray.length > 0)
+				animationDropDown.selectedIndex = Std.int(Math.min(animationDropDown.selectedIndex, animationArray.length - 1));
+			else
+				animationDropDown.selectedIndex = 0;
+			if (animationArray.length > 0 && animationDropDown.callback != null)
+				animationDropDown.callback(animationDropDown.selectedIndex);
+		}
 	}
 
-	var imageInputText:FlxUIInputText;
-	var scaleStepper:FlxUINumericStepper;
-	var xStepper:FlxUINumericStepper;
-	var yStepper:FlxUINumericStepper;
-	var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
+	var imageInputText:ShadowTextInput;
+	var scaleStepper:ShadowStepper;
+	var xStepper:ShadowStepper;
+	var yStepper:ShadowStepper;
+	var blockPressWhileTypingOn:Array<ShadowTextInput> = [];
 
 	function addCharacterUI()
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
-		tab_group.name = "Character";
+		var tab:FlxSpriteGroup = UI_mainbox.getTabGroup("Character");
+		if (tab == null)
+			return;
 
-		imageInputText = new FlxUIInputText(10, 30, 80, character.jsonFile.image, 8);
-		blockPressWhileTypingOn.push(imageInputText);
-		xStepper = new FlxUINumericStepper(imageInputText.x, imageInputText.y + 50, 10, character.jsonFile.position[0], -2000, 2000, 0);
-		yStepper = new FlxUINumericStepper(imageInputText.x + 80, xStepper.y, 10, character.jsonFile.position[1], -2000, 2000, 0);
-		scaleStepper = new FlxUINumericStepper(imageInputText.x, xStepper.y + 50, 0.05, character.jsonFile.scale, 0.1, 10, 2);
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var fieldWidth:Int = editorMainWidth - pad * 2;
+		var labelHeight:Int = ShadowStyle.FONT_SIZE_SM + 4;
 
-		var noAntialiasingCheckbox:FlxUICheckBox = new FlxUICheckBox(scaleStepper.x + 80, scaleStepper.y, null, null, "No Antialiasing", 100);
-		noAntialiasingCheckbox.checked = (character.jsonFile.no_antialiasing == true);
-		noAntialiasingCheckbox.callback = function()
+		var y:Int = pad;
+		tab.add(new ShadowLabel(pad, y, "Image file name:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
+		imageInputText = new ShadowTextInput(pad, y, fieldWidth, character.jsonFile.image);
+		imageInputText.callback = function(text:String)
 		{
-			character.jsonFile.no_antialiasing = noAntialiasingCheckbox.checked;
-			character.antialiasing = !character.jsonFile.no_antialiasing;
+			character.jsonFile.image = text;
+			reloadCharacter();
 		};
+		tab.add(imageInputText);
+		blockPressWhileTypingOn.push(imageInputText);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
 
-		tab_group.add(new FlxText(10, imageInputText.y - 18, 0, 'Image file name:'));
-		tab_group.add(new FlxText(10, xStepper.y - 18, 0, 'Position Offset:'));
-		tab_group.add(new FlxText(10, scaleStepper.y - 18, 0, 'Scale:'));
-		tab_group.add(imageInputText);
-		tab_group.add(xStepper);
-		tab_group.add(yStepper);
-		tab_group.add(scaleStepper);
-		tab_group.add(noAntialiasingCheckbox);
+		tab.add(new ShadowLabel(pad, y, "Position Offset:", ShadowStyle.FONT_SIZE_SM));
+		y += labelHeight;
 
-		var reloadImageButton:FlxButton = new FlxButton(10, scaleStepper.y + 60, "Reload Image", function()
+		// Fit 2 steppers exactly inside the field width
+		var stepperSpacing:Int = ShadowStyle.SPACING_MD;
+		var stepperWidth:Int = Std.int((fieldWidth - stepperSpacing) / 2);
+
+		xStepper = new ShadowStepper(pad, y, 10, character.jsonFile.position[0], -2000, 2000, 0, function(value:Float)
+		{
+			character.jsonFile.position[0] = value;
+			reloadCharacter();
+		}, stepperWidth);
+
+		yStepper = new ShadowStepper(pad + stepperWidth + stepperSpacing, y, 10, character.jsonFile.position[1], -2000, 2000, 0, function(value:Float)
+		{
+			character.jsonFile.position[1] = value;
+			reloadCharacter();
+		}, stepperWidth);
+
+		tab.add(xStepper);
+		tab.add(yStepper);
+		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
+
+		var buttonY:Int = y + ShadowStyle.SPACING_MD;
+		var buttonWidth:Int = 110;
+		var buttonSpacing:Int = ShadowStyle.SPACING_MD;
+
+		var reloadImageButton:ShadowButton = new ShadowButton(pad, buttonY, "Reload Image", function()
 		{
 			reloadCharacter();
-		});
+		}, buttonWidth);
 
-		var loadButton:FlxButton = new FlxButton(reloadImageButton.x + 100, reloadImageButton.y, "Load Character", function()
+		var loadButton:ShadowButton = new ShadowButton(pad + buttonWidth + buttonSpacing, buttonY, "Load Character", function()
 		{
 			loadCharacter();
-		});
-		var saveButton:FlxButton = new FlxButton(loadButton.x, reloadImageButton.y - 25, "Save Character", function()
+		}, buttonWidth);
+
+		// Move Save Character under Reload Image
+		var saveButton:ShadowButton = new ShadowButton(pad, buttonY + ShadowStyle.HEIGHT_BUTTON + buttonSpacing, "Save Character", function()
 		{
 			saveCharacter();
-		});
-		tab_group.add(reloadImageButton);
-		tab_group.add(loadButton);
-		tab_group.add(saveButton);
-		UI_mainbox.addGroup(tab_group);
+		}, buttonWidth);
+
+		tab.add(reloadImageButton);
+		tab.add(loadButton);
+		tab.add(saveButton);
 	}
 
 	function updateCharTypeBox()
@@ -507,34 +567,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 		DialogueBoxPsych.updateBoxOffsets(box);
 	}
 
-	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
-	{
-		if (id == FlxUIInputText.CHANGE_EVENT && sender == imageInputText)
-		{
-			character.jsonFile.image = imageInputText.text;
-		}
-		else if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
-		{
-			if (sender == scaleStepper)
-			{
-				character.jsonFile.scale = scaleStepper.value;
-				reloadCharacter();
-			}
-			else if (sender == xStepper)
-			{
-				character.jsonFile.position[0] = xStepper.value;
-				reloadCharacter();
-			}
-			else if (sender == yStepper)
-			{
-				character.jsonFile.position[1] = yStepper.value;
-				reloadCharacter();
-			}
-		}
-	}
-
 	var currentGhosts:Int = 0;
-	var lastTab:String = 'Character';
+	var lastTab:Int = TAB_CHARACTER;
 	var transitioning:Bool = false;
 
 	override function update(elapsed:Float)
@@ -563,21 +597,21 @@ class DialogueCharacterEditorState extends MusicBeatState
 		var blockInput:Bool = false;
 		for (inputText in blockPressWhileTypingOn)
 		{
-			if (inputText.hasFocus)
+			if (inputText.hasFocus())
 			{
 				ClientPrefs.toggleVolumeKeys(false);
 				blockInput = true;
 
 				if (FlxG.keys.justPressed.ENTER)
-					inputText.hasFocus = false;
+					inputText.setFocus(false);
 				break;
 			}
 		}
 
-		if (!blockInput && !animationDropDown.dropPanel.visible)
+		if (!blockInput && !ShadowDropdown.isAnyOpen())
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.SPACE || touchPad.buttonA.justPressed && UI_mainbox.selected_tab_id == 'Character')
+			if (FlxG.keys.justPressed.SPACE || (touchPad.buttonA.justPressed && UI_mainbox.selectedTab == TAB_CHARACTER))
 			{
 				character.playAnim(character.jsonFile.animations[curAnim].anim);
 				daText.resetDialogue();
@@ -615,7 +649,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 				}
 			}
 
-			if (UI_mainbox.selected_tab_id == 'Animations'
+			if (UI_mainbox.selectedTab == TAB_ANIMATIONS
 				&& curSelectedAnim != null
 				&& character.dialogueAnimations.exists(curSelectedAnim))
 			{
@@ -693,7 +727,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			}
 			if (FlxG.keys.justPressed.H || touchPad.buttonY.justPressed)
 			{
-				if (UI_mainbox.selected_tab_id == 'Animations')
+				if (UI_mainbox.selectedTab == TAB_ANIMATIONS)
 				{
 					currentGhosts++;
 					if (currentGhosts > 2)
@@ -716,9 +750,9 @@ class DialogueCharacterEditorState extends MusicBeatState
 				hudGroup.visible = true;
 			}
 
-			if (UI_mainbox.selected_tab_id != lastTab)
+			if (UI_mainbox.selectedTab != lastTab)
 			{
-				if (UI_mainbox.selected_tab_id == 'Animations')
+				if (UI_mainbox.selectedTab == TAB_ANIMATIONS)
 				{
 					hudGroup.alpha = 0;
 					mainGroup.alpha = 0;
@@ -757,11 +791,11 @@ class DialogueCharacterEditorState extends MusicBeatState
 							+ character.jsonFile.animations.length
 							+ ') - Press W or S to scroll';
 				}
-				lastTab = UI_mainbox.selected_tab_id;
+				lastTab = UI_mainbox.selectedTab;
 				currentGhosts = 0;
 			}
 
-			if (UI_mainbox.selected_tab_id == 'Character')
+			if (UI_mainbox.selectedTab == TAB_CHARACTER)
 			{
 				var negaMult:Array<Int> = [1, -1];
 				var controlAnim:Array<Bool> = [FlxG.keys.justPressed.W, FlxG.keys.justPressed.S];
@@ -815,7 +849,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 	function loadCharacter()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -930,7 +964,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[0].toLowerCase().replace(' ', '');
 
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, characterName + ".json", null, "*/*");

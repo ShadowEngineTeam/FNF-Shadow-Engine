@@ -31,7 +31,6 @@ class Project extends HXProject
 	static final LUA_ALLOWED:CompileFlag = CompileFlag.get("LUA_ALLOWED");
 	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
 	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
-	static final MODCHARTS_ALLOWED:CompileFlag = CompileFlag.get("MODCHARTS_ALLOWED");
 	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
 
 	static final ENABLE_ASCII_ART:Bool = true;
@@ -215,7 +214,6 @@ class Project extends HXProject
 		LUA_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
 		VIDEOS_ALLOWED.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
 		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
-		MODCHARTS_ALLOWED.integrate(/*DCEBUILD.isDisabled()*/false);
 		DCEBUILD.integrate(false);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
@@ -316,12 +314,6 @@ class Project extends HXProject
 		if (DISCORD_ALLOWED.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
-		if (MODCHARTS_ALLOWED.isEnabled())
-		{
-			setHaxedef('PSYCH');
-			setHaxedef('PSYCHVERSION', '0.7.3'); // SE based with PE 0.7.3
-		}
-
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
 	}
@@ -354,7 +346,6 @@ class Project extends HXProject
 	function configureLibs()
 	{
 		includeHaxelib("flixel");
-		includeHaxelib("flixel-ui");
 		includeHaxelib("flixel-addons");
 		includeHaxelib("flixel-animate");
 
@@ -366,8 +357,6 @@ class Project extends HXProject
 			includeHaxelib("hxvlc");
 		if (DISCORD_ALLOWED.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
-		if (MODCHARTS_ALLOWED.isEnabled())
-			includeHaxelib("fnf-modcharting-tools");
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");

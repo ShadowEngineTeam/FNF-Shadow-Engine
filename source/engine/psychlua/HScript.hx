@@ -119,29 +119,6 @@ class HScript extends SScript
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
 
-		#if MODCHARTS_ALLOWED
-		set('Math', Math);
-		set('ModchartEditorState', modcharting.ModchartEditorState);
-		set('ModchartEvent', modcharting.ModchartEvent);
-		set('ModchartEventManager', modcharting.ModchartEventManager);
-		set('ModchartFile', modcharting.ModchartFile);
-		set('ModchartFuncs', modcharting.ModchartFuncs);
-		set('ModchartMusicBeatState', modcharting.ModchartMusicBeatState);
-		set('ModchartUtil', modcharting.ModchartUtil);
-		for (i in ['mod', 'Modifier'])
-			set(i, modcharting.Modifier);
-		set('ModifierSubValue', modcharting.Modifier.ModifierSubValue);
-		set('ModTable', modcharting.ModTable);
-		set('NoteMovement', modcharting.NoteMovement);
-		set('NotePositionData', modcharting.NotePositionData);
-		set('Playfield', modcharting.Playfield);
-		set('PlayfieldRenderer', modcharting.PlayfieldRenderer);
-		set('SimpleQuaternion', modcharting.SimpleQuaternion);
-		set('SustainStrip', modcharting.SustainStrip);
-
-		modcharting.ModchartFuncs.loadHScriptFunctions(this);
-		#end
-
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
 		{
@@ -525,13 +502,6 @@ class HScript extends SScript
 
 		super.destroy();
 	}
-
-	#if MODCHARTS_ALLOWED
-	public function initMod(mod:modcharting.Modifier)
-	{
-		call("initMod", [mod]);
-	}
-	#end
 }
 
 class CustomFlxColor

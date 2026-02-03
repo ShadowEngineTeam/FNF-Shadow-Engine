@@ -4,6 +4,7 @@ import states.MainMenuState;
 import backend.StageData;
 import flixel.addons.transition.FlxTransitionableState;
 import mobile.substates.MobileControlSelectSubState;
+import backend.ui.ShadowStyle;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -124,6 +125,7 @@ class OptionsState extends MusicBeatState
 		#end
 		ClientPrefs.saveSettings();
 		ClientPrefs.loadPrefs();
+		ShadowStyle.applySavedTheme();
 		removeTouchPad();
 		addTouchPad("UP_DOWN", #if android "A_B_X_Y" #else "A_B_C" #end);
 		persistentUpdate = true;
@@ -206,6 +208,7 @@ class OptionsState extends MusicBeatState
 	override function destroy()
 	{
 		ClientPrefs.loadPrefs();
+		ShadowStyle.applySavedTheme();
 		super.destroy();
 	}
 }
