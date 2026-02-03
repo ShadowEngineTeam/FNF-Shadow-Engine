@@ -55,6 +55,13 @@
       "x": 1030,
       "y": 127,
       "color": "0x49A9B2"
+    },
+	{
+      "button": "buttonF",
+      "graphic": "f",
+      "x": 0,
+      "y": 596,
+      "color": "0xB1FC00"
     }
   ]
 }

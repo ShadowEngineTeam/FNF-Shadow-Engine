@@ -11,7 +11,6 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.FlxGraphic;
-import flixel.FlxState;
 import backend.Song;
 import backend.StageData;
 import objects.Character;

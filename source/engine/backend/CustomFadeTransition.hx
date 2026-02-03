@@ -1,7 +1,6 @@
 package backend;
 
 import flixel.util.FlxGradient;
-import flixel.FlxSubState;
 
 class CustomFadeTransition extends MusicBeatSubstate
 {

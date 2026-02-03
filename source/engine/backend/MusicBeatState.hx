@@ -1,18 +1,11 @@
 package backend;
 
-import flixel.FlxSubState;
-#if MODCHARTS_ALLOWED
-import modcharting.ModchartMusicBeatState;
-#else
-import flixel.addons.ui.FlxUIState;
-#end
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.FlxState;
 import flixel.util.FlxSave;
 import backend.PsychCamera;
 import haxe.io.Path;
 
-class MusicBeatState extends #if MODCHARTS_ALLOWED ModchartMusicBeatState #else FlxUIState #end implements IMusicState
+class MusicBeatState extends FlxTransitionableState implements IMusicState
 {
 	public var stateInstance:FlxState = null;
 

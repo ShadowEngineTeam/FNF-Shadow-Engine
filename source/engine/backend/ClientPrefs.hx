@@ -37,6 +37,7 @@ import states.TitleState;
 	public var framerate:Int = 60;
 	public var camZooms:Bool = true;
 	public var hideHud:Bool = false;
+	public var uiTheme:String = 'dark';
 	public var noteOffset:Int = 0;
 	public var arrowRGB:Array<Array<FlxColor>> = [
 		[0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
@@ -304,8 +305,8 @@ class ClientPrefs
 
 	public static function toggleVolumeKeys(?turnOn:Bool = true)
 	{
-		FlxG.sound.muteKeys = turnOn ? TitleState.muteKeys : [];
-		FlxG.sound.volumeDownKeys = turnOn ? TitleState.volumeDownKeys : [];
-		FlxG.sound.volumeUpKeys = turnOn ? TitleState.volumeUpKeys : [];
+		FlxG.sound.muteKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.muteKeys : [];
+		FlxG.sound.volumeDownKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeDownKeys : [];
+		FlxG.sound.volumeUpKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeUpKeys : [];
 	}
 }

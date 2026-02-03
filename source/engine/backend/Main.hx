@@ -6,7 +6,6 @@ import flixel.input.keyboard.FlxKey;
 import debug.codename.Framerate;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
-import flixel.FlxState;
 import haxe.io.Path;
 import openfl.Assets;
 import openfl.system.System;
@@ -153,12 +152,14 @@ class Main extends Sprite
 		#end
 
 		#if android
-		FlxG.android.preventDefaultKeys = [BACK];
+		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
 		#end
 
 		#if native
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
+
+		FlxSprite.defaultAntialiasing = true;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)

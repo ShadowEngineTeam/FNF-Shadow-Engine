@@ -17,20 +17,20 @@ class Project extends HXProject
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.5.5";
+	static final VERSION:String = "0.6.0";
 	static final COMPANY:String = "FNF-SE";
 	static final PACKAGE:String = "com.fnfse.shadowengine";
 	static final MAIN_CLASS:String = "backend.Main";
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
-	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows", "source/library_shadows"];
+	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "float_deltatime", "gpu_textures"];
 
 	static final MODS_ALLOWED:CompileFlag = CompileFlag.get("MODS_ALLOWED");
 	static final HSCRIPT_ALLOWED:CompileFlag = CompileFlag.get("HSCRIPT_ALLOWED");
 	static final LUA_ALLOWED:CompileFlag = CompileFlag.get("LUA_ALLOWED");
 	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
 	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
-	static final MODCHARTS_ALLOWED:CompileFlag = CompileFlag.get("MODCHARTS_ALLOWED");
 	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
 	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
@@ -175,6 +175,9 @@ class Project extends HXProject
 		var buildDir = 'export/${isDebug() ? 'debug' : isFinal() ? 'final' : 'release'}/';
 		app.path = buildDir;
 
+		for (shadowName in LIBRARY_SHADOWS_LIST)
+			SOURCE_FOLDERS.push('source/library_shadows/${shadowName}');
+
 		sources = SOURCE_FOLDERS;
 		templatePaths.push("templates");
 
@@ -212,7 +215,6 @@ class Project extends HXProject
 		LUA_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
 		VIDEOS_ALLOWED.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
 		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
-		MODCHARTS_ALLOWED.integrate(/*DCEBUILD.isDisabled()*/false);
 		DCEBUILD.integrate(false);
 		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
 
@@ -314,12 +316,6 @@ class Project extends HXProject
 		if (DISCORD_ALLOWED.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
-		if (MODCHARTS_ALLOWED.isEnabled())
-		{
-			setHaxedef('PSYCH');
-			setHaxedef('PSYCHVERSION', '0.7.3'); // SE based with PE 0.7.3
-		}
-
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
 	}
@@ -352,7 +348,6 @@ class Project extends HXProject
 	function configureLibs()
 	{
 		includeHaxelib("flixel");
-		includeHaxelib("flixel-ui");
 		includeHaxelib("flixel-addons");
 		includeHaxelib("flixel-animate");
 
@@ -364,8 +359,6 @@ class Project extends HXProject
 			includeHaxelib("hxvlc");
 		if (DISCORD_ALLOWED.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
-		if (MODCHARTS_ALLOWED.isEnabled())
-			includeHaxelib("fnf-modcharting-tools");
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");
@@ -401,7 +394,7 @@ class Project extends HXProject
 			for (path => px in sizes)
 				addIcon('icons/ios/SE-Icon-Default-${path}.png', px);
 
-			addIcon("icons/ios/SE-Icon-Default-1024x1024.png"); // lime requires default as well
+			addIcon("icons/ios/SE-Icon-Default-1024x1024.png"); // lime requires default aswell
 		}
 		else
 		{

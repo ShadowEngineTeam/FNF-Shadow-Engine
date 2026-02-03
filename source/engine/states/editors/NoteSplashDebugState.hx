@@ -3,8 +3,6 @@ package states.editors;
 import objects.Note;
 import objects.StrumNote;
 import objects.NoteSplash;
-import flixel.addons.ui.FlxInputText;
-import flixel.addons.ui.FlxUINumericStepper;
 
 using StringTools;
 
@@ -19,10 +17,10 @@ class NoteSplashDebugState extends MusicBeatState
 	var notes:FlxTypedGroup<StrumNote>;
 	var splashes:FlxTypedGroup<FlxSprite>;
 
-	var imageInputText:FlxInputText;
-	var nameInputText:FlxInputText;
-	var stepperMinFps:FlxUINumericStepper;
-	var stepperMaxFps:FlxUINumericStepper;
+	var imageInputText:ShadowTextInput;
+	var nameInputText:ShadowTextInput;
+	var stepperMinFps:ShadowStepper;
+	var stepperMaxFps:ShadowStepper;
 
 	var offsetsText:FlxText;
 	var curFrameText:FlxText;
@@ -34,11 +32,24 @@ class NoteSplashDebugState extends MusicBeatState
 	var missingTextBG:FlxSprite;
 	var missingText:FlxText;
 
+	var UI_help:ShadowPanel;
+	var UI_helpOverlay:FlxSprite;
+	var UI_infoPanel:ShadowPanel;
+	var UI_settingsPanel:ShadowPanel;
+	var camOther:FlxCamera;
+
 	public static final defaultTexture:String = 'noteSplashes';
 
 	override function create()
 	{
+		initPsychCamera();
 		FlxG.camera.bgColor = FlxColor.fromHSL(0, 0, 0.5);
+
+		camOther = new FlxCamera();
+		camOther.bgColor.alpha = 0;
+		camOther.visible = false;
+		FlxG.cameras.add(camOther, false);
+
 		selection = new FlxSprite(0, 270).makeGraphic(150, 150, FlxColor.BLACK);
 		selection.alpha = 0.4;
 		add(selection);
@@ -51,8 +62,8 @@ class NoteSplashDebugState extends MusicBeatState
 
 		for (i in 0...maxNotes)
 		{
-			var x = i * 220 + 240;
-			var y = 290;
+			var x:Int = i * 220 + 240;
+			var y:Int = 290;
 			var note:StrumNote = new StrumNote(x, y, i, 0, null);
 			note.alpha = 0.75;
 			note.playAnim('static');
@@ -65,114 +76,123 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
-		var txtx = 60;
-		var txty = 640;
+		var tipText:FlxText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${controls.mobileC ? "F" : "F1"} for Help', 16);
+		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
+		tipText.scrollFactor.set();
+		add(tipText);
 
-		var imageName:FlxText = new FlxText(txtx, txty - 120, 'Image Name:', 16);
-		add(imageName);
+		var settingsPanelW:Int = 400;
+		var settingsPanelH:Int = 200;
+		UI_settingsPanel = new ShadowPanel((FlxG.width - settingsPanelW) / 2, FlxG.height - settingsPanelH - ShadowStyle.SPACING_LG, settingsPanelW, settingsPanelH);
+		UI_settingsPanel.scrollFactor.set();
+		add(UI_settingsPanel);
 
-		imageInputText = new FlxInputText(txtx, txty - 100, 360, defaultTexture, 16);
-		imageInputText.callback = function(text:String, action:String)
+		var innerX:Int = ShadowStyle.SPACING_SM;
+		var innerY:Int = ShadowStyle.SPACING_SM;
+
+		var imageName:ShadowLabel = new ShadowLabel(innerX, innerY, 'Image Name:', ShadowStyle.FONT_SIZE_MD);
+		UI_settingsPanel.add(imageName);
+
+		imageInputText = new ShadowTextInput(innerX, innerY + 22, 360, defaultTexture);
+		imageInputText.input.callback = function(text:String, action:String)
 		{
-			switch (action)
+			if (action == ShadowInputText.ENTER_ACTION)
 			{
-				case 'enter':
-					imageInputText.hasFocus = false;
-					textureName = text;
-					try
+				imageInputText.setFocus(false);
+				textureName = text;
+				try
+				{
+					loadFrames();
+				}
+				catch (e:Dynamic)
+				{
+					trace('ERROR! $e');
+					textureName = defaultTexture;
+					loadFrames();
+
+					missingText.text = 'ERROR WHILE LOADING IMAGE:\n$text';
+					missingText.screenCenter(Y);
+					missingText.visible = true;
+					missingTextBG.visible = true;
+					FlxG.sound.play(Paths.sound('cancelMenu'));
+
+					new FlxTimer().start(2.5, function(tmr:FlxTimer)
 					{
-						loadFrames();
-					}
-					catch (e:Dynamic)
-					{
-						trace('ERROR! $e');
-						textureName = defaultTexture;
-						loadFrames();
-
-						missingText.text = 'ERROR WHILE LOADING IMAGE:\n$text';
-						missingText.screenCenter(Y);
-						missingText.visible = true;
-						missingTextBG.visible = true;
-						FlxG.sound.play(Paths.sound('cancelMenu'));
-
-						new FlxTimer().start(2.5, function(tmr:FlxTimer)
-						{
-							missingText.visible = false;
-							missingTextBG.visible = false;
-						});
-					}
-
-				default:
-					trace('changed image to $text');
+						missingText.visible = false;
+						missingTextBG.visible = false;
+					});
+				}
+			}
+			else
+			{
+				trace('changed image to $text');
 			}
 		};
-		add(imageInputText);
+		UI_settingsPanel.add(imageInputText);
 
-		var animName:FlxText = new FlxText(txtx, txty, 'Animation Name:', 16);
-		add(animName);
+		var fpsLabel:ShadowLabel = new ShadowLabel(innerX, innerY + 60, 'Min/Max Framerate:', ShadowStyle.FONT_SIZE_MD);
+		UI_settingsPanel.add(fpsLabel);
 
-		nameInputText = new FlxInputText(txtx, txty + 20, 360, '', 16);
-		nameInputText.callback = function(text:String, action:String)
+		stepperMinFps = new ShadowStepper(innerX, innerY + 82, 1, 22, 1, 60, 0);
+		stepperMaxFps = new ShadowStepper(innerX + 60, innerY + 82, 1, 26, 1, 60, 0);
+
+		stepperMinFps.callback = function(value:Float)
 		{
-			switch (action)
-			{
-				case 'enter':
-					nameInputText.hasFocus = false;
+			if (value > stepperMaxFps.value)
+				stepperMaxFps.value = value;
+			if (config != null)
+				config.minFps = Std.int(value);
+		};
+		stepperMaxFps.callback = function(value:Float)
+		{
+			if (value < stepperMinFps.value)
+				stepperMinFps.value = value;
+			if (config != null)
+				config.maxFps = Std.int(value);
+		};
 
-				default:
-					trace('changed anim name to $text');
-					config.anim = text;
-					curAnim = 1;
-					reloadAnims();
+		UI_settingsPanel.add(stepperMinFps);
+		UI_settingsPanel.add(stepperMaxFps);
+
+		var animName:ShadowLabel = new ShadowLabel(innerX, innerY + 120, 'Animation Name:', ShadowStyle.FONT_SIZE_MD);
+		UI_settingsPanel.add(animName);
+
+		nameInputText = new ShadowTextInput(innerX, innerY + 142, 360, '');
+		nameInputText.input.callback = function(text:String, action:String)
+		{
+			if (action == ShadowInputText.ENTER_ACTION)
+				nameInputText.setFocus(false);
+
+			trace('changed anim name to $text');
+			if (config != null)
+			{
+				config.anim = text;
+				curAnim = 1;
+				reloadAnims();
 			}
 		};
-		add(nameInputText);
+		UI_settingsPanel.add(nameInputText);
 
-		add(new FlxText(txtx, txty - 50, 0, 'Min/Max Framerate:', 16));
-		stepperMinFps = new FlxUINumericStepper(txtx, txty - 30, 1, 22, 1, 60, 0);
-		stepperMinFps.name = 'min_fps';
-		add(stepperMinFps);
+		var infoPanelW:Int = 500;
+		var infoPanelH:Int = 90;
+		UI_infoPanel = new ShadowPanel((FlxG.width - infoPanelW) / 2, ShadowStyle.SPACING_LG, infoPanelW, infoPanelH);
+		UI_infoPanel.scrollFactor.set();
+		add(UI_infoPanel);
 
-		stepperMaxFps = new FlxUINumericStepper(txtx + 60, txty - 30, 1, 26, 1, 60, 0);
-		stepperMaxFps.name = 'max_fps';
-		add(stepperMaxFps);
-
-		offsetsText = new FlxText(300, 150, 680, '', 16);
-		offsetsText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		offsetsText.scrollFactor.set();
-		add(offsetsText);
-
-		curFrameText = new FlxText(300, 100, 680, '', 16);
-		curFrameText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		curFrameText.scrollFactor.set();
-		add(curFrameText);
-
-		curAnimText = new FlxText(300, 50, 680, '', 16);
-		curAnimText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		curAnimText = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM, infoPanelW - ShadowStyle.SPACING_SM * 2, '', 16);
+		curAnimText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		curAnimText.scrollFactor.set();
-		add(curAnimText);
+		UI_infoPanel.add(curAnimText);
 
-		var sillyText:String;
+		curFrameText = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM + 28, infoPanelW - ShadowStyle.SPACING_SM * 2, '', 16);
+		curFrameText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
+		curFrameText.scrollFactor.set();
+		UI_infoPanel.add(curFrameText);
 
-		if (controls.mobileC)
-		{
-			sillyText = "Press Y to Reset animation\n
-                        Press A twice to save to the loaded Note Splash PNG's folder\n
-                        Press Top LEFT/RIGHT to change selected note - Arrow Keys to change offset\n
-                        C/V - Copy & Paste";
-		}
-		else
-		{
-			sillyText = "Press SPACE to Reset animation\n
-                        Press ENTER twice to save to the loaded Note Splash PNG's folder\n
-                        A/D change selected note - Arrow Keys to change offset (Hold shift for 10x)\n
-                        Ctrl + C/V - Copy & Paste";
-		}
-
-		var text:FlxText = new FlxText(0, 520, FlxG.width, sillyText, 16);
-		text.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		text.scrollFactor.set();
-		add(text);
+		offsetsText = new FlxText(ShadowStyle.SPACING_SM, ShadowStyle.SPACING_SM + 56, infoPanelW - ShadowStyle.SPACING_SM * 2, '', 16);
+		offsetsText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
+		offsetsText.scrollFactor.set();
+		UI_infoPanel.add(offsetsText);
 
 		savedText = new FlxText(0, 340, FlxG.width, '', 24);
 		savedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -190,6 +210,7 @@ class NoteSplashDebugState extends MusicBeatState
 		missingText.visible = false;
 		add(missingText);
 
+		makeHelpUI();
 		loadFrames();
 		changeSelection();
 		super.create();
@@ -203,10 +224,34 @@ class NoteSplashDebugState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		@:privateAccess
-		cast(stepperMinFps.text_field, FlxInputText).hasFocus = cast(stepperMaxFps.text_field, FlxInputText).hasFocus = false;
+		if (UI_help != null && UI_help.visible)
+		{
+			ClientPrefs.toggleVolumeKeys(false);
+			FlxG.mouse.enabled = false;
+			if (touchPad.buttonF.justPressed || (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
+			{
+				UI_help.visible = false;
+				UI_helpOverlay.visible = false;
+				camOther.visible = false;
+				ClientPrefs.toggleVolumeKeys(true);
+				FlxG.mouse.enabled = true;
+				FlxG.mouse.visible = true;
+			}
+			super.update(elapsed);
+			return;
+		}
 
-		var notTyping:Bool = !nameInputText.hasFocus && !imageInputText.hasFocus;
+		if (FlxG.keys.justPressed.F1)
+		{
+			UI_help.visible = true;
+			UI_helpOverlay.visible = true;
+			camOther.visible = true;
+			ClientPrefs.toggleVolumeKeys(false);
+			FlxG.mouse.visible = false;
+			return;
+		}
+
+		var notTyping:Bool = !nameInputText.hasFocus() && !imageInputText.hasFocus();
 		if (controls.BACK && notTyping)
 		{
 			MusicBeatState.switchState(new MasterEditorMenu());
@@ -228,8 +273,8 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (selecArr != null)
 		{
-			var movex = 0;
-			var movey = 0;
+			var movex:Int = 0;
+			var movey:Int = 0;
 			if (FlxG.keys.justPressed.LEFT || touchPad.buttonLeft2.justPressed)
 				movex = -1;
 			else if (FlxG.keys.justPressed.RIGHT || touchPad.buttonRight2.justPressed)
@@ -255,7 +300,6 @@ class NoteSplashDebugState extends MusicBeatState
 			}
 		}
 
-		// Copy & Paste
 		if (FlxG.keys.pressed.CONTROL || idk)
 		{
 			if (FlxG.keys.justPressed.C || touchPad.buttonC.justPressed)
@@ -279,7 +323,6 @@ class NoteSplashDebugState extends MusicBeatState
 			}
 		}
 
-		// Saving
 		pressEnterToSave -= elapsed;
 		if (visibleTime >= 0)
 		{
@@ -374,7 +417,6 @@ class NoteSplashDebugState extends MusicBeatState
 		stepperMinFps.value = config.minFps;
 		stepperMaxFps.value = config.maxFps;
 
-
 		reloadAnims();
 	}
 
@@ -389,7 +431,7 @@ class NoteSplashDebugState extends MusicBeatState
 			curLen = config.offsets.length;
 		}
 
-		var strToSave = config.anim + '\n' + config.minFps + ' ' + config.maxFps;
+		var strToSave:String = config.anim + '\n' + config.minFps + ' ' + config.maxFps;
 		for (offGroup in config.offsets)
 			strToSave += '\n' + offGroup[0] + ' ' + offGroup[1];
 
@@ -403,26 +445,6 @@ class NoteSplashDebugState extends MusicBeatState
 		#else
 		savedText.text = 'Can\'t save on this platform, too bad.';
 		#end
-	}
-
-	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
-	{
-		if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
-		{
-			var nums:FlxUINumericStepper = cast sender;
-			var wname = nums.name;
-			switch (wname)
-			{
-				case 'min_fps':
-					if (nums.value > stepperMaxFps.value)
-						stepperMaxFps.value = nums.value;
-				case 'max_fps':
-					if (nums.value < stepperMinFps.value)
-						stepperMinFps.value = nums.value;
-			}
-			config.minFps = Std.int(stepperMinFps.value);
-			config.maxFps = Std.int(stepperMaxFps.value);
-		}
 	}
 
 	var maxAnims:Int = 0;
@@ -534,6 +556,59 @@ class NoteSplashDebugState extends MusicBeatState
 	{
 		spr.animation.addByPrefix(name, anim, framerate, loop);
 		return spr.animation.getByName(name) != null;
+	}
+
+	function makeHelpUI()
+	{
+		UI_helpOverlay = new FlxSprite();
+		UI_helpOverlay.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		UI_helpOverlay.alpha = 0.6;
+		UI_helpOverlay.cameras = [camOther];
+		UI_helpOverlay.scrollFactor.set();
+		UI_helpOverlay.visible = false;
+		add(UI_helpOverlay);
+
+		var panelWidth:Int = 750;
+		var panelHeight:Int = 400;
+		UI_help = new ShadowPanel((FlxG.width - panelWidth) / 2, (FlxG.height - panelHeight) / 2, panelWidth, panelHeight);
+		UI_help.cameras = [camOther];
+		UI_help.scrollFactor.set();
+		UI_help.visible = false;
+		add(UI_help);
+
+		var titleText:FlxText = new FlxText(0, ShadowStyle.SPACING_LG, panelWidth, "Controls Help", 24);
+		titleText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), 24, ShadowStyle.TEXT_PRIMARY, CENTER);
+		titleText.scrollFactor.set();
+		UI_help.add(titleText);
+
+		var helpContent:String;
+		if (controls.mobileC)
+		{
+			helpContent = "Y - Reset/Play animation\n" + "A (twice) - Save to loaded Note Splash PNG's folder\n" + "Top LEFT/RIGHT - Change selected note\n"
+				+ "Arrow Keys - Change offset\n" + "W/S - Change animation\n" + "X/E - Change frame\n" + "C/V - Copy & Paste offsets\n"
+				+ "BACK - Return to Editor Menu";
+		}
+		else
+		{
+			helpContent = "SPACE - Reset/Play animation\n"
+				+ "ENTER (twice) - Save to loaded Note Splash PNG's folder\n"
+				+ "A/D - Change selected note\n"
+				+ "Arrow Keys - Change offset (Hold SHIFT for 10x)\n"
+				+ "W/S - Change animation\n"
+				+ "Q/E - Change frame\n"
+				+ "Ctrl + C/V - Copy & Paste offsets\n"
+				+ "ESCAPE - Return to Editor Menu";
+		}
+
+		var contentText:FlxText = new FlxText(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG + 50, panelWidth - ShadowStyle.SPACING_LG * 2, helpContent);
+		contentText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_SECONDARY);
+		contentText.scrollFactor.set();
+		UI_help.add(contentText);
+
+		var closeText:FlxText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close');
+		closeText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
+		closeText.scrollFactor.set();
+		UI_help.add(closeText);
 	}
 
 	override function destroy()

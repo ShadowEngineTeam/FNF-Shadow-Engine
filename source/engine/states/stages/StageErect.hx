@@ -66,7 +66,7 @@ class StageErect extends BaseStage
 			boyfriend.shader = makeCoolShader(12, 0, -23, 7);
 		}
 	}
-	
+
 	function makeSolidColor(sprite:FlxSprite, width:Int, height:Int, color:FlxColor = FlxColor.WHITE):FlxSprite
 	{
 		final graphic:FlxGraphic = FlxG.bitmap.create(2, 2, color, false, 'solid#${color.toHexString(true, false)}');
