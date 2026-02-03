@@ -53,10 +53,10 @@ class Prompt extends MusicBeatSubstate
 		overlay.scrollFactor.set();
 		add(overlay);
 
-		var panelWidth = 450;
-		var panelHeight = 180;
-		var panelX = Std.int((FlxG.width - panelWidth) / 2);
-		var panelY = Std.int((FlxG.height - panelHeight) / 2);
+		var panelWidth:Int = 450;
+		var panelHeight:Int = 180;
+		var panelX:Int = Std.int((FlxG.width - panelWidth) / 2);
+		var panelY:Int = Std.int((FlxG.height - panelHeight) / 2);
 
 		panel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
 		panel.scrollFactor.set();
@@ -67,10 +67,10 @@ class Prompt extends MusicBeatSubstate
 		questionText.scrollFactor.set();
 		panel.add(questionText);
 
-		var buttonSpacing = ShadowStyle.SPACING_LG;
-		var totalButtonWidth = buttonWidth * 2 + buttonSpacing;
-		var buttonY = panelHeight - buttonHeight - ShadowStyle.SPACING_LG;
-		var buttonStartX = Std.int((panelWidth - totalButtonWidth) / 2);
+		var buttonSpacing:Int = ShadowStyle.SPACING_LG;
+		var totalButtonWidth:Float = buttonWidth * 2 + buttonSpacing;
+		var buttonY:Int = panelHeight - buttonHeight - ShadowStyle.SPACING_LG;
+		var buttonStartX:Int = Std.int((panelWidth - totalButtonWidth) / 2);
 
 		buttonAccept = new FlxSprite(buttonStartX, buttonY);
 		buttonAccept.scrollFactor.set();
@@ -122,8 +122,8 @@ class Prompt extends MusicBeatSubstate
 
 	function updateSelection()
 	{
-		var hoverAccept = FlxG.mouse.overlaps(buttonAccept, camera);
-		var hoverCancel = FlxG.mouse.overlaps(buttonCancel, camera);
+		var hoverAccept:Bool = FlxG.mouse.overlaps(buttonAccept, camera);
+		var hoverCancel:Bool = FlxG.mouse.overlaps(buttonCancel, camera);
 
 		drawButton(buttonAccept, selected == 0, hoverAccept);
 		drawButton(buttonCancel, selected == 1, hoverCancel);
@@ -139,8 +139,8 @@ class Prompt extends MusicBeatSubstate
 		if (buttonAccept == null || buttonCancel == null)
 			return;
 
-		var hoverAccept = FlxG.mouse.overlaps(buttonAccept, camera);
-		var hoverCancel = FlxG.mouse.overlaps(buttonCancel, camera);
+		var hoverAccept:Bool = FlxG.mouse.overlaps(buttonAccept, camera);
+		var hoverCancel:Bool = FlxG.mouse.overlaps(buttonCancel, camera);
 
 		if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
 		{
