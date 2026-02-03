@@ -44,9 +44,7 @@ class ShadowInputText extends FlxText
 	}
 
 	public var callback:String->String->Void;
-
 	public var background:Bool = false;
-
 	public var caretColor(default, set):Int;
 
 	function set_caretColor(i:Int):Int
@@ -66,49 +64,27 @@ class ShadowInputText extends FlxText
 	}
 
 	public var selectionColor(default, set):FlxColor = FlxColor.fromRGB(0, 0, 0, 96);
-
 	public var params(default, set):Array<Dynamic>;
-
 	public var passwordMode(get, set):Bool;
-
 	public var hasFocus(default, set):Bool = false;
-
 	public var caretIndex(default, set):Int = 0;
-
 	public var focusGained:Void->Void;
-
 	public var focusLost:Void->Void;
-
 	public var forceCase(default, set):Int = ALL_CASES;
-
 	public var maxLength(default, set):Int = 0;
-
 	public var lines(default, set):Int;
-
 	public var filterMode(default, set):Int = NO_FILTER;
-
 	public var fieldBorderColor(default, set):Int = FlxColor.BLACK;
-
 	public var fieldBorderThickness(default, set):Int = 1;
-
 	public var backgroundColor(default, set):Int = FlxColor.WHITE;
-
 	private var backgroundSprite:FlxSprite;
-
 	private var _caretTimer:FlxTimer;
-
 	private var caret:FlxSprite;
-
 	private var selectionSprite:FlxSprite;
-
 	private var fieldBorderSprite:FlxSprite;
-
 	private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
-
 	private var _charBoundaries:Array<FlxRect>;
-
 	private var lastScroll:Int;
-
 	private var _selectionAnchor:Int = 0;
 	private var _selecting:Bool = false;
 	private var _suppressCaretScroll:Bool = false;
@@ -254,7 +230,7 @@ class ShadowInputText extends FlxText
 		if (FlxG.mouse.justPressed && (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen()))
 			return;
 
-		var cam = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
+		var cam:FlxCamera = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
 
 		if (FlxG.mouse.justPressed)
 		{
@@ -264,7 +240,7 @@ class ShadowInputText extends FlxText
 				var textLen:Int = (text != null) ? text.length : 0;
 				var oldCaret:Int = caretIndex;
 
-				var mouseWorldPos = FlxPoint.get();
+				var mouseWorldPos:FlxPoint = FlxPoint.get();
 				FlxG.mouse.getWorldPosition(cam, mouseWorldPos);
 				var localX:Float = mouseWorldPos.x - x;
 				var localY:Float = mouseWorldPos.y - y;
@@ -302,10 +278,10 @@ class ShadowInputText extends FlxText
 
 		if (_selecting && FlxG.mouse.pressed)
 		{
-			var textLen = (text != null) ? text.length : 0;
+			var textLen:Int = (text != null) ? text.length : 0;
 			if (textLen > 0)
 			{
-				var newIndex = getCaretIndex();
+				var newIndex:Int = getCaretIndex();
 				if (newIndex > textLen)
 					newIndex = textLen;
 				if (newIndex != caretIndex)
@@ -331,7 +307,7 @@ class ShadowInputText extends FlxText
 		if (!hasFocus || !visible || !active)
 			return;
 
-		var textLen = (text != null) ? text.length : 0;
+		var textLen:Int = (text != null) ? text.length : 0;
 
 		switch (key)
 		{
@@ -348,8 +324,8 @@ class ShadowInputText extends FlxText
 				}
 				if (caretIndex > 0)
 				{
-					var oldCaret = caretIndex;
-					var newIndex = caretIndex - 1;
+					var oldCaret:Int = caretIndex;
+					var newIndex:Int = caretIndex - 1;
 
 					if (shiftPressed && textLen > 0)
 					{
@@ -383,8 +359,8 @@ class ShadowInputText extends FlxText
 				}
 				if (caretIndex < textLen)
 				{
-					var oldCaret = caretIndex;
-					var newIndex = caretIndex + 1;
+					var oldCaret:Int = caretIndex;
+					var newIndex:Int = caretIndex + 1;
 
 					if (shiftPressed && textLen > 0)
 					{
@@ -507,7 +483,7 @@ class ShadowInputText extends FlxText
 
 				if (newText.length > 0)
 				{
-					var selectionLength = hasSelection() ? (getSelectionEnd() - getSelectionBegin()) : 0;
+					var selectionLength:Int = hasSelection() ? (getSelectionEnd() - getSelectionBegin()) : 0;
 					if (maxLength == 0 || (text.length - selectionLength + newText.length) <= maxLength)
 					{
 						if (hasSelection())
@@ -542,8 +518,8 @@ class ShadowInputText extends FlxText
 
 	function pasteClipboardText(clipboardText:String)
 	{
-		var selectionLength = hasSelection() ? (getSelectionEnd() - getSelectionBegin()) : 0;
-		var maxPaste = maxLength > 0 ? (maxLength - (text.length - selectionLength)) : clipboardText.length;
+		var selectionLength:Int = hasSelection() ? (getSelectionEnd() - getSelectionBegin()) : 0;
+		var maxPaste:Int = maxLength > 0 ? (maxLength - (text.length - selectionLength)) : clipboardText.length;
 		if (maxPaste < 0)
 			maxPaste = 0;
 
@@ -584,8 +560,8 @@ class ShadowInputText extends FlxText
 
 	private inline function getSelectionBegin():Int
 	{
-		var textLen = (text != null) ? text.length : 0;
-		var begin = caretIndex < _selectionAnchor ? caretIndex : _selectionAnchor;
+		var textLen:Int = (text != null) ? text.length : 0;
+		var begin:Int = caretIndex < _selectionAnchor ? caretIndex : _selectionAnchor;
 		if (begin < 0)
 			return 0;
 		if (begin > textLen)
@@ -595,8 +571,8 @@ class ShadowInputText extends FlxText
 
 	private inline function getSelectionEnd():Int
 	{
-		var textLen = (text != null) ? text.length : 0;
-		var end = caretIndex > _selectionAnchor ? caretIndex : _selectionAnchor;
+		var textLen:Int = (text != null) ? text.length : 0;
+		var end:Int = caretIndex > _selectionAnchor ? caretIndex : _selectionAnchor;
 		if (end < 0)
 			return 0;
 		if (end > textLen)
@@ -608,8 +584,8 @@ class ShadowInputText extends FlxText
 	{
 		if (!hasSelection() || text == null || text.length == 0)
 			return "";
-		var start = getSelectionBegin();
-		var end = getSelectionEnd();
+		var start:Int = getSelectionBegin();
+		var end:Int = getSelectionEnd();
 		if (start >= text.length || end <= 0 || start >= end)
 			return "";
 		return text.substring(start, end);
@@ -617,7 +593,7 @@ class ShadowInputText extends FlxText
 
 	private function clearSelection():Void
 	{
-		var textLen = (text != null) ? text.length : 0;
+		var textLen:Int = (text != null) ? text.length : 0;
 		if (caretIndex > textLen)
 			caretIndex = textLen;
 		if (caretIndex < 0)
@@ -646,8 +622,8 @@ class ShadowInputText extends FlxText
 		if (!hasSelection())
 			return false;
 
-		var textLen = (text != null) ? text.length : 0;
-		var target = toStart ? getSelectionBegin() : getSelectionEnd();
+		var textLen:Int = (text != null) ? text.length : 0;
+		var target:Int = toStart ? getSelectionBegin() : getSelectionEnd();
 		if (target > textLen)
 			target = textLen;
 		if (target < 0)
@@ -663,8 +639,8 @@ class ShadowInputText extends FlxText
 		if (!hasSelection() || text == null || text.length == 0)
 			return false;
 
-		var start = getSelectionBegin();
-		var end = getSelectionEnd();
+		var start:Int = getSelectionBegin();
+		var end:Int = getSelectionEnd();
 		if (start >= end || start >= text.length)
 			return false;
 
@@ -677,9 +653,9 @@ class ShadowInputText extends FlxText
 
 	private function replaceSelection(newText:String):Void
 	{
-		var start = getSelectionBegin();
-		var end = getSelectionEnd();
-		var currentText = (text != null) ? text : "";
+		var start:Int = getSelectionBegin();
+		var end:Int = getSelectionEnd();
+		var currentText:String = (text != null) ? text : "";
 
 		if (start > currentText.length)
 			start = currentText.length;
@@ -695,12 +671,12 @@ class ShadowInputText extends FlxText
 	private function getCaretIndex():Int
 	{
 		#if FLX_MOUSE
-		var mousePos = FlxPoint.get();
-		var cam = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
+		var mousePos:FlxPoint = FlxPoint.get();
+		var cam:FlxCamera = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
 		FlxG.mouse.getWorldPosition(cam, mousePos);
-		var hit = FlxPoint.get(mousePos.x - x, mousePos.y - y);
+		var hit:FlxPoint = FlxPoint.get(mousePos.x - x, mousePos.y - y);
 		mousePos.put();
-		var result = getCharIndexAtPoint(hit.x, hit.y);
+		var result:Int = getCharIndexAtPoint(hit.x, hit.y);
 		hit.put();
 		return result;
 		#else
@@ -766,17 +742,17 @@ class ShadowInputText extends FlxText
 
 	private inline function traceScrollState(action:String, textLen:Int):Void
 	{
-		var viewW = textField != null ? Std.int(textField.width - 4) : -1;
-		var textW = textField != null ? Std.int(textField.textWidth) : -1;
-		var caretScreenX = caret != null ? Std.int(caret.x - x) : -1;
-		var caretTextX = caretScreenX >= 0 ? caretScreenX + lastScroll : -1;
+		var viewW:Int = textField != null ? Std.int(textField.width - 4) : -1;
+		var textW:Int = textField != null ? Std.int(textField.textWidth) : -1;
+		var caretScreenX:Int = caret != null ? Std.int(caret.x - x) : -1;
+		var caretTextX:Int = caretScreenX >= 0 ? caretScreenX + lastScroll : -1;
 		//trace('[ShadowInputText] ' + action + ' caretIndex=' + caretIndex + '/' + textLen + ' caretScreenX=' + caretScreenX
 		//	+ ' caretTextX=' + caretTextX + ' scrollX=' + lastScroll + ' viewW=' + viewW + ' textW=' + textW);
 	}
 
 	private inline function setCaretIndexSilent(newIndex:Int):Void
 	{
-		var oldSuppress = _suppressCaretScroll;
+		var oldSuppress:Bool = _suppressCaretScroll;
 		_suppressCaretScroll = true;
 		caretIndex = newIndex;
 		_suppressCaretScroll = oldSuppress;
@@ -793,8 +769,8 @@ class ShadowInputText extends FlxText
 			return;
 		}
 
-		var begin = getSelectionBegin();
-		var end = getSelectionEnd();
+		var begin:Int = getSelectionBegin();
+		var end:Int = getSelectionEnd();
 
 		if (begin >= text.length)
 			begin = text.length;
@@ -807,8 +783,8 @@ class ShadowInputText extends FlxText
 			return;
 		}
 
-		var targetWidth = Std.int(width);
-		var targetHeight = Std.int(height);
+		var targetWidth:Int = Std.int(width);
+		var targetHeight:Int = Std.int(height);
 		if (targetWidth <= 0 || targetHeight <= 0)
 		{
 			selectionSprite.visible = false;
@@ -832,9 +808,9 @@ class ShadowInputText extends FlxText
 			return;
 		}
 
-		var offx = getSelectionOffsetX();
-		var left = offx + startRect.left;
-		var right = offx + endRect.right;
+		var offx:Float = getSelectionOffsetX();
+		var left:Float = offx + startRect.left;
+		var right:Float = offx + endRect.right;
 
 		#if !js
 		left -= lastScroll;
@@ -849,7 +825,7 @@ class ShadowInputText extends FlxText
 
 		left = Math.max(0, left);
 		right = Math.min(width, right);
-		var rectW = right - left;
+		var rectW:Float = right - left;
 		if (rectW <= 0)
 		{
 			selectionSprite.visible = false;
@@ -915,7 +891,7 @@ class ShadowInputText extends FlxText
 
 		textField.text = Text;
 
-		var textLen = Text.length;
+		var textLen:Int = Text.length;
 		if (_selectionAnchor > textLen)
 			_selectionAnchor = textLen;
 		if (_selectionAnchor < 0)
@@ -1008,7 +984,7 @@ class ShadowInputText extends FlxText
 			return;
 		}
 
-		var targetIndex = caretIndex;
+		var targetIndex:Int = caretIndex;
 		if (targetIndex < 0)
 			targetIndex = 0;
 		if (targetIndex > textLen)
@@ -1050,7 +1026,7 @@ class ShadowInputText extends FlxText
 
 			redrawTextForScroll();
 
-			var oldSuppress = _suppressCaretScroll;
+			var oldSuppress:Bool = _suppressCaretScroll;
 			_suppressCaretScroll = true;
 			set_caretIndex(caretIndex);
 			_suppressCaretScroll = oldSuppress;
@@ -1066,8 +1042,8 @@ class ShadowInputText extends FlxText
 		if (textField == null)
 			return;
 
-		var visibleWidth = textField.width - 4;
-		var maxScroll = Std.int(textField.textWidth - visibleWidth);
+		var visibleWidth:Float = textField.width - 4;
+		var maxScroll:Int = Std.int(textField.textWidth - visibleWidth);
 		if (maxScroll < 0)
 			maxScroll = 0;
 
@@ -1102,7 +1078,7 @@ class ShadowInputText extends FlxText
 	private function onSetTextCheck():Void
 	{
 		#if !js
-		var textLen = (text != null) ? text.length : 0;
+		var textLen:Int = (text != null) ? text.length : 0;
 		if (textLen == 0)
 		{
 			textField.scrollH = 0;
@@ -1112,7 +1088,7 @@ class ShadowInputText extends FlxText
 		}
 
 		var boundary:Rectangle = null;
-		var targetIndex = caretIndex;
+		var targetIndex:Int = caretIndex;
 		if (targetIndex < 0)
 			targetIndex = 0;
 		if (targetIndex > textLen)
@@ -1125,8 +1101,8 @@ class ShadowInputText extends FlxText
 
 		if (boundary != null)
 		{
-			var visibleWidth = textField.width - 4;
-			var maxScroll = Std.int(textField.textWidth - visibleWidth);
+			var visibleWidth:Float = textField.width - 4;
+			var maxScroll:Int = Std.int(textField.textWidth - visibleWidth);
 			if (maxScroll < 0)
 				maxScroll = 0;
 
@@ -1194,8 +1170,8 @@ class ShadowInputText extends FlxText
 		if (textField != null && needsScrollRender && pixels != null)
 		{
 			// Re-render with scroll offset: draw the expanded text shifted left
-			var scrolledPixels = new BitmapData(Std.int(width), Std.int(height), true, 0x00000000);
-			var scrollMatrix = new Matrix();
+			var scrolledPixels:BitmapData = new BitmapData(Std.int(width), Std.int(height), true, 0x00000000);
+			var scrollMatrix:Matrix = new Matrix();
 			scrollMatrix.translate(-lastScroll, 0);
 			scrolledPixels.draw(textField, scrollMatrix);
 
@@ -1395,11 +1371,11 @@ class ShadowInputText extends FlxText
 				_caretTimer.start(0.5, toggleCaret, 0);
 				caret.visible = true;
 
-				var textLen = (text != null) ? text.length : 0;
-				var moveCaretToEnd = true;
+				var textLen:Int = (text != null) ? text.length : 0;
+				var moveCaretToEnd:Bool = true;
 
 				#if FLX_MOUSE
-				var cam = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
+				var cam:FlxCamera = (_cameras != null && _cameras.length > 0) ? _cameras[0] : FlxG.camera;
 				if (FlxG.mouse.justPressed && FlxG.mouse.overlaps(this, cam))
 					moveCaretToEnd = false;
 				#end
@@ -1437,7 +1413,7 @@ class ShadowInputText extends FlxText
 			calcFrame();
 
 			#if (js && html5)
-			var window = FlxG.stage.window;
+			var window:lime.ui.Window = FlxG.stage.window;
 			@:privateAccess window.__backend.setTextInputEnabled(newFocus);
 			#end
 		}
@@ -1476,7 +1452,7 @@ class ShadowInputText extends FlxText
 				offx = 0;
 		}
 
-		var textLen = (text != null) ? text.length : 0;
+		var textLen:Int = (text != null) ? text.length : 0;
 
 		if (newCaretIndex < 0)
 			newCaretIndex = 0;

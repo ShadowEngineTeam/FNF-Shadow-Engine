@@ -74,10 +74,10 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function makeOffsetUI()
 	{
-		var panelWidth = 160;
-		var panelHeight = 80;
-		var panelX = (FlxG.width - panelWidth) / 2;
-		var panelY = 470;
+		var panelWidth:Int = 160;
+		var panelHeight:Int = 80;
+		var panelX:Float = (FlxG.width - panelWidth) / 2;
+		var panelY:Int = 470;
 
 		UI_offsetPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight, "Position Offset");
 		UI_offsetPanel.cameras = [camHUD];
@@ -91,37 +91,36 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addEditorBox()
 	{
+		var buttonWidth:Int = 140;
+		var buttonSpacing:Int = 12;
+		var totalWidth:Int = buttonWidth * 2 + buttonSpacing;
+		var baseX:Float = (FlxG.width - totalWidth) / 2;
+		var buttonY:Int = 570;
 
-		var buttonWidth = 140;
-		var buttonSpacing = 12;
-		var totalWidth = buttonWidth * 2 + buttonSpacing;
-		var baseX = (FlxG.width - totalWidth) / 2;
-		var buttonY = 570;
-
-		var loadButton = new ShadowButton(baseX, buttonY, "Load Character", function()
+		var loadButton:ShadowButton = new ShadowButton(baseX, buttonY, "Load Character", function()
 		{
 			loadCharacter();
 		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
 		loadButton.cameras = [camHUD];
 		add(loadButton);
 
-		var saveButton = new ShadowButton(baseX + buttonWidth + buttonSpacing, buttonY, "Save Character", function()
+		var saveButton:ShadowButton = new ShadowButton(baseX + buttonWidth + buttonSpacing, buttonY, "Save Character", function()
 		{
 			saveCharacter();
 		}, buttonWidth, ShadowStyle.HEIGHT_BUTTON);
 		saveButton.cameras = [camHUD];
 		add(saveButton);
 
-		var charWidth = 280;
-		var charHeight = 220;
+		var charWidth:Int = 280;
+		var charHeight:Int = 220;
 		var tabs = [{name: 'Character', label: 'Character'}];
 		UI_mainbox = new ShadowTabMenu(FlxG.width - charWidth - 20, 460, tabs, charWidth, charHeight);
 		UI_mainbox.cameras = [camHUD];
 		addCharacterUI();
 		add(UI_mainbox);
 
-		var typeWidth = 150;
-		var typeHeight = 180;
+		var typeWidth:Int = 150;
+		var typeHeight:Int = 180;
 		var tabs = [{name: 'Character Type', label: 'Character Type'}];
 		UI_typebox = new ShadowTabMenu(20, 460, tabs, typeWidth, typeHeight);
 		UI_typebox.cameras = [camHUD];
@@ -136,7 +135,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addTypeUI()
 	{
-		var tab_group = UI_typebox.getTabGroup("Character Type");
+		var tab_group:FlxSpriteGroup = UI_typebox.getTabGroup("Character Type");
 
 		opponentCheckbox = new ShadowCheckbox(10, 20, "Opponent", false, function(_)
 		{
@@ -166,13 +165,13 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function addCharacterUI()
 	{
-		var tab_group = UI_mainbox.getTabGroup("Character");
-		var pad = 10;
-		var inputWidth = 160;
-		var rowHeight = 45;
+		var tab_group:FlxSpriteGroup = UI_mainbox.getTabGroup("Character");
+		var pad:Int = 10;
+		var inputWidth:Int = 160;
+		var rowHeight:Int = 45;
 
 		// Row 1: Image file name + Scale
-		var row1Y = 20;
+		var row1Y:Int = 20;
 		tab_group.add(new ShadowLabel(pad, row1Y, 'Image file name:', ShadowStyle.FONT_SIZE_SM));
 		imageInputText = new ShadowTextInput(pad, row1Y + 18, inputWidth, characterFile.image, function(text)
 		{
@@ -188,7 +187,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		}, 80);
 
 		// Row 2: Idle animation
-		var row2Y = row1Y + rowHeight;
+		var row2Y:Int = row1Y + rowHeight;
 		tab_group.add(new ShadowLabel(pad, row2Y, 'Idle animation (.XML):', ShadowStyle.FONT_SIZE_SM));
 		idleInputText = new ShadowTextInput(pad, row2Y + 18, inputWidth, characterFile.idle_anim, function(text)
 		{
@@ -197,7 +196,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		blockPressWhileTypingOn.push(idleInputText);
 
 		// Row 3: Confirm animation
-		var row3Y = row2Y + rowHeight;
+		var row3Y:Int = row2Y + rowHeight;
 		tab_group.add(new ShadowLabel(pad, row3Y, 'Start Press animation (.XML):', ShadowStyle.FONT_SIZE_SM));
 		confirmInputText = new ShadowTextInput(pad, row3Y + 18, inputWidth, characterFile.confirm_anim, function(text)
 		{
@@ -206,14 +205,14 @@ class MenuCharacterEditorState extends MusicBeatState
 		blockPressWhileTypingOn.push(confirmInputText);
 
 		// Row 4: Flip X checkbox + Reload button
-		var row4Y = row3Y + rowHeight;
+		var row4Y:Int = row3Y + rowHeight;
 		flipXCheckbox = new ShadowCheckbox(pad, row4Y + 5, "Flip X", characterFile.flipX, function(value)
 		{
 			grpWeekCharacters.members[curTypeSelected].flipX = value;
 			characterFile.flipX = value;
 		});
 
-		var reloadImageButton = new ShadowButton(pad + inputWidth + 15, row4Y, "Reload Char", function()
+		var reloadImageButton:ShadowButton = new ShadowButton(pad + inputWidth + 15, row4Y, "Reload Char", function()
 		{
 			reloadSelectedCharacter();
 		}, 90, ShadowStyle.HEIGHT_BUTTON);
@@ -287,7 +286,6 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-
 		var blockInput:Bool = false;
 		for (inputText in blockPressWhileTypingOn)
 		{
@@ -364,7 +362,7 @@ class MenuCharacterEditorState extends MusicBeatState
 	function loadCharacter()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -473,7 +471,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[splittedImage.length - 1].toLowerCase().replace(' ', '');
 
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, characterName + ".json", null, "*/*");

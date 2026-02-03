@@ -85,7 +85,7 @@ class ShadowPanel extends FlxSpriteGroup
 
 	function updateHeaderLayout()
 	{
-		var rightX = bg.x + (_width - _headerRightPad - ShadowStyle.SIZE_HEADER_BTN);
+		var rightX:Float = bg.x + (_width - _headerRightPad - ShadowStyle.SIZE_HEADER_BTN);
 
 		if (showMinimizeButton)
 			minimizeBtn.x = rightX;
@@ -94,7 +94,7 @@ class ShadowPanel extends FlxSpriteGroup
 
 		minimizeBtn.visible = showMinimizeButton;
 
-		var reservedRight = headerButtonsWidth();
+		var reservedRight:Int = headerButtonsWidth();
 		titleText.fieldWidth = _width - ShadowStyle.SPACING_SM * 2 - reservedRight;
 		if (titleText.fieldWidth < 10)
 			titleText.fieldWidth = 10;
@@ -116,12 +116,12 @@ class ShadowPanel extends FlxSpriteGroup
 
 	function drawMinimizeButton(hover:Bool)
 	{
-		var size = ShadowStyle.SIZE_HEADER_BTN;
+		var size:Int = ShadowStyle.SIZE_HEADER_BTN;
 		var bgColor = hover ? ShadowStyle.brighten(ShadowStyle.BG_LIGHT, 0.1) : ShadowStyle.BG_LIGHT;
 		minimizeBtn.makeGraphic(size, size, bgColor, true);
 
 		var lineColor = ShadowStyle.TEXT_PRIMARY;
-		var padding = 4;
+		var padding:Int = 4;
 
 		if (collapsed)
 		{
@@ -135,7 +135,7 @@ class ShadowPanel extends FlxSpriteGroup
 		}
 		else
 		{
-			var lineY = size - padding - 2;
+			var lineY:Int = size - padding - 2;
 			for (i in padding...(size - padding))
 			{
 				minimizeBtn.pixels.setPixel32(i, lineY, lineColor);
@@ -211,12 +211,12 @@ class ShadowPanel extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var mx = FlxG.mouse.screenX;
-		var my = FlxG.mouse.screenY;
+		var mx:Int = FlxG.mouse.screenX;
+		var my:Int = FlxG.mouse.screenY;
 
 		updateHeaderLayout();
 
-		var overMinimizeBtn = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
+		var overMinimizeBtn:Bool = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
 
 		if (overMinimizeBtn != _minimizeBtnHover)
 		{
@@ -224,11 +224,11 @@ class ShadowPanel extends FlxSpriteGroup
 			drawMinimizeButton(_minimizeBtnHover);
 		}
 
-		var headerLeft = this.x;
-		var headerTop = this.y;
-		var headerRight = this.x + _width;
-		var headerBottom = this.y + ShadowStyle.HEIGHT_HEADER;
-		var inHeader = mx >= headerLeft && mx <= headerRight && my >= headerTop && my <= headerBottom;
+		var headerLeft:Float = this.x;
+		var headerTop:Float = this.y;
+		var headerRight:Float = this.x + _width;
+		var headerBottom:Float = this.y + ShadowStyle.HEIGHT_HEADER;
+		var inHeader:Bool = mx >= headerLeft && mx <= headerRight && my >= headerTop && my <= headerBottom;
 
 		if (_wantsMinimizeToggle)
 		{
@@ -276,8 +276,8 @@ class ShadowPanel extends FlxSpriteGroup
 		// Only start dragging if we have focus
 		if (_pressing && !_dragging && FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 		{
-			var dx = mx - _pressStartX;
-			var dy = my - _pressStartY;
+			var dx:Float = mx - _pressStartX;
+			var dy:Float = my - _pressStartY;
 			if ((dx * dx + dy * dy) >= 16)
 			{
 				_dragging = true;

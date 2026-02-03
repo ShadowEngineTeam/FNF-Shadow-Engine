@@ -104,9 +104,9 @@ class DialogueEditorState extends MusicBeatState
 	function addEditorBox()
 	{
 		var tabs = [{name: 'Dialogue Line', label: 'Dialogue Line'}];
-		var margin = ShadowStyle.SPACING_LG;
-		var panelWidth = 350;
-		var panelHeight = 320;
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var panelWidth:Int = 350;
+		var panelHeight:Int = 320;
 
 		UI_box = new ShadowTabMenu(12, 103, tabs, panelWidth, panelHeight);
 		UI_box.scrollFactor.set();
@@ -122,29 +122,29 @@ class DialogueEditorState extends MusicBeatState
 
 	function addDialogueLineUI()
 	{
-		var tab_group = UI_box.getTabGroup("Dialogue Line");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Dialogue Line");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var fullW = Std.int(@:privateAccess UI_box._width - pad * 2);
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var fullW:Int = Std.int(@:privateAccess UI_box._width - pad * 2);
 
-		var row0 = pad;
-		var row1 = row0 + rowStep;
-		var row2 = row1 + rowStep;
-		var row3 = row2 + rowStep;
-		var row4 = row3 + rowStep;
-		var row5 = row4 + rowStep;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var row2:Int = row1 + rowStep;
+		var row3:Int = row2 + rowStep;
+		var row4:Int = row3 + rowStep;
+		var row5:Int = row4 + rowStep;
 
-		var controlY0 = row0 + labelOffset;
-		var controlY1 = row1 + labelOffset;
-		var controlY2 = row2 + labelOffset;
-		var controlY3 = row3 + labelOffset;
-		var controlY4 = row4 + labelOffset;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var controlY2:Int = row2 + labelOffset;
+		var controlY3:Int = row3 + labelOffset;
+		var controlY4:Int = row4 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
 
 		characterInputText = new ShadowTextInput(pad, controlY0, fullW - 20, DialogueCharacter.DEFAULT_CHARACTER);
 		blockPressWhileTypingOn.push(characterInputText);
@@ -198,12 +198,12 @@ class DialogueEditorState extends MusicBeatState
 			reloadText(true);
 		};
 
-		var loadButton = new ShadowButton(pad, controlY4, "Load Dialogue", function()
+		var loadButton:ShadowButton = new ShadowButton(pad, controlY4, "Load Dialogue", function()
 		{
 			loadDialogue();
 		}, 150);
 
-		var saveButton = new ShadowButton(pad + 160, controlY4, "Save Dialogue", function()
+		var saveButton:ShadowButton = new ShadowButton(pad + 160, controlY4, "Save Dialogue", function()
 		{
 			saveDialogue();
 		}, 150);
@@ -574,7 +574,7 @@ class DialogueEditorState extends MusicBeatState
 	function loadDialogue()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -665,7 +665,7 @@ class DialogueEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, "dialogue.json", null, "*/*");

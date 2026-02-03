@@ -62,8 +62,8 @@ class NoteSplashDebugState extends MusicBeatState
 
 		for (i in 0...maxNotes)
 		{
-			var x = i * 220 + 240;
-			var y = 290;
+			var x:Int = i * 220 + 240;
+			var y:Int = 290;
 			var note:StrumNote = new StrumNote(x, y, i, 0, null);
 			note.alpha = 0.75;
 			note.playAnim('static');
@@ -76,21 +76,21 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
-		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${controls.mobileC ? "F" : "F1"} for Help', 16);
+		var tipText:FlxText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${controls.mobileC ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
 		tipText.scrollFactor.set();
 		add(tipText);
 
-		var settingsPanelW = 400;
-		var settingsPanelH = 200;
+		var settingsPanelW:Int = 400;
+		var settingsPanelH:Int = 200;
 		UI_settingsPanel = new ShadowPanel((FlxG.width - settingsPanelW) / 2, FlxG.height - settingsPanelH - ShadowStyle.SPACING_LG, settingsPanelW, settingsPanelH);
 		UI_settingsPanel.scrollFactor.set();
 		add(UI_settingsPanel);
 
-		var innerX = ShadowStyle.SPACING_SM;
-		var innerY = ShadowStyle.SPACING_SM;
+		var innerX:Int = ShadowStyle.SPACING_SM;
+		var innerY:Int = ShadowStyle.SPACING_SM;
 
-		var imageName = new ShadowLabel(innerX, innerY, 'Image Name:', ShadowStyle.FONT_SIZE_MD);
+		var imageName:ShadowLabel = new ShadowLabel(innerX, innerY, 'Image Name:', ShadowStyle.FONT_SIZE_MD);
 		UI_settingsPanel.add(imageName);
 
 		imageInputText = new ShadowTextInput(innerX, innerY + 22, 360, defaultTexture);
@@ -130,7 +130,7 @@ class NoteSplashDebugState extends MusicBeatState
 		};
 		UI_settingsPanel.add(imageInputText);
 
-		var fpsLabel = new ShadowLabel(innerX, innerY + 60, 'Min/Max Framerate:', ShadowStyle.FONT_SIZE_MD);
+		var fpsLabel:ShadowLabel = new ShadowLabel(innerX, innerY + 60, 'Min/Max Framerate:', ShadowStyle.FONT_SIZE_MD);
 		UI_settingsPanel.add(fpsLabel);
 
 		stepperMinFps = new ShadowStepper(innerX, innerY + 82, 1, 22, 1, 60, 0);
@@ -154,7 +154,7 @@ class NoteSplashDebugState extends MusicBeatState
 		UI_settingsPanel.add(stepperMinFps);
 		UI_settingsPanel.add(stepperMaxFps);
 
-		var animName = new ShadowLabel(innerX, innerY + 120, 'Animation Name:', ShadowStyle.FONT_SIZE_MD);
+		var animName:ShadowLabel = new ShadowLabel(innerX, innerY + 120, 'Animation Name:', ShadowStyle.FONT_SIZE_MD);
 		UI_settingsPanel.add(animName);
 
 		nameInputText = new ShadowTextInput(innerX, innerY + 142, 360, '');
@@ -173,8 +173,8 @@ class NoteSplashDebugState extends MusicBeatState
 		};
 		UI_settingsPanel.add(nameInputText);
 
-		var infoPanelW = 500;
-		var infoPanelH = 90;
+		var infoPanelW:Int = 500;
+		var infoPanelH:Int = 90;
 		UI_infoPanel = new ShadowPanel((FlxG.width - infoPanelW) / 2, ShadowStyle.SPACING_LG, infoPanelW, infoPanelH);
 		UI_infoPanel.scrollFactor.set();
 		add(UI_infoPanel);
@@ -273,8 +273,8 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (selecArr != null)
 		{
-			var movex = 0;
-			var movey = 0;
+			var movex:Int = 0;
+			var movey:Int = 0;
 			if (FlxG.keys.justPressed.LEFT || touchPad.buttonLeft2.justPressed)
 				movex = -1;
 			else if (FlxG.keys.justPressed.RIGHT || touchPad.buttonRight2.justPressed)
@@ -431,7 +431,7 @@ class NoteSplashDebugState extends MusicBeatState
 			curLen = config.offsets.length;
 		}
 
-		var strToSave = config.anim + '\n' + config.minFps + ' ' + config.maxFps;
+		var strToSave:String = config.anim + '\n' + config.minFps + ' ' + config.maxFps;
 		for (offGroup in config.offsets)
 			strToSave += '\n' + offGroup[0] + ' ' + offGroup[1];
 
@@ -568,15 +568,15 @@ class NoteSplashDebugState extends MusicBeatState
 		UI_helpOverlay.visible = false;
 		add(UI_helpOverlay);
 
-		var panelWidth = 750;
-		var panelHeight = 400;
+		var panelWidth:Int = 750;
+		var panelHeight:Int = 400;
 		UI_help = new ShadowPanel((FlxG.width - panelWidth) / 2, (FlxG.height - panelHeight) / 2, panelWidth, panelHeight);
 		UI_help.cameras = [camOther];
 		UI_help.scrollFactor.set();
 		UI_help.visible = false;
 		add(UI_help);
 
-		var titleText = new FlxText(0, ShadowStyle.SPACING_LG, panelWidth, "Controls Help", 24);
+		var titleText:FlxText = new FlxText(0, ShadowStyle.SPACING_LG, panelWidth, "Controls Help", 24);
 		titleText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), 24, ShadowStyle.TEXT_PRIMARY, CENTER);
 		titleText.scrollFactor.set();
 		UI_help.add(titleText);
@@ -600,12 +600,12 @@ class NoteSplashDebugState extends MusicBeatState
 				+ "ESCAPE - Return to Editor Menu";
 		}
 
-		var contentText = new FlxText(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG + 50, panelWidth - ShadowStyle.SPACING_LG * 2, helpContent);
+		var contentText:FlxText = new FlxText(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG + 50, panelWidth - ShadowStyle.SPACING_LG * 2, helpContent);
 		contentText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_SECONDARY);
 		contentText.scrollFactor.set();
 		UI_help.add(contentText);
 
-		var closeText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close');
+		var closeText:FlxText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close');
 		closeText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
 		closeText.scrollFactor.set();
 		UI_help.add(closeText);

@@ -98,7 +98,7 @@ class ShadowDropdown extends FlxSpriteGroup
 
 	override function set_cameras(value:Array<FlxCamera>):Array<FlxCamera>
 	{
-		var out = super.set_cameras(value);
+		var out:Array<FlxCamera> = super.set_cameras(value);
 		applyCamerasToChildren();
 		return out;
 	}
@@ -185,14 +185,14 @@ class ShadowDropdown extends FlxSpriteGroup
 	function drawArrow()
 	{
 		arrow.makeGraphic(12, _height, FlxColor.TRANSPARENT, true);
-		var cx = 6;
-		var cy = Std.int(_height / 2);
+		var cx:Int = 6;
+		var cy:Int = Std.int(_height / 2);
 		for (row in 0...4)
 		{
 			for (col in 0...(row * 2 + 1))
 			{
-				var px = cx - row + col;
-				var py = cy - 2 + row;
+				var px:Int = cx - row + col;
+				var py:Int = cy - 2 + row;
 				if (px >= 0 && px < 12 && py >= 0 && py < _height)
 					arrow.pixels.setPixel32(px, py, ShadowStyle.TEXT_SECONDARY);
 			}
@@ -231,7 +231,7 @@ class ShadowDropdown extends FlxSpriteGroup
 		if (localY < 0)
 			return -1;
 
-		var idx = _scrollIndex + Std.int(localY / _height);
+		var idx:Int = _scrollIndex + Std.int(localY / _height);
 		return (idx >= 0 && idx < options.length) ? idx : -1;
 	}
 
@@ -258,7 +258,7 @@ class ShadowDropdown extends FlxSpriteGroup
 
 		while (_rowItems.length < _maxVisible)
 		{
-			var t = new FlxText(ShadowStyle.SPACING_SM, 0, _width - ShadowStyle.SPACING_SM * 2, "");
+			var t:FlxText = new FlxText(ShadowStyle.SPACING_SM, 0, _width - ShadowStyle.SPACING_SM * 2, "");
 			t.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 			t.antialiasing = ShadowStyle.antialiasing;
 			t.visible = false;
@@ -518,7 +518,7 @@ class ShadowDropdown extends FlxSpriteGroup
 				_ignoreUntilMouseRelease = false;
 		}
 
-		var overHeader = isMouseOverHeader(cam);
+		var overHeader:Bool = isMouseOverHeader(cam);
 		if (overHeader && !_headerHovered)
 		{
 			_headerHovered = true;
@@ -533,7 +533,7 @@ class ShadowDropdown extends FlxSpriteGroup
 
 		if (isOpen)
 		{
-			var idx = getHoveredIndexOnList(cam);
+			var idx:Int = getHoveredIndexOnList(cam);
 			if (idx != _hoverIndex)
 			{
 				_hoverIndex = idx;
@@ -541,8 +541,8 @@ class ShadowDropdown extends FlxSpriteGroup
 			}
 		}
 
-		var anyClick = isAnyMouseJustPressed();
-		var leftClick = FlxG.mouse.justPressed;
+		var anyClick:Bool = isAnyMouseJustPressed();
+		var leftClick:Bool = FlxG.mouse.justPressed;
 
 		if (!_ignoreUntilMouseRelease && anyClick && nowTick > _ignoreClickUntilTick)
 		{
@@ -557,7 +557,7 @@ class ShadowDropdown extends FlxSpriteGroup
 
 			if (isOpen && leftClick)
 			{
-				var idx = getHoveredIndexOnList(cam);
+				var idx:Int = getHoveredIndexOnList(cam);
 				if (idx != -1)
 				{
 					selectedIndex = idx;
@@ -579,7 +579,7 @@ class ShadowDropdown extends FlxSpriteGroup
 
 		if (isOpen && isMouseOverList(cam))
 		{
-			var wheel = FlxG.mouse.wheel;
+			var wheel:Int = FlxG.mouse.wheel;
 			var maxScroll:Int = Std.int(Math.max(0, options.length - Math.min(options.length, _maxVisible)));
 			if (wheel != 0 && maxScroll > 0)
 			{

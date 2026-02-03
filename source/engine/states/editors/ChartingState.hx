@@ -2,6 +2,7 @@ package states.editors;
 
 import haxe.format.JsonParser;
 import haxe.io.Bytes;
+import haxe.io.Path;
 import flixel.FlxCamera;
 import flixel.FlxObject;
 import flixel.addons.display.FlxGridOverlay;
@@ -33,7 +34,7 @@ class ChartingState extends MusicBeatState
 	public static var noteTypeList:Array<String> = // Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
 		['', 'Alt Animation', 'Hey!', 'Hurt Note', 'GF Sing', 'No Animation'];
 
-	public var ignoreWarnings = false;
+	public var ignoreWarnings:Bool = false;
 
 	var curNoteTypes:Array<String> = [];
 	var undos = [];
@@ -140,10 +141,7 @@ class ChartingState extends MusicBeatState
 	var gridBG:FlxSprite;
 	var nextGridBG:FlxSprite;
 
-	var daquantspot = 0;
 	var curEventSelected:Int = 0;
-	var curUndoIndex = 0;
-	var curRedoIndex = 0;
 	var _song:SwagSong;
 	/*
 	 * WILL BE THE CURRENT / LAST PLACED NOTE
@@ -190,7 +188,7 @@ class ChartingState extends MusicBeatState
 	}
 
 	public static var quantization:Int = 16;
-	public static var curQuant = 3;
+	public static var curQuant:Int = 3;
 
 	public var quantizations:Array<Int> = [4, 8, 12, 16, 20, 24, 32, 48, 64, 96, 192];
 
@@ -318,8 +316,8 @@ class ChartingState extends MusicBeatState
 		dummyArrow.antialiasing = ClientPrefs.data.antialiasing;
 		add(dummyArrow);
 
-		var infoPanelW = 200;
-		var infoPanelH = 150;
+		var infoPanelW:Int = 200;
+		var infoPanelH:Int = 150;
 		UI_infoPanel = new ShadowPanel(ShadowStyle.SPACING_LG, ShadowStyle.SPACING_LG, infoPanelW, infoPanelH);
 		UI_infoPanel.scrollFactor.set();
 
@@ -333,7 +331,7 @@ class ChartingState extends MusicBeatState
 		bpmTxt.scrollFactor.set();
 		UI_infoPanel.add(bpmTxt);
 
-		var tabs = [
+		var tabs:Array<TabDef> = [
 			{name: "Song", label: 'Song'},
 			{name: "Section", label: 'Section'},
 			{name: "Note", label: 'Note'},
@@ -415,17 +413,17 @@ class ChartingState extends MusicBeatState
 
 	function addSongUI():Void
 	{
-		var tab_group = UI_box.getTabGroup("Song");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Song");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var buttonWidth = 80;
-		var buttonGap = ShadowStyle.SPACING_SM;
-		var dropdownWidth = 120;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var buttonWidth:Int = 80;
+		var buttonGap:Int = ShadowStyle.SPACING_SM;
+		var dropdownWidth:Int = 120;
 
 		// Build character list
 		var directories:Array<String> = [];
@@ -454,7 +452,7 @@ class ChartingState extends MusicBeatState
 			{
 				for (file in FileSystem.readDirectory(directory))
 				{
-					var path = haxe.io.Path.join([directory, file]);
+					var path:String = Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
 					{
 						var charToCheck:String = file.substr(0, file.length - 5);
@@ -498,7 +496,7 @@ class ChartingState extends MusicBeatState
 			{
 				for (file in FileSystem.readDirectory(directory))
 				{
-					var path = haxe.io.Path.join([directory, file]);
+					var path:String = Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
 					{
 						var stageToCheck:String = file.substr(0, file.length - 5);
@@ -514,19 +512,19 @@ class ChartingState extends MusicBeatState
 		if (stageList.length < 1)
 			stageList.push('stage');
 
-		var row0 = pad;
+		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Song Title:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		UI_songTitle = new ShadowTextInput(pad, row0 + labelOffset, 90, _song.song);
 		tab_group.add(UI_songTitle);
 		registerBlockerInput(UI_songTitle);
 
-		var saveButton = new ShadowButton(pad + 95 + buttonGap, row0 + labelOffset, "Save", function()
+		var saveButton:ShadowButton = new ShadowButton(pad + 95 + buttonGap, row0 + labelOffset, "Save", function()
 		{
 			saveLevel();
 		}, 50);
 		tab_group.add(saveButton);
 
-		var reloadSong = new ShadowButton(saveButton.x + 55, row0 + labelOffset, "Reload Audio", function()
+		var reloadSong:ShadowButton = new ShadowButton(saveButton.x + 55, row0 + labelOffset, "Reload Audio", function()
 		{
 			currentSongName = Paths.formatToSongPath(UI_songTitle.text);
 			updateJsonData();
@@ -535,7 +533,7 @@ class ChartingState extends MusicBeatState
 		}, 80);
 		tab_group.add(reloadSong);
 
-		var row1 = row0 + rowStep;
+		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "BPM:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stepperBPM = new ShadowStepper(pad, row1 + labelOffset, 1, Conductor.bpm, 1, 400, 3, function(value:Float)
 		{
@@ -555,15 +553,15 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(stepperSpeed);
 
-		var check_voices = new ShadowCheckbox(pad + 150, row1 + labelOffset + 4, "Voices", _song.needsVoices, function(checked:Bool)
+		var check_voices:ShadowCheckbox = new ShadowCheckbox(pad + 150, row1 + labelOffset + 4, "Voices", _song.needsVoices, function(checked:Bool)
 		{
 			_song.needsVoices = checked;
 		});
 		tab_group.add(check_voices);
 
-		var row2 = row1 + rowStep;
+		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Boyfriend:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		var player1DropDown = new ShadowDropdown(pad, row2 + labelOffset, characters, function(index:Int)
+		var player1DropDown:ShadowDropdown = new ShadowDropdown(pad, row2 + labelOffset, characters, function(index:Int)
 		{
 			_song.player1 = characters[index];
 			updateJsonData();
@@ -578,9 +576,9 @@ class ChartingState extends MusicBeatState
 		}, dropdownWidth);
 		stageDropDown.selectedIndex = stageList.indexOf(_song.stage);
 
-		var row3 = row2 + rowStep;
+		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Girlfriend:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		var gfVersionDropDown = new ShadowDropdown(pad, row3 + labelOffset, characters, function(index:Int)
+		var gfVersionDropDown:ShadowDropdown = new ShadowDropdown(pad, row3 + labelOffset, characters, function(index:Int)
 		{
 			_song.gfVersion = characters[index];
 			updateJsonData();
@@ -588,9 +586,9 @@ class ChartingState extends MusicBeatState
 		}, dropdownWidth);
 		gfVersionDropDown.selectedIndex = characters.indexOf(_song.gfVersion);
 
-		var row4 = row3 + rowStep;
+		var row4:Int = row3 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row4, "Opponent:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		var player2DropDown = new ShadowDropdown(pad, row4 + labelOffset, characters, function(index:Int)
+		var player2DropDown:ShadowDropdown = new ShadowDropdown(pad, row4 + labelOffset, characters, function(index:Int)
 		{
 			_song.player2 = characters[index];
 			updateJsonData();
@@ -598,8 +596,8 @@ class ChartingState extends MusicBeatState
 		}, dropdownWidth);
 		player2DropDown.selectedIndex = characters.indexOf(_song.player2);
 
-		var row5 = row4 + rowStep;
-		var reloadSongJson = new ShadowButton(pad, row5, "Reload JSON", function()
+		var row5:Int = row4 + rowStep;
+		var reloadSongJson:ShadowButton = new ShadowButton(pad, row5, "Reload JSON", function()
 		{
 			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
 			{
@@ -608,14 +606,14 @@ class ChartingState extends MusicBeatState
 		}, buttonWidth);
 		tab_group.add(reloadSongJson);
 
-		var loadAutosaveBtn = new ShadowButton(pad + buttonWidth + buttonGap, row5, "Load Auto", function()
+		var loadAutosaveBtn:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row5, "Load Auto", function()
 		{
 			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
 			MusicBeatState.resetState();
 		}, 70);
 		tab_group.add(loadAutosaveBtn);
 
-		var loadEventJson = new ShadowButton(pad + buttonWidth + buttonGap + 75, row5, "Load Events", function()
+		var loadEventJson:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap + 75, row5, "Load Events", function()
 		{
 			var songName:String = Paths.formatToSongPath(_song.song);
 			var baseFile:String = Paths.json(songName + '/events');
@@ -641,20 +639,20 @@ class ChartingState extends MusicBeatState
 		}, buttonWidth);
 		tab_group.add(loadEventJson);
 
-		var row6 = row5 + ShadowStyle.HEIGHT_BUTTON + rowGap;
-		var saveEvents = new ShadowButton(pad, row6, "Save Events", function()
+		var row6:Int = row5 + ShadowStyle.HEIGHT_BUTTON + rowGap;
+		var saveEvents:ShadowButton = new ShadowButton(pad, row6, "Save Events", function()
 		{
 			saveEvents();
 		}, buttonWidth);
 		tab_group.add(saveEvents);
 
-		var clear_events = new ShadowButton(pad + buttonWidth + buttonGap, row6, "Clear Events", function()
+		var clear_events:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row6, "Clear Events", function()
 		{
 			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings));
 		}, buttonWidth);
 		tab_group.add(clear_events);
 
-		var clear_notes = new ShadowButton(pad + (buttonWidth + buttonGap) * 2, row6, "Clear Notes", function()
+		var clear_notes:ShadowButton = new ShadowButton(pad + (buttonWidth + buttonGap) * 2, row6, "Clear Notes", function()
 		{
 			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
 			{
@@ -696,19 +694,19 @@ class ChartingState extends MusicBeatState
 
 	function addSectionUI():Void
 	{
-		var tab_group = UI_box.getTabGroup("Section");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Section");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var buttonWidth = 80;
-		var buttonGap = ShadowStyle.SPACING_SM;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var buttonWidth:Int = 80;
+		var buttonGap:Int = ShadowStyle.SPACING_SM;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
 
-		var row0 = pad;
+		var row0:Int = pad;
 		check_mustHitSection = new ShadowCheckbox(pad, row0, "Must Hit Section", _song.notes[curSec].mustHitSection, function(checked:Bool)
 		{
 			_song.notes[curSec].mustHitSection = checked;
@@ -725,14 +723,14 @@ class ChartingState extends MusicBeatState
 		});
 		tab_group.add(check_gfSection);
 
-		var row1 = row0 + ShadowStyle.HEIGHT_CHECKBOX + rowGap;
+		var row1:Int = row0 + ShadowStyle.HEIGHT_CHECKBOX + rowGap;
 		check_altAnim = new ShadowCheckbox(pad, row1, "Alt Animation", _song.notes[curSec].altAnim, function(checked:Bool)
 		{
 			_song.notes[curSec].altAnim = checked;
 		});
 		tab_group.add(check_altAnim);
 
-		var row2 = row1 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
+		var row2:Int = row1 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
 		tab_group.add(new ShadowLabel(pad, row2, "Beats per Section:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stepperBeats = new ShadowStepper(pad, row2 + labelOffset, 1, getSectionBeats(), 1, 7, 2, function(value:Float)
 		{
@@ -741,14 +739,14 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(stepperBeats);
 
-		var row3 = row2 + rowStep;
+		var row3:Int = row2 + rowStep;
 		check_changeBPM = new ShadowCheckbox(pad, row3 + labelOffset + checkboxOffset, "Change BPM", _song.notes[curSec].changeBPM, function(checked:Bool)
 		{
 			_song.notes[curSec].changeBPM = checked;
 		});
 		tab_group.add(check_changeBPM);
 
-		var sectionBpmValue = check_changeBPM.checked ? _song.notes[curSec].bpm : Conductor.bpm;
+		var sectionBpmValue:Float = check_changeBPM.checked ? _song.notes[curSec].bpm : Conductor.bpm;
 		stepperSectionBPM = new ShadowStepper(pad + 110, row3 + labelOffset, 1, sectionBpmValue, 0, 999, 1, function(value:Float)
 		{
 			_song.notes[curSec].bpm = value;
@@ -756,8 +754,8 @@ class ChartingState extends MusicBeatState
 		}, 70);
 		tab_group.add(stepperSectionBPM);
 
-		var row4 = row3 + rowStep;
-		var copyButton = new ShadowButton(pad, row4, "Copy", function()
+		var row4:Int = row3 + rowStep;
+		var copyButton:ShadowButton = new ShadowButton(pad, row4, "Copy", function()
 		{
 			notesCopied = [];
 			sectionToCopy = curSec;
@@ -786,7 +784,7 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(copyButton);
 
-		var pasteButton = new ShadowButton(pad + 65, row4, "Paste", function()
+		var pasteButton:ShadowButton = new ShadowButton(pad + 65, row4, "Paste", function()
 		{
 			if (notesCopied == null || notesCopied.length < 1)
 				return;
@@ -827,7 +825,7 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(pasteButton);
 
-		var clearSectionButton = new ShadowButton(pad + 130, row4, "Clear", function()
+		var clearSectionButton:ShadowButton = new ShadowButton(pad + 130, row4, "Clear", function()
 		{
 			if (check_notesSec.checked)
 				_song.notes[curSec].sectionNotes = [];
@@ -850,7 +848,7 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(clearSectionButton);
 
-		var swapSection = new ShadowButton(pad + 195, row4, "Swap", function()
+		var swapSection:ShadowButton = new ShadowButton(pad + 195, row4, "Swap", function()
 		{
 			for (i in 0..._song.notes[curSec].sectionNotes.length)
 			{
@@ -862,20 +860,20 @@ class ChartingState extends MusicBeatState
 		}, 50);
 		tab_group.add(swapSection);
 
-		var row5 = row4 + ShadowStyle.HEIGHT_BUTTON + rowGap;
+		var row5:Int = row4 + ShadowStyle.HEIGHT_BUTTON + rowGap;
 		check_notesSec = new ShadowCheckbox(pad, row5, "Notes", true);
 		tab_group.add(check_notesSec);
 		check_eventsSec = new ShadowCheckbox(pad + 70, row5, "Events", true);
 		tab_group.add(check_eventsSec);
 
-		var row6 = row5 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
-		var copyLastButton = new ShadowButton(pad, row6, "Copy Last", function()
+		var row6:Int = row5 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
+		var copyLastButton:ShadowButton = new ShadowButton(pad, row6, "Copy Last", function()
 		{
 			var value:Int = Std.int(stepperCopy.value);
 			if (value == 0)
 				return;
 
-			var daSec = FlxMath.maxInt(curSec, value);
+			var daSec:Int = FlxMath.maxInt(curSec, value);
 
 			for (note in _song.notes[daSec - value].sectionNotes)
 			{
@@ -908,8 +906,8 @@ class ChartingState extends MusicBeatState
 		stepperCopy = new ShadowStepper(pad + 80, row6, 1, 1, -999, 999, 0, null, 60);
 		tab_group.add(stepperCopy);
 
-		var row7 = row6 + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var duetButton = new ShadowButton(pad, row7, "Duet", function()
+		var row7:Int = row6 + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var duetButton:ShadowButton = new ShadowButton(pad, row7, "Duet", function()
 		{
 			var duetNotes:Array<Array<Dynamic>> = [];
 			for (note in _song.notes[curSec].sectionNotes)
@@ -931,7 +929,7 @@ class ChartingState extends MusicBeatState
 		}, 60);
 		tab_group.add(duetButton);
 
-		var mirrorButton = new ShadowButton(pad + 65, row7, "Mirror", function()
+		var mirrorButton:ShadowButton = new ShadowButton(pad + 65, row7, "Mirror", function()
 		{
 			for (note in _song.notes[curSec].sectionNotes)
 			{
@@ -953,14 +951,14 @@ class ChartingState extends MusicBeatState
 
 	function addNoteUI():Void
 	{
-		var tab_group = UI_box.getTabGroup("Note");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Note");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
 
 		// Build note types list
 		var key:Int = 0;
@@ -1022,7 +1020,7 @@ class ChartingState extends MusicBeatState
 			displayNameList[i] = i + '. ' + displayNameList[i];
 		}
 
-		var row0 = pad;
+		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Sustain length:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		stepperSusLength = new ShadowStepper(pad, row0 + labelOffset, Conductor.stepCrochet / 2, 0, 0, Conductor.stepCrochet * 64, 0, function(value:Float)
 		{
@@ -1034,7 +1032,7 @@ class ChartingState extends MusicBeatState
 		}, 120);
 		tab_group.add(stepperSusLength);
 
-		var row1 = row0 + rowStep;
+		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "Strum time (ms):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		strumTimeInputText = new ShadowTextInput(pad, row1 + labelOffset, 180, "0", function(text:String)
 		{
@@ -1050,7 +1048,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(strumTimeInputText);
 		registerBlockerInput(strumTimeInputText);
 
-		var row2 = row1 + rowStep;
+		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Note type:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		noteTypeDropDown = new ShadowDropdown(pad, row2 + labelOffset, displayNameList, function(index:Int)
 		{
@@ -1063,15 +1061,15 @@ class ChartingState extends MusicBeatState
 		}, 200);
 		tab_group.add(noteTypeDropDown);
 
-		var row3 = row2 + rowStep;
-		var check_disableNoteRGB = new ShadowCheckbox(pad, row3, "Disable Note RGB", (_song.disableNoteRGB == true), function(checked:Bool)
+		var row3:Int = row2 + rowStep;
+		var check_disableNoteRGB:ShadowCheckbox = new ShadowCheckbox(pad, row3, "Disable Note RGB", (_song.disableNoteRGB == true), function(checked:Bool)
 		{
 			_song.disableNoteRGB = checked;
 			updateGrid();
 		});
 		tab_group.add(check_disableNoteRGB);
 
-		var row4 = row3 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
+		var row4:Int = row3 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
 		tab_group.add(new ShadowLabel(pad, row4, "Note Texture (Player):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		noteSkinInputText = new ShadowTextInput(pad, row4 + labelOffset, 250, editorPlayerArrowSkin != null ? editorPlayerArrowSkin : '', function(text:String)
 		{
@@ -1080,7 +1078,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(noteSkinInputText);
 		registerBlockerInput(noteSkinInputText);
 
-		var row5 = row4 + rowStep;
+		var row5:Int = row4 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row5, "Note Texture (Opponent):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin != null ? editorOpponentArrowSkin : '',
 			function(text:String)
@@ -1090,7 +1088,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(noteSkinInputText2);
 		registerBlockerInput(noteSkinInputText2);
 
-		var row6 = row5 + rowStep;
+		var row6:Int = row5 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row6, "Note Splashes Texture:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		noteSplashesInputText = new ShadowTextInput(pad, row6 + labelOffset, 150, _song.splashSkin != null ? _song.splashSkin : '', function(text:String)
 		{
@@ -1099,7 +1097,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(noteSplashesInputText);
 		registerBlockerInput(noteSplashesInputText);
 
-		var reloadNotesButton = new ShadowButton(pad + 160, row6 + labelOffset, "Reload Notes", function()
+		var reloadNotesButton:ShadowButton = new ShadowButton(pad + 160, row6 + labelOffset, "Reload Notes", function()
 		{
 			editorPlayerArrowSkin = noteSkinInputText.text;
 			editorOpponentArrowSkin = noteSkinInputText2.text;
@@ -1115,16 +1113,16 @@ class ChartingState extends MusicBeatState
 
 	function addEventsUI():Void
 	{
-		var tab_group = UI_box.getTabGroup("Events");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Events");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var buttonWidth = 30;
-		var buttonGap = ShadowStyle.SPACING_SM;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var buttonWidth:Int = 30;
+		var buttonGap:Int = ShadowStyle.SPACING_SM;
 
 		#if (HSCRIPT_ALLOWED || LUA_ALLOWED)
 		var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
@@ -1145,7 +1143,7 @@ class ChartingState extends MusicBeatState
 			{
 				for (file in FileSystem.readDirectory(directory))
 				{
-					var path = haxe.io.Path.join([directory, file]);
+					var path:String = Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith('.txt'))
 					{
 						var fileToCheck:String = file.substr(0, file.length - 4);
@@ -1168,7 +1166,7 @@ class ChartingState extends MusicBeatState
 			leEvents.push(eventStuff[i][0]);
 		}
 
-		var row0 = pad;
+		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Event:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		eventDropDown = new ShadowDropdown(pad, row0 + labelOffset, leEvents, function(index:Int)
 		{
@@ -1183,8 +1181,8 @@ class ChartingState extends MusicBeatState
 			}
 		}, 150);
 
-		var btnX = pad + 160;
-		var removeButton = new ShadowButton(btnX, row0 + labelOffset, "-", function()
+		var btnX:Int = pad + 160;
+		var removeButton:ShadowButton = new ShadowButton(btnX, row0 + labelOffset, "-", function()
 		{
 			if (curSelectedNote != null && curSelectedNote[2] == null)
 			{
@@ -1211,7 +1209,7 @@ class ChartingState extends MusicBeatState
 		}, buttonWidth);
 		tab_group.add(removeButton);
 
-		var addButton = new ShadowButton(btnX + buttonWidth + buttonGap, row0 + labelOffset, "+", function()
+		var addButton:ShadowButton = new ShadowButton(btnX + buttonWidth + buttonGap, row0 + labelOffset, "+", function()
 		{
 			if (curSelectedNote != null && curSelectedNote[2] == null)
 			{
@@ -1223,23 +1221,23 @@ class ChartingState extends MusicBeatState
 		}, buttonWidth);
 		tab_group.add(addButton);
 
-		var moveLeftButton = new ShadowButton(btnX + (buttonWidth + buttonGap) * 2 + 10, row0 + labelOffset, "<", function()
+		var moveLeftButton:ShadowButton = new ShadowButton(btnX + (buttonWidth + buttonGap) * 2 + 10, row0 + labelOffset, "<", function()
 		{
 			changeEventSelected(-1);
 		}, buttonWidth);
 		tab_group.add(moveLeftButton);
 
-		var moveRightButton = new ShadowButton(btnX + (buttonWidth + buttonGap) * 3 + 10, row0 + labelOffset, ">", function()
+		var moveRightButton:ShadowButton = new ShadowButton(btnX + (buttonWidth + buttonGap) * 3 + 10, row0 + labelOffset, ">", function()
 		{
 			changeEventSelected(1);
 		}, buttonWidth);
 		tab_group.add(moveRightButton);
 
-		var row1 = row0 + rowStep;
+		var row1:Int = row0 + rowStep;
 		selectedEventText = new ShadowLabel(pad, row1, "Selected Event: None");
 		tab_group.add(selectedEventText);
 
-		var row2 = row1 + ShadowStyle.FONT_SIZE_MD + rowGap;
+		var row2:Int = row1 + ShadowStyle.FONT_SIZE_MD + rowGap;
 		tab_group.add(new ShadowLabel(pad, row2, "Value 1:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		value1InputText = new ShadowTextInput(pad, row2 + labelOffset, 250, "", function(text:String)
 		{
@@ -1252,7 +1250,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(value1InputText);
 		registerBlockerInput(value1InputText);
 
-		var row3 = row2 + rowStep;
+		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Value 2:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		value2InputText = new ShadowTextInput(pad, row3 + labelOffset, 250, "", function(text:String)
 		{
@@ -1265,7 +1263,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(value2InputText);
 		registerBlockerInput(value2InputText);
 
-		var row4 = row3 + rowStep;
+		var row4:Int = row3 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row4, "Description:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		descText = new ShadowLabel(pad, row4 + labelOffset, eventStuff[0][1], ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		tab_group.add(descText);
@@ -1309,16 +1307,16 @@ class ChartingState extends MusicBeatState
 
 	function addChartingUI()
 	{
-		var tab_group = UI_box.getTabGroup("Charting");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Charting");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var checkboxRowHeight = ShadowStyle.HEIGHT_CHECKBOX + rowGap;
-		var checkboxColumnSpacing = 120;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var checkboxRowHeight:Int = ShadowStyle.HEIGHT_CHECKBOX + rowGap;
+		var checkboxColumnSpacing:Int = 120;
 		var currentRow:Float = pad;
 
 		inline function columnX(column:Int):Float
@@ -1329,7 +1327,7 @@ class ChartingState extends MusicBeatState
 		inline function nextCheckboxRow(extra:Float = 0):Float
 		{
 			currentRow += extra;
-			var y = currentRow;
+			var y:Float = currentRow;
 			currentRow += checkboxRowHeight;
 			return y;
 		}
@@ -1337,20 +1335,20 @@ class ChartingState extends MusicBeatState
 		inline function nextInputRow(extra:Float = 0):Float
 		{
 			currentRow += extra;
-			var y = currentRow;
+			var y:Float = currentRow;
 			currentRow += rowStep;
 			return y;
 		}
 
-		var row0 = nextCheckboxRow();
-		var row1 = nextInputRow();
-		var row2 = nextCheckboxRow();
-		var row3 = nextInputRow(4);
-		var row4 = nextCheckboxRow();
-		var row5 = nextCheckboxRow();
-		var row6 = nextInputRow(4);
-		var row7 = nextCheckboxRow();
-		var row8 = nextCheckboxRow();
+		var row0:Float = nextCheckboxRow();
+		var row1:Float = nextInputRow();
+		var row2:Float = nextCheckboxRow();
+		var row3:Float = nextInputRow(4);
+		var row4:Float = nextCheckboxRow();
+		var row5:Float = nextCheckboxRow();
+		var row6:Float = nextInputRow(4);
+		var row7:Float = nextCheckboxRow();
+		var row8:Float = nextCheckboxRow();
 
 		// Initialize save data
 		#if lime_openal
@@ -1532,17 +1530,17 @@ class ChartingState extends MusicBeatState
 
 	function addDataUI()
 	{
-		var tab_group = UI_box.getTabGroup("Data");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Data");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var inputWidth = 250;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var inputWidth:Int = 250;
 
-		var row0 = pad;
+		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Game Over Character:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar != null ? _song.gameOverChar : '',
 			function(text:String)
@@ -1552,7 +1550,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(gameOverCharacterInputText);
 		registerBlockerInput(gameOverCharacterInputText);
 
-		var row1 = row0 + rowStep;
+		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "Death Sound (sounds/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound != null ? _song.gameOverSound : '',
 			function(text:String)
@@ -1562,7 +1560,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(gameOverSoundInputText);
 		registerBlockerInput(gameOverSoundInputText);
 
-		var row2 = row1 + rowStep;
+		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Loop Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop != null ? _song.gameOverLoop : '',
 			function(text:String)
@@ -1572,7 +1570,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(gameOverLoopInputText);
 		registerBlockerInput(gameOverLoopInputText);
 
-		var row3 = row2 + rowStep;
+		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Retry Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd != null ? _song.gameOverEnd : '',
 			function(text:String)
@@ -1593,10 +1591,10 @@ class ChartingState extends MusicBeatState
 		UI_helpOverlay.visible = false;
 		add(UI_helpOverlay);
 
-		var panelWidth = 750;
-		var panelHeight = 500;
-		var panelX = (FlxG.width - panelWidth) / 2;
-		var panelY = (FlxG.height - panelHeight) / 2;
+		var panelWidth:Int = 750;
+		var panelHeight:Int = 500;
+		var panelX:Float = (FlxG.width - panelWidth) / 2;
+		var panelY:Float = (FlxG.height - panelHeight) / 2;
 
 		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
 		UI_help.cameras = [camOther];
@@ -1605,9 +1603,9 @@ class ChartingState extends MusicBeatState
 		UI_help.active = false;
 		add(UI_help);
 
-		var pad = ShadowStyle.SPACING_LG;
+		var pad:Int = ShadowStyle.SPACING_LG;
 
-		var titleLabel = new ShadowLabel(pad, pad, "Controls Help", 24, ShadowStyle.TEXT_PRIMARY);
+		var titleLabel:ShadowLabel = new ShadowLabel(pad, pad, "Controls Help", 24, ShadowStyle.TEXT_PRIMARY);
 		UI_help.add(titleLabel);
 
 		var helpStr:String;
@@ -1629,10 +1627,10 @@ class ChartingState extends MusicBeatState
 				"Esc - Test your chart inside Chart Editor\nEnter - Play your chart\n" + "Q/E - Decrease/Increase Note Sustain Length\nSpace - Stop/Resume song";
 		}
 
-		var helpText = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
+		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -2216,14 +2214,14 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			var style = currentType;
+			var style:Int = currentType;
 
 			if (FlxG.keys.pressed.SHIFT || touchPad.buttonY.pressed)
 			{
 				style = 3;
 			}
 
-			var conductorTime = Conductor.songPosition; // + sectionStartTime();Conductor.songPosition / Conductor.stepCrochet;
+			var conductorTime:Float = Conductor.songPosition; // + sectionStartTime();Conductor.songPosition / Conductor.stepCrochet;
 
 			// AWW YOU MADE IT SEXY <3333 THX SHADMAR
 
@@ -2298,7 +2296,7 @@ class ChartingState extends MusicBeatState
 					}
 
 					var secStart:Float = sectionStartTime();
-					var datime = (feces - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
+					var datime:Float = (feces - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
 					if (curSelectedNote != null)
 					{
 						var controlArray:Array<Bool> = [
@@ -2373,11 +2371,11 @@ class ChartingState extends MusicBeatState
 
 		#if FLX_PITCH
 		// PLAYBACK SPEED CONTROLS
-		var holdingShift = FlxG.keys.pressed.SHIFT;
-		var holdingLB = FlxG.keys.pressed.LBRACKET;
-		var holdingRB = FlxG.keys.pressed.RBRACKET;
-		var pressedLB = FlxG.keys.justPressed.LBRACKET;
-		var pressedRB = FlxG.keys.justPressed.RBRACKET;
+		var holdingShift:Bool = FlxG.keys.pressed.SHIFT;
+		var holdingLB:Bool = FlxG.keys.pressed.LBRACKET;
+		var holdingRB:Bool = FlxG.keys.pressed.RBRACKET;
+		var pressedLB:Bool = FlxG.keys.justPressed.LBRACKET;
+		var pressedRB:Bool = FlxG.keys.justPressed.RBRACKET;
 
 		if (!holdingShift && pressedLB || holdingShift && holdingLB)
 			playbackSpeed -= 0.01;
@@ -3333,7 +3331,7 @@ class ChartingState extends MusicBeatState
 
 	public function doANoteThing(cs, d, style)
 	{
-		var delnote = false;
+		var delnote:Bool = false;
 		if (strumLineNotes.members[d].overlaps(curRenderedNotes))
 		{
 			curRenderedNotes.forEachAlive(function(note:Note)
@@ -3568,7 +3566,7 @@ class ChartingState extends MusicBeatState
 		if ((data != null) && (data.length > 0))
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data.trim(), null, Paths.formatToSongPath(_song.song) + ".json", null, "*/*");
@@ -3603,7 +3601,7 @@ class ChartingState extends MusicBeatState
 		if ((data != null) && (data.length > 0))
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data.trim(), null, "events.json", null, "*/*");

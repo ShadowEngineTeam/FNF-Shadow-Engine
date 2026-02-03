@@ -39,7 +39,7 @@ class CharacterEditorState extends MusicBeatState
 
 	var anims = null;
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
-	var curAnim = 0;
+	var curAnim:Int = 0;
 
 	private var camEditor:FlxCamera;
 	private var camHUD:FlxCamera;
@@ -217,7 +217,7 @@ class CharacterEditorState extends MusicBeatState
 		helpBg.active = helpBg.visible = false;
 		add(helpBg);
 
-		var arr = str.split('\n');
+		var arr:Array<String> = str.split('\n');
 		helpTexts = new FlxSpriteGroup();
 		helpTexts.cameras = [camHUD];
 		for (i in 0...arr.length)
@@ -250,7 +250,7 @@ class CharacterEditorState extends MusicBeatState
 			character.destroy();
 		}
 
-		var isPlayer = (reload ? character.isPlayer : !predictCharacterIsNotPlayer(_char));
+		var isPlayer:Bool = (reload ? character.isPlayer : !predictCharacterIsNotPlayer(_char));
 		character = new Character(0, 0, _char, isPlayer);
 		if (!reload && character.editorIsPlayer != null && isPlayer != character.editorIsPlayer)
 		{
@@ -273,22 +273,22 @@ class CharacterEditorState extends MusicBeatState
 
 	function makeUIMenu()
 	{
-		var mainTabs = [{name: 'Ghost', label: 'Ghost'}, {name: 'Settings', label: 'Settings'}];
-		var margin = ShadowStyle.SPACING_LG;
-		var topWidth = 300;
-		var topHeight = 145;
-		var bottomWidth = 420;
-		var bottomHeight = 365;
-		var topX = FlxG.width - topWidth - margin;
-		var topY = margin;
-		var bottomX = FlxG.width - bottomWidth - margin;
-		var bottomY = topY + topHeight + margin;
+		var mainTabs:Array<TabDef> = [{name: 'Ghost', label: 'Ghost'}, {name: 'Settings', label: 'Settings'}];
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var topWidth:Int = 300;
+		var topHeight:Int = 145;
+		var bottomWidth:Int = 420;
+		var bottomHeight:Int = 365;
+		var topX:Int = FlxG.width - topWidth - margin;
+		var topY:Int = margin;
+		var bottomX:Int = FlxG.width - bottomWidth - margin;
+		var bottomY:Int = topY + topHeight + margin;
 
 		UI_box = new ShadowTabMenu(topX, topY, mainTabs, topWidth, topHeight);
 		UI_box.cameras = [camHUD];
 		UI_box.scrollFactor.set();
 
-		var characterTabs = [
+		var characterTabs:Array<TabDef> = [
 			{name: 'Character', label: 'Character'},
 			{name: 'Animations', label: 'Animations'},
 		];
@@ -317,21 +317,21 @@ class CharacterEditorState extends MusicBeatState
 
 	function addGhostUI()
 	{
-		var tab_group = UI_box.getTabGroup("Ghost");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Ghost");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_BUTTON + rowGap;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_BUTTON - ShadowStyle.HEIGHT_CHECKBOX) / 2);
-		var buttonWidth = 110;
-		var stepperWidth = 100;
-		var row0 = pad;
-		var row1 = row0 + rowStep;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_BUTTON + rowGap;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_BUTTON - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var buttonWidth:Int = 110;
+		var stepperWidth:Int = 100;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
 
-		var makeGhostButton = new ShadowButton(pad, row0, "Make Ghost", function()
+		var makeGhostButton:ShadowButton = new ShadowButton(pad, row0, "Make Ghost", function()
 		{
 			var anim = anims[curAnim];
 			if (!character.isAnimationNull())
@@ -393,10 +393,10 @@ class CharacterEditorState extends MusicBeatState
 			}
 		}, buttonWidth);
 
-		var highlightGhost = new ShadowCheckbox(makeGhostButton.x + buttonWidth + ShadowStyle.SPACING_MD, makeGhostButton.y + checkboxOffset,
+		var highlightGhost:ShadowCheckbox = new ShadowCheckbox(makeGhostButton.x + buttonWidth + ShadowStyle.SPACING_MD, makeGhostButton.y + checkboxOffset,
 			"Highlight Ghost", false, function(checked:Bool)
 		{
-			var value = checked ? 125 : 0;
+			var value:Int = checked ? 125 : 0;
 			ghost.colorTransform.redOffset = value;
 			ghost.colorTransform.greenOffset = value;
 			ghost.colorTransform.blueOffset = value;
@@ -408,8 +408,8 @@ class CharacterEditorState extends MusicBeatState
 			}
 		});
 
-		var ghostAlphaLabel = new ShadowLabel(pad, row1, "Opacity:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
-		var ghostAlphaStepper = new ShadowStepper(pad, row1 + labelOffset, 0.05, ghostAlpha, 0, 1, 2, function(value:Float)
+		var ghostAlphaLabel:ShadowLabel = new ShadowLabel(pad, row1, "Opacity:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var ghostAlphaStepper:ShadowStepper = new ShadowStepper(pad, row1 + labelOffset, 0.05, ghostAlpha, 0, 1, 2, function(value:Float)
 		{
 			ghostAlpha = value;
 			ghost.alpha = ghostAlpha;
@@ -428,25 +428,25 @@ class CharacterEditorState extends MusicBeatState
 
 	function addSettingsUI()
 	{
-		var tab_group = UI_box.getTabGroup("Settings");
+		var tab_group:FlxSpriteGroup = UI_box.getTabGroup("Settings");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var panelWidth = Std.int(UI_box.width);
-		var colGap = ShadowStyle.SPACING_MD;
-		var rightColWidth = 120;
-		var rightX = panelWidth - pad - rightColWidth;
-		var leftX = pad;
-		var leftW = rightX - colGap - leftX;
-		var row0 = pad;
-		var row1 = row0 + rowStep;
-		var controlY0 = row0 + labelOffset;
-		var controlY1 = row1 + labelOffset;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_box.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 120;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
 
 		check_player = new ShadowCheckbox(leftX, controlY1 + checkboxOffset, "Playable Character", character.isPlayer, function(checked:Bool)
 		{
@@ -456,7 +456,7 @@ class CharacterEditorState extends MusicBeatState
 			updatePointerPos(false);
 		});
 
-		var reloadCharacter = new ShadowButton(rightX, controlY0, "Reload Char", function()
+		var reloadCharacter:ShadowButton = new ShadowButton(rightX, controlY0, "Reload Char", function()
 		{
 			addCharacter(true);
 			updatePointerPos();
@@ -464,7 +464,7 @@ class CharacterEditorState extends MusicBeatState
 			reloadCharacterDropDown();
 		}, rightColWidth);
 
-		var templateCharacter = new ShadowButton(rightX, controlY1, "Load Template", function()
+		var templateCharacter:ShadowButton = new ShadowButton(rightX, controlY1, "Load Template", function()
 		{
 			final _template:CharacterFile = {
 				animations: [
@@ -499,7 +499,7 @@ class CharacterEditorState extends MusicBeatState
 
 		charDropDown = new ShadowDropdown(leftX, controlY0, [''], function(index:Int)
 		{
-			var intended = characterList[index];
+			var intended:String = characterList[index];
 			if (intended == null || intended.length < 1)
 				return;
 
@@ -539,37 +539,37 @@ class CharacterEditorState extends MusicBeatState
 
 	function addAnimationsUI()
 	{
-		var tab_group = UI_characterbox.getTabGroup("Animations");
+		var tab_group:FlxSpriteGroup = UI_characterbox.getTabGroup("Animations");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var panelWidth = Std.int(UI_characterbox.width);
-		var colGap = ShadowStyle.SPACING_MD;
-		var rightColWidth = 180;
-		var rightX = panelWidth - pad - rightColWidth;
-		var leftX = pad;
-		var leftW = rightX - colGap - leftX;
-		var fullW = panelWidth - pad * 2;
-		var row0 = pad;
-		var row1 = row0 + rowStep;
-		var row2 = row1 + rowStep;
-		var row3 = row2 + rowStep;
-		var row4 = row3 + rowStep;
-		var row5 = row4 + rowStep;
-		var row6 = row5 + rowStep;
-		var controlY0 = row0 + labelOffset;
-		var controlY1 = row1 + labelOffset;
-		var controlY2 = row2 + labelOffset;
-		var controlY3 = row3 + labelOffset;
-		var controlY4 = row4 + labelOffset;
-		var controlY5 = row5 + labelOffset;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
-		var buttonWidth = 120;
-		var buttonGap = ShadowStyle.SPACING_SM;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_characterbox.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 180;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var fullW:Int = panelWidth - pad * 2;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var row2:Int = row1 + rowStep;
+		var row3:Int = row2 + rowStep;
+		var row4:Int = row3 + rowStep;
+		var row5:Int = row4 + rowStep;
+		var row6:Int = row5 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var controlY2:Int = row2 + labelOffset;
+		var controlY3:Int = row3 + labelOffset;
+		var controlY4:Int = row4 + labelOffset;
+		var controlY5:Int = row5 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var buttonWidth:Int = 120;
+		var buttonGap:Int = ShadowStyle.SPACING_SM;
 
 		animationInputText = new ShadowTextInput(leftX, controlY1, leftW, "");
 		animationFrameLabelCheckBox = new ShadowCheckbox(rightX, controlY0 + checkboxOffset, "Frame Label (Textuer Atlas)");
@@ -593,7 +593,7 @@ class CharacterEditorState extends MusicBeatState
 			animationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
 		}, leftW);
 
-		var addUpdateButton = new ShadowButton(leftX, controlY5, "Add/Update", function()
+		var addUpdateButton:ShadowButton = new ShadowButton(leftX, controlY5, "Add/Update", function()
 		{
 			var indices:Array<Int> = [];
 			var indicesStr:Array<String> = animationIndicesInputText.text.trim().split(',');
@@ -635,7 +635,7 @@ class CharacterEditorState extends MusicBeatState
 			trace('Added/Updated animation: ' + animationInputText.text);
 		}, buttonWidth);
 
-		var removeButton = new ShadowButton(leftX + buttonWidth + buttonGap, controlY5, "Remove", function()
+		var removeButton:ShadowButton = new ShadowButton(leftX + buttonWidth + buttonGap, controlY5, "Remove", function()
 		{
 			for (anim in character.animationsArray)
 				if (animationInputText.text == anim.anim)
@@ -703,46 +703,46 @@ class CharacterEditorState extends MusicBeatState
 
 	function addCharacterUI()
 	{
-		var tab_group = UI_characterbox.getTabGroup("Character");
+		var tab_group:FlxSpriteGroup = UI_characterbox.getTabGroup("Character");
 		if (tab_group == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowGap = ShadowStyle.SPACING_SM;
-		var labelOffset = ShadowStyle.FONT_SIZE_SM + 4;
-		var rowStep = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
-		var panelWidth = Std.int(UI_characterbox.width);
-		var colGap = ShadowStyle.SPACING_MD;
-		var rightColWidth = 140;
-		var rightX = panelWidth - pad - rightColWidth;
-		var leftX = pad;
-		var leftW = rightX - colGap - leftX;
-		var row0 = pad;
-		var row1 = row0 + rowStep;
-		var row2 = row1 + rowStep;
-		var row3 = row2 + rowStep;
-		var row4 = row3 + rowStep;
-		var row5 = row4 + rowStep;
-		var controlY0 = row0 + labelOffset;
-		var controlY1 = row1 + labelOffset;
-		var controlY2 = row2 + labelOffset;
-		var controlY3 = row3 + labelOffset;
-		var controlY4 = row4 + labelOffset;
-		var controlY5 = row5 + labelOffset;
-		var checkboxOffset = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
-		var leftStepperWidth = 70;
-		var rightStepperGap = ShadowStyle.SPACING_SM;
-		var rightStepperWidth = Std.int((rightColWidth - rightStepperGap) / 2);
-		var colorStepperWidth = 55;
-		var colorGap = ShadowStyle.SPACING_SM;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowGap:Int = ShadowStyle.SPACING_SM;
+		var labelOffset:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var rowStep:Int = labelOffset + ShadowStyle.HEIGHT_INPUT + rowGap;
+		var panelWidth:Int = Std.int(UI_characterbox.width);
+		var colGap:Int = ShadowStyle.SPACING_MD;
+		var rightColWidth:Int = 140;
+		var rightX:Int = panelWidth - pad - rightColWidth;
+		var leftX:Int = pad;
+		var leftW:Int = rightX - colGap - leftX;
+		var row0:Int = pad;
+		var row1:Int = row0 + rowStep;
+		var row2:Int = row1 + rowStep;
+		var row3:Int = row2 + rowStep;
+		var row4:Int = row3 + rowStep;
+		var row5:Int = row4 + rowStep;
+		var controlY0:Int = row0 + labelOffset;
+		var controlY1:Int = row1 + labelOffset;
+		var controlY2:Int = row2 + labelOffset;
+		var controlY3:Int = row3 + labelOffset;
+		var controlY4:Int = row4 + labelOffset;
+		var controlY5:Int = row5 + labelOffset;
+		var checkboxOffset:Int = Std.int((ShadowStyle.HEIGHT_INPUT - ShadowStyle.HEIGHT_CHECKBOX) / 2);
+		var leftStepperWidth:Int = 70;
+		var rightStepperGap:Int = ShadowStyle.SPACING_SM;
+		var rightStepperWidth:Int = Std.int((rightColWidth - rightStepperGap) / 2);
+		var colorStepperWidth:Int = 55;
+		var colorGap:Int = ShadowStyle.SPACING_SM;
 
 		imageInputText = new ShadowTextInput(leftX, controlY0, leftW, character.imageFile, function(text:String)
 		{
 			character.imageFile = text;
 		});
-		var reloadImage = new ShadowButton(rightX, controlY0, "Reload Image", function()
+		var reloadImage:ShadowButton = new ShadowButton(rightX, controlY0, "Reload Image", function()
 		{
-			var lastAnim = character.getAnimationName();
+			var lastAnim:String = character.getAnimationName();
 			character.imageFile = imageInputText.text;
 			reloadCharacterImage();
 			if (!character.isAnimationNull())
@@ -751,7 +751,7 @@ class CharacterEditorState extends MusicBeatState
 			}
 		}, rightColWidth);
 
-		var decideIconColor = new ShadowButton(rightX, controlY1, "Get Icon Color", function()
+		var decideIconColor:ShadowButton = new ShadowButton(rightX, controlY1, "Get Icon Color", function()
 		{
 			var coolColor:FlxColor = FlxColor.fromInt(CoolUtil.dominantColor(healthIcon));
 			character.healthColorArray[0] = coolColor.red;
@@ -762,7 +762,7 @@ class CharacterEditorState extends MusicBeatState
 
 		healthIconInputText = new ShadowTextInput(leftX, controlY1, leftW, healthIcon.getCharacter(), function(text:String)
 		{
-			var lastIcon = healthIcon.getCharacter();
+			var lastIcon:String = healthIcon.getCharacter();
 			healthIcon.changeIcon(text);
 			character.healthIcon = text;
 			if (lastIcon != healthIcon.getCharacter())
@@ -826,7 +826,7 @@ class CharacterEditorState extends MusicBeatState
 				updatePointerPos();
 			}, rightStepperWidth);
 
-		var saveCharacterButton = new ShadowButton(rightX, controlY5, "Save Character", function()
+		var saveCharacterButton:ShadowButton = new ShadowButton(rightX, controlY5, "Save Character", function()
 		{
 			saveCharacter();
 		}, rightColWidth);
@@ -878,24 +878,24 @@ class CharacterEditorState extends MusicBeatState
 
 	function makeAnimListUI()
 	{
-		var margin = ShadowStyle.SPACING_LG;
-		var panelWidth = 280;
-		var panelHeight = 450;
-		var panelX = margin;
-		var panelY = margin;
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var panelWidth:Int = 280;
+		var panelHeight:Int = 450;
+		var panelX:Int = margin;
+		var panelY:Int = margin;
 
 		UI_animListPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
 		UI_animListPanel.cameras = [camHUD];
 		UI_animListPanel.scrollFactor.set();
 		add(UI_animListPanel);
 
-		var titleLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Animation List", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		var titleLabel:ShadowLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Animation List", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
 		UI_animListPanel.add(titleLabel);
 
-		var listX = ShadowStyle.SPACING_MD;
-		var listY = ShadowStyle.SPACING_MD + 30;
-		var listWidth = panelWidth - (ShadowStyle.SPACING_MD * 2);
-		var listHeight = panelHeight - listY - ShadowStyle.SPACING_MD;
+		var listX:Int = ShadowStyle.SPACING_MD;
+		var listY:Int = ShadowStyle.SPACING_MD + 30;
+		var listWidth:Int = panelWidth - (ShadowStyle.SPACING_MD * 2);
+		var listHeight:Int = panelHeight - listY - ShadowStyle.SPACING_MD;
 
 		UI_animList = new ShadowList(listX, listY, listWidth, listHeight, []);
 		UI_animList.callback = function(index:Int)
@@ -912,18 +912,18 @@ class CharacterEditorState extends MusicBeatState
 
 	function makeHealthIconUI()
 	{
-		var margin = ShadowStyle.SPACING_LG;
-		var panelWidth = 280;
-		var panelHeight = 120;
-		var panelX = margin;
-		var panelY = margin + 450 + ShadowStyle.SPACING_MD;
+		var margin:Int = ShadowStyle.SPACING_LG;
+		var panelWidth:Int = 280;
+		var panelHeight:Int = 120;
+		var panelX:Int = margin;
+		var panelY:Int = margin + 450 + ShadowStyle.SPACING_MD;
 
 		UI_healthPanel = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
 		UI_healthPanel.cameras = [camHUD];
 		UI_healthPanel.scrollFactor.set();
 		add(UI_healthPanel);
 
-		var titleLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Character Icon", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		var titleLabel:ShadowLabel = new ShadowLabel(ShadowStyle.SPACING_MD, ShadowStyle.SPACING_MD, "Character Icon", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
 		UI_healthPanel.add(titleLabel);
 
 		if (healthIcon != null)
@@ -934,18 +934,18 @@ class CharacterEditorState extends MusicBeatState
 			UI_healthPanel.add(healthIcon);
 		}
 
-		var offsetWX = 30;
+		var offsetWX:Int = 30;
 
-		var colorX = ShadowStyle.SPACING_MD + 90 + offsetWX;
-		var colorY = ShadowStyle.SPACING_MD + 40;
-		var colorWidth = 170 - offsetWX;
-		var colorHeight = 50;
+		var colorX:Int = ShadowStyle.SPACING_MD + 90 + offsetWX;
+		var colorY:Int = ShadowStyle.SPACING_MD + 40;
+		var colorWidth:Int = 170 - offsetWX;
+		var colorHeight:Int = 50;
 
 		UI_healthColorRect = new FlxSprite(colorX - 5, colorY);
 		UI_healthColorRect.makeGraphic(colorWidth, colorHeight, FlxColor.WHITE);
 		UI_healthPanel.add(UI_healthColorRect);
 
-		var colorLabel = new ShadowLabel(colorX - 5, colorY - 18, "Health Bar Color", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var colorLabel:ShadowLabel = new ShadowLabel(colorX - 5, colorY - 18, "Health Bar Color", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		UI_healthPanel.add(colorLabel);
 
 		if (healthBar != null)
@@ -964,10 +964,10 @@ class CharacterEditorState extends MusicBeatState
 		UI_helpOverlay.visible = false;
 		add(UI_helpOverlay);
 
-		var panelWidth = 600;
-		var panelHeight = 400;
-		var panelX = (FlxG.width - panelWidth) / 2;
-		var panelY = (FlxG.height - panelHeight) / 2;
+		var panelWidth:Int = 600;
+		var panelHeight:Int = 400;
+		var panelX:Float = (FlxG.width - panelWidth) / 2;
+		var panelY:Float = (FlxG.height - panelHeight) / 2;
 
 		UI_help = new ShadowPanel(panelX, panelY, panelWidth, panelHeight);
 		UI_help.cameras = [camOther];
@@ -976,9 +976,9 @@ class CharacterEditorState extends MusicBeatState
 		UI_help.active = false;
 		add(UI_help);
 
-		var pad = ShadowStyle.SPACING_LG;
+		var pad:Int = ShadowStyle.SPACING_LG;
 
-		var titleLabel = new ShadowLabel(pad, pad, "Controls Help", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
+		var titleLabel:ShadowLabel = new ShadowLabel(pad, pad, "Controls Help", ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY);
 		UI_help.add(titleLabel);
 
 		var str:String;
@@ -991,10 +991,10 @@ class CharacterEditorState extends MusicBeatState
 			str = "CAMERA\nE/Q - Camera Zoom In/Out\nJ/K/L/I - Move Camera\nR - Reset Camera Zoom\n\nCHARACTER\nCtrl + R - Reset Current Offset\nCtrl + C - Copy Current Offset\nCtrl + V - Paste Copied Offset on Current Animation\nCtrl + Z - Undo Last Paste or Reset\nW/S - Previous/Next Animation\nSpace - Replay Animation\nArrow Keys/Mouse & Right Click - Move Offset\nA/D - Frame Advance (Back/Forward)\n\nOTHER\nF12 - Toggle Silhouettes\nHold Shift - Move Offsets 10x faster and Camera 4x faster\nHold Control - Move camera 4x slower";
 		}
 
-		var helpText = new ShadowLabel(pad, pad + 30, str, ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
+		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 30, str, ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -1130,7 +1130,7 @@ class CharacterEditorState extends MusicBeatState
 		if (FlxG.keys.pressed.I)
 			FlxG.camera.scroll.y -= elapsed * 500 * shiftMult * ctrlMult;
 
-		var lastZoom = FlxG.camera.zoom;
+		var lastZoom:Float = FlxG.camera.zoom;
 		if (FlxG.keys.justPressed.R && !FlxG.keys.pressed.CONTROL || touchPad.buttonZ.justPressed)
 			FlxG.camera.zoom = 1;
 		else if ((FlxG.keys.pressed.E || touchPad.buttonX.pressed) && FlxG.camera.zoom < 3)
@@ -1168,7 +1168,7 @@ class CharacterEditorState extends MusicBeatState
 			}
 		}
 
-		var changedOffset = false;
+		var changedOffset:Bool = false;
 		var moveKeysP;
 		var moveKeys;
 		if (controls.mobileC)
@@ -1285,8 +1285,8 @@ class CharacterEditorState extends MusicBeatState
 			updateAnimationInfo();
 		}
 
-		var txt = 'ERROR: No Animation Found';
-		var clr = FlxColor.RED;
+		var txt:String = 'ERROR: No Animation Found';
+		var clr:FlxColor = FlxColor.RED;
 		if (!character.isAnimationNull())
 		{
 			if (FlxG.keys.pressed.A || FlxG.keys.pressed.D)
@@ -1308,7 +1308,7 @@ class CharacterEditorState extends MusicBeatState
 
 			if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5)
 			{
-				var isLeft = false;
+				var isLeft:Bool = false;
 				if ((holdingFrameTime > 0.5 && FlxG.keys.pressed.A) || FlxG.keys.justPressed.A)
 					isLeft = true;
 				character.animPaused = true;
@@ -1416,7 +1416,7 @@ class CharacterEditorState extends MusicBeatState
 		healthColorStepperG.value = character.healthColorArray[1];
 		healthColorStepperB.value = character.healthColorArray[2];
 
-		var healthColor = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
+		var healthColor:FlxColor = FlxColor.fromRGB(character.healthColorArray[0], character.healthColorArray[1], character.healthColorArray[2]);
 		healthBar.leftBar.color = healthBar.rightBar.color = healthColor;
 		healthIcon.changeIcon(character.healthIcon);
 
@@ -1481,9 +1481,9 @@ class CharacterEditorState extends MusicBeatState
 		if (animationInfoLabel == null)
 			return;
 
-		var animName = 'None';
-		var offsetX = 0;
-		var offsetY = 0;
+		var animName:String = 'None';
+		var offsetX:Int = 0;
+		var offsetY:Int = 0;
 		if (anims != null && curAnim >= 0 && curAnim < anims.length)
 		{
 			var currentAnim = anims[curAnim];
@@ -1498,11 +1498,11 @@ class CharacterEditorState extends MusicBeatState
 			}
 		}
 
-		var framesInfo = '';
+		var framesInfo:String = '';
 		if (!character.isAnimationNull() && character.animation.curAnim != null)
 		{
-			var frameCur = character.animation.curAnim.curFrame;
-			var totalFrames = character.animation.curAnim.numFrames;
+			var frameCur:Int = character.animation.curAnim.curFrame;
+			var totalFrames:Int = character.animation.curAnim.numFrames;
 			if (totalFrames > 0)
 				framesInfo = ' | Frame: ' + frameCur + ' / ' + (totalFrames - 1);
 		}
@@ -1592,7 +1592,7 @@ class CharacterEditorState extends MusicBeatState
 		if (charDropDown != null)
 		{
 			charDropDown.setOptions(characterList);
-			var selectedIndex = characterList.indexOf(_char);
+			var selectedIndex:Int = characterList.indexOf(_char);
 			charDropDown.selectedIndex = selectedIndex > -1 ? selectedIndex : 0;
 		}
 	}
@@ -1608,7 +1608,7 @@ class CharacterEditorState extends MusicBeatState
 		if (animationDropDown != null)
 		{
 			animationDropDown.setOptions(animList);
-			var selectedIndex = Std.int(Math.max(0, Math.min(animList.length - 1, curAnim)));
+			var selectedIndex:Int = Std.int(Math.max(0, Math.min(animList.length - 1, curAnim)));
 			animationDropDown.selectedIndex = selectedIndex;
 		}
 	}
@@ -1681,7 +1681,7 @@ class CharacterEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, '$_char' + ".json", null, "*/*");

@@ -66,10 +66,10 @@ class ShadowButton extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var inputBlocked = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
-		var mouseOver = !inputBlocked && isMouseOver();
-		var mousePressed = FlxG.mouse.pressed;
-		var mouseJustPressed = FlxG.mouse.justPressed;
+		var inputBlocked:Bool = (ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen());
+		var mouseOver:Bool = (!inputBlocked && isMouseOver());
+		var mousePressed:Bool = FlxG.mouse.pressed;
+		var mouseJustPressed:Bool = FlxG.mouse.justPressed;
 
 		if (mouseOver && !_hovered)
 		{

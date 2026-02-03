@@ -50,7 +50,7 @@ class ShadowStepper extends FlxSpriteGroup
 		drawBackground();
 		add(bg);
 
-		var arrowHeight = Std.int(_height / 2);
+		var arrowHeight:Int = Std.int(_height / 2);
 		upArrow = new FlxSprite(_width - _arrowWidth, 0);
 		drawUpArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(upArrow);
@@ -59,7 +59,7 @@ class ShadowStepper extends FlxSpriteGroup
 		drawDownArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(downArrow);
 
-		var textWidth = _width - _arrowWidth - ShadowStyle.SPACING_XS * 2;
+		var textWidth:Int = _width - _arrowWidth - ShadowStyle.SPACING_XS * 2;
 		valueText = new FlxText(ShadowStyle.SPACING_XS, 0, textWidth, "");
 		valueText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		valueText.antialiasing = ShadowStyle.antialiasing;
@@ -84,7 +84,7 @@ class ShadowStepper extends FlxSpriteGroup
 			bg.pixels.setPixel32(_width - _arrowWidth - 1, i, ShadowStyle.BORDER_DARK);
 		}
 
-		var midY = Std.int(_height / 2);
+		var midY:Int = Std.int(_height / 2);
 		for (i in (_width - _arrowWidth)..._width)
 		{
 			bg.pixels.setPixel32(i, midY, ShadowStyle.BORDER_DARK);
@@ -94,15 +94,15 @@ class ShadowStepper extends FlxSpriteGroup
 	function drawUpArrow(color:FlxColor, arrowHeight:Int)
 	{
 		upArrow.makeGraphic(_arrowWidth, arrowHeight, ShadowStyle.BG_MEDIUM, true);
-		var cx = Std.int(_arrowWidth / 2);
-		var cy = Std.int(arrowHeight / 2);
+		var cx:Int = Std.int(_arrowWidth / 2);
+		var cy:Int = Std.int(arrowHeight / 2);
 		// Draw upward pointing triangle
 		for (row in 0...4)
 		{
 			for (col in 0...(row * 2 + 1))
 			{
-				var px = cx - row + col;
-				var py = cy + row - 1;
+				var px:Int = cx - row + col;
+				var py:Int = cy + row - 1;
 				if (px >= 0 && px < _arrowWidth && py >= 0 && py < arrowHeight)
 					upArrow.pixels.setPixel32(px, py, color);
 			}
@@ -112,15 +112,15 @@ class ShadowStepper extends FlxSpriteGroup
 	function drawDownArrow(color:FlxColor, arrowHeight:Int)
 	{
 		downArrow.makeGraphic(_arrowWidth, arrowHeight, ShadowStyle.BG_MEDIUM, true);
-		var cx = Std.int(_arrowWidth / 2);
-		var cy = Std.int(arrowHeight / 2);
+		var cx:Int = Std.int(_arrowWidth / 2);
+		var cy:Int = Std.int(arrowHeight / 2);
 		// Draw downward pointing triangle
 		for (row in 0...4)
 		{
 			for (col in 0...(row * 2 + 1))
 			{
-				var px = cx - row + col;
-				var py = cy - row + 1;
+				var px:Int = cx - row + col;
+				var py:Int = cy - row + 1;
 				if (px >= 0 && px < _arrowWidth && py >= 0 && py < arrowHeight)
 					downArrow.pixels.setPixel32(px, py, color);
 			}
@@ -151,8 +151,8 @@ class ShadowStepper extends FlxSpriteGroup
 	{
 		if (valueText == null || valueText.textField == null)
 			return 0;
-		var textW = valueText.textField.textWidth;
-		var fieldW = valueText.fieldWidth;
+		var textW:Float = valueText.textField.textWidth;
+		var fieldW:Float = valueText.fieldWidth;
 		if (textW > fieldW)
 			return textW - fieldW + 4;
 		return 0;
@@ -165,11 +165,11 @@ class ShadowStepper extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var arrowHeight = Std.int(_height / 2);
-		var inputBlocked = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
-		var overUp = !inputBlocked && isMouseOver(upArrow);
-		var overDown = !inputBlocked && isMouseOver(downArrow);
-		var overBg = !inputBlocked && isMouseOver(bg);
+		var arrowHeight:Int = Std.int(_height / 2);
+		var inputBlocked:Bool = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
+		var overUp:Bool = !inputBlocked && isMouseOver(upArrow);
+		var overDown:Bool = !inputBlocked && isMouseOver(downArrow);
+		var overBg:Bool = !inputBlocked && isMouseOver(bg);
 
 		if (overUp && !_upHovered)
 		{

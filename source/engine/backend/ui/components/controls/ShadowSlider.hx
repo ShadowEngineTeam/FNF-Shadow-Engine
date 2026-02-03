@@ -46,7 +46,7 @@ class ShadowSlider extends FlxSpriteGroup
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 
-		var trackY = Std.int((_height - _trackHeight) / 2);
+		var trackY:Int = Std.int((_height - _trackHeight) / 2);
 		track = new FlxSprite(0, trackY);
 		drawTrack();
 		add(track);
@@ -100,7 +100,7 @@ class ShadowSlider extends FlxSpriteGroup
 			thumb.pixels.setPixel32(_thumbWidth - 1, i, borderColor);
 		}
 
-		var centerX = Std.int(_thumbWidth / 2);
+		var centerX:Int = Std.int(_thumbWidth / 2);
 		for (i in 4...(_thumbHeight - 4))
 		{
 			thumb.pixels.setPixel32(centerX, i, ShadowStyle.BORDER_LIGHT);
@@ -109,16 +109,16 @@ class ShadowSlider extends FlxSpriteGroup
 
 	function updateFill()
 	{
-		var percent = (max != min) ? (_value - min) / (max - min) : 0;
-		var fillWidth = Std.int(Math.max(1, (_width - 2) * percent));
-		var trackY = Std.int((_height - _trackHeight) / 2);
+		var percent:Float = (max != min) ? (_value - min) / (max - min) : 0;
+		var fillWidth:Int = Std.int(Math.max(1, (_width - 2) * percent));
+		var trackY:Int = Std.int((_height - _trackHeight) / 2);
 		fill.makeGraphic(fillWidth, _trackHeight - 2, ShadowStyle.ACCENT, true);
 	}
 
 	function updateThumbPosition()
 	{
-		var percent = (max != min) ? (_value - min) / (max - min) : 0;
-		var usableWidth = _width - _thumbWidth;
+		var percent:Float = (max != min) ? (_value - min) / (max - min) : 0;
+		var usableWidth:Int = _width - _thumbWidth;
 		thumb.x = this.x + percent * usableWidth;
 	}
 
@@ -152,10 +152,10 @@ class ShadowSlider extends FlxSpriteGroup
 	function getValueFromMouseX():Float
 	{
 		FlxG.mouse.getScreenPosition(camera, _mousePos);
-		var localX = _mousePos.x - (this.x + _thumbWidth / 2);
-		var usableWidth = _width - _thumbWidth;
+		var localX:Float = _mousePos.x - (this.x + _thumbWidth / 2);
+		var usableWidth:Int = _width - _thumbWidth;
 
-		var percent = Math.max(0, Math.min(1, localX / usableWidth));
+		var percent:Float = Math.max(0, Math.min(1, localX / usableWidth));
 		return min + percent * (max - min);
 	}
 
@@ -166,9 +166,9 @@ class ShadowSlider extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var inputBlocked = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
-		var overThumb = !inputBlocked && isMouseOver(thumb);
-		var overSlider = !inputBlocked && isMouseOverSlider();
+		var inputBlocked:Bool = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
+		var overThumb:Bool = !inputBlocked && isMouseOver(thumb);
+		var overSlider:Bool = !inputBlocked && isMouseOverSlider();
 
 		if ((overThumb || _dragging) && !_hovered)
 		{
@@ -184,7 +184,7 @@ class ShadowSlider extends FlxSpriteGroup
 		if (FlxG.mouse.justPressed && !inputBlocked && overSlider)
 		{
 			_dragging = true;
-			var newValue = getValueFromMouseX();
+			var newValue:Float = getValueFromMouseX();
 			if (newValue != _value)
 			{
 				value = newValue;
@@ -197,7 +197,7 @@ class ShadowSlider extends FlxSpriteGroup
 		{
 			if (FlxG.mouse.pressed)
 			{
-				var newValue = getValueFromMouseX();
+				var newValue:Float = getValueFromMouseX();
 				if (newValue != _value)
 				{
 					value = newValue;
@@ -214,9 +214,9 @@ class ShadowSlider extends FlxSpriteGroup
 		// Mouse wheel support
 		if (overSlider && FlxG.mouse.wheel != 0 && !inputBlocked)
 		{
-			var step = (max - min) / 20; // 5% increments
-			var multiplier = FlxG.keys.pressed.SHIFT ? 5 : 1;
-			var newValue = _value + step * FlxG.mouse.wheel * multiplier;
+			var step:Float = (max - min) / 20; // 5% increments
+			var multiplier:Int = FlxG.keys.pressed.SHIFT ? 5 : 1;
+			var newValue:Float = _value + step * FlxG.mouse.wheel * multiplier;
 			newValue = Math.max(min, Math.min(max, newValue));
 			if (newValue != _value)
 			{

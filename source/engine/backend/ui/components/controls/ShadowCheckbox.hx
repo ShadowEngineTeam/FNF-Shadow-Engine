@@ -101,7 +101,7 @@ class ShadowCheckbox extends FlxSpriteGroup
 
 	override function set_visible(Value:Bool):Bool
 	{
-		var v = super.set_visible(Value);
+		var v:Bool = super.set_visible(Value);
 		if (checkmark != null)
 			checkmark.visible = v && _checked;
 		return v;
@@ -117,8 +117,8 @@ class ShadowCheckbox extends FlxSpriteGroup
 		if (checkmark != null)
 			checkmark.visible = _checked;
 
-		var inputBlocked = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
-		var mouseOver = !inputBlocked && isMouseOver();
+		var inputBlocked:Bool = ShadowDropdown.isClickCaptured() || ShadowDropdown.isAnyOpen();
+		var mouseOver:Bool = !inputBlocked && isMouseOver();
 
 		if (mouseOver && !_hovered)
 		{

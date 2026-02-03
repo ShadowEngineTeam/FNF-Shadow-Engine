@@ -166,7 +166,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	function addEditorBox()
 	{
-		var mainTabs:Array<{name:String, label:String}> = [
+		var mainTabs:Array<TabDef> = [
 			{name: 'Animations', label: 'Animations'},
 			{name: 'Character', label: 'Character'},
 		];
@@ -181,7 +181,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		UI_mainbox.selectedTab = TAB_CHARACTER;
 		lastTab = TAB_CHARACTER;
 
-		var typeTabs:Array<{name:String, label:String}> = [{name: 'Character Type', label: 'Character Type'}];
+		var typeTabs:Array<TabDef> = [{name: 'Character Type', label: 'Character Type'}];
 		UI_typebox = new ShadowTabMenu(290, 55, typeTabs, editorTypeWidth,
 			editorTypeHeight);
 		UI_typebox.scrollFactor.set();
@@ -196,12 +196,12 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	function addTypeUI()
 	{
-		var tab = UI_typebox.getTabGroup("Character Type");
+		var tab:FlxSpriteGroup = UI_typebox.getTabGroup("Character Type");
 		if (tab == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var rowDelta = ShadowStyle.HEIGHT_CHECKBOX + ShadowStyle.SPACING_SM;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var rowDelta:Int = ShadowStyle.HEIGHT_CHECKBOX + ShadowStyle.SPACING_SM;
 
 		leftCheckbox = new ShadowCheckbox(pad, pad, "Left", false, function(checked:Bool)
 		{
@@ -234,15 +234,15 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	function addAnimationsUI()
 	{
-		var tab = UI_mainbox.getTabGroup("Animations");
+		var tab:FlxSpriteGroup = UI_mainbox.getTabGroup("Animations");
 		if (tab == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var labelHeight = ShadowStyle.FONT_SIZE_SM + 4;
-		var dropdownWidth = editorMainWidth - pad * 2;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var labelHeight:Int = ShadowStyle.FONT_SIZE_SM + 4;
+		var dropdownWidth:Int = editorMainWidth - pad * 2;
 
-		var y = pad;
+		var y:Int = pad;
 		tab.add(new ShadowLabel(pad, y, "Animations:", ShadowStyle.FONT_SIZE_SM));
 		y += labelHeight;
 
@@ -293,8 +293,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 		blockPressWhileTypingOn.push(idleInputText);
 		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
 
-		var buttonY = y;
-		var addUpdateButton = new ShadowButton(pad, buttonY, "Add/Update", function()
+		var buttonY:Int = y;
+		var addUpdateButton:ShadowButton = new ShadowButton(pad, buttonY, "Add/Update", function()
 		{
 			var theAnim:String = animationInputText.text.trim();
 			if (theAnim.length == 0)
@@ -338,12 +338,12 @@ class DialogueCharacterEditorState extends MusicBeatState
 				ghostIdle.reloadAnimations();
 			}
 
-			var lastIndex = animationDropDown.selectedIndex;
+			var lastIndex:Int = animationDropDown.selectedIndex;
 			reloadAnimationsDropDown();
 			if (animationArray.length > 0)
 				animationDropDown.selectedIndex = Std.int(Math.min(lastIndex, animationArray.length - 1));
 		}, 110);
-		var removeUpdateButton = new ShadowButton(pad + addUpdateButton.width + ShadowStyle.SPACING_MD, buttonY, "Remove", function()
+		var removeUpdateButton:ShadowButton = new ShadowButton(pad + addUpdateButton.width + ShadowStyle.SPACING_MD, buttonY, "Remove", function()
 		{
 			var targetAnim:String = animationInputText.text.trim();
 			for (i in 0...character.jsonFile.animations.length)
@@ -411,15 +411,15 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	function addCharacterUI()
 	{
-		var tab = UI_mainbox.getTabGroup("Character");
+		var tab:FlxSpriteGroup = UI_mainbox.getTabGroup("Character");
 		if (tab == null)
 			return;
 
-		var pad = ShadowStyle.SPACING_MD;
-		var fieldWidth = editorMainWidth - pad * 2;
-		var labelHeight = ShadowStyle.FONT_SIZE_SM + 4;
+		var pad:Int = ShadowStyle.SPACING_MD;
+		var fieldWidth:Int = editorMainWidth - pad * 2;
+		var labelHeight:Int = ShadowStyle.FONT_SIZE_SM + 4;
 
-		var y = pad;
+		var y:Int = pad;
 		tab.add(new ShadowLabel(pad, y, "Image file name:", ShadowStyle.FONT_SIZE_SM));
 		y += labelHeight;
 		imageInputText = new ShadowTextInput(pad, y, fieldWidth, character.jsonFile.image);
@@ -436,7 +436,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		y += labelHeight;
 
 		// Fit 2 steppers exactly inside the field width
-		var stepperSpacing = ShadowStyle.SPACING_MD;
+		var stepperSpacing:Int = ShadowStyle.SPACING_MD;
 		var stepperWidth:Int = Std.int((fieldWidth - stepperSpacing) / 2);
 
 		xStepper = new ShadowStepper(pad, y, 10, character.jsonFile.position[0], -2000, 2000, 0, function(value:Float)
@@ -455,22 +455,22 @@ class DialogueCharacterEditorState extends MusicBeatState
 		tab.add(yStepper);
 		y += ShadowStyle.HEIGHT_INPUT + ShadowStyle.SPACING_MD;
 
-		var buttonY = y + ShadowStyle.SPACING_MD;
-		var buttonWidth = 110;
-		var buttonSpacing = ShadowStyle.SPACING_MD;
+		var buttonY:Int = y + ShadowStyle.SPACING_MD;
+		var buttonWidth:Int = 110;
+		var buttonSpacing:Int = ShadowStyle.SPACING_MD;
 
-		var reloadImageButton = new ShadowButton(pad, buttonY, "Reload Image", function()
+		var reloadImageButton:ShadowButton = new ShadowButton(pad, buttonY, "Reload Image", function()
 		{
 			reloadCharacter();
 		}, buttonWidth);
 
-		var loadButton = new ShadowButton(pad + buttonWidth + buttonSpacing, buttonY, "Load Character", function()
+		var loadButton:ShadowButton = new ShadowButton(pad + buttonWidth + buttonSpacing, buttonY, "Load Character", function()
 		{
 			loadCharacter();
 		}, buttonWidth);
 
 		// Move Save Character under Reload Image
-		var saveButton = new ShadowButton(pad, buttonY + ShadowStyle.HEIGHT_BUTTON + buttonSpacing, "Save Character", function()
+		var saveButton:ShadowButton = new ShadowButton(pad, buttonY + ShadowStyle.HEIGHT_BUTTON + buttonSpacing, "Save Character", function()
 		{
 			saveCharacter();
 		}, buttonWidth);
@@ -849,7 +849,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 	function loadCharacter()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -964,7 +964,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[0].toLowerCase().replace(' ', '');
 
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, characterName + ".json", null, "*/*");

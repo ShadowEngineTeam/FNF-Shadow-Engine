@@ -80,16 +80,16 @@ class ShadowList extends FlxSpriteGroup
 		}
 		itemLabels = [];
 
-		var startIndex = scrollOffset;
+		var startIndex:Int = scrollOffset;
 		var endIndex = Std.int(Math.min(items.length, scrollOffset + maxVisibleItems));
 
 		for (i in startIndex...endIndex)
 		{
-			var displayIndex = i - scrollOffset;
-			var yPos = 2 + (displayIndex * itemHeight);
+			var displayIndex:Int = i - scrollOffset;
+			var yPos:Int = 2 + (displayIndex * itemHeight);
 
-			var color = (i == _selectedIndex) ? FlxColor.LIME : ShadowStyle.TEXT_PRIMARY;
-			var label = new ShadowLabel(4, yPos, items[i], ShadowStyle.FONT_SIZE_MD, color, _width - 8);
+			var color:FlxColor = (i == _selectedIndex) ? FlxColor.LIME : ShadowStyle.TEXT_PRIMARY;
+			var label:ShadowLabel = new ShadowLabel(4, yPos, items[i], ShadowStyle.FONT_SIZE_MD, color, _width - 8);
 			itemLabels.push(label);
 			add(label);
 		}
@@ -104,13 +104,13 @@ class ShadowList extends FlxSpriteGroup
 
 		#if FLX_MOUSE
 		var mousePos:FlxPoint = FlxG.mouse.getWorldPosition(camera);
-		var localMouseX = mousePos.x - this.x;
-		var localMouseY = mousePos.y - this.y;
-		var isOverList = localMouseX >= 0 && localMouseX < _width && localMouseY >= 0 && localMouseY < _height;
+		var localMouseX:Float = mousePos.x - this.x;
+		var localMouseY:Float = mousePos.y - this.y;
+		var isOverList:Bool = localMouseX >= 0 && localMouseX < _width && localMouseY >= 0 && localMouseY < _height;
 
 		if (FlxG.mouse.justPressed && isOverList)
 		{
-			var clickedIndex = Std.int((localMouseY - 2) / itemHeight) + scrollOffset;
+			var clickedIndex:Int = Std.int((localMouseY - 2) / itemHeight) + scrollOffset;
 
 			if (clickedIndex >= 0 && clickedIndex < items.length)
 			{
@@ -126,7 +126,7 @@ class ShadowList extends FlxSpriteGroup
 			if (scrollOffset < 0)
 				scrollOffset = 0;
 
-			var maxScroll = Std.int(Math.max(0, items.length - maxVisibleItems));
+			var maxScroll:Int = Std.int(Math.max(0, items.length - maxVisibleItems));
 			if (scrollOffset > maxScroll)
 				scrollOffset = maxScroll;
 
@@ -164,7 +164,7 @@ class ShadowList extends FlxSpriteGroup
 			// just color update
 			for (i in 0...itemLabels.length)
 			{
-				var actualIndex = i + scrollOffset;
+				var actualIndex:Int = i + scrollOffset;
 				itemLabels[i].color = (actualIndex == _selectedIndex) ? FlxColor.LIME : ShadowStyle.TEXT_PRIMARY;
 			}
 		}
@@ -184,7 +184,7 @@ class ShadowList extends FlxSpriteGroup
 
 		items[index] = newText;
 
-		var visibleIndex = index - scrollOffset;
+		var visibleIndex:Int = index - scrollOffset;
 		if (visibleIndex >= 0 && visibleIndex < itemLabels.length)
 		{
 			itemLabels[visibleIndex].text = newText;
@@ -202,7 +202,7 @@ class ShadowList extends FlxSpriteGroup
 		items = newItems;
 		for (i in 0...itemLabels.length)
 		{
-			var actualIndex = i + scrollOffset;
+			var actualIndex:Int = i + scrollOffset;
 			if (actualIndex < items.length)
 			{
 				itemLabels[i].text = items[actualIndex];

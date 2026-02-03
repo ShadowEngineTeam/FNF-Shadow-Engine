@@ -91,7 +91,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 				tabButtons.push(tabBtn);
 				add(tabBtn);
 
-				var content = new FlxSpriteGroup(0, ShadowStyle.HEIGHT_TAB);
+				var content:FlxSpriteGroup = new FlxSpriteGroup(0, ShadowStyle.HEIGHT_TAB);
 				content.visible = (i == 0);
 				content.active = (i == 0);
 				tabContents.set(tabs[i].name, content);
@@ -121,7 +121,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 	{
 		_tabStartX = 0;
 
-		var reservedRight = headerButtonsWidth();
+		var reservedRight:Int = headerButtonsWidth();
 
 		_tabAreaWidth = _width - reservedRight;
 		if (_tabAreaWidth < 0)
@@ -147,8 +147,8 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		if (index == tabs.length - 1)
 		{
-			var used = index * _tabWidth;
-			var rem = _tabAreaWidth - used;
+			var used:Int = index * _tabWidth;
+			var rem:Int = _tabAreaWidth - used;
 			return (rem > 0) ? rem : _tabWidth;
 		}
 
@@ -157,7 +157,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 	function updateButtonPositions()
 	{
-		var rightX = _width - _headerRightPad;
+		var rightX:Int = _width - _headerRightPad;
 
 		rightX -= ShadowStyle.SIZE_HEADER_BTN;
 		minimizeBtn.x += rightX;
@@ -185,7 +185,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 		for (i in 0...tabButtons.length)
 		{
 			var btn = tabButtons[i];
-			var w = tabButtonWidth(i);
+			var w:Int = tabButtonWidth(i);
 
 			btn.x = _tabStartX + i * _tabWidth;
 
@@ -203,12 +203,12 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 	function drawMinimizeButton(hover:Bool)
 	{
-		var size = ShadowStyle.SIZE_HEADER_BTN;
+		var size:Int = ShadowStyle.SIZE_HEADER_BTN;
 		var bgColor = hover ? ShadowStyle.brighten(ShadowStyle.BG_LIGHT, 0.1) : ShadowStyle.BG_LIGHT;
 		minimizeBtn.makeGraphic(size, size, bgColor, true);
 
 		var lineColor = ShadowStyle.TEXT_PRIMARY;
-		var padding = 4;
+		var padding:Int = 4;
 
 		if (collapsed)
 		{
@@ -222,7 +222,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 		}
 		else
 		{
-			var lineY = size - padding - 2;
+			var lineY:Int = size - padding - 2;
 			for (i in padding...(size - padding))
 			{
 				minimizeBtn.pixels.setPixel32(i, lineY, lineColor);
@@ -233,7 +233,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 	function drawPanel()
 	{
-		var panelHeight = _height - ShadowStyle.HEIGHT_TAB;
+		var panelHeight:Int = _height - ShadowStyle.HEIGHT_TAB;
 		panelBg.makeGraphic(_width, panelHeight, ShadowStyle.BG_DARK, true);
 		for (i in 0..._width)
 			panelBg.pixels.setPixel32(i, panelHeight - 1, ShadowStyle.BORDER_DARK);
@@ -260,17 +260,17 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 	function createTabButton(index:Int):FlxSpriteGroup
 	{
-		var btnX = _tabStartX + index * _tabWidth;
-		var btn = new FlxSpriteGroup(btnX, 0);
+		var btnX:Int = _tabStartX + index * _tabWidth;
+		var btn:FlxSpriteGroup = new FlxSpriteGroup(btnX, 0);
 
-		var w = tabButtonWidth(index);
+		var w:Int = tabButtonWidth(index);
 
-		var bg = new FlxSprite();
+		var bg:FlxSprite = new FlxSprite();
 		bg.makeGraphic(w, ShadowStyle.HEIGHT_TAB - 2, ShadowStyle.BG_MEDIUM);
 		bg.ID = index;
 		btn.add(bg);
 
-		var txt = new FlxText(0, 0, w, tabs[index].label);
+		var txt:FlxText = new FlxText(0, 0, w, tabs[index].label);
 		txt.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		txt.antialiasing = ShadowStyle.antialiasing;
 		txt.y = (ShadowStyle.HEIGHT_TAB - txt.height) / 2 - 1;
@@ -284,7 +284,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 		for (i in 0...tabButtons.length)
 		{
 			var btn = tabButtons[i];
-			var w = tabButtonWidth(i);
+			var w:Int = tabButtonWidth(i);
 
 			var bg:FlxSprite = cast btn.members[0];
 			var txt:FlxText = cast btn.members[1];
@@ -345,7 +345,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 				var content = tabContents.get(tabs[i].name);
 				if (content != null)
 				{
-					var isActive = (i == _selectedTab) && !collapsed;
+					var isActive:Bool = (i == _selectedTab) && !collapsed;
 					content.visible = isActive;
 					content.active = isActive;
 					content.forEach(function(member:flixel.FlxBasic)
@@ -376,10 +376,10 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var mx = FlxG.mouse.screenX;
-		var my = FlxG.mouse.screenY;
+		var mx:Int = FlxG.mouse.screenX;
+		var my:Int = FlxG.mouse.screenY;
 
-		var overMinimizeBtn = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
+		var overMinimizeBtn:Bool = showMinimizeButton && minimizeBtn.visible && FlxG.mouse.overlaps(minimizeBtn, camera);
 
 		if (overMinimizeBtn != _minimizeBtnHover)
 		{
@@ -387,7 +387,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 			drawMinimizeButton(_minimizeBtnHover);
 		}
 
-		var inTabBar = FlxG.mouse.overlaps(tabBar, camera) && !overMinimizeBtn;
+		var inTabBar:Bool = FlxG.mouse.overlaps(tabBar, camera) && !overMinimizeBtn;
 
 		if (_wantsMinimizeToggle)
 		{
@@ -450,8 +450,8 @@ class ShadowTabMenu extends FlxSpriteGroup
 
 		if (_pressing && !_dragging && FlxG.mouse.pressed && ShadowStyle.hasFocus(this))
 		{
-			var dx = mx - _pressStartX;
-			var dy = my - _pressStartY;
+			var dx:Float = mx - _pressStartX;
+			var dy:Float = my - _pressStartY;
 			if ((dx * dx + dy * dy) >= 16)
 			{
 				_dragging = true;

@@ -11,6 +11,7 @@ import objects.MenuCharacter;
 import objects.MenuItem;
 import states.editors.MasterEditorMenu;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.graphics.frames.FlxAtlasFrames;
 
 class WeekEditorState extends MusicBeatState
 {
@@ -40,7 +41,7 @@ class WeekEditorState extends MusicBeatState
 		txtWeekTitle.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
 
-		var ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		var ui_tex:FlxAtlasFrames = Paths.getSparrowAtlas('campaign_menu_UI_assets');
 		var bgYellow:FlxSprite = new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		bgSprite = new FlxSprite(0, 56);
 		bgSprite.antialiasing = ClientPrefs.data.antialiasing;
@@ -112,7 +113,7 @@ class WeekEditorState extends MusicBeatState
 		addWeekUI();
 		addOtherUI();
 
-		var loadWeekButton = new ShadowButton(0, 650, "Load Week", function()
+		var loadWeekButton:ShadowButton = new ShadowButton(0, 650, "Load Week", function()
 		{
 			loadWeek();
 		}, 90);
@@ -120,14 +121,14 @@ class WeekEditorState extends MusicBeatState
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
 
-		var freeplayButton = new ShadowButton(0, 650, "Freeplay", function()
+		var freeplayButton:ShadowButton = new ShadowButton(0, 650, "Freeplay", function()
 		{
 			MusicBeatState.switchState(new WeekEditorFreeplayState(weekFile));
 		}, 90);
 		freeplayButton.screenCenter(X);
 		add(freeplayButton);
 
-		var saveWeekButton = new ShadowButton(0, 650, "Save Week", function()
+		var saveWeekButton:ShadowButton = new ShadowButton(0, 650, "Save Week", function()
 		{
 			saveWeek(weekFile);
 		}, 90);
@@ -152,7 +153,7 @@ class WeekEditorState extends MusicBeatState
 
 	function addWeekUI()
 	{
-		var tab = UI_box.getTabGroup("Week");
+		var tab:FlxSpriteGroup = UI_box.getTabGroup("Week");
 		if (tab == null)
 			return;
 
@@ -269,7 +270,7 @@ class WeekEditorState extends MusicBeatState
 
 	function addOtherUI()
 	{
-		var tab = UI_box.getTabGroup("Other");
+		var tab:FlxSpriteGroup = UI_box.getTabGroup("Other");
 		if (tab == null)
 			return;
 
@@ -367,8 +368,8 @@ class WeekEditorState extends MusicBeatState
 	function reloadBG()
 	{
 		bgSprite.visible = true;
-		var assetName = weekFile.weekBackground;
-		var isMissing = true;
+		var assetName:String = weekFile.weekBackground;
+		var isMissing:Bool = true;
 
 		if (assetName != null && assetName.length > 0)
 		{
@@ -497,7 +498,7 @@ class WeekEditorState extends MusicBeatState
 	public static function loadWeek()
 	{
 		#if mobile
-		var fileDialog = new lime.ui.FileDialog();
+		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
 		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
@@ -592,7 +593,7 @@ class WeekEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			#if mobile
-			var fileDialog = new lime.ui.FileDialog();
+			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
 			fileDialog.save(data, null, weekFileName + ".json", null, "*/*");
@@ -649,7 +650,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var iconArray:Array<HealthIcon> = [];
 
-	var curSelected = 0;
+	var curSelected:Int = 0;
 
 	override function create()
 	{
@@ -697,7 +698,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 		blackBlack.alpha = 0.6;
 		add(blackBlack);
 
-		var loadWeekButton = new ShadowButton(0, 685, "Load Week", function()
+		var loadWeekButton:ShadowButton = new ShadowButton(0, 685, "Load Week", function()
 		{
 			WeekEditorState.loadWeek();
 		}, 90);
@@ -705,14 +706,14 @@ class WeekEditorFreeplayState extends MusicBeatState
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
 
-		var storyModeButton = new ShadowButton(0, 685, "Story Mode", function()
+		var storyModeButton:ShadowButton = new ShadowButton(0, 685, "Story Mode", function()
 		{
 			MusicBeatState.switchState(new WeekEditorState(weekFile));
 		}, 90);
 		storyModeButton.screenCenter(X);
 		add(storyModeButton);
 
-		var saveWeekButton = new ShadowButton(0, 685, "Save Week", function()
+		var saveWeekButton:ShadowButton = new ShadowButton(0, 685, "Save Week", function()
 		{
 			WeekEditorState.saveWeek(weekFile);
 		}, 90);
@@ -730,7 +731,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 
 	function addFreeplayUI()
 	{
-		var tab = UI_box.getTabGroup("Freeplay");
+		var tab:FlxSpriteGroup = UI_box.getTabGroup("Freeplay");
 		if (tab == null)
 			return;
 
@@ -754,13 +755,13 @@ class WeekEditorFreeplayState extends MusicBeatState
 		}, 55);
 		tab.add(bgColorStepperB);
 
-		var copyColor = new ShadowButton(10, 65, "Copy", function()
+		var copyColor:ShadowButton = new ShadowButton(10, 65, "Copy", function()
 		{
 			Clipboard.text = bg.color.red + ',' + bg.color.green + ',' + bg.color.blue;
 		}, 60);
 		tab.add(copyColor);
 
-		var pasteColor = new ShadowButton(75, 65, "Paste", function()
+		var pasteColor:ShadowButton = new ShadowButton(75, 65, "Paste", function()
 		{
 			if (Clipboard.text != null)
 			{
@@ -799,7 +800,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 		blockPressWhileTypingOn.push(iconInputText);
 		tab.add(iconInputText);
 
-		var hideFreeplayCheckbox = new ShadowCheckbox(10, 152, "Hide from Freeplay?", weekFile.hideFreeplay, function(checked)
+		var hideFreeplayCheckbox:ShadowCheckbox = new ShadowCheckbox(10, 152, "Hide from Freeplay?", weekFile.hideFreeplay, function(checked)
 		{
 			weekFile.hideFreeplay = checked;
 		});
@@ -859,7 +860,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 			return;
 		}
 
-		var blockInput = false;
+		var blockInput:Bool = false;
 		for (inputText in blockPressWhileTypingOn)
 		{
 			if (inputText.hasFocus())
