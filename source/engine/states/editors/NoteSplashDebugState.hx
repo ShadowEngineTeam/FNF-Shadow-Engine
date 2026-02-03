@@ -76,7 +76,7 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
-		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, "Press F1 for Help", 16);
+		var tipText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${controls.mobileC ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
 		tipText.scrollFactor.set();
 		add(tipText);
@@ -228,7 +228,7 @@ class NoteSplashDebugState extends MusicBeatState
 		{
 			ClientPrefs.toggleVolumeKeys(false);
 			FlxG.mouse.enabled = false;
-			if (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE)
+			if (touchPad.buttonF.justPressed || (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
 			{
 				UI_help.visible = false;
 				UI_helpOverlay.visible = false;
@@ -605,7 +605,7 @@ class NoteSplashDebugState extends MusicBeatState
 		contentText.scrollFactor.set();
 		UI_help.add(contentText);
 
-		var closeText = new FlxText(0, panelHeight - 40, panelWidth, "Press F1 or ESC to close");
+		var closeText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close');
 		closeText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
 		closeText.scrollFactor.set();
 		UI_help.add(closeText);

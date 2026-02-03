@@ -994,7 +994,7 @@ class CharacterEditorState extends MusicBeatState
 		var helpText = new ShadowLabel(pad, pad + 30, str, ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText = new ShadowLabel(pad, panelHeight - pad - 20, "Press ESC or F1 to close", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var closeText = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
