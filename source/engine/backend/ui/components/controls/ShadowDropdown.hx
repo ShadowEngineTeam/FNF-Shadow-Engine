@@ -329,6 +329,8 @@ class ShadowDropdown extends FlxSpriteGroup
 			listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
 			listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
 		}
+		listBg.x = this.x;
+		listBg.y = this.y + _height;
 		listBg.visible = true;
 
 		dropList.visible = true;
