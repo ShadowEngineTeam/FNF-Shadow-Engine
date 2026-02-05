@@ -145,8 +145,8 @@ class ClientPrefs
 		'back' => [B],
 		'pause' => [START],
 		'reset' => [BACK],
-		'fullscreen' => [NONE],
-		'fpsCounter' => [NONE]
+		'fullscreen' => [LEFT_STICK_CLICK],
+		'fpsCounter' => [RIGHT_STICK_CLICK]
 	];
 	public static var mobileBinds:Map<String, Array<MobileInputID>> = [
 		'note_up' => [MobileInputID.NOTE_UP, MobileInputID.UP2],
