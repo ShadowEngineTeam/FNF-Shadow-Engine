@@ -23,6 +23,7 @@ class LoadingState extends MusicBeatState
 	static var requestedBitmaps:Map<String, BitmapData> = [];
 	#if (target.threaded)
 	static var mutex:Mutex = new Mutex();
+	static var loadedMutex:Mutex = new Mutex();
 	#end
 
 	function new(target:FlxState, stopMusic:Bool)
@@ -47,13 +48,7 @@ class LoadingState extends MusicBeatState
 	var canChangeState:Bool = true;
 
 	var loadingText:FlxText;
-
 	var timePassed:Float;
-	var shakeFl:Float;
-	var shakeMult:Float = 0;
-
-	var isSpinning:Bool = false;
-	var pressedTimes:Int = 0;
 
 	override function create()
 	{
@@ -108,7 +103,6 @@ class LoadingState extends MusicBeatState
 		}
 
 		timePassed += elapsed;
-		shakeFl += elapsed * 3000;
 		var txt:String = 'Now Loading.';
 		switch (Math.floor(timePassed % 1 * 3))
 		{
@@ -326,7 +320,116 @@ class LoadingState extends MusicBeatState
 		loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
 		loaded = 0;
 
-		// then start threads
+		#if (!target.threaded)
+		for (sound in soundsToPrepare)
+		{
+			try
+			{
+				var ret:Dynamic = Paths.sound(sound);
+				if (ret != null)
+					trace('finished preloading sound $sound');
+				else
+					trace('ERROR! fail on preloading sound $sound');
+			}
+			catch (e:Dynamic)
+			{
+				trace('ERROR! fail on preloading sound $sound');
+			}
+			loaded++;
+		}
+
+		for (music in musicToPrepare)
+		{
+			try
+			{
+				var ret:Dynamic = Paths.music(music);
+				if (ret != null)
+					trace('finished preloading music $music');
+				else
+					trace('ERROR! fail on preloading music $music');
+			}
+			catch (e:Dynamic)
+			{
+				trace('ERROR! fail on preloading music $music');
+			}
+			loaded++;
+		}
+
+		for (song in songsToPrepare)
+		{
+			try
+			{
+				var ret:Dynamic = Paths.returnSound(null, song, 'songs');
+				if (ret != null)
+					trace('finished preloading song $song');
+				else
+					trace('ERROR! fail on preloading song $song');
+			}
+			catch (e:Dynamic)
+			{
+				trace('ERROR! fail on preloading song $song');
+			}
+			loaded++;
+		}
+
+		for (image in imagesToPrepare)
+		{
+			try
+			{
+				var bitmap:BitmapData = null;
+				var file:String = null;
+
+				#if MODS_ALLOWED
+				file = Paths.modsImages(image);
+				if (Paths.currentTrackedAssets.exists(file))
+				{
+					loaded++;
+					continue;
+				}
+				else if (FileSystem.exists(file))
+					bitmap = BitmapData.fromFile(file);
+				else
+				#end
+				{
+					file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
+					if (Paths.currentTrackedAssets.exists(file))
+					{
+						loaded++;
+						continue;
+					}
+					else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
+						bitmap = OpenFlAssets.getBitmapData(file);
+					else
+					{
+						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
+						if (Paths.currentTrackedAssets.exists(file))
+						{
+							loaded++;
+							continue;
+						}
+						else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.IMAGE_EXT)))
+							bitmap = OpenFlAssets.getBitmapData(file);
+						else
+						{
+							trace('no such image $image exists');
+							loaded++;
+							continue;
+						}
+					}
+				}
+
+				if (bitmap != null)
+					requestedBitmaps.set(file, bitmap);
+				else
+					trace('oh no the image is null NOOOO ($image)');
+			}
+			catch (e:Dynamic)
+			{
+				trace('ERROR! fail on preloading image $image');
+			}
+			loaded++;
+		}
+		#else
 		for (sound in soundsToPrepare)
 			initThread(() -> Paths.sound(sound), 'sound $sound');
 		for (music in musicToPrepare)
@@ -334,7 +437,6 @@ class LoadingState extends MusicBeatState
 		for (song in songsToPrepare)
 			initThread(() -> Paths.returnSound(null, song, 'songs'), 'song $song');
 
-		// for images, they get to have their own thread
 		for (image in imagesToPrepare)
 		{
 			#if (target.threaded)
@@ -354,8 +456,12 @@ class LoadingState extends MusicBeatState
 					{
 						#if (target.threaded)
 						mutex.release();
+						loadedMutex.acquire();
 						#end
 						loaded++;
+						#if (target.threaded)
+						loadedMutex.release();
+						#end
 						return;
 					}
 					else if (FileSystem.exists(file))
@@ -368,8 +474,12 @@ class LoadingState extends MusicBeatState
 						{
 							#if (target.threaded)
 							mutex.release();
+							loadedMutex.acquire();
 							#end
 							loaded++;
+							#if (target.threaded)
+							loadedMutex.release();
+							#end
 							return;
 						}
 						else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
@@ -381,8 +491,12 @@ class LoadingState extends MusicBeatState
 							{
 								#if (target.threaded)
 								mutex.release();
+								loadedMutex.acquire();
 								#end
 								loaded++;
+								#if (target.threaded)
+								loadedMutex.release();
+								#end
 								return;
 							}
 							else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.IMAGE_EXT)))
@@ -392,8 +506,12 @@ class LoadingState extends MusicBeatState
 								trace('no such image $image exists');
 								#if (target.threaded)
 								mutex.release();
+								loadedMutex.acquire();
 								#end
 								loaded++;
+								#if (target.threaded)
+								loadedMutex.release();
+								#end
 								return;
 							}
 						}
@@ -414,11 +532,18 @@ class LoadingState extends MusicBeatState
 					#end
 					trace('ERROR! fail on preloading image $image');
 				}
+				#if (target.threaded)
+				loadedMutex.acquire();
+				#end
 				loaded++;
+				#if (target.threaded)
+				loadedMutex.release();
+				#end
 			#if (target.threaded)
 			});
 			#end
 		}
+		#end
 	}
 
 	static function initThread(func:Void->Dynamic, traceData:String)
@@ -432,10 +557,6 @@ class LoadingState extends MusicBeatState
 			try
 			{
 				var ret:Dynamic = func();
-				#if (target.threaded)
-				mutex.release();
-				#end
-
 				if (ret != null)
 					trace('finished preloading $traceData');
 				else
@@ -443,14 +564,18 @@ class LoadingState extends MusicBeatState
 			}
 			catch (e:Dynamic)
 			{
-				#if (target.threaded)
-				mutex.release();
-				#end
 				trace('ERROR! fail on preloading $traceData');
 			}
-			loaded++;
 			#if (target.threaded)
 			mutex.release();
+			#end
+
+			#if (target.threaded)
+			loadedMutex.acquire();
+			#end
+			loaded++;
+			#if (target.threaded)
+			loadedMutex.release();
 			#end
 		#if (target.threaded)
 		});
