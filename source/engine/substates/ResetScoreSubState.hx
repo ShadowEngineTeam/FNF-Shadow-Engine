@@ -71,7 +71,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 		noText.x += 200;
 		add(noText);
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_RIGHT", "A_B");
 		addTouchPadCamera(false);
 		#end
@@ -122,7 +122,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 			ClientPrefs.saveSettings();
 			close();
 		}
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
 		{
 			addTouchPad("LEFT_RIGHT", "A_B");

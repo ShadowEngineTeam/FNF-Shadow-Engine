@@ -217,7 +217,7 @@ class NoteSplashDebugState extends MusicBeatState
 		loadFrames();
 		changeSelection();
 		super.create();
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NOTE_SPLASH_DEBUG", "NOTE_SPLASH_DEBUG");
 		#end
 		FlxG.mouse.visible = true;
@@ -233,7 +233,7 @@ class NoteSplashDebugState extends MusicBeatState
 		{
 			ClientPrefs.toggleVolumeKeys(false);
 			FlxG.mouse.enabled = false;
-			if (#if MOBILE_CONTROLS_ALLOWED touchPad.buttonF.justPressed || #end (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
+			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonF.justPressed || #end (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
 			{
 				UI_help.visible = false;
 				UI_helpOverlay.visible = false;
@@ -268,9 +268,9 @@ class NoteSplashDebugState extends MusicBeatState
 		if (!notTyping)
 			return;
 
-		if (FlxG.keys.justPressed.A #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp.justPressed #end)
+		if (FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end)
 			changeSelection(-1);
-		else if (FlxG.keys.justPressed.D #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown.justPressed #end)
+		else if (FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end)
 			changeSelection(1);
 
 		if (maxAnims < 1)
@@ -280,17 +280,17 @@ class NoteSplashDebugState extends MusicBeatState
 		{
 			var movex:Int = 0;
 			var movey:Int = 0;
-			if (FlxG.keys.justPressed.LEFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft2.justPressed #end)
+			if (FlxG.keys.justPressed.LEFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft2.justPressed #end)
 				movex = -1;
-			else if (FlxG.keys.justPressed.RIGHT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight2.justPressed #end)
+			else if (FlxG.keys.justPressed.RIGHT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight2.justPressed #end)
 				movex = 1;
 
-			if (FlxG.keys.justPressed.UP #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp2.justPressed #end)
+			if (FlxG.keys.justPressed.UP #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp2.justPressed #end)
 				movey = 1;
-			else if (FlxG.keys.justPressed.DOWN #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown2.justPressed #end)
+			else if (FlxG.keys.justPressed.DOWN #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown2.justPressed #end)
 				movey = -1;
 
-			if (FlxG.keys.pressed.SHIFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonZ.pressed #end)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end)
 			{
 				movex *= 10;
 				movey *= 10;
@@ -307,7 +307,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (FlxG.keys.pressed.CONTROL || idk)
 		{
-			if (FlxG.keys.justPressed.C #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonC.justPressed #end)
+			if (FlxG.keys.justPressed.C #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				var arr:Array<Float> = selectedArray();
 				if (copiedArray == null)
@@ -315,7 +315,7 @@ class NoteSplashDebugState extends MusicBeatState
 				copiedArray[0] = arr[0];
 				copiedArray[1] = arr[1];
 			}
-			else if ((FlxG.keys.justPressed.V #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonV.justPressed #end))
+			else if ((FlxG.keys.justPressed.V #if FEATURE_MOBILE_CONTROLS || touchPad.buttonV.justPressed #end))
 			{
 				if (copiedArray != null)
 				{
@@ -336,7 +336,7 @@ class NoteSplashDebugState extends MusicBeatState
 				savedText.visible = false;
 		}
 
-		if (FlxG.keys.justPressed.ENTER #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonA.justPressed #end)
+		if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 		{
 			if (controls.mobileC)
 			{
@@ -362,18 +362,18 @@ class NoteSplashDebugState extends MusicBeatState
 		}
 
 		// Reset anim & change anim
-		if (FlxG.keys.justPressed.SPACE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.justPressed #end)
+		if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			changeAnim();
-		else if (FlxG.keys.justPressed.S #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft.justPressed #end)
+		else if (FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end)
 			changeAnim(-1);
-		else if (FlxG.keys.justPressed.W #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight.justPressed #end)
+		else if (FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end)
 			changeAnim(1);
 
 		// Force frame
 		var updatedFrame:Bool = false;
-		if (updatedFrame = FlxG.keys.justPressed.Q #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.justPressed #end)
+		if (updatedFrame = FlxG.keys.justPressed.Q #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			forceFrame--;
-		else if (updatedFrame = FlxG.keys.justPressed.E #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonE.justPressed #end)
+		else if (updatedFrame = FlxG.keys.justPressed.E #if FEATURE_MOBILE_CONTROLS || touchPad.buttonE.justPressed #end)
 			forceFrame++;
 
 		if (updatedFrame)

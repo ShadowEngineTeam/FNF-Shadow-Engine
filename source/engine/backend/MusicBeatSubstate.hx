@@ -20,7 +20,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public var hscriptArray:Array<HScript> = [];
 	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
 	public var instancesExclude:Array<String> = [];
@@ -34,11 +34,11 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 	public var modchartCameras:Map<String, FlxCamera> = new Map<String, FlxCamera>();
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public var luaArray:Array<FunkinLua> = [];
 	#end
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
 	private var currentClassName:String;
@@ -51,7 +51,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	private function get_controls():Controls
 		return Controls.instance;
 
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
 	public var touchPadCam:FlxCamera;
 	public var luaTouchPad:TouchPad;
@@ -260,13 +260,13 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	override function destroy()
 	{
 		controls.isInSubstate = false;
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		removeLuaTouchPad();
 		removeMobileControls();
 		#end
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		for (lua in luaArray)
 		{
 			lua.call('onDestroy', []);
@@ -276,7 +276,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		FunkinLua.customFunctions.clear();
 		#end
 
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		for (script in hscriptArray)
 			if (script != null)
 			{
@@ -296,7 +296,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		instance = this;
 		stateInstance = cast this;
 
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
 			.replace('states.', '')
 			.replace('substates.', '')
@@ -310,7 +310,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	override function create()
 	{
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
 		luaDebugCam = new FlxCamera();
 		luaDebugCam.bgColor.alpha = 0;
@@ -318,10 +318,10 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		luaDebugGroup.cameras = [luaDebugCam];
 		add(luaDebugGroup);
 		#end
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		startLuasNamed('substatescripts/' + currentClassName + '.lua');
 		#end
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		startHScriptsNamed('substatescripts/' + currentClassName);
 		#end
 		super.create();
@@ -457,7 +457,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		return val == null ? 4 : val;
 	}
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	public function addTextToDebug(text:String, color:FlxColor)
 	{
 		if (luaDebugGroup == null)
@@ -485,7 +485,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
 			return modchartSprites.get(tag);
 		if (text && modchartTexts.exists(tag))
@@ -496,11 +496,11 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		return null;
 	}
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public function startLuasNamed(luaFile:String)
 	{
 		var luaToLoad:String = '';
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		luaToLoad = Paths.modFolders(luaFile);
 		if (!FileSystem.exists(luaToLoad))
 		#end
@@ -519,7 +519,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	}
 	#end
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool)
 	{
 		function doFile(file:String):Bool
@@ -533,7 +533,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			var scriptToLoad:String = file;
 			if (!FileSystem.exists(scriptToLoad))
 			{
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				scriptToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(scriptToLoad))
 				#end
@@ -640,7 +640,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (args == null)
 			args = [];
 		if (exclusions == null)
@@ -688,7 +688,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;
 
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		if (exclusions == null)
 			exclusions = new Array();
 		if (excludeValues == null)
@@ -750,7 +750,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (exclusions == null)
 			exclusions = [];
 		for (script in luaArray)
@@ -765,7 +765,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		if (exclusions == null)
 			exclusions = [];
 		for (script in hscriptArray)

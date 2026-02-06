@@ -1,11 +1,11 @@
 #if !macro
 // Discord API
-#if DISCORD_ALLOWED
+#if FEATURE_DISCORD_RPC
 import backend.Discord;
 #end
 import haxe.Json;
 // Psych
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import hxluajit.*;
 import hxluajit.Types;
 import psychlua.*;
@@ -15,11 +15,11 @@ import psychlua.FunkinLua;
 import psychlua.ModchartSprite;
 import psychlua.HScript;
 #end
-#if HSCRIPT_ALLOWED
+#if FEATURE_HSCRIPT
 import tea.SScript;
 #end
 // Mobile Controls
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 import mobile.objects.MobileControls;
 import mobile.objects.IMobileControls;
 import mobile.objects.Hitbox;

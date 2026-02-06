@@ -1,6 +1,6 @@
 package mobile.backend;
 
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 import haxe.ds.Map;
 import haxe.io.Path;
 import openfl.utils.Assets;
@@ -27,7 +27,7 @@ class MobileData
 
 		readDirectory(Paths.getSharedPath('mobile/DPadModes'), dpadModes);
 		readDirectory(Paths.getSharedPath('mobile/ActionModes'), actionModes);
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'mobile/'))
 		{
 			readDirectory(Path.join([folder, 'DPadModes']), dpadModes);

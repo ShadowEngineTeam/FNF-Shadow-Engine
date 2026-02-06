@@ -148,7 +148,7 @@ class ClientPrefs
 		'fullscreen' => [LEFT_STICK_CLICK],
 		'fpsCounter' => [RIGHT_STICK_CLICK]
 	];
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public static var mobileBinds:Map<String, Array<MobileInputID>> = [
 		'note_up' => [MobileInputID.NOTE_UP, MobileInputID.UP2],
 		'note_left' => [MobileInputID.NOTE_LEFT, MobileInputID.LEFT2],
@@ -187,7 +187,7 @@ class ClientPrefs
 	{
 		var keyBind:Array<FlxKey> = keyBinds.get(key);
 		var gamepadBind:Array<FlxGamepadInputID> = gamepadBinds.get(key);
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		var mobileBind:Array<MobileInputID> = mobileBinds.get(key);
 		while (mobileBind != null && mobileBind.contains(NONE))
 			mobileBind.remove(NONE);
@@ -202,7 +202,7 @@ class ClientPrefs
 	{
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		defaultMobileBinds = mobileBinds.copy();
 		#end
 	}
@@ -219,7 +219,7 @@ class ClientPrefs
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 		save.data.gamepad = gamepadBinds;
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		save.data.mobile = mobileBinds;
 		#end
 		save.flush();
@@ -264,7 +264,7 @@ class ClientPrefs
 		if (FlxG.save.data.mute != null)
 			FlxG.sound.muted = FlxG.save.data.mute;
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.check();
 		#end
 
@@ -287,7 +287,7 @@ class ClientPrefs
 					if (gamepadBinds.exists(control))
 						gamepadBinds.set(control, keys);
 			}
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (save.data.mobile != null)
 			{
 				var loadedControls:Map<String, Array<MobileInputID>> = save.data.mobile;

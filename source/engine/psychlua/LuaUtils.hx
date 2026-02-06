@@ -121,7 +121,7 @@ class LuaUtils
 
 	public static function getModSetting(saveTag:String, ?modName:String = null)
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (FlxG.save.data.modSettings == null)
 			FlxG.save.data.modSettings = new Map<String, Dynamic>();
 
@@ -172,7 +172,7 @@ class LuaUtils
 		else
 		{
 			FlxG.save.data.modSettings.remove(modName);
-			#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			FunkinLua.getCurrentMusicState().addTextToDebug('getModSetting: $path could not be found!', FlxColor.RED);
 			#else
 			FlxG.log.warn('getModSetting: $path could not be found!');
@@ -182,7 +182,7 @@ class LuaUtils
 
 		if (settings.exists(saveTag))
 			return settings.get(saveTag);
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		FunkinLua.getCurrentMusicState().addTextToDebug('getModSetting: "$saveTag" could not be found inside $modName\'s settings!', FlxColor.RED);
 		#else
 		FlxG.log.warn('getModSetting: "$saveTag" could not be found inside $modName\'s settings!');
@@ -323,7 +323,7 @@ class LuaUtils
 
 	inline public static function getTextObject(name:String):FlxText
 	{
-		return #if LUA_ALLOWED FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
+		return #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
 		Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
 	}
 
@@ -415,7 +415,7 @@ class LuaUtils
 
 	public static function resetTextTag(tag:String)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (!FunkinLua.getCurrentMusicState().modchartTexts.exists(tag))
 		{
 			return;
@@ -431,7 +431,7 @@ class LuaUtils
 
 	public static function resetSpriteTag(tag:String)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (!FunkinLua.getCurrentMusicState().modchartSprites.exists(tag))
 		{
 			return;
@@ -447,7 +447,7 @@ class LuaUtils
 
 	public static function cancelTween(tag:String)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (FunkinLua.getCurrentMusicState().modchartTweens.exists(tag))
 		{
 			FunkinLua.getCurrentMusicState().modchartTweens.get(tag).cancel();
@@ -469,7 +469,7 @@ class LuaUtils
 
 	public static function cancelTimer(tag:String)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (FunkinLua.getCurrentMusicState().modchartTimers.exists(tag))
 		{
 			var theTimer:FlxTimer = cast(FunkinLua.getCurrentMusicState().modchartTimers.get(tag), FlxTimer);
@@ -632,7 +632,7 @@ class LuaUtils
 
 	public static function typeToString(type:Int):String
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		switch (type)
 		{
 			case type if (type == Lua.TBOOLEAN):

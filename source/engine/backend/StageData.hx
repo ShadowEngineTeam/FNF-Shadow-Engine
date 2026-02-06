@@ -94,7 +94,7 @@ class StageData
 	{
 		var path:String = Paths.getSharedPath('stages/' + stage + '.json');
 		var rawJson:String = null;
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders('stages/' + stage + '.json');
 		if (FileSystem.exists(modPath))
 		{

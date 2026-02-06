@@ -26,13 +26,13 @@ class Project extends HXProject
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
 	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "float_deltatime", "gpu_textures"];
 
-	static final MODS_ALLOWED:CompileFlag = CompileFlag.get("MODS_ALLOWED");
-	static final HSCRIPT_ALLOWED:CompileFlag = CompileFlag.get("HSCRIPT_ALLOWED");
-	static final LUA_ALLOWED:CompileFlag = CompileFlag.get("LUA_ALLOWED");
-	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
-	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
-	static final MOBILE_CONTROLS_ALLOWED:CompileFlag = CompileFlag.get("MOBILE_CONTROLS_ALLOWED");
-	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
+	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
+	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
+	static final FEATURE_LUA:CompileFlag = CompileFlag.get("FEATURE_LUA");
+	static final FEATURE_VIDEOS:CompileFlag = CompileFlag.get("FEATURE_VIDEOS");
+	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
+	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
+	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -207,13 +207,13 @@ class Project extends HXProject
 
 	function configureCompileFlags()
 	{
-		MODS_ALLOWED.integrate(isDesktop() || isMobile());
-		HSCRIPT_ALLOWED.integrate(true);
-		LUA_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
-		VIDEOS_ALLOWED.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
-		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
-		MOBILE_CONTROLS_ALLOWED.integrate(isMobile());
-		DCEBUILD.integrate(false);
+		FEATURE_MODS.integrate(isDesktop() || isMobile());
+		FEATURE_HSCRIPT.integrate(true);
+		FEATURE_LUA.integrate((isDesktop() && !isHashLink()) || isMobile());
+		FEATURE_VIDEOS.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
+		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
+		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
+		FEATURE_DCE.integrate(false);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -229,7 +229,7 @@ class Project extends HXProject
 		setHaxedef("HXCPP_STACK_IDS");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
-		if (DCEBUILD.isDisabled())
+		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
 
 		if (isAndroid() && !isDebug())
@@ -301,16 +301,16 @@ class Project extends HXProject
 		//addMacroFlag("allowPackage('flash')");
 		//addMacroFlag("include('my.pack')");
 
-		if (!DCEBUILD.isEnabled())
+		if (FEATURE_DCE.isDisabled())
 		{
 			addHaxeFlag("-dce no");
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
 
-		/*if (VIDEOS_ALLOWED.isEnabled())
+		/*if (FEATURE_VIDEOS.isEnabled())
 			setHaxedef("HXVLC_SHARE_DIRECTORY");*/
 
-		if (DISCORD_ALLOWED.isEnabled())
+		if (FEATURE_DISCORD_RPC.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
 		if (isMobile() || isWeb())
@@ -323,7 +323,7 @@ class Project extends HXProject
 		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
 		addAssetPath("assets/shared");
-		if (MOBILE_CONTROLS_ALLOWED.isEnabled())
+		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
 		final textureFormats = ["ASTC", "S3TC", "PNG"];
@@ -350,13 +350,13 @@ class Project extends HXProject
 		includeHaxelib("flixel-addons");
 		includeHaxelib("flixel-animate");
 
-		if (LUA_ALLOWED.isEnabled())
+		if (FEATURE_LUA.isEnabled())
 			includeHaxelib("hxluajit");
-		if (HSCRIPT_ALLOWED.isEnabled())
+		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
-		if (VIDEOS_ALLOWED.isEnabled())
+		if (FEATURE_VIDEOS.isEnabled())
 			includeHaxelib("hxvlc");
-		if (DISCORD_ALLOWED.isEnabled())
+		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
 
 		if (isDebug() && isCPP())

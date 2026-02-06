@@ -23,7 +23,7 @@ interface IMusicState
 	private var curDecStep:Float;
 	private var curDecBeat:Float;
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public var hscriptArray:Array<HScript>;
 	public final hscriptExtensions:Array<String>;
 	public var instancesExclude:Array<String>;
@@ -37,11 +37,11 @@ interface IMusicState
 	public var modchartSaves:Map<String, FlxSave>;
 	public var modchartCameras:Map<String, FlxCamera>;
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public var luaArray:Array<FunkinLua>;
 	#end
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
 	private var currentClassName:String;
@@ -53,7 +53,7 @@ interface IMusicState
 
 	private function get_controls():Controls;
 
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
 	public var touchPadCam:FlxCamera;
 	public var luaTouchPad:TouchPad;
@@ -64,7 +64,7 @@ interface IMusicState
 
 	public function remove(basic:FlxBasic, splice:Bool = false):FlxBasic;
 
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public function addTouchPad(DPad:String, Action:String):Void;
 	public function removeTouchPad():Void;
 	public function addMobileControls(defaultDrawTarget:Bool = false):Void;
@@ -92,17 +92,17 @@ interface IMusicState
 	public function sectionHit():Void;
 	function getBeatsOnSection():Null<Float>;
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	public function addTextToDebug(text:String, color:FlxColor):Void;
 	#end
 
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite;
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public function startLuasNamed(luaFile:String):Bool;
 	#end
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool):Bool;
 	public function initHScript(file:String):Void;
 	#end

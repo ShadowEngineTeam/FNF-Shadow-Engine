@@ -1,6 +1,6 @@
 package mobile.objects;
 
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 import openfl.display.BitmapData;
 import openfl.display.Shape;
 import flixel.graphics.FlxGraphic;

@@ -1,6 +1,6 @@
 package mobile.input;
 
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 import flixel.system.macros.FlxMacroUtil;
 
 /**

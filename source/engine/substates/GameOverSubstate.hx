@@ -76,7 +76,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		setOnScripts('inGameOver', true);
 		callOnScripts('onGameOverStart', []);
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
 		addTouchPadCamera(false);
 		#end
@@ -99,7 +99,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		if (controls.BACK)
 		{
-			#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
+			#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 			FlxG.sound.music.stop();
 			PlayState.deathCounter = 0;
 			PlayState.seenCutscene = false;

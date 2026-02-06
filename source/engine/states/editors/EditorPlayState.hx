@@ -149,12 +149,12 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence (with Time Left)
 		DiscordClient.changePresence('Playtesting on Chart Editor', PlayState.SONG.song, null, true, songLength);
 		#end
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addMobileControls(false);
 		mobileControls.instance.visible = true;
 		mobileControls.onButtonDown.add(onButtonPress);
@@ -173,9 +173,9 @@ class EditorPlayState extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
-		if (#if MOBILE_CONTROLS_ALLOWED touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
+		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = false;
 			#end
 			endSong();
@@ -832,7 +832,7 @@ class EditorPlayState extends MusicBeatSubstate
 		}
 	}
 
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	private function onButtonPress(button:TouchButton):Void
 	{
 		if (button.IDs.filter(id -> id.toString().startsWith("EXTRA")).length > 0)
@@ -1140,7 +1140,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var characterPath:String = 'characters/' + char + '.json';
 		var path:String;
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(characterPath);
 		if (FileSystem.exists(modPath))
 			path = modPath;

@@ -137,7 +137,7 @@ class Controls
 	// Gamepad, Keyboard & Mobile stuff
 	public var keyboardBinds:Map<String, Array<FlxKey>>;
 	public var gamepadBinds:Map<String, Array<FlxGamepadInputID>>;
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public var mobileBinds:Map<String, Array<MobileInputID>>;
 	#end
 
@@ -149,7 +149,7 @@ class Controls
 
 		return result
 			|| _myGamepadJustPressed(gamepadBinds[key]) == true
-			#if MOBILE_CONTROLS_ALLOWED || mobileCJustPressed(mobileBinds[key]) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCJustPressed(mobileBinds[key]) == true
 			|| touchPadJustPressed(mobileBinds[key]) == true #end;
 	}
 
@@ -161,7 +161,7 @@ class Controls
 
 		return result
 			|| _myGamepadPressed(gamepadBinds[key]) == true
-			#if MOBILE_CONTROLS_ALLOWED || mobileCPressed(mobileBinds[key]) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCPressed(mobileBinds[key]) == true
 			|| touchPadPressed(mobileBinds[key]) == true #end;
 	}
 
@@ -173,7 +173,7 @@ class Controls
 
 		return result
 			|| _myGamepadJustReleased(gamepadBinds[key]) == true
-			#if MOBILE_CONTROLS_ALLOWED || mobileCJustReleased(mobileBinds[key]) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCJustReleased(mobileBinds[key]) == true
 			|| touchPadJustReleased(mobileBinds[key]) == true #end;
 	}
 
@@ -227,7 +227,7 @@ class Controls
 		return false;
 	}
 
-	#if MOBILE_CONTROLS_ALLOWED
+	#if FEATURE_MOBILE_CONTROLS
 	public var isInSubstate:Bool = false; // don't worry about this it becomes true and false on it's own in MusicBeatSubstate
 	public var requestedInstance(get, default):Dynamic; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
 	public var requestedMobileC(get, default):IMobileControls; // for PlayState and EditorPlayState (hitbox and touchPad)
@@ -322,7 +322,7 @@ class Controls
 	{
 		gamepadBinds = ClientPrefs.gamepadBinds;
 		keyboardBinds = ClientPrefs.keyBinds;
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		mobileBinds = ClientPrefs.mobileBinds;
 		#end
 	}

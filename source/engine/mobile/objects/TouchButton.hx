@@ -1,6 +1,6 @@
 package mobile.objects;
 
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 import flixel.input.FlxInput;
 import flixel.input.FlxPointer;
 import flixel.input.IFlxInput;

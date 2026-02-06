@@ -59,7 +59,7 @@ class TitleState extends MusicBeatState
 	{
 		Paths.clearStoredMemory();
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		Mods.pushGlobalMods();
 		#end
 		Mods.loadTopMod();
@@ -91,7 +91,7 @@ class TitleState extends MusicBeatState
 			}
 			persistentUpdate = true;
 			persistentDraw = true;
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			MobileData.init();
 			#end
 		}

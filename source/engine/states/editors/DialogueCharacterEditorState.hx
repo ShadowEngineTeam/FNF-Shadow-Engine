@@ -151,7 +151,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		FlxG.mouse.visible = true;
 		updateCharTypeBox();
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("DIALOGUE_PORTRAIT", "DIALOGUE_PORTRAIT");
 		addTouchPadCamera();
 		#end
@@ -548,7 +548,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 				+ character.jsonFile.animations.length
 				+ ') - Press W or S to scroll';
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Dialogue Character Editor", "Editting: " + character.jsonFile.image);
 		#end
@@ -613,7 +613,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		if (!blockInput && !ShadowDropdown.isAnyOpen())
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.SPACE #if MOBILE_CONTROLS_ALLOWED || (touchPad.buttonA.justPressed && UI_mainbox.selectedTab == TAB_CHARACTER) #end)
+			if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || (touchPad.buttonA.justPressed && UI_mainbox.selectedTab == TAB_CHARACTER) #end)
 			{
 				character.playAnim(character.jsonFile.animations[curAnim].anim);
 				daText.resetDialogue();
@@ -623,7 +623,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			// lots of Ifs lol get trolled
 			var offsetAdd:Int = 1;
 			var speed:Float = 300;
-			if (FlxG.keys.pressed.SHIFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonZ.pressed #end)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end)
 			{
 				speed = 1200;
 				offsetAdd = 10;
@@ -659,22 +659,22 @@ class DialogueCharacterEditorState extends MusicBeatState
 				var animShit:DialogueAnimArray = character.dialogueAnimations.get(curSelectedAnim);
 				var controlArrayLoop:Array<Bool> = [
 					FlxG.keys.justPressed.A
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft2.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft2.justPressed #end,
 					FlxG.keys.justPressed.W
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp2.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp2.justPressed #end,
 					FlxG.keys.justPressed.D
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight2.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight2.justPressed #end,
 					FlxG.keys.justPressed.S
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown2.justPressed #end];
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown2.justPressed #end];
 				var controlArrayIdle:Array<Bool> = [
 					FlxG.keys.justPressed.LEFT
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end,
 					FlxG.keys.justPressed.UP
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end,
 					FlxG.keys.justPressed.RIGHT
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight.justPressed #end,
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end,
 					FlxG.keys.justPressed.DOWN
-					#if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown.justPressed #end];
+					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end];
 				for (i in 0...controlArrayLoop.length)
 				{
 					if (controlArrayLoop[i])
@@ -727,7 +727,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 				if (camGame.zoom > 1)
 					camGame.zoom = 1;
 			}
-			if (FlxG.keys.justPressed.H #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.justPressed #end)
+			if (FlxG.keys.justPressed.H #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			{
 				if (UI_mainbox.selectedTab == TAB_ANIMATIONS)
 				{
@@ -745,7 +745,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 					hudGroup.visible = !hudGroup.visible;
 				}
 			}
-			if (FlxG.keys.justPressed.R #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.justPressed #end)
+			if (FlxG.keys.justPressed.R #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			{
 				camGame.zoom = 1;
 				mainGroup.setPosition(0, 0);
@@ -831,7 +831,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 				}
 			}
 
-			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonB.justPressed #end)
+			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);

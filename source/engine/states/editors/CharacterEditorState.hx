@@ -160,7 +160,7 @@ class CharacterEditorState extends MusicBeatState
 		updateHealthBar();
 		character.finishAnimation();
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "CHARACTER_EDITOR");
 		addTouchPadCamera(false);
 		#end
@@ -1075,9 +1075,9 @@ class CharacterEditorState extends MusicBeatState
 			ClientPrefs.toggleVolumeKeys(false);
 			FlxG.mouse.enabled = false;
 
-			if ((FlxG.keys.justPressed.F1 #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
+			if ((FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
 			{
-				#if MOBILE_CONTROLS_ALLOWED
+				#if FEATURE_MOBILE_CONTROLS
 				if (controls.mobileC)
 				{
 					touchPad.forEachAlive(function(button:TouchButton)
@@ -1116,12 +1116,12 @@ class CharacterEditorState extends MusicBeatState
 		var shiftMult:Float = 1;
 		var ctrlMult:Float = 1;
 		var shiftMultBig:Float = 1;
-		if (FlxG.keys.pressed.SHIFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonC.pressed #end)
+		if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.pressed #end)
 		{
 			shiftMult = 4;
 			shiftMultBig = 10;
 		}
-		if (FlxG.keys.pressed.CONTROL #if MOBILE_CONTROLS_ALLOWED /*|| touchPad.buttonC.pressed*/ #end)
+		if (FlxG.keys.pressed.CONTROL #if FEATURE_MOBILE_CONTROLS /*|| touchPad.buttonC.pressed*/ #end)
 			ctrlMult = 0.25;
 
 		// CAMERA CONTROLS
@@ -1135,15 +1135,15 @@ class CharacterEditorState extends MusicBeatState
 			FlxG.camera.scroll.y -= elapsed * 500 * shiftMult * ctrlMult;
 
 		var lastZoom:Float = FlxG.camera.zoom;
-		if (FlxG.keys.justPressed.R && !FlxG.keys.pressed.CONTROL #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonZ.justPressed #end)
+		if (FlxG.keys.justPressed.R && !FlxG.keys.pressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.justPressed #end)
 			FlxG.camera.zoom = 1;
-		else if ((FlxG.keys.pressed.E #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.pressed #end) && FlxG.camera.zoom < 3)
+		else if ((FlxG.keys.pressed.E #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.pressed #end) && FlxG.camera.zoom < 3)
 		{
 			FlxG.camera.zoom += elapsed * FlxG.camera.zoom * shiftMult * ctrlMult;
 			if (FlxG.camera.zoom > 3)
 				FlxG.camera.zoom = 3;
 		}
-		else if ((FlxG.keys.pressed.Q #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.pressed #end) && FlxG.camera.zoom > 0.1)
+		else if ((FlxG.keys.pressed.Q #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.pressed #end) && FlxG.camera.zoom > 0.1)
 		{
 			FlxG.camera.zoom -= elapsed * FlxG.camera.zoom * shiftMult * ctrlMult;
 			if (FlxG.camera.zoom < 0.1)
@@ -1157,9 +1157,9 @@ class CharacterEditorState extends MusicBeatState
 		var changedAnim:Bool = false;
 		if (anims.length > 1)
 		{
-			if ((FlxG.keys.justPressed.W #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonV.justPressed #end) && (changedAnim = true))
+			if ((FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonV.justPressed #end) && (changedAnim = true))
 				curAnim--;
-			else if ((FlxG.keys.justPressed.S #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonD.justPressed #end) && (changedAnim = true))
+			else if ((FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonD.justPressed #end) && (changedAnim = true))
 				curAnim++;
 
 			if (changedAnim)
@@ -1175,7 +1175,7 @@ class CharacterEditorState extends MusicBeatState
 		var changedOffset:Bool = false;
 		var moveKeysP;
 		var moveKeys;
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		if (controls.mobileC)
 		{
 			moveKeysP = [
@@ -1268,7 +1268,7 @@ class CharacterEditorState extends MusicBeatState
 			}
 		}
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		if (touchPad.buttonA.justPressed)
 		{
 			undoOffsets = [character.offset.x, character.offset.y];
@@ -1339,13 +1339,13 @@ class CharacterEditorState extends MusicBeatState
 		frameAdvanceText.color = clr;
 
 		// OTHER CONTROLS
-		if (FlxG.keys.justPressed.F12 #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonS.justPressed #end)
+		if (FlxG.keys.justPressed.F12 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonS.justPressed #end)
 			silhouettes.visible = !silhouettes.visible;
 
 		// Open help (closing is handled at the top of update)
-		if (FlxG.keys.justPressed.F1 #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonF.justPressed #end)
+		if (FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end)
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (controls.mobileC)
 			{
 				touchPad.forEachAlive(function(button:TouchButton)
@@ -1367,7 +1367,7 @@ class CharacterEditorState extends MusicBeatState
 			if (helpTexts != null)
 				helpTexts.visible = false;
 		}
-		else if (FlxG.keys.justPressed.ESCAPE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonB.justPressed #end)
+		else if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 		{
 			FlxG.mouse.visible = false;
 			if (!_goToPlayState)
@@ -1442,7 +1442,7 @@ class CharacterEditorState extends MusicBeatState
 
 	inline function updatePresence()
 	{
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Character Editor", "Character: " + _char, healthIcon.getCharacter());
 		#end

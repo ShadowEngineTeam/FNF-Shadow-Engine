@@ -39,7 +39,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		FlxG.cameras.add(camHUD, false);
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
 		#end
 
@@ -63,7 +63,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		makeOffsetUI();
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("MENU_CHARACTER", "MENU_CHARACTER");
 		#end
 
@@ -280,7 +280,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		char.animation.play('idle');
 		updateOffset();
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
 		#end
@@ -305,38 +305,38 @@ class MenuCharacterEditorState extends MusicBeatState
 		if (!blockInput)
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonB.justPressed #end)
+			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 
 			var shiftMult:Int = 1;
-			if (FlxG.keys.pressed.SHIFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonA.pressed #end)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.pressed #end)
 				shiftMult = 10;
 
-			if (FlxG.keys.justPressed.LEFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft.justPressed #end)
+			if (FlxG.keys.justPressed.LEFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end)
 			{
 				characterFile.position[0] += shiftMult;
 				updateOffset();
 			}
-			if (FlxG.keys.justPressed.RIGHT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight.justPressed #end)
+			if (FlxG.keys.justPressed.RIGHT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end)
 			{
 				characterFile.position[0] -= shiftMult;
 				updateOffset();
 			}
-			if (FlxG.keys.justPressed.UP #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp.justPressed #end)
+			if (FlxG.keys.justPressed.UP #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end)
 			{
 				characterFile.position[1] += shiftMult;
 				updateOffset();
 			}
-			if (FlxG.keys.justPressed.DOWN #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown.justPressed #end)
+			if (FlxG.keys.justPressed.DOWN #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end)
 			{
 				characterFile.position[1] -= shiftMult;
 				updateOffset();
 			}
 
-			if (FlxG.keys.justPressed.SPACE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonC.justPressed #end && curTypeSelected == 1)
+			if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end && curTypeSelected == 1)
 			{
 				grpWeekCharacters.members[curTypeSelected].animation.play('confirm', true);
 			}

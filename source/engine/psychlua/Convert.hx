@@ -1,6 +1,6 @@
 package psychlua;
 
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import haxe.ds.*;
 import psychlua.FunkinLua.State;
 import hxluajit.Types;

@@ -35,7 +35,7 @@ class ResultsScreen extends MusicBeatSubstate
 
 	override function create()
 	{
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Results", null);
 		#end
@@ -164,7 +164,7 @@ class ResultsScreen extends MusicBeatSubstate
 		{
 			obj.cameras = [fuckingCamera];
 		});
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
 		addTouchPadCamera(false);
 		#end
@@ -185,7 +185,7 @@ class ResultsScreen extends MusicBeatSubstate
 			PlayState.instance.endCallback();
 		}
 
-		if (#if MOBILE_CONTROLS_ALLOWED touchPad.buttonB.justPressed || #end controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end controls.RESET)
 		{
 			PlayState.instance.paused = true; // For lua
 			FlxG.sound.music.volume = 0;

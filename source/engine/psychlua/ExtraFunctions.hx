@@ -183,7 +183,7 @@ class ExtraFunctions
 			if (absolute)
 				return FileSystem.exists(filename);
 
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var modPath:String = Paths.modFolders(filename);
 			if (FileSystem.exists(modPath))
 				return true;
@@ -196,7 +196,7 @@ class ExtraFunctions
 		{
 			try
 			{
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				if (!absolute)
 				{
 					File.saveContent(Paths.mods(path), content);
@@ -217,7 +217,7 @@ class ExtraFunctions
 		{
 			try
 			{
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				if (!ignoreModFolders)
 				{
 					var modPath = Paths.modFolders(path);

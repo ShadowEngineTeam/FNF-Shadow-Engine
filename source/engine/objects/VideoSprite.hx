@@ -7,7 +7,7 @@ import hxvlc.flixel.FlxVideoSprite;
 
 class VideoSprite extends FlxSpriteGroup
 {
-	#if VIDEOS_ALLOWED
+	#if FEATURE_VIDEOS
 	public var finishCallback:Void->Void = null;
 	public var onSkip:Void->Void = null;
 

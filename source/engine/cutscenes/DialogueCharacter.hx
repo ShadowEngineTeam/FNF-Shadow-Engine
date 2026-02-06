@@ -59,7 +59,7 @@ class DialogueCharacter extends FlxSprite
 		var characterPath:String = 'images/dialogue/' + character + '.json';
 		var defaultPath:String = 'images/dialogue/' + DEFAULT_CHARACTER + '.json';
 		var path:String = Paths.getSharedPath(characterPath);
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(characterPath);
 		if (FileSystem.exists(modPath))
 			path = modPath;

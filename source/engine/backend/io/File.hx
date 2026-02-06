@@ -36,7 +36,7 @@ class File
 
 	public static function getContent(path:String):Null<String>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -58,7 +58,7 @@ class File
 
 	public static function getBytes(path:String):Null<haxe.io.Bytes>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -86,21 +86,21 @@ class File
 
 	public static function saveContent(path:String, content:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		SysFile.saveContent(cwd(path), cwd(content));
 		#end
 	}
 
 	public static function saveBytes(path:String, bytes:haxe.io.Bytes):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		SysFile.saveBytes(cwd(path), bytes);
 		#end
 	}
 
 	public static function read(path:String, binary:Bool = true):Null<FileInput>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -117,7 +117,7 @@ class File
 
 	public static function write(path:String, binary:Bool = true):Null<FileOutput>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -134,7 +134,7 @@ class File
 
 	public static function append(path:String, binary:Bool = true):Null<FileOutput>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -151,7 +151,7 @@ class File
 
 	public static function update(path:String, binary:Bool = true):Null<FileOutput>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -168,7 +168,7 @@ class File
 
 	public static function copy(srcPath:String, dstPath:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualSrc:String = cwd(srcPath);
 		actualSrc = getCaseInsensitivePath(actualSrc);
@@ -181,7 +181,7 @@ class File
 		#end
 	}
 
-	#if (linux && MODS_ALLOWED)
+	#if (linux && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
 	{
 		if (SysFileSystem.exists(path))

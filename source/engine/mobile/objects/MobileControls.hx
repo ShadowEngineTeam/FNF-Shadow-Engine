@@ -1,6 +1,6 @@
 package mobile.objects;
 
-#if MOBILE_CONTROLS_ALLOWED
+#if FEATURE_MOBILE_CONTROLS
 // I wanted to delete this but I have no idea how I coded MobileControlSelectSubState so idk how to implement IMobileControls into it... yet... - Karim Akra
 
 /**

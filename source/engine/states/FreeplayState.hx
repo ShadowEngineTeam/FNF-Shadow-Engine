@@ -57,7 +57,7 @@ class FreeplayState extends MusicBeatState
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -184,7 +184,7 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		updateTexts();
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_C_X_Y_Z");
 		#end
 		super.create();
@@ -195,7 +195,7 @@ class FreeplayState extends MusicBeatState
 		changeSelection(0, false);
 		persistentUpdate = true;
 		super.closeSubState();
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "A_B_C_X_Y_Z");
 		#end
@@ -246,7 +246,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		var shiftMult:Int = 1;
-		if ((FlxG.keys.pressed.SHIFT #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonZ.pressed #end) && !player.playingMusic)
+		if ((FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end) && !player.playingMusic)
 			shiftMult = 3;
 
 		if (!player.playingMusic)
@@ -335,15 +335,15 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if ((FlxG.keys.justPressed.CONTROL #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonC.justPressed #end) && !player.playingMusic)
+		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end) && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubstate());
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end
 		}
-		else if (FlxG.keys.justPressed.SPACE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.justPressed #end)
+		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 		{
 			if (instPlaying != curSelected && !player.playingMusic)
 			{
@@ -441,15 +441,15 @@ class FreeplayState extends MusicBeatState
 			LoadingState.loadAndSwitchState(new PlayState());
 			// FlxG.sound.music.volume = 0;
 			destroyFreeplayVocals();
-			#if (MODS_ALLOWED && DISCORD_ALLOWED)
+			#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 			DiscordClient.loadModRPC();
 			#end
 		}
-		else if ((controls.RESET #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.justPressed #end) && !player.playingMusic)
+		else if ((controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end
 			FlxG.sound.play(Paths.sound('scrollMenu'));

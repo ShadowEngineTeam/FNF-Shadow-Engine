@@ -72,7 +72,7 @@ class StoryMenuState extends MusicBeatState
 		grpLocks = new FlxTypedGroup<FlxSprite>();
 		add(grpLocks);
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -167,7 +167,7 @@ class StoryMenuState extends MusicBeatState
 		changeWeek();
 		changeDifficulty();
 
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_X_Y");
 		#end
 
@@ -179,7 +179,7 @@ class StoryMenuState extends MusicBeatState
 		persistentUpdate = true;
 		changeWeek();
 		super.closeSubState();
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "A_B_X_Y");
 		#end
@@ -236,19 +236,19 @@ class StoryMenuState extends MusicBeatState
 			else if (upP || downP)
 				changeDifficulty();
 
-			if (FlxG.keys.justPressed.CONTROL #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.justPressed #end)
+			if (FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			{
 				persistentUpdate = false;
 				openSubState(new GameplayChangersSubstate());
-				#if MOBILE_CONTROLS_ALLOWED
+				#if FEATURE_MOBILE_CONTROLS
 				removeTouchPad();
 				#end
 			}
-			else if (controls.RESET #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.justPressed #end)
+			else if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			{
 				persistentUpdate = false;
 				openSubState(new ResetScoreSubState('', curDifficulty, '', curWeek));
-				#if MOBILE_CONTROLS_ALLOWED
+				#if FEATURE_MOBILE_CONTROLS
 				removeTouchPad();
 				#end
 				//FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -338,7 +338,7 @@ class StoryMenuState extends MusicBeatState
 				FreeplayState.destroyFreeplayVocals();
 			});
 
-			#if (MODS_ALLOWED && DISCORD_ALLOWED)
+			#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 			DiscordClient.loadModRPC();
 			#end
 		}

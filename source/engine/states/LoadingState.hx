@@ -220,7 +220,7 @@ class LoadingState extends MusicBeatState
 			var path:String = Paths.json('$folder/preload');
 			var json:Dynamic = null;
 
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var modPath:String = Paths.modsJson('$folder/preload');
 			if (FileSystem.exists(modPath))
 				json = Json.parse(File.getContent(modPath), modPath);
@@ -379,7 +379,7 @@ class LoadingState extends MusicBeatState
 				var bitmap:BitmapData = null;
 				var file:String = null;
 
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				file = Paths.modsImages(image);
 				if (Paths.currentTrackedAssets.exists(file))
 				{
@@ -450,7 +450,7 @@ class LoadingState extends MusicBeatState
 					var bitmap:BitmapData = null;
 					var file:String = null;
 
-					#if MODS_ALLOWED
+					#if FEATURE_MODS
 					file = Paths.modsImages(image);
 					if (Paths.currentTrackedAssets.exists(file))
 					{

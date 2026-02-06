@@ -94,7 +94,7 @@ class DialogueEditorState extends MusicBeatState
 		
 		addEditorBox();
 		changeText();
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_X_Y");
 		#end
 
@@ -341,7 +341,7 @@ class DialogueEditorState extends MusicBeatState
 		if (daText.rows > 2)
 			daText.y -= DialogueBoxPsych.LONG_TEXT_ADD;
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		var rpcText:String = lineInputText.text;
 		if (rpcText == null || rpcText.length < 1)
 			rpcText = '(Empty)';
@@ -408,11 +408,11 @@ class DialogueEditorState extends MusicBeatState
 		if (!blockInput)
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.SPACE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonY.justPressed #end)
+			if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			{
 				reloadText(false);
 			}
-			if (FlxG.keys.justPressed.ESCAPE #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonB.justPressed #end)
+			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
@@ -420,12 +420,12 @@ class DialogueEditorState extends MusicBeatState
 			}
 			var negaMult:Array<Int> = [1, -1];
 			var controlAnim:Array<Bool> = [
-				FlxG.keys.justPressed.W #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonUp.justPressed #end,
-				FlxG.keys.justPressed.S #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonDown.justPressed #end
+				FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end,
+				FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end
 			];
 			var controlText:Array<Bool> = [
-				FlxG.keys.justPressed.D #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonRight.justPressed #end,
-				FlxG.keys.justPressed.A #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonLeft.justPressed #end
+				FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end,
+				FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end
 			];
 			for (i in 0...controlAnim.length)
 			{
@@ -460,7 +460,7 @@ class DialogueEditorState extends MusicBeatState
 				}
 			}
 
-			if (FlxG.keys.justPressed.O #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonA.justPressed #end)
+			if (FlxG.keys.justPressed.O #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 			{
 				dialogueFile.dialogue.remove(dialogueFile.dialogue[curSelected]);
 				if (dialogueFile.dialogue.length < 1)
@@ -469,7 +469,7 @@ class DialogueEditorState extends MusicBeatState
 				}
 				changeText();
 			}
-			else if (FlxG.keys.justPressed.P #if MOBILE_CONTROLS_ALLOWED || touchPad.buttonX.justPressed #end)
+			else if (FlxG.keys.justPressed.P #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			{
 				dialogueFile.dialogue.insert(curSelected + 1, copyDefaultLine());
 				changeText(1);

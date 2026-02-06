@@ -17,7 +17,7 @@ class Paths
 {
 	public static var IMAGE_EXT:String = "png";
 	public static var GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif S3TC "dds" #else IMAGE_EXT #end;
-	#if VIDEOS_ALLOWED
+	#if FEATURE_VIDEOS
 	public static var VIDEO_EXT = "mp4";
 	#end
 	public static var LOADOLD:Bool = false;
@@ -101,7 +101,7 @@ class Paths
 
 	public static function getPath(file:String, ?type:AssetType = TEXT, ?library:Null<String> = null, ?modsAllowed:Bool = false):String
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (modsAllowed)
 		{
 			var customFile:String = file;
@@ -173,10 +173,10 @@ class Paths
 		return getPath('$key.lua', TEXT, library);
 	}
 
-	#if VIDEOS_ALLOWED
+	#if FEATURE_VIDEOS
 	static public function video(key:String)
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var file:String = modsVideo(key);
 		if (FileSystem.exists(file))
 		{
@@ -234,7 +234,7 @@ class Paths
 		var bitmap:BitmapData = null;
 		var file:String = null;
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		file = modsImages(key);
 		if (currentTrackedAssets.exists(file))
 		{
@@ -316,7 +316,7 @@ class Paths
 
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (!ignoreMods && FileSystem.exists(modFolders(key)))
 			return File.getContent(modFolders(key));
 		#end
@@ -332,7 +332,7 @@ class Paths
 
 	inline static public function font(key:String)
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var file:String = modsFont(key);
 		if (FileSystem.exists(file))
 		{
@@ -346,7 +346,7 @@ class Paths
 	{
 		var path:String = getPath(key, type, library, false);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (!ignoreMods)
 		{
 			var modKey:String = key;
@@ -370,7 +370,7 @@ class Paths
 		var imageLoaded:FlxGraphic = image(key, library);
 
 		var xmlPath:String = getPath('images/$key.xml', TEXT, library, true);
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
 			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
@@ -380,7 +380,7 @@ class Paths
 			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath));
 
 		var jsonPath:String = getPath('images/$key.json', TEXT, library, true);
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
 			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
@@ -396,7 +396,7 @@ class Paths
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
 			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
@@ -410,7 +410,7 @@ class Paths
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modTxt:String = modsTxt(key);
 		if (FileSystem.exists(modTxt))
 			return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(modTxt));
@@ -424,7 +424,7 @@ class Paths
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
 			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
@@ -444,7 +444,7 @@ class Paths
 
 		var animateFolder:String = getPath('images/$key', library);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modFolder:String = modsImages(key);
 		if (FileSystem.exists(modFolder))
 			return FlxAnimateFrames.fromAnimate(modFolder, settings);
@@ -466,7 +466,7 @@ class Paths
 
 	public static function returnSound(path:Null<String>, key:String, ?library:String)
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modLibPath:String = '';
 		if (library != null)
 			modLibPath = '$library/';
@@ -503,7 +503,7 @@ class Paths
 		return currentTrackedSounds.get(gottenPath);
 	}
 
-	#if MODS_ALLOWED
+	#if FEATURE_MODS
 	inline static public function mods(key:String = '')
 	{
 		return #if mobile Sys.getCwd() + #end 'mods/' + key;
@@ -519,7 +519,7 @@ class Paths
 		return modFolders('data/' + key + '.json');
 	}
 
-	#if VIDEOS_ALLOWED
+	#if FEATURE_VIDEOS
 	inline static public function modsVideo(key:String)
 	{
 		return modFolders('videos/' + key + '.' + VIDEO_EXT);

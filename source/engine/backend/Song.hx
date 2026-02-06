@@ -120,7 +120,7 @@ class Song
 		var formattedSong:String = Paths.formatToSongPath(jsonInput);
 		var path:String = "";
 		var rawJson:String = null;
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
 		if (FileSystem.exists(modPath))
 		{

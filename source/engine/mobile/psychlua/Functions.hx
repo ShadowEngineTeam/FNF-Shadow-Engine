@@ -1,7 +1,7 @@
 package mobile.psychlua;
 
 import psychlua.CustomSubstate;
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import lime.ui.Haptic;
 import psychlua.FunkinLua;
 import psychlua.LuaUtils;
@@ -22,7 +22,7 @@ class MobileFunctions
 
 		funk.set("extraButtonPressed", (button:String) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -40,7 +40,7 @@ class MobileFunctions
 
 		funk.set("extraButtonJustPressed", (button:String) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -58,7 +58,7 @@ class MobileFunctions
 
 		funk.set("extraButtonJustReleased", (button:String) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -76,7 +76,7 @@ class MobileFunctions
 
 		funk.set("extraButtonReleased", (button:String) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -103,7 +103,7 @@ class MobileFunctions
 
 		funk.set("addTouchPad", (DPadMode:String, ActionMode:String, ?addToCustomSubstate:Bool = false, ?posAtCustomSubstate:Int = -1) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			FunkinLua.getCurrentMusicState().makeLuaTouchPad(DPadMode, ActionMode);
 			if (addToCustomSubstate)
 			{
@@ -117,14 +117,14 @@ class MobileFunctions
 
 		funk.set("removeTouchPad", () ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			FunkinLua.getCurrentMusicState().removeLuaTouchPad();
 			#end
 		});
 
 		funk.set("addTouchPadCamera", (?defaultDrawTarget:Bool) ->
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (defaultDrawTarget == null)
 				defaultDrawTarget = false;
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
@@ -138,7 +138,7 @@ class MobileFunctions
 
 		funk.set("touchPadJustPressed", function(button:Dynamic):Bool
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
@@ -151,7 +151,7 @@ class MobileFunctions
 
 		funk.set("touchPadPressed", function(button:Dynamic):Bool
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
@@ -164,7 +164,7 @@ class MobileFunctions
 
 		funk.set("touchPadJustReleased", function(button:Dynamic):Bool
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
@@ -177,7 +177,7 @@ class MobileFunctions
 
 		funk.set("touchPadReleased", function(button:Dynamic):Bool
 		{
-			#if MOBILE_CONTROLS_ALLOWED
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
@@ -315,7 +315,7 @@ class MobileFunctions
 
 	public static function getMobileControlsAsString():String
 	{
-		#if MOBILE_CONTROLS_ALLOWED
+		#if FEATURE_MOBILE_CONTROLS
 		try
 		{
 			switch (MobileData.mode)

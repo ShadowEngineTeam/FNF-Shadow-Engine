@@ -44,7 +44,7 @@ class KeepMacro
 			// OPENFL SYSTEM
 			"openfl.system",
 			// VIDEOS
-			#if VIDEOS_ALLOWED
+			#if FEATURE_VIDEOS
 			"hxvlc.flixel",
 			"hxvlc.openfl",
 			#end
