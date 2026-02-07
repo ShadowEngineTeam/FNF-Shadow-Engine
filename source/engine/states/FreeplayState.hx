@@ -166,11 +166,11 @@ class FreeplayState extends MusicBeatState
 
 		if (controls.mobileC)
 		{
-			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'X'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.';
+			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.';
 		}
 		else
 		{
-			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'SPACE'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
+			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
 		}
 		bottomString = leText;
 		var size:Int = 16;
@@ -336,7 +336,7 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(START)) && !player.playingMusic)
+		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK)) && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubstate());
@@ -344,7 +344,7 @@ class FreeplayState extends MusicBeatState
 			removeTouchPad();
 			#end
 		}
-		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK))
+		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(START))
 		{
 			if (instPlaying != curSelected && !player.playingMusic)
 			{
