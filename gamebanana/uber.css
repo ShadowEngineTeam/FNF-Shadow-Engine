@@ -1,56 +1,56 @@
-:root{
-   --NotificationUnseenBG: #701E24;
-   --NavPaneBackgroundColor: #0a0a0a;
-   --DefaultNanoFontSize: 0.5rem;
-    --DefaultMicroFontSize: 0.6rem;
-    --DefaultTinyFontSize: 0.7rem;
-    --DefaultMiniFontSize: 0.8rem;
-    --DefaultSmallFontSize: 0.9rem;
-    --DefaultMediumFontSize: 1rem;
-    --DefaultLargeFontSize: 1.25rem;
-    --DefaultXLargeFontSize: 1.5rem;
-    --DefaultXxLargeFontSize: 2rem;
-    --DefaultXxxLargeFontSize: 2.5rem;
-    --DefaultXxxxLargeFontSize: 3rem;
-    --DefaultXxxxxLargeFontSize: 4rem;
-    --DefaultTextFontFamily: "Open Sans", sans-serif;
-    --DefaultTechnicalFontFamily: "IBM Plex Mono", monospace;
-    --DefaultTextColor: #e2e2e2;
-    --DefaultBlueColor: #4eb5ff;
-    --DefaultRedColor: #cc0000;      
-    --DefaultRedDarkColor: #4a0000;
-    --DefaultGreenColor: #6EE16C;
-    --DefaultGreenDarkColor: #344734;
-    --DefaultPurpleColor: #FF5E9D;
-    --DefaultGreyColor: #444444;
-    --DefaultOrangeColor: #FF7238;
-    --DefaultYellowColor: #ffcc00;   
-    --StateLabelBackground: #3c4044;
-    --LinkColor: #cc0000;            
-    --LinkHoverColor: #ffcc00;       
-    --PrimaryNavBottomBorder: 1px solid rgba(255,0,0,0.5);
-    --PrimaryNavBackgroundColor: #000000;
-    --PrimaryNavHeight: 60px;
-    --PrimaryNavFontSize: 1em;
-    --SecondaryNavBackgroundColor: #0a0a0a;
-    --SecondaryNavFullWidth: 400px;
-    --SecondaryNavSmallIconOuterWidth: 36px;
-    --SecondaryNavRegularIconOuterWidth: 52px;
-    --NavControlsHeight: 1.5em;
-    --NavUpdatesIndicatorColor: #cc0000;
-    --NavPaneTitleFontFamily: "Open Sans", sans-serif;
-    --NavPaneTitleFontSize: 1.5em;
-    --PageTitleFontSize: 3em;
-    --PageTitleFontSize800: 2.5em;
-    --PageTitleFontSize600: 2em;
-    --PageTitleFontSize400: 1.5em;
-    --PageTitleColor: #cc0000;
-    --PageDescriptionFontSize: 1rem;
-    --BreadcrumbFontSize: 0.8em;
+:root {
+  --NotificationUnseenBG: #701e24;
+  --NavPaneBackgroundColor: #0a0a0a;
+  --DefaultNanoFontSize: 0.5rem;
+  --DefaultMicroFontSize: 0.6rem;
+  --DefaultTinyFontSize: 0.7rem;
+  --DefaultMiniFontSize: 0.8rem;
+  --DefaultSmallFontSize: 0.9rem;
+  --DefaultMediumFontSize: 1rem;
+  --DefaultLargeFontSize: 1.25rem;
+  --DefaultXLargeFontSize: 1.5rem;
+  --DefaultXxLargeFontSize: 2rem;
+  --DefaultXxxLargeFontSize: 2.5rem;
+  --DefaultXxxxLargeFontSize: 3rem;
+  --DefaultXxxxxLargeFontSize: 4rem;
+  --DefaultTextFontFamily: "Open Sans", sans-serif;
+  --DefaultTechnicalFontFamily: "IBM Plex Mono", monospace;
+  --DefaultTextColor: #e2e2e2;
+  --DefaultBlueColor: #4eb5ff;
+  --DefaultRedColor: #cc0000;
+  --DefaultRedDarkColor: #4a0000;
+  --DefaultGreenColor: #6ee16c;
+  --DefaultGreenDarkColor: #344734;
+  --DefaultPurpleColor: #ff5e9d;
+  --DefaultGreyColor: #444444;
+  --DefaultOrangeColor: #ff7238;
+  --DefaultYellowColor: #ffcc00;
+  --StateLabelBackground: #3c4044;
+  --LinkColor: #cc0000;
+  --LinkHoverColor: #ffcc00;
+  --PrimaryNavBottomBorder: 1px solid rgba(255, 0, 0, 0.5);
+  --PrimaryNavBackgroundColor: #000000;
+  --PrimaryNavHeight: 60px;
+  --PrimaryNavFontSize: 1em;
+  --SecondaryNavBackgroundColor: #0a0a0a;
+  --SecondaryNavFullWidth: 400px;
+  --SecondaryNavSmallIconOuterWidth: 36px;
+  --SecondaryNavRegularIconOuterWidth: 52px;
+  --NavControlsHeight: 1.5em;
+  --NavUpdatesIndicatorColor: #cc0000;
+  --NavPaneTitleFontFamily: "Open Sans", sans-serif;
+  --NavPaneTitleFontSize: 1.5em;
+  --PageTitleFontSize: 3em;
+  --PageTitleFontSize800: 2.5em;
+  --PageTitleFontSize600: 2em;
+  --PageTitleFontSize400: 1.5em;
+  --PageTitleColor: #cc0000;
+  --PageDescriptionFontSize: 1rem;
+  --BreadcrumbFontSize: 0.8em;
 }
 
 body {
-    background: #0f0f0f;
+  background: #0f0f0f;
 }
 
 h1 {
@@ -58,276 +58,248 @@ h1 {
 }
 
 #SiteLogo img {
-   max-width: unset;
-   filter: grayscale(100%) brightness(0.8) sepia(100%) hue-rotate(-50deg) saturate(600%);
+  max-width: unset;
+  filter: grayscale(100%) brightness(0.8) sepia(100%) hue-rotate(-50deg)
+    saturate(600%);
 }
 
-#MainContent{
-   background: #0a0a0a;
+#MainContent {
+  background: #0a0a0a;
 }
 
-#ContentGrid{
-   background: #0a0a0a;
+#ContentGrid {
+  background: #0a0a0a;
 }
 
-.PageModule>.Content {
-   background: #121212;
-   border: 1px solid #cc000055;
-   border-radius: 10px; 
-   overflow: hidden; 
+.PageModule > .Content {
+  background: #121212;
+  border: 1px solid #cc000055;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
-b, h2, h3 {
-   background: #4a0000 !important;
-   color: #ffcc00 !important;
-   text-align: center !important;
-   border-bottom: 1px solid #cc0000 !important;
-   border-top: 1px solid #cc0000 !important;
-   border-radius: 8px 8px 0 0;
+h2,
+h3 {
+  background: #4a0000 !important;
+  color: #ffcc00 !important;
+  text-align: center !important;
+  border-radius: 5px;
 }
 
 .MemberLink {
-    position: relative;
-    color: #cc0000 !important;
-    transition: all 0.2s ease-in-out;
-    text-decoration: none;
+  position: relative;
+  color: #cc0000 !important;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
 }
 
 .MemberLink:hover {
-    color: #ff4d4d !important; 
-    text-shadow: 0 0 8px rgba(204, 0, 0, 0.6);
+  color: #ff4d4d !important;
+  text-shadow: 0 0 8px rgba(204, 0, 0, 0.6);
 }
 
-.MemberLink [class^="Icon"], 
+.MemberLink [class^="Icon"],
 .MemberLink .ChainIcon,
 .MemberLink indicator {
-    filter: saturate(0.5) brightness(0.8) sepia(100%) hue-rotate(-50deg) saturate(500%);
-    opacity: 0.7;
+  filter: saturate(0.5) brightness(0.8) sepia(100%) hue-rotate(-50deg)
+    saturate(500%);
+  opacity: 0.7;
 }
 
 .MemberLink:hover [class^="Icon"] {
-    filter: none;
-    opacity: 1;
+  filter: none;
+  opacity: 1;
 }
 
-.Avatar.Online:after, 
+.Avatar.Online:after,
 .MemberLink.Online:after,
 .MemberLink indicator.Online {
-    content: "";
-    background: #00ffcc !important;
-    box-shadow: 0 0 5px #00ffcc, 0 0 0 2px rgba(0,0,0,0.8);
-    border-radius: 50%;
+  content: "";
+  background: #00ffcc !important;
+  box-shadow:
+    0 0 5px #00ffcc,
+    0 0 0 2px rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
 }
 
 .MemberLink indicator.Online {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-left: 5px;
-    vertical-align: middle;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
 .MemberLink indicator.Offline {
-    display: none;
+  display: none;
 }
 
-.Avatar.Online:after, 
+.Avatar.Online:after,
 .MemberLink.Online:after {
-    width: 10px;
-    height: 10px;
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
 }
 
-.PageModule>h2:after{
+.PageModule > h2:after {
   visibility: hidden;
 }
 
-#PrimaryNav{
-    background: #000000;
-    border-bottom: 2px solid #cc0000;
- }
-
-#SecondaryNav{
-    background: #0a0a0a;
-    border-right: 1px solid #cc0000;
- }
-
-#SubNavigator{
-   display: block;
-   border-bottom: none;
-   text-align: center;
- }
-
-#SubNavigator.Fixed{
-background: #0a0a0a;
+#PrimaryNav {
+  background: #000000;
+  border-bottom: 2px solid #cc0000;
 }
 
- #SubNavigator .DropdownMenuSubNavigator{
-    background: #0a0a0a;
+#SecondaryNav {
+  background: #0a0a0a;
+  border-right: 1px solid #cc0000;
 }
 
-#SubNavigator .ActiveEntry{
-   font-weight: bold;
-   margin-bottom: -0.125em;
-   border-bottom-width: 0.125em;
-   border-bottom-style: solid;
-   border-bottom-color: #cc0000;
-   background: #0a0a0a;
+#SubNavigator {
+  display: block;
+  border-bottom: none;
+  text-align: center;
 }
 
-#HeadlineBackground, #PageBackground
-{
-   opacity: 0;
+#SubNavigator.Fixed {
+  background: #0a0a0a;
 }
 
-a, #PageTitle{
-   color: #cc0000;
+.GreenColor {
+  color: #ffcc00;
 }
 
-a:hover{
-   color: #ffcc00;
-}
-
-button, .ButtonLike{
-   background: #151515;
-   border: 1px solid #cc0000;
-   color: #e2e2e2;
-   border-radius: 6px; 
-}
-
-.ExtendedContentButton{
-   background: #151515;
-   border: 1px solid #cc0000;
-   border-radius: 6px;
-}
-
-#StatsModule ul li itemCount {
-   color: #cc0000;
-}
-
-.PageModule {
-   transition: transform 0.3s ease, box-shadow 0.3s ease;
-   border-radius: 10px;
-}
-
-.PageModule:hover {
-   transform: translateY(-5px) scale(1.01);
-   box-shadow: 0 5px 20px rgba(204, 0, 0, 0.4);
-   z-index: 5;
-}
-
-.Modal .CloseModal{
-   position: absolute;
-   top: 0;
-   right: 0;
-   padding: 0.9em;
-   margin: 2px;
-   z-index: 1;
-   font-size: 1.5em;
-   cursor: pointer;
-}
-
-.Editor .ViewModes .Wysiwyg .RichText{
-    background: #121212;
-    border-radius: 8px;
-    border: 1px solid #cc0000;
-}
-
-.Editor .WysiwygPalettes{
-    background: #121212;
-    border-top: 1px solid #cc0000;
-    border-radius: 0 0 8px 8px;
-}
-
-#PageFooter{
-    background: #000000;
-}
-
-input:checked+.Tab {
-   border: 3px solid #cc0000;
-   border-bottom: 0;
-   cursor: default;
-   font-weight: 700;
-   margin-bottom: -3px;
-   opacity: 1;
-}
-
-#VisitorsModule .Tabs{
-   padding: 0.5em 0.75em;
-   font-size: var(--DefaultSmallFontSize);
-}
-
-.Tabs{
-   border: none;
-   border-bottom: 0;
-   border-radius: 0.25em 0.25em 0 0;
-   cursor: pointer;
-   opacity: .5;
-   padding: 0.75em 1em;
-   transition: opacity .2s ease-in-out;
-}
- 
-.TabsWrapper {
-   border-bottom: hidden;
-}
-
-#SubNavigator li {
-    transition: all 0.3s ease;
-    border-radius: 8px;
-}
-
-#SubNavigator li spriteIcon {
-    filter: grayscale(1) brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(600%);
-    transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-#SubNavigator li itemCount {
-    font-size: var(--DefaultMiniFontSize);
-    color: #cc0000;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 2px 6px;
-    border-radius: 10px;
-    border: 1px solid rgba(204, 0, 0, 0.3);
-    font-weight: bold;
-}
-
-#SubNavigator li div {
-    opacity: 0.7;
-    color: #e2e2e2;
-    transition: all 0.3s ease;
-}
-
-#SubNavigator li:hover {
-    background: rgba(204, 0, 0, 0.1);
-}
-
-#SubNavigator li:hover div {
-    opacity: 1;
-    color: #ffcc00;
-    text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
-}
-
-#SubNavigator li:hover spriteIcon {
-    filter: brightness(1.2) drop-shadow(0 0 5px #cc0000);
-    transform: scale(1.1);
+#SubNavigator .DropdownMenuSubNavigator {
+  background: #0a0a0a;
 }
 
 #SubNavigator .ActiveEntry {
-    background: rgba(204, 0, 0, 0.15) !important;
-    border-bottom: 3px solid #cc0000 !important;
-    color: #ffcc00 !important;
-    border-radius: 8px 8px 0 0;
+  font-weight: bold;
+  margin-bottom: -0.125em;
+  border-bottom-width: 0.125em;
+  border-bottom-style: solid;
+  border-bottom-color: #cc0000;
+  background: #0a0a0a;
 }
 
-.Tab{
-   background: transparent;
-   border: 1px solid #cc0000;
-   border-bottom: 0;
-   border-radius: 8px 8px 0 0; 
-   cursor: pointer;
-   opacity: .5;
-   padding: 0.75em 1em;
-   transition: opacity .2s ease-in-out;
- }
+#HeadlineBackground,
+#PageBackground {
+  opacity: 0;
+}
+
+a {
+  color: #ffcc00;
+}
+
+a:hover {
+  color: #cc0000;
+}
+
+button,
+.ButtonLike {
+  background: #151515;
+  color: #e2e2e2;
+  border-radius: 5px;
+}
+
+.ExtendedContentButton {
+  background: #151515;
+  border: 1px solid #cc0000;
+  border-radius: 5px;
+}
+
+#StatsModule ul li itemCount {
+  color: #cc0000;
+}
+
+.Editor .ViewModes .Wysiwyg .RichText {
+  background: #121212;
+  border-radius: 5px;
+  border: 1px solid #cc0000;
+}
+.Editor .WysiwygPalettes {
+  background: #121212;
+  border-top: 1px solid #cc0000;
+  border-radius: 5px;
+}
+
+#PageFooter {
+  background: #000000;
+}
+
+input:checked + .Tab {
+  border: 3px solid #cc0000;
+  border-bottom: 0;
+  cursor: default;
+  font-weight: 700;
+  margin-bottom: -3px;
+  opacity: 1;
+}
+
+#VisitorsModule .Tabs {
+  padding: 0.5em 0.75em;
+  font-size: var(--DefaultSmallFontSize);
+}
+
+.Tabs {
+  border: none;
+  border-bottom: 0;
+  border-radius: 0.25em 0.25em 0 0;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 0.75em 1em;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.TabsWrapper {
+  border-bottom: hidden;
+}
+
+#SubNavigator li {
+  transition: all 0.3s ease;
+}
+
+#SubNavigator li spriteIcon {
+  filter: grayscale(1) brightness(0.5) sepia(1) hue-rotate(-50deg)
+    saturate(600%);
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
+}
+
+#SubNavigator li itemCount {
+  font-size: var(--DefaultMiniFontSize);
+  color: #cc0000;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+#SubNavigator li div {
+  opacity: 0.7;
+  color: #e2e2e2;
+}
+
+#SubNavigator li:hover {
+  background: rgba(204, 0, 0, 0.1);
+}
+
+#SubNavigator .ActiveEntry {
+  background: rgba(204, 0, 0, 0.15) !important;
+  border-bottom: 5px solid #cc0000 !important;
+  color: #ffcc00 !important;
+  border-radius: 5px;
+}
+
+.Tab {
+  background: transparent;
+  border: 1px solid #cc0000;
+  border-bottom: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 0.75em 1em;
+  transition: opacity 0.2s ease-in-out;
+}
