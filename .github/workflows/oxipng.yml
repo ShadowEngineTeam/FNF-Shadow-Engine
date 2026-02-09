@@ -1,0 +1,29 @@
+name: oxipng
+
+on: workflow_dispatch
+
+jobs:
+  oxipng:
+    name: oxipng
+    timeout-minutes: 600
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Install and run oxipng
+        run: |
+          sudo apt update
+          curl -LkSs -O https://github.com/oxipng/oxipng/releases/download/v10.1.0/oxipng_10.1.0-1_amd64.deb
+          sudo apt install ./oxipng_10.1.0-1_amd64.deb
+          /usr/bin/find . -type f -iname "*.png" ! -path "*/.haxelib/*" ! -path "*/export/*" -exec oxipng -o max -z -s -a -v {} \;
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: images
+          path: |
+            docs
+            icons
+            images
+            images-png
