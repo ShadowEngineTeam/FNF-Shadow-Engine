@@ -338,7 +338,7 @@ class Project extends HXProject
 
 		for (format in textureFormats)
 			if (defines.exists(format))
-				addAssetPath('images-${format.toLowerCase()}', 'assets/shared/images');
+				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");

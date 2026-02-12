@@ -5,6 +5,7 @@ on: workflow_dispatch
 jobs:
   Build:
     name: ${{ matrix.name }}
+    uses: ./.github/workflows/build.yml
     strategy:
       matrix:
         include:
@@ -62,7 +63,6 @@ jobs:
             assetType: ASTC
             artifactName: iOSBuild
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
-    uses: ./.github/workflows/build.yml
     secrets:
       SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
       SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
