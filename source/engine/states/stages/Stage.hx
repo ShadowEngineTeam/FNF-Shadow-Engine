@@ -26,7 +26,7 @@ class Stage extends BaseStage
 			stageLight.flipX = true;
 			add(stageLight);
 
-			var stageCurtains:BGSprite = new BGSprite('stagecurtains', -500, -300, 1.3, 1.3);
+			var stageCurtains:BGSprite = new BGSprite('stages/week1/stagecurtains', -500, -300, 1.3, 1.3);
 			stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
 			stageCurtains.updateHitbox();
 			add(stageCurtains);
