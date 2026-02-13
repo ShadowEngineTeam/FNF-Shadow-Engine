@@ -33,6 +33,7 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -214,6 +215,7 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
+		FEATURE_FUNKIN_CONTENT.integrate(true);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -325,6 +327,12 @@ class Project extends HXProject
 		addAssetPath("assets/shared");
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		{
+			addAssetPath("assets/funkin_resources/embed", 'assets/embed', true);
+			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
+			addAssetPath("assets/funkin_resources/shared", 'assets/shared', false);
+		}
 
 		final textureFormats = ["ASTC", "S3TC", "PNG"];
 		var hasFormat = false;
@@ -338,7 +346,11 @@ class Project extends HXProject
 
 		for (format in textureFormats)
 			if (defines.exists(format))
+			{
 				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
+				if (FEATURE_FUNKIN_CONTENT.isEnabled())
+					addAssetPath('assets/funkin_resources/images-${format.toLowerCase()}', 'assets/shared/images', false);
+			}
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");
@@ -358,6 +370,11 @@ class Project extends HXProject
 			includeHaxelib("hxvlc");
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		{
+			includeHaxelib("funkin.vis");
+			includeHaxelib("grig.audio");
+		}
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");
