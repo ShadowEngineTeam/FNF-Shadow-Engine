@@ -43,8 +43,8 @@ class KeepMacro
 			"flixel.addons.weapon",
 			// OPENFL SYSTEM
 			"openfl.system",
-			// VIDEOS
-			#if FEATURE_VIDEOS
+			// HXVLC
+			#if hxvlc
 			"hxvlc.flixel",
 			"hxvlc.openfl",
 			#end
