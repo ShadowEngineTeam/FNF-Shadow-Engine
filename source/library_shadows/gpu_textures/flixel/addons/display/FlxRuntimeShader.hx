@@ -48,6 +48,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
     static final varyingKeyword:EReg = ~/\bvarying\s+(?:lowp|mediump|highp\s+)?([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
     static final texture2DKeyword:EReg = ~/\btexture2D\b/g;
     static final glFragColorKeyword:EReg = ~/\bgl_FragColor\b/g;
+	static final glVersionCleaner:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
 
 	/**
 	 * Constructs a GLSL shader.
@@ -95,9 +96,9 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	 */
 	@:noCompletion private function __processFragmentSource(input:String):String
 	{
-        switch (glVersion)
+        switch (glVersionCleaner.replace(glVersion, '$1'))
 		{
-            case "300 es", "310 es", "320 es":
+            case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
 				input = varyingKeyword.replace(input, "in $1 $2");
 				input = texture2DKeyword.replace(input, "texture");
 				input = glFragColorKeyword.replace(input, "openfl_FragColor");
@@ -116,9 +117,9 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	 */
 	@:noCompletion private function __processVertexSource(input:String):String
 	{
-        switch (glVersion)
+        switch (glVersionCleaner.replace(glVersion, '$1'))
 		{
-            case "300 es", "310 es", "320 es":
+           case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
                 input = attributeKeyword.replace(input, "in $1 $2");
 				input = varyingKeyword.replace(input, "out $1 $2");
 				input = texture2DKeyword.replace(input, "texture");

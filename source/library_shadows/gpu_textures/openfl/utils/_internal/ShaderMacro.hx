@@ -456,19 +456,17 @@ class ShaderMacro
 	 */
 	private static function processGLSLText(source:String, glVersion:String, isFragment:Bool)
 	{
-		if (glVersion == null || glVersion == "") return processGLSLText(source, getDefaultGLVersion(), isFragment);
+		if (glVersion == "" || glVersion == null) return processGLSLText(source, getDefaultGLVersion(), isFragment);
 
 		var attributeKeyword:EReg = ~/\battribute\s+([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
 		var varyingKeyword:EReg = ~/\bvarying\s+(?:lowp|mediump|highp\s+)?([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
 		var texture2DKeyword:EReg = ~/\btexture2D\b/g;
 		var glFragColorKeyword:EReg = ~/\bgl_FragColor\b/g;
+		var glVersionCleaner:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
 
-		switch (glVersion)
+		switch (glVersionCleaner.replace(glVersion, '$1'))
 		{
-			default:
-				return source;
-
-			case "300 es", "310 es", "320 es":
+			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
 				var result = source;
 
 				if (isFragment)
@@ -485,18 +483,22 @@ class ShaderMacro
 				result = glFragColorKeyword.replace(result, "openfl_FragColor");
 
 				return result;
+			default:
+				return source;
 		}
 	}
 
 	private static function buildGLSLHeaders(glVersion:String):String
 	{
-		switch (glVersion)
+		var glVersionCleaner:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
+
+		switch (glVersionCleaner.replace(glVersion, '$1'))
 		{
-			case "300 es", "310 es", "320 es":
+			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
 				return "out vec4 openfl_FragColor;\n";
 			default:
 				return "";
-		};
+		}
 	}
 
 	private static function buildGLSLExtensions(glExtensions:Array<{name:String, behavior:String}>, glVersion:String,
