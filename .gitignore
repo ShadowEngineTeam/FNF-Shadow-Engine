@@ -4,6 +4,7 @@ export/*
 .haxelib
 *.code-workspace
 vs_Community.exe
+.DS_Store
 # Local history which shouldn't be shared.
 .history
 .ionide
