@@ -8,7 +8,6 @@ import objects.NoteSplash;
 import objects.StrumNote;
 import objects.SustainSplash;
 import flixel.util.FlxSort;
-import flixel.util.FlxStringUtil;
 import flixel.animation.FlxAnimationController;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
@@ -57,6 +56,8 @@ class EditorPlayState extends MusicBeatSubstate
 	var showCombo:Bool = false;
 	var showComboNum:Bool = true;
 	var showRating:Bool = true;
+	var noteTimingRating:FlxText;
+	var noteTimingRatingTween:FlxTween;
 
 	// Originals
 	var startOffset:Float = 0;
@@ -574,8 +575,8 @@ class EditorPlayState extends MusicBeatSubstate
 
 	private function popUpScore(note:Note = null):Void
 	{
-		var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset);
-		// trace(noteDiff, ' ' + Math.abs(note.strumTime - Conductor.songPosition));
+		var noteDiffNoAbs:Float = note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset;
+		var noteDiff:Float = Math.abs(noteDiffNoAbs);
 
 		vocals.volume = 1;
 		var placement:String = Std.string(combo);
@@ -585,17 +586,30 @@ class EditorPlayState extends MusicBeatSubstate
 		coolText.x = FlxG.width * 0.35;
 
 		var rating:FlxSprite = new FlxSprite();
-		var score:Int = 350;
 
-		// tryna do MS based judgment due to popular demand
-		var daRating:Rating = Conductor.judgeNote(ratingsData, noteDiff / playbackRate);
+		var judgment:String = Rating.judgeNote(noteDiff);
+		var score:Int = Rating.scoreNote(noteDiff);
+
+		// tryna do PBOT1 based judgment due to popular demand
+		var daRating:Rating = switch (judgment)
+		{
+			case 'sick':
+				ratingsData[0]; // sick
+			case 'good':
+				ratingsData[1]; // good
+			case 'bad':
+				ratingsData[2]; // bad
+			case 'shit':
+				ratingsData[3]; // shit
+			default:
+				ratingsData[3]; // default to shit
+		};
 
 		totalNotesHit += daRating.ratingMod;
 		note.ratingMod = daRating.ratingMod;
 		if (!note.ratingDisabled)
 			daRating.hits++;
 		note.rating = daRating.name;
-		score = daRating.score;
 
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
@@ -645,6 +659,49 @@ class EditorPlayState extends MusicBeatSubstate
 		rating.updateHitbox();
 		comboSpr.setGraphicSize(Std.int(comboSpr.width * 0.7));
 		comboSpr.updateHitbox();
+
+		if (ClientPrefs.data.showNoteTiming && (!ClientPrefs.data.hideHud && showRating) && noteTimingRating == null)
+		{
+			add(noteTimingRating = new FlxText(0, 0, 0, "0ms"));
+		}
+		if (noteTimingRating != null)
+		{
+			switch (daRating.name)
+			{
+				case 'shit' | 'bad':
+					noteTimingRating.color = FlxColor.RED;
+				case 'good':
+					noteTimingRating.color = FlxColor.LIME;
+				case 'sick':
+					noteTimingRating.color = FlxColor.CYAN;
+			}
+			noteTimingRating.borderStyle = OUTLINE;
+			noteTimingRating.borderSize = 1;
+			noteTimingRating.borderColor = FlxColor.BLACK;
+			noteTimingRating.text = FlxMath.roundDecimal(noteDiffNoAbs / playbackRate, 3) + "ms";
+			noteTimingRating.size = 20;
+			noteTimingRating.alpha = 1;
+			noteTimingRating.active = true;
+
+			if (noteTimingRatingTween != null)
+			{
+				noteTimingRatingTween.cancel();
+			}
+
+			noteTimingRating.screenCenter();
+			noteTimingRating.x = coolText.x + ClientPrefs.data.comboOffset[0] + 100;
+			noteTimingRating.y += -ClientPrefs.data.comboOffset[1] - 80 + (comboSpr?.height ?? 0);
+			if (PlayState.isPixelStage)
+				noteTimingRating.y += 60;
+			noteTimingRating.acceleration.y = 600;
+			noteTimingRating.velocity.y -= 150;
+			noteTimingRating.velocity.x += comboSpr?.velocity?.x ?? (FlxG.random.int(1, 10) * playbackRate);
+
+			noteTimingRatingTween = FlxTween.tween(noteTimingRating, {alpha: 0}, 0.2 / playbackRate, {
+				startDelay: Conductor.crochet * 0.001 / playbackRate,
+				onComplete: (t) -> noteTimingRating.active = false
+			});
+		}
 
 		var seperatedScore:Array<Int> = [];
 

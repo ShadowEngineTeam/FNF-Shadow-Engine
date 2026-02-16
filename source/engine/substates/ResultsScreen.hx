@@ -80,7 +80,7 @@ class ResultsScreen extends MusicBeatSubstate
 		if (PlayState.instance.cpuControlled)
 			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nHighest Combo: ${PlayState.instance.maxCombo}\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
 		else
-			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.instance.songMisses)}\nHighest Combo: ${PlayState.instance.maxCombo}\nScore: ${PlayState.instance.songScore}\nAccuracy: ${CoolUtil.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
+			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.instance.songMisses)}\nHighest Combo: ${PlayState.instance.maxCombo}\nScore: ${FlxStringUtil.formatMoney(PlayState.instance.songScore, false)}\nAccuracy: ${CoolUtil.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
 
 		comboText = new FlxText(20, -75, 0, comboTxt);
 		comboText.setFormat(Paths.font("Comfortaa-Bold.ttf"), 28, FlxColor.WHITE);

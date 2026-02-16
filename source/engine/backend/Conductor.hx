@@ -25,16 +25,6 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function judgeNote(arr:Array<Rating>, diff:Float = 0):Rating // die
-	{
-		var data:Array<Rating> = arr;
-		for (i in 0...data.length - 1) // skips last window (Shit)
-			if (diff <= data[i].hitWindow)
-				return data[i];
-
-		return data[data.length - 1];
-	}
-
 	public static function getCrotchetAtTime(time:Float)
 	{
 		var lastChange = getBPMFromSeconds(time);

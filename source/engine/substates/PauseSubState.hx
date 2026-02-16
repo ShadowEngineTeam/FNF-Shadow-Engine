@@ -4,7 +4,6 @@ import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.util.FlxStringUtil;
 import states.FreeplayState;
 import options.OptionsState;
 

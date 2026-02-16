@@ -3,7 +3,6 @@ package objects;
 import backend.InputFormatter;
 import flixel.group.FlxGroup;
 import flixel.ui.FlxBar;
-import flixel.util.FlxStringUtil;
 import states.FreeplayState;
 
 /**

@@ -10,7 +10,6 @@ import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSort;
-import flixel.util.FlxStringUtil;
 import flixel.input.keyboard.FlxKey;
 import flixel.animation.FlxAnimationController;
 import openfl.utils.Assets;
@@ -1229,7 +1228,7 @@ class PlayState extends MusicBeatState
 			str += ' (${percent}%) - ${ratingFC}';
 		}
 
-		var tempScore:String = 'Score: ${songScore}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
+		var tempScore:String = 'Score: ${FlxStringUtil.formatMoney(songScore, false)}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
 		// "tempScore" variable is used to prevent another memory leak, just in case
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
@@ -2825,10 +2824,24 @@ class PlayState extends MusicBeatState
 
 		var placement:Float = FlxG.width * 0.35;
 		var rating:FlxSprite = new FlxSprite();
-		var score:Int = 350;
 
-		// tryna do MS based judgment due to popular demand
-		var daRating:Rating = Conductor.judgeNote(ratingsData, noteDiff / playbackRate);
+		var judgment:String = Rating.judgeNote(noteDiff);
+		var score:Int = Rating.scoreNote(noteDiff);
+
+		// tryna do PBOT1 based judgment due to popular demand
+		var daRating:Rating = switch (judgment)
+		{
+			case 'sick':
+				ratingsData[0]; // sick
+			case 'good':
+				ratingsData[1]; // good
+			case 'bad':
+				ratingsData[2]; // bad
+			case 'shit':
+				ratingsData[3]; // shit
+			default:
+				ratingsData[3]; // default to shit
+		};
 
 		switch (daRating.image)
 		{
@@ -2847,7 +2860,6 @@ class PlayState extends MusicBeatState
 		if (!note.ratingDisabled)
 			daRating.hits++;
 		note.rating = daRating.name;
-		score = daRating.score;
 
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
@@ -3375,7 +3387,7 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= 10;
+			songScore -= 100;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
