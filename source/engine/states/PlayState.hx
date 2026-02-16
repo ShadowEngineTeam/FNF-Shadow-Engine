@@ -3878,7 +3878,7 @@ class PlayState extends MusicBeatState
 		}
 
 		var arr:Array<String> = runtimeShaders.get(name);
-		return new FlxRuntimeShader(arr[0], arr[1]);
+		return new FlxRuntimeShader(arr[0], arr[1], lime.graphics.opengl.GL.getParameter(lime.graphics.opengl.GL.SHADING_LANGUAGE_VERSION).contains("GLSL ES 1.00") ? "100" : "300 es");
 		#else
 		FlxG.log.warn("Platform unsupported for Runtime Shaders!");
 		return null;

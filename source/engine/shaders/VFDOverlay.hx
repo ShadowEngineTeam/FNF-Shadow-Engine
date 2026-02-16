@@ -14,6 +14,9 @@ class VFDOverlay extends GraphicsShader
 		return value;
 	}
 
+	#if (!ios && !macos)
+	@:glVersion('100')
+	#end
 	@:glFragmentSource('
 		#pragma header
 		const vec2 s = vec2(1, 1.7320508);

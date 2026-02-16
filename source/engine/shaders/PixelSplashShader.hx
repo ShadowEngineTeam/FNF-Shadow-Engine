@@ -41,6 +41,9 @@ class PixelSplashShaderRef
 
 class PixelSplashShader extends FlxShader
 {
+	#if (!ios && !macos)
+	@:glVersion('100')
+	#end
 	@:glFragmentHeader('
 		#pragma header
 		

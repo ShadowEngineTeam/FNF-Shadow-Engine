@@ -49,6 +49,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
     static final texture2DKeyword:EReg = ~/\btexture2D\b/g;
     static final glFragColorKeyword:EReg = ~/\bgl_FragColor\b/g;
 	static final glVersionCleaner:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
+	static final outFragColorKeyword:EReg = ~/\bout\s+vec4\s+openfl_FragColor\s*;\s*/g;
 
 	/**
 	 * Constructs a GLSL shader.
@@ -104,7 +105,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
 				input = glFragColorKeyword.replace(input, "openfl_FragColor");
 
 			default:
-				// we don't need do anything
+				input = outFragColorKeyword.replace(input, "");
 		}
 
 		var result = pragmaHeaderKeyword.replace(input, glFragmentHeaderRaw);
@@ -126,7 +127,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
 				input = glFragColorKeyword.replace(input, "openfl_FragColor");
 
 			default:
-                // we don't need do anything
+                input = outFragColorKeyword.replace(input, "");
 		}
 
 		var result = pragmaHeaderKeyword.replace(input, glVertexHeaderRaw);
