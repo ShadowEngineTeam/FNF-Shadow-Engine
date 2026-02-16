@@ -256,8 +256,8 @@ class Paths
 				localTrackedAssets.push(file);
 				return currentTrackedAssets.get(file);
 			}
-			else if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
-				bitmap = Assets.getBitmapData(file);
+			else if (FileSystem.exists(file))
+				bitmap = getBitmapDataFromFile(file);
 
 			if (bitmap == null)
 			{
@@ -267,9 +267,9 @@ class Paths
 					localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
-				else if (Assets.exists(file, getImageAssetType(IMAGE_EXT)))
+				else if (FileSystem.exists(file))
 				{
-					bitmap = Assets.getBitmapData(file);
+					bitmap = getBitmapDataFromFile(file);
 				}
 			}
 		}
