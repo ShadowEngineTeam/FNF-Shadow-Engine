@@ -334,7 +334,7 @@ class Paths
 		{
 			try
 			{
-				var bytes = sys.io.File.getBytes(file);
+				var bytes = File.getBytes(file);
 				if (bytes != null)
 				{
 					var texture = switch (ext)
@@ -350,7 +350,7 @@ class Paths
 			}
 			catch (e:Dynamic)
 			{
-				//trace('Failed to load compressed texture from $file: $e');
+				trace('Failed to load compressed texture from $file: $e');
 				return null;
 			}
 		}
