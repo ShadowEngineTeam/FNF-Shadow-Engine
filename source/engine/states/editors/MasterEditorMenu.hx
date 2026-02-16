@@ -26,7 +26,7 @@ class MasterEditorMenu extends MusicBeatState
 	override function create()
 	{
 		FlxG.camera.bgColor = FlxColor.BLACK;
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
@@ -48,7 +48,7 @@ class MasterEditorMenu extends MusicBeatState
 			leText.snapToPosition();
 		}
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42).makeGraphic(FlxG.width, 42, 0xFF000000);
 		textBG.alpha = 0.6;
 		add(textBG);
@@ -72,7 +72,9 @@ class MasterEditorMenu extends MusicBeatState
 
 		FlxG.mouse.visible = false;
 
-		addTouchPad(#if MODS_ALLOWED "LEFT_FULL" #else "UP_DOWN" #end, "A_B");
+		#if FEATURE_MOBILE_CONTROLS
+		addTouchPad(#if FEATURE_MODS "LEFT_FULL" #else "UP_DOWN" #end, "A_B");
+		#end
 
 		super.create();
 	}
@@ -87,7 +89,7 @@ class MasterEditorMenu extends MusicBeatState
 		{
 			changeSelection(1);
 		}
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (controls.UI_LEFT_P)
 		{
 			changeDirectory(-1);
@@ -156,7 +158,7 @@ class MasterEditorMenu extends MusicBeatState
 			curSelected = 0;
 	}
 
-	#if MODS_ALLOWED
+	#if FEATURE_MODS
 	function changeDirectory(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);

@@ -1,11 +1,11 @@
 #if !macro
 // Discord API
-#if DISCORD_ALLOWED
+#if FEATURE_DISCORD_RPC
 import backend.Discord;
 #end
 import haxe.Json;
 // Psych
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import hxluajit.*;
 import hxluajit.Types;
 import psychlua.*;
@@ -15,10 +15,11 @@ import psychlua.FunkinLua;
 import psychlua.ModchartSprite;
 import psychlua.HScript;
 #end
-#if HSCRIPT_ALLOWED
+#if FEATURE_HSCRIPT
 import tea.SScript;
 #end
 // Mobile Controls
+#if FEATURE_MOBILE_CONTROLS
 import mobile.objects.MobileControls;
 import mobile.objects.IMobileControls;
 import mobile.objects.Hitbox;
@@ -27,6 +28,7 @@ import mobile.objects.TouchButton;
 import mobile.input.MobileInputID;
 import mobile.backend.MobileData;
 import mobile.input.MobileInputManager;
+#end
 // Android
 #if android
 import android.content.Context as AndroidContext;
@@ -67,6 +69,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
+import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;

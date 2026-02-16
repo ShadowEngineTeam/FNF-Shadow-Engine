@@ -39,6 +39,8 @@ import states.TitleState;
 	public var hideHud:Bool = false;
 	public var uiTheme:String = 'dark';
 	public var noteOffset:Int = 0;
+	public var disableRGBNotes:Bool = false;
+	public var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 	public var arrowRGB:Array<Array<FlxColor>> = [
 		[0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
 		[0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7],
@@ -139,13 +141,14 @@ class ClientPrefs
 		'ui_left' => [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT],
 		'ui_down' => [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN],
 		'ui_right' => [DPAD_RIGHT, LEFT_STICK_DIGITAL_RIGHT],
-		'accept' => [A, START],
+		'accept' => [A],
 		'back' => [B],
 		'pause' => [START],
 		'reset' => [BACK],
-		'fullscreen' => [NONE],
-		'fpsCounter' => [NONE]
+		'fullscreen' => [LEFT_STICK_CLICK],
+		'fpsCounter' => [RIGHT_STICK_CLICK]
 	];
+	#if FEATURE_MOBILE_CONTROLS
 	public static var mobileBinds:Map<String, Array<MobileInputID>> = [
 		'note_up' => [MobileInputID.NOTE_UP, MobileInputID.UP2],
 		'note_left' => [MobileInputID.NOTE_LEFT, MobileInputID.LEFT2],
@@ -163,6 +166,7 @@ class ClientPrefs
 		'fpsCounter' => [MobileInputID.NONE]
 	];
 	public static var defaultMobileBinds:Map<String, Array<MobileInputID>> = null;
+	#end
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
 
@@ -183,20 +187,24 @@ class ClientPrefs
 	{
 		var keyBind:Array<FlxKey> = keyBinds.get(key);
 		var gamepadBind:Array<FlxGamepadInputID> = gamepadBinds.get(key);
+		#if FEATURE_MOBILE_CONTROLS
 		var mobileBind:Array<MobileInputID> = mobileBinds.get(key);
+		while (mobileBind != null && mobileBind.contains(NONE))
+			mobileBind.remove(NONE);
+		#end
 		while (keyBind != null && keyBind.contains(NONE))
 			keyBind.remove(NONE);
 		while (gamepadBind != null && gamepadBind.contains(NONE))
 			gamepadBind.remove(NONE);
-		while (mobileBind != null && mobileBind.contains(NONE))
-			mobileBind.remove(NONE);
 	}
 
 	public static function loadDefaultKeys()
 	{
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
+		#if FEATURE_MOBILE_CONTROLS
 		defaultMobileBinds = mobileBinds.copy();
+		#end
 	}
 
 	public static function saveSettings()
@@ -211,7 +219,9 @@ class ClientPrefs
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 		save.data.gamepad = gamepadBinds;
+		#if FEATURE_MOBILE_CONTROLS
 		save.data.mobile = mobileBinds;
+		#end
 		save.flush();
 		FlxG.log.add("Settings saved!");
 	}
@@ -254,7 +264,7 @@ class ClientPrefs
 		if (FlxG.save.data.mute != null)
 			FlxG.sound.muted = FlxG.save.data.mute;
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.check();
 		#end
 
@@ -277,6 +287,7 @@ class ClientPrefs
 					if (gamepadBinds.exists(control))
 						gamepadBinds.set(control, keys);
 			}
+			#if FEATURE_MOBILE_CONTROLS
 			if (save.data.mobile != null)
 			{
 				var loadedControls:Map<String, Array<MobileInputID>> = save.data.mobile;
@@ -284,6 +295,7 @@ class ClientPrefs
 					if (mobileBinds.exists(control))
 						mobileBinds.set(control, keys);
 			}
+			#end
 			reloadVolumeKeys();
 		}
 	}

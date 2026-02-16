@@ -15,19 +15,19 @@ class MainMenuState extends MusicBeatState
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
-	var optionShit:Array<String> = ['story_mode', 'freeplay', #if MODS_ALLOWED 'mods', #end 'options'];
+	var optionShit:Array<String> = ['story_mode', 'freeplay', #if FEATURE_MODS 'mods', #end 'options'];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
 	override function create()
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		Mods.pushGlobalMods();
 		#end
 		Mods.loadTopMod();
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -90,7 +90,9 @@ class MainMenuState extends MusicBeatState
 		add(psychVer);
 		changeItem();
 
+		#if FEATURE_MOBILE_CONTROLS 
 		addTouchPad("UP_DOWN", "A_B_E");
+		#end
 
 		super.create();
 
@@ -140,7 +142,7 @@ class MainMenuState extends MusicBeatState
 							MusicBeatState.switchState(new StoryMenuState());
 						case 'freeplay':
 							MusicBeatState.switchState(new FreeplayState());
-						#if MODS_ALLOWED
+						#if FEATURE_MODS
 						case 'mods':
 							MusicBeatState.switchState(new ModsMenuState());
 						#end
@@ -171,7 +173,7 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 
-			if (controls.justPressed('debug_1') || touchPad.buttonE.justPressed)
+			if (controls.justPressed('debug_1') #if FEATURE_MOBILE_CONTROLS || touchPad.buttonE.justPressed #end)
 			{
 				selectedSomethin = true;
 				MusicBeatState.switchState(new MasterEditorMenu());

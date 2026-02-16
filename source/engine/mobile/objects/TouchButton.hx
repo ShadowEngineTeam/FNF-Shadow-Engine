@@ -1,5 +1,6 @@
 package mobile.objects;
 
+#if FEATURE_MOBILE_CONTROLS
 import flixel.input.FlxInput;
 import flixel.input.FlxPointer;
 import flixel.input.IFlxInput;
@@ -675,3 +676,4 @@ enum StatusIndicators
 	// used when u make ur own status indicator like in hitbox
 	NONE;
 }
+#end

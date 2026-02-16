@@ -64,6 +64,9 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 
+		var option:Option = new Option('Disable RGB Notes', "If checked, notes will use the HSV coloring method.", 'disableRGBNotes', 'bool');
+		addOption(option);
+
 		var option:Option = new Option('Hide HUD', 'If checked, hides most HUD elements.', 'hideHud', 'bool');
 		addOption(option);
 
@@ -114,7 +117,7 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangePauseMusic;
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		var option:Option = new Option('Discord Rich Presence',
 			"Uncheck this to prevent accidental leaks, it will hide the Application from your \"Playing\" box on Discord", 'discordRPC', 'bool');
 		addOption(option);

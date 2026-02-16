@@ -4,7 +4,6 @@ import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.util.FlxStringUtil;
 import states.FreeplayState;
 import options.OptionsState;
 
@@ -152,15 +151,10 @@ class PauseSubState extends MusicBeatSubstate
 		regenMenu();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 
-		if (PlayState.chartingMode)
-		{
-			addTouchPad("LEFT_FULL", "A");
-		}
-		else
-		{
-			addTouchPad("UP_DOWN", "A");
-		}
+		#if FEATURE_MOBILE_CONTROLS
+		addTouchPad(PlayState.chartingMode ? "LEFT_FULL" : "UP_DOWN", "A");
 		addTouchPadCamera(false);
+		#end
 
 		super.create();
 	}
@@ -332,7 +326,7 @@ class PauseSubState extends MusicBeatSubstate
 					}
 					OptionsState.onPlayState = true;
 				case "Exit to menu":
-					#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
+					#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
 
@@ -348,8 +342,13 @@ class PauseSubState extends MusicBeatSubstate
 			}
 		}
 
+		#if FEATURE_MOBILE_CONTROLS
 		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
+		{
+			addTouchPad(PlayState.chartingMode ? "LEFT_FULL" : "UP_DOWN", "A");
 			addTouchPadCamera(false);
+		}
+		#end
 	}
 
 	function deleteSkipTimeText()

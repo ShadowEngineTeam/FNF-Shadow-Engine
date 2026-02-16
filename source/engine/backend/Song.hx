@@ -17,7 +17,7 @@ typedef SwagSong =
 	var gfVersion:String;
 	var stage:String;
 
-	@:optional var disableNoteRGB:Bool;
+	@:optional var disableNoteCustomColor:Bool;
 
 	@:optional var gameOverChar:String;
 	@:optional var gameOverSound:String;
@@ -46,7 +46,8 @@ class Song
 	public var gameOverSound:String;
 	public var gameOverLoop:String;
 	public var gameOverEnd:String;
-	public var disableNoteRGB:Bool = false;
+	public var disableNoteRGB(get, set):Bool;
+	public var disableNoteCustomColor:Bool = false;
 	public var speed:Float = 1;
 	public var stage:String;
 	public var player1:String = 'bf';
@@ -69,6 +70,12 @@ class Song
 		{
 			songJson.playerArrowSkin = songJson.opponentArrowSkin = songJson.arrowSkin;
 			songJson.arrowSkin == null;
+		}
+
+		if (songJson.disableNoteRGB != null)
+		{
+			songJson.disableNoteCustomColor = songJson.disableNoteRGB;
+			songJson.disableNoteRGB = null;
 		}
 
 		if (StringTools.startsWith(songJson.format, 'psych_v1'))
@@ -113,7 +120,7 @@ class Song
 		var formattedSong:String = Paths.formatToSongPath(jsonInput);
 		var path:String = "";
 		var rawJson:String = null;
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
 		if (FileSystem.exists(modPath))
 		{
@@ -175,5 +182,14 @@ class Song
 		}
 
 		throw new haxe.Exception("No song data found, or is invalid.");
+	}
+
+	function get_disableNoteRGB():Bool
+		return disableNoteCustomColor;
+
+	function set_disableNoteRGB(value:Bool):Bool
+	{
+		disableNoteCustomColor = value;
+		return value;
 	}
 }

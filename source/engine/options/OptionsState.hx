@@ -19,7 +19,9 @@ class OptionsState extends MusicBeatState
 		'Graphics',
 		'Visuals and UI',
 		'Gameplay',
+		#if (mobile || FEATURE_MOBILE_CONTROLS)
 		'Mobile Options'
+		#end
 	];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 
@@ -33,12 +35,17 @@ class OptionsState extends MusicBeatState
 	function openSelectedSubstate(label:String)
 	{
 		persistentUpdate = false;
+		#if FEATURE_MOBILE_CONTROLS
 		if (label != "Adjust Delay and Combo")
-			removeTouchPad();
+			removeTouchPad(); // because Adjust Delay and Combo is not a substate
+		#end
 		switch (label)
 		{
 			case 'Note Colors':
-				openSubState(new options.NotesSubState());
+				if (ClientPrefs.data.disableRGBNotes)
+					openSubState(new options.NotesSubStateOld());
+				else
+					openSubState(new options.NotesSubState());
 			case 'Controls':
 				openSubState(new options.ControlsSubState());
 			case 'Graphics':
@@ -49,8 +56,10 @@ class OptionsState extends MusicBeatState
 				openSubState(new options.GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
 				MusicBeatState.switchState(new options.NoteOffsetState());
+			#if (mobile || FEATURE_MOBILE_CONTROLS)
 			case 'Mobile Options':
 				openSubState(new mobile.options.MobileOptionsSubState());
+			#end
 		}
 	}
 
@@ -59,7 +68,7 @@ class OptionsState extends MusicBeatState
 
 	override function create()
 	{
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
@@ -71,7 +80,7 @@ class OptionsState extends MusicBeatState
 		bg.screenCenter();
 		add(bg);
 
-		tipText = new FlxText(150, FlxG.height - #if android 40 #else 24 #end, 0, 'Press ${controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL'} to Go Mobile Controls Menu' #if android + '\nPress ${controls.mobileC ? 'Y' : 'SHIFT'} to Open DATA Folder' #end, 16);
+		tipText = new FlxText(150, FlxG.height - #if android 40 #else 24 #end, 0, 'Press ${controls.mobileC ? #if (android && FEATURE_MOBILE_CONTROLS) 'X' #else 'C' #end : 'CTRL'} to Go Mobile Controls Menu' #if android + '\nPress ${controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT'} to Open DATA Folder' #end, 16);
 		tipText.setFormat("VCR OSD Mono", 17, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tipText.borderSize = 1.25;
 		tipText.scrollFactor.set();
@@ -97,7 +106,9 @@ class OptionsState extends MusicBeatState
 		changeSelection();
 		ClientPrefs.saveSettings();
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("UP_DOWN", #if android "A_B_X_Y" #else "A_B_C" #end);
+		#end
 
 		#if (target.threaded)
 		Thread.create(() ->
@@ -105,10 +116,8 @@ class OptionsState extends MusicBeatState
 			mutex.acquire();
 
 			for (i in VisualsUISubState.pauseMusics)
-			{
 				if (i.toLowerCase() != "none")
 					Paths.music(Paths.formatToSongPath(i));
-			}
 
 			mutex.release();
 		});
@@ -120,14 +129,16 @@ class OptionsState extends MusicBeatState
 	override function closeSubState()
 	{
 		super.closeSubState();
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 		ClientPrefs.saveSettings();
 		ClientPrefs.loadPrefs();
 		ShadowStyle.applySavedTheme();
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("UP_DOWN", #if android "A_B_X_Y" #else "A_B_C" #end);
+		#end
 		persistentUpdate = true;
 	}
 
@@ -148,14 +159,16 @@ class OptionsState extends MusicBeatState
 				changeSelection(1);
 			}
 
+			#if FEATURE_MOBILE_CONTROLS
 			if ((#if android touchPad.buttonX.justPressed #else touchPad.buttonC.justPressed #end || FlxG.keys.justPressed.CONTROL))
 			{
 				persistentUpdate = false;
 				openSubState(new MobileControlSelectSubState());
 			}
+			#end
 
 			#if android
-			if (touchPad.buttonY.justPressed || FlxG.keys.justPressed.SHIFT)
+			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonY.justPressed #else FlxG.android.justReleased.BACK #end || FlxG.keys.justPressed.SHIFT)
 				android.Tools.openDataFolder();
 			#end
 

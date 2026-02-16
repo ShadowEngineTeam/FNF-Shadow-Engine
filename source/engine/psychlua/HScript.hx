@@ -4,17 +4,17 @@ import flixel.FlxBasic;
 import objects.Character;
 import psychlua.LuaUtils;
 import psychlua.CustomSubstate;
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import psychlua.FunkinLua;
 #end
-#if HSCRIPT_ALLOWED
+#if FEATURE_HSCRIPT
 import tea.SScript;
 
 class HScript extends SScript
 {
 	public var modFolder:String;
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public var parentLua:FunkinLua;
 
 	public static function initHaxeModule(parent:FunkinLua)
@@ -59,7 +59,7 @@ class HScript extends SScript
 
 		super(file, false, false);
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		parentLua = parent;
 		if (parent != null)
 		{
@@ -71,7 +71,7 @@ class HScript extends SScript
 		if (scriptFile != null && scriptFile.length > 0)
 		{
 			this.origin = scriptFile;
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var myFolder:Array<String> = scriptFile.split('/');
 			if (myFolder[0] + '/' == Paths.mods()
 				&& (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1]))) // is inside mods folder
@@ -112,6 +112,8 @@ class HScript extends SScript
 		set('Character', Character);
 		set('Alphabet', Alphabet);
 		set('Note', objects.Note);
+		set('NoteSplash', objects.NoteSplash);
+		set('SustainSplash', objects.SustainSplash);
 		set('CustomSubstate', CustomSubstate);
 		#if !flash
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
@@ -268,7 +270,7 @@ class HScript extends SScript
 
 		// For adding your own callbacks
 		// not very tested but should work
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		set('createGlobalCallback', function(name:String, func:Dynamic)
 		{
 			for (script in cast(FunkinLua.getCurrentMusicState().luaArray, Array<Dynamic>))
@@ -307,7 +309,7 @@ class HScript extends SScript
 			catch (e:Dynamic)
 			{
 				var msg:String = e.message.substr(0, e.message.indexOf('\n'));
-				#if LUA_ALLOWED
+				#if FEATURE_LUA
 				if (parentLua != null)
 				{
 					FunkinLua.lastCalledScript = parentLua;
@@ -321,7 +323,7 @@ class HScript extends SScript
 					trace('$origin - $msg');
 			}
 		});
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		set('parentLua', parentLua);
 		#else
 		set('parentLua', null);
@@ -372,7 +374,7 @@ class HScript extends SScript
 
 		if (!exists(funcToRun))
 		{
-			#if LUA_ALLOWED
+			#if FEATURE_LUA
 			FunkinLua.luaTrace(origin + ' - No HScript function named: $funcToRun', false, false, FlxColor.RED);
 			#else
 			FunkinLua.getCurrentMusicState().addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
@@ -387,7 +389,7 @@ class HScript extends SScript
 			if (e != null)
 			{
 				var msg:String = e.toString();
-				#if LUA_ALLOWED
+				#if FEATURE_LUA
 				if (parentLua != null)
 				{
 					FunkinLua.luaTrace('$origin: ${parentLua.lastCalledFunction} - $msg', false, false, FlxColor.RED);
@@ -408,13 +410,13 @@ class HScript extends SScript
 		return call(funcToRun, funcArgs);
 	}
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public static function implement(funk:FunkinLua)
 	{
 		funk.addLocalCallback("runHaxeCode",
 			function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 			{
-				#if HSCRIPT_ALLOWED
+				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
 				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
@@ -441,7 +443,7 @@ class HScript extends SScript
 
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null)
 		{
-			#if HSCRIPT_ALLOWED
+			#if FEATURE_HSCRIPT
 			var callValue = funk.hscript.executeFunction(funcToRun, funcArgs);
 			if (!callValue.succeeded)
 			{
@@ -470,12 +472,12 @@ class HScript extends SScript
 			if (c == null)
 				c = Type.resolveEnum(str + libName);
 
-			#if HSCRIPT_ALLOWED
+			#if FEATURE_HSCRIPT
 			if (c != null)
 				SScript.globalVariables[libName] = c;
 			#end
 
-			#if HSCRIPT_ALLOWED
+			#if FEATURE_HSCRIPT
 			if (funk.hscript != null)
 			{
 				try
@@ -498,7 +500,7 @@ class HScript extends SScript
 	override public function destroy()
 	{
 		origin = null;
-		#if LUA_ALLOWED parentLua = null; #end
+		#if FEATURE_LUA parentLua = null; #end
 
 		super.destroy();
 	}

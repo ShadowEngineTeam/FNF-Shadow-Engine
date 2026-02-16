@@ -29,7 +29,9 @@ class FlashingState extends MusicBeatState
 		warnText.screenCenter(Y);
 		add(warnText);
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
+		#end
 	}
 
 	override function update(elapsed:Float)

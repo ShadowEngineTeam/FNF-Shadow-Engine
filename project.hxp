@@ -2,6 +2,7 @@ import haxe.io.Path;
 import hxp.*;
 import lime.tools.*;
 import sys.io.File;
+import sys.io.Process;
 import sys.FileSystem;
 import lime.graphics.Image;
 
@@ -18,21 +19,22 @@ class Project extends HXProject
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
 	static final VERSION:String = "0.6.0";
-	static final COMPANY:String = "FNF-SE";
-	static final PACKAGE:String = "com.fnfse.shadowengine";
+	static final COMPANY:String = "ShadowEngineTeam";
+	static final PACKAGE:String = "org.shadowengineteam.fnf";
 	static final MAIN_CLASS:String = "backend.Main";
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
 	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "float_deltatime", "gpu_textures"];
 
-	static final MODS_ALLOWED:CompileFlag = CompileFlag.get("MODS_ALLOWED");
-	static final HSCRIPT_ALLOWED:CompileFlag = CompileFlag.get("HSCRIPT_ALLOWED");
-	static final LUA_ALLOWED:CompileFlag = CompileFlag.get("LUA_ALLOWED");
-	static final VIDEOS_ALLOWED:CompileFlag = CompileFlag.get("VIDEOS_ALLOWED");
-	static final DISCORD_ALLOWED:CompileFlag = CompileFlag.get("DISCORD_ALLOWED");
-	static final DCEBUILD:CompileFlag = CompileFlag.get("DCEBUILD");
-	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
+	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
+	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
+	static final FEATURE_LUA:CompileFlag = CompileFlag.get("FEATURE_LUA");
+	static final FEATURE_VIDEOS:CompileFlag = CompileFlag.get("FEATURE_VIDEOS");
+	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
+	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
+	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+  static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -69,7 +71,7 @@ class Project extends HXProject
 
 	function getHaxeVersion():String
 	{
-		var process = new sys.io.Process("haxe", ["-version"]);
+		var process:Process = new Process("haxe", ["-version"]);
 		var version:String = "";
 
 		try
@@ -84,15 +86,15 @@ class Project extends HXProject
 
 	function doWelcomeHeader()
 	{
-		var haxeVersion = getHaxeVersion().trim();
-		var width = 50;
+		var haxeVersion:String = getHaxeVersion().trim();
+		var width:Int = 50;
 
 		inline function centerText(text:String, width:Int):String
 		{
-			var innerWidth = width - 2;
-			var padding = Std.int(Math.max(0, Std.int((innerWidth - text.length) / 2)));
-			var left = StringTools.lpad("", " ", padding);
-			var right = StringTools.lpad("", " ", innerWidth - text.length - padding);
+			var innerWidth:Int = width - 2;
+			var padding:Int = Std.int(Math.max(0, Std.int((innerWidth - text.length) / 2)));
+			var left:String = StringTools.lpad("", " ", padding);
+			var right:String = StringTools.lpad("", " ", innerWidth - text.length - padding);
 			return "=" + left + text + right + "=";
 		}
 
@@ -102,24 +104,24 @@ class Project extends HXProject
 			if (label.length == 0)
 			{
 				// no label: center the value
-				var padding = Std.int(Math.max(0, (innerWidth - value.length) / 2));
-				var left = StringTools.lpad("", " ", padding);
-				var right = StringTools.lpad("", " ", innerWidth - value.length - padding);
+				var padding:Int = Std.int(Math.max(0, (innerWidth - value.length) / 2));
+				var left:String = StringTools.lpad("", " ", padding);
+				var right:String = StringTools.lpad("", " ", innerWidth - value.length - padding);
 				return "=" + left + value + right + "=";
 			}
 			else
 			{
-				var colonPos = Std.int(innerWidth / 2);
-				var labelPart = StringTools.lpad(label, " ", Std.int(Math.max(0, colonPos - 2)));
-				var valuePart = value;
-				var remainingSpace = Std.int(Math.max(0, innerWidth - (labelPart.length + 3 + valuePart.length)));
-				var rightPad = StringTools.lpad("", " ", remainingSpace);
+				var colonPos:Int = Std.int(innerWidth / 2);
+				var labelPart:String = StringTools.lpad(label, " ", Std.int(Math.max(0, colonPos - 2)));
+				var valuePart:String = value;
+				var remainingSpace:Int = Std.int(Math.max(0, innerWidth - (labelPart.length + 3 + valuePart.length)));
+				var rightPad:String = StringTools.lpad("", " ", remainingSpace);
 				return "=" + labelPart + " : " + valuePart + rightPad + "=";
 			}
 		}
 
-		var unicode = #if (target.unicode) true #else false #end;
-		var targetPlatform = isWeb() ? "Web (HTML5)" : isIOS() ? "iOS" : isAndroid() ? "Android" : isWindows() ? "Windows" : isMac() ? "Mac" : isLinux() ? "Linux" : "Unknown";
+		var unicode:Bool = #if (target.unicode) true #else false #end;
+		var targetPlatform:String = isWeb() ? "Web (HTML5)" : isIOS() ? "iOS" : isAndroid() ? "Android" : isWindows() ? "Windows" : isMac() ? "Mac" : isLinux() ? "Linux" : "Unknown";
 
 		if (isHashLink())
 			targetPlatform = "Hashlink (" + targetPlatform + ")";
@@ -132,10 +134,10 @@ class Project extends HXProject
 			//var asciiArt = generateAsciiArt("icons/iconOG.png", width - 2, 100);
 			// hardcoding here as new image fucked things up and I have no solution for now
 			final asciiArt = "11Qm~>Xi{<XtJ~>!?Ou~>_i!>l_+~~]}l| !-fii]!#iLj)-\n11Qm~>Xi{<XtJ~>!?O<~~<<~<<~~~~~~~<<<~<_<]!#iLj)-\n11Qm~>Xi{<XtJ~+~<~<~~~~~~~~~~~~~~~~_1+{_<~^iLj)-\n11Qm~>XiXXXt]<<~~~~~~~~~~~~~~~~~~)]iO-_~+~~iLj)-\n11Qm~>X//<<~~<~~~~~~~~~~~~~~~<[#Lx_+~~~~~_ciLj)-\n11Qm~>{{{~<~~~~~~~~~~~~~~~~~~~~~<~~<~~~~+<iiLj)-\n11Qm~>Xi!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<_iiLj)-\n+}~~~+_<~~~~~~~~~~C@@~~~~~~~~~~~~~~~~~~~I:iiLj)-\n##~~~~~~~~~~~~~~-W$$$*<~~~~~~~~~~~~~~~<_>>iiLj)-\n##[~~<~~~~~~~~~_&@@@@@r~~~~~~~~~~~~~~~~cXuiiQx(-\nttt_-~~~~~~~~~~m@$[~m@t~~~~~~~~~~_<?[[_<~<~~~~[1\n!!!!!><~~~~~~~~*@$B1~+~~~~~~~~~~~~~~~~~~~~+~]OOO\ntttttt<~~O?~~~~@@$Bd?~~~~~~~~~~~~~~~~~~~~~_##OOO\ntttttt~-n~w@L_~~~~~~~~~~~~~~~~~~~~~~~~~~_<###+-1\nlllllllll~<<~~~~~~~~~~~~~~~~~~~~~~~~~_{{<<###+-1\n!!!!!!!!!Y)!-i<~~++~<~<Y0x{><~~>>><~<t}{<<###+-1";
-			var asciiLines = asciiArt.split("\n");
+			var asciiLines:Array<String> = asciiArt.split("\n");
 			for (line in asciiLines)
 			{
-				var paddedLine = StringTools.rpad(line, " ", width - 2);
+				var paddedLine:String = StringTools.rpad(line, " ", width - 2);
 				trace("=" + paddedLine + "=");
 			}
 		}
@@ -186,20 +188,17 @@ class Project extends HXProject
 		window.background = 0x000000;
 		window.hardware = true;
 		window.vsync = false;
+		window.orientation = Orientation.LANDSCAPE;
 
 		if (isWeb())
 			window.resizable = true;
-
-		if (isDesktop())
+		else if (isDesktop())
 		{
-			window.orientation = Orientation.LANDSCAPE;
 			window.fullscreen = false;
 			window.resizable = true;
-			window.vsync = false;
 		}
 		else if (isMobile())
 		{
-			window.orientation = Orientation.LANDSCAPE;
 			window.fullscreen = true;
 			window.resizable = false;
 			window.allowShaders = true;
@@ -210,13 +209,14 @@ class Project extends HXProject
 
 	function configureCompileFlags()
 	{
-		MODS_ALLOWED.integrate(isDesktop() || isMobile());
-		HSCRIPT_ALLOWED.integrate(true);
-		LUA_ALLOWED.integrate((isDesktop() && !isHashLink()) || isMobile());
-		VIDEOS_ALLOWED.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
-		DISCORD_ALLOWED.integrate((isDesktop() && !isHashLink()));
-		DCEBUILD.integrate(false);
-		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
+		FEATURE_MODS.integrate(isDesktop() || isMobile());
+		FEATURE_HSCRIPT.integrate(true);
+		FEATURE_LUA.integrate((isDesktop() && !isHashLink()) || isMobile());
+		FEATURE_VIDEOS.integrate((isDesktop() && !isHashLink()) || (isMobile() && !isIOSSimulator()));
+		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
+		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
+		FEATURE_DCE.integrate(false);
+    USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -232,14 +232,14 @@ class Project extends HXProject
 		setHaxedef("HXCPP_STACK_IDS");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
-		if (DCEBUILD.isDisabled())
+		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
 
 		if (isAndroid() && !isDebug())
 		{
-			final keystoreDir = Path.join([Sys.getCwd(), "keystore/android"]);
-			var keystorePath = Path.join([keystoreDir, "key.keystore"]);
-			var jsonPath = Path.join([keystoreDir, "keystore.json"]);
+			final keystoreDir:String = Path.join([Sys.getCwd(), "keystore/android"]);
+			var keystorePath:String = Path.join([keystoreDir, "key.keystore"]);
+			var jsonPath:String = Path.join([keystoreDir, "keystore.json"]);
 			var rawJson:String = '';
 			var keyData:Dynamic;
 
@@ -247,11 +247,6 @@ class Project extends HXProject
 			{
 				warn('Android keystore not found at: $keystorePath, using dummy.');
 				keystorePath = Path.join([keystoreDir, "dummy", "key.keystore"]);
-			}
-
-			if (!FileSystem.exists(jsonPath))
-			{
-				warn('Keystore JSON file not found at: $jsonPath, using dummy.');
 				jsonPath = Path.join([keystoreDir, "dummy", "keystore.json"]);
 			}
 
@@ -301,19 +296,13 @@ class Project extends HXProject
 		if (isAndroid())
 			setHaxedef("DISABLED_MACRO_SUPERLATIVE");
 
-		//addMacroFlag("allowPackage('flash')");
-		//addMacroFlag("include('my.pack')");
-
-		if (!DCEBUILD.isEnabled())
+		if (FEATURE_DCE.isDisabled())
 		{
 			addHaxeFlag("-dce no");
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
 
-		/*if (VIDEOS_ALLOWED.isEnabled())
-			setHaxedef("HXVLC_SHARE_DIRECTORY");*/
-
-		if (DISCORD_ALLOWED.isEnabled())
+		if (FEATURE_DISCORD_RPC.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
 		if (isMobile() || isWeb())
@@ -326,9 +315,11 @@ class Project extends HXProject
 		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
 		addAssetPath("assets/shared");
+		if (FEATURE_MOBILE_CONTROLS.isEnabled())
+			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
-		final textureFormats = ["ASTC", "S3TC", "PNG"];
-		var hasFormat = false;
+		final textureFormats:Array<String> = ["ASTC", "S3TC", "PNG"];
+		var hasFormat:Bool = false;
 
 		for (format in textureFormats)
 			if (defines.exists(format))
@@ -339,7 +330,7 @@ class Project extends HXProject
 
 		for (format in textureFormats)
 			if (defines.exists(format))
-				addAssetPath('images-${format.toLowerCase()}', 'assets/shared/images');
+				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");
@@ -351,13 +342,13 @@ class Project extends HXProject
 		includeHaxelib("flixel-addons");
 		includeHaxelib("flixel-animate");
 
-		if (LUA_ALLOWED.isEnabled())
+		if (FEATURE_LUA.isEnabled())
 			includeHaxelib("hxluajit");
-		if (HSCRIPT_ALLOWED.isEnabled())
+		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
-		if (VIDEOS_ALLOWED.isEnabled())
+		if (FEATURE_VIDEOS.isEnabled())
 			includeHaxelib("hxvlc");
-		if (DISCORD_ALLOWED.isEnabled())
+		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
 
 		if (isDebug() && isCPP())
@@ -373,7 +364,7 @@ class Project extends HXProject
 			adaptiveIcon = new AdaptiveIcon('icons/android/', true);
 		else if (isIOS())
 		{
-			final sizes = [
+			final sizes:Map<String, Int> = [
 				"20x20@1x" => 20,
 				//"20x20@2x" => 40, // also used by 40x40@1x
 				"20x20@3x" => 60,
@@ -409,7 +400,7 @@ class Project extends HXProject
 
 	function addAsset(path:String, ?rename:String, embed:Bool = false):Void
 	{
-		var asset = new Asset(path, rename, null, embed, true);
+		var asset:Asset = new Asset(path, rename, null, embed, true);
 		asset.library = "default";
 		assets.push(asset);
 	}
@@ -419,7 +410,7 @@ class Project extends HXProject
 		if (path == "")
 			return;
 
-		var targetPath = Path.addTrailingSlash(rename ?? path);
+		var targetPath:String = Path.addTrailingSlash(rename ?? path);
 
 		if (!FileSystem.exists(path))
 			error('Path "${path}" was not found');
@@ -442,24 +433,24 @@ class Project extends HXProject
 	{
 		try
 		{
-			var image = Image.fromFile(imagePath);
+			var image:Image = Image.fromFile(imagePath);
 			if (image == null)
 				throw "Image could not be loaded.";
 
-			var scaleX = targetWidth / image.width;
-			var scaleY = (maxHeight / image.height) * 0.5; // compensate for tall text characters
-			var scale = Math.min(scaleX, scaleY); // maintain aspect ratio
+			var scaleX:Float = targetWidth / image.width;
+			var scaleY:Float = (maxHeight / image.height) * 0.5; // compensate for tall text characters
+			var scale:Float = Math.min(scaleX, scaleY); // maintain aspect ratio
 
-			var newWidth = Math.round(image.width * scale);
-			var newHeight = Math.round(image.height * scale);
+			var newWidth:Int = Math.round(image.width * scale);
+			var newHeight:Int = Math.round(image.height * scale);
 			if (newWidth <= 0)
 				newWidth = 1;
 			if (newHeight <= 0)
 				newHeight = 1;
 
-			var chars = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light to dark
+			var chars:String = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"; // light to dark
 
-			var result = [];
+			var result:Array<String> = [];
 			for (y in 0...newHeight)
 			{
 				if (y % 2 == 1)

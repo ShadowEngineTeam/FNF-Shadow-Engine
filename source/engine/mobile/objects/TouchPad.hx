@@ -1,5 +1,6 @@
 package mobile.objects;
 
+#if FEATURE_MOBILE_CONTROLS
 import flixel.util.FlxSignal.FlxTypedSignal;
 
 /**
@@ -197,3 +198,4 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		return super.set_alpha(Value);
 	}
 }
+#end

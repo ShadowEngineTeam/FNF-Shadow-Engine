@@ -1,7 +1,7 @@
 package mobile.psychlua;
 
 import psychlua.CustomSubstate;
-#if LUA_ALLOWED
+#if FEATURE_LUA
 import lime.ui.Haptic;
 import psychlua.FunkinLua;
 import psychlua.LuaUtils;
@@ -22,6 +22,7 @@ class MobileFunctions
 
 		funk.set("extraButtonPressed", (button:String) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -33,11 +34,13 @@ class MobileFunctions
 						return MusicBeatState.getState().mobileControls.buttonExtra.pressed;
 				}
 			}
+			#end
 			return false;
 		});
 
 		funk.set("extraButtonJustPressed", (button:String) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -49,11 +52,13 @@ class MobileFunctions
 						return MusicBeatState.getState().mobileControls.buttonExtra.justPressed;
 				}
 			}
+			#end
 			return false;
 		});
 
 		funk.set("extraButtonJustReleased", (button:String) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -65,11 +70,13 @@ class MobileFunctions
 						return MusicBeatState.getState().mobileControls.buttonExtra.justReleased;
 				}
 			}
+			#end
 			return false;
 		});
 
 		funk.set("extraButtonReleased", (button:String) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			if (MusicBeatState.getState().mobileControls != null)
 			{
@@ -81,6 +88,7 @@ class MobileFunctions
 						return MusicBeatState.getState().mobileControls.buttonExtra.released;
 				}
 			}
+			#end
 			return false;
 		});
 
@@ -95,6 +103,7 @@ class MobileFunctions
 
 		funk.set("addTouchPad", (DPadMode:String, ActionMode:String, ?addToCustomSubstate:Bool = false, ?posAtCustomSubstate:Int = -1) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			FunkinLua.getCurrentMusicState().makeLuaTouchPad(DPadMode, ActionMode);
 			if (addToCustomSubstate)
 			{
@@ -103,15 +112,19 @@ class MobileFunctions
 			}
 			else
 				FunkinLua.getCurrentMusicState().addLuaTouchPad();
+			#end
 		});
 
 		funk.set("removeTouchPad", () ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			FunkinLua.getCurrentMusicState().removeLuaTouchPad();
+			#end
 		});
 
 		funk.set("addTouchPadCamera", (?defaultDrawTarget:Bool) ->
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (defaultDrawTarget == null)
 				defaultDrawTarget = false;
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
@@ -120,42 +133,59 @@ class MobileFunctions
 				return;
 			}
 			FunkinLua.getCurrentMusicState().addLuaTouchPadCamera(defaultDrawTarget);
+			#end
 		});
 
 		funk.set("touchPadJustPressed", function(button:Dynamic):Bool
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
 			}
 			return FunkinLua.getCurrentMusicState().luaTouchPadJustPressed(button);
+			#else
+			return false;
+			#end
 		});
 
 		funk.set("touchPadPressed", function(button:Dynamic):Bool
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
 			}
 			return FunkinLua.getCurrentMusicState().luaTouchPadPressed(button);
+			#else
+			return false;
+			#end
 		});
 
 		funk.set("touchPadJustReleased", function(button:Dynamic):Bool
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
 			}
 			return FunkinLua.getCurrentMusicState().luaTouchPadJustReleased(button);
+			#else
+			return false;
+			#end
 		});
 
 		funk.set("touchPadReleased", function(button:Dynamic):Bool
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (FunkinLua.getCurrentMusicState().luaTouchPad == null)
 			{
 				return false;
 			}
 			return FunkinLua.getCurrentMusicState().luaTouchPadReleased(button);
+			#else
+			return false;
+			#end
 		});
 
 		funk.set("touchJustPressed", TouchUtil.justPressed);
@@ -285,6 +315,7 @@ class MobileFunctions
 
 	public static function getMobileControlsAsString():String
 	{
+		#if FEATURE_MOBILE_CONTROLS
 		try
 		{
 			switch (MobileData.mode)
@@ -305,6 +336,9 @@ class MobileFunctions
 		{
 			return 'unknown';
 		}
+		#else
+		return 'none';
+		#end
 	}
 }
 

@@ -1,5 +1,6 @@
 package mobile.objects;
 
+#if FEATURE_MOBILE_CONTROLS
 import flixel.util.FlxSignal.FlxTypedSignal;
 
 /**
@@ -18,3 +19,4 @@ interface IMobileControls
 	public var onButtonDown:FlxTypedSignal<TouchButton->Void>;
 	public var onButtonUp:FlxTypedSignal<TouchButton->Void>;
 }
+#end

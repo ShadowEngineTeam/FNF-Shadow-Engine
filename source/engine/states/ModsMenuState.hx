@@ -66,7 +66,7 @@ class ModsMenuState extends MusicBeatState
 		modsList = Mods.parseList();
 		Mods.currentModDirectory = modsList.all[0] != null ? modsList.all[0] : '';
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -190,7 +190,9 @@ class ModsMenuState extends MusicBeatState
 			add(txt);
 
 			changeSelectedMod();
+			#if FEATURE_MOBILE_CONTROLS
 			addTouchPad("NONE", "B");
+			#end
 			return super.create();
 		}
 
@@ -330,10 +332,12 @@ class ModsMenuState extends MusicBeatState
 		bottomText.scrollFactor.set();
 		add(bottomText);
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("UP_DOWN", "B");
 		touchPad.y -= 215; // so that you can press the buttons.
 		if (controls.mobileC)
 			touchPad.alpha = 0.3;
+		#end
 		super.create();
 	}
 

@@ -96,7 +96,9 @@ class WeekEditorState extends MusicBeatState
 		reloadAllShit();
 
 		FlxG.mouse.visible = true;
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("UP_DOWN", "B");
+		#end
 
 		super.create();
 	}
@@ -373,7 +375,7 @@ class WeekEditorState extends MusicBeatState
 
 		if (assetName != null && assetName.length > 0)
 		{
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var modPath = Paths.modsImages('menubackgrounds/menu_' + assetName);
 			if (FileSystem.exists(modPath))
 			{
@@ -406,7 +408,7 @@ class WeekEditorState extends MusicBeatState
 
 		if (assetName != null && assetName.length > 0)
 		{
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var modPath:String = Paths.modsImages('storymenu/' + assetName);
 			if (FileSystem.exists(modPath))
 			{
@@ -443,7 +445,7 @@ class WeekEditorState extends MusicBeatState
 
 		recalculateStuffPosition();
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Week Editor", "Editing: " + weekFileName);
 		#end
 	}
@@ -474,7 +476,7 @@ class WeekEditorState extends MusicBeatState
 		if (!blockInput)
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
+			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				MusicBeatState.switchState(new MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
@@ -679,7 +681,9 @@ class WeekEditorFreeplayState extends MusicBeatState
 
 		addEditorBox();
 		changeSelection();
+		#if FEATURE_MOBILE_CONTROLS 
 		addTouchPad("UP_DOWN", "B");
+		#end
 		super.create();
 	}
 
@@ -876,7 +880,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 		if (!blockInput)
 		{
 			ClientPrefs.toggleVolumeKeys(true);
-			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonB.justPressed)
+			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				MusicBeatState.switchState(new MasterEditorMenu());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));

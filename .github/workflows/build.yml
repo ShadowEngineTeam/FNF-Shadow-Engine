@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
+        with:
+          submodules: true
 
       - name: Setup Haxe
         if: ${{ inputs.name != 'Linux ARM64' && inputs.name != 'Linux ARMV7' }}
@@ -77,14 +79,14 @@ jobs:
       - name: Install Libraries
         shell: bash
         run: |
-          haxelib git hmm https://github.com/FNF-SE/hmm --skip-dependencies --quiet
+          haxelib git hmm https://github.com/ShadowEngineTeam/hmm --skip-dependencies --quiet
           haxelib run hmm install --quiet
           if [ "${{ inputs.name }}" == "Windows ARM64" ]; then
             haxelib remove hxvlc
-            haxelib git hxvlc https://github.com/FNF-SE/hxvlc winarm64 --skip-dependencies --quiet
+            haxelib git hxvlc https://github.com/ShadowEngineTeam/hxvlc winarm64 --skip-dependencies --quiet
           elif [ "${{ inputs.name }}" == "Windows i686" ]; then
             haxelib remove hxvlc
-            haxelib git hxvlc https://github.com/FNF-SE/hxvlc win32 --skip-dependencies --quiet
+            haxelib git hxvlc https://github.com/ShadowEngineTeam/hxvlc win32 --skip-dependencies --quiet
           fi
 
       - name: Configure Android
@@ -96,7 +98,7 @@ jobs:
           haxelib run lime config ANDROID_SETUP true
 
       - name: Extract Android keystore
-        if: ${{ inputs.name == 'Android' && github.repository_owner == 'FNF-SE' }}
+        if: ${{ inputs.name == 'Android' && github.repository_owner == 'ShadowEngineTeam' }}
         shell: bash
         env:
           SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}

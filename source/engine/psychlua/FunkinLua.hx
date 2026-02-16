@@ -23,7 +23,7 @@ import substates.PauseSubState;
 import substates.GameOverSubstate;
 import psychlua.LuaUtils;
 import psychlua.LuaUtils.LuaTweenOptions;
-#if HSCRIPT_ALLOWED
+#if FEATURE_HSCRIPT
 import psychlua.HScript;
 #end
 import psychlua.DebugLuaText;
@@ -39,7 +39,7 @@ class FunkinLua
 	inline private function get_game()
 		return cast FunkinLua.getCurrentMusicState();
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public var lua:State = null;
 	#end
 
@@ -48,7 +48,7 @@ class FunkinLua
 	public var modFolder:String = null;
 	public var closed:Bool = false;
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public var hscript:HScript = null;
 	#end
 
@@ -58,7 +58,7 @@ class FunkinLua
 
 	public function new(scriptName:String)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		var times:Float = Date.now().getTime();
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
@@ -72,7 +72,7 @@ class FunkinLua
 		game.luaArray.push(this);
 
 		var myFolder:Array<String> = this.scriptName.split('/');
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (myFolder[0] + '/' == Paths.mods()
 			&& (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1]))) // this is inside mods folder
 			this.modFolder = myFolder[1];
@@ -360,7 +360,7 @@ class FunkinLua
 
 				MusicBeatState.switchState(new states.FreeplayState());
 
-				#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
+				#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				PlayState.changedDifficulty = false;
@@ -473,7 +473,7 @@ class FunkinLua
 			{
 				var path:String;
 				var formattedSong = Paths.formatToSongPath(PlayState.SONG.song);
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				var modPath:String = Paths.modsJson(formattedSong + '/' + dialogueFile);
 				if (FileSystem.exists(modPath))
 					path = modPath;
@@ -513,7 +513,7 @@ class FunkinLua
 			});
 			set("startVideo", function(videoFile:String, ?canSkip:Bool = true, ?forMidSong:Bool = false, ?shouldLoop:Bool = false, ?playOnLoad:Bool = true)
 			{
-				#if VIDEOS_ALLOWED
+				#if FEATURE_VIDEOS
 				if (FileSystem.exists(Paths.video(videoFile)))
 				{
 					if (cast(game, PlayState).videoCutscene != null)
@@ -763,11 +763,11 @@ class FunkinLua
 		});
 		set("addHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
 		{
-			#if HSCRIPT_ALLOWED
+			#if FEATURE_HSCRIPT
 			FunkinLua.getCurrentMusicState().startHScriptsNamed(hscriptFile, function(file:String)
 			{
 				var scriptToLoad:String = '';
-				#if MODS_ALLOWED
+				#if FEATURE_MODS
 				scriptToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(scriptToLoad))
 				#end
@@ -815,7 +815,7 @@ class FunkinLua
 		});
 		set("removeHScript", function(hscriptFile:String)
 		{
-			#if HSCRIPT_ALLOWED
+			#if FEATURE_HSCRIPT
 			function huntHScript(name:String)
 			{
 				for (script in cast(game.hscriptArray, Array<Dynamic>))
@@ -1717,7 +1717,7 @@ class FunkinLua
 		#end
 
 		// mod settings
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		addLocalCallback("getModSetting", function(saveTag:String, ?modName:String = null)
 		{
 			if (modName == null)
@@ -1742,8 +1742,8 @@ class FunkinLua
 			return closed;
 		});
 
-		#if DISCORD_ALLOWED DiscordClient.addLuaCallbacks(this); #end
-		#if HSCRIPT_ALLOWED HScript.implement(this); #end
+		#if FEATURE_DISCORD_RPC DiscordClient.addLuaCallbacks(this); #end
+		#if FEATURE_HSCRIPT HScript.implement(this); #end
 		ReflectionFunctions.implement(this);
 		TextFunctions.implement(this);
 		ExtraFunctions.implement(this);
@@ -1797,7 +1797,7 @@ class FunkinLua
 
 		lastCalledFunction = func;
 		lastCalledScript = this;
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		try
 		{
 			if (lua == null)
@@ -1847,7 +1847,7 @@ class FunkinLua
 
 	public function set(variable:String, data:Dynamic)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (lua == null)
 			return;
 
@@ -1866,7 +1866,7 @@ class FunkinLua
 	{
 		closed = true;
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (lua == null)
 		{
 			return;
@@ -1874,7 +1874,7 @@ class FunkinLua
 		Lua.close(lua);
 		lua = null;
 		#end
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		if (hscript != null)
 		{
 			hscript.destroy();
@@ -1920,7 +1920,7 @@ class FunkinLua
 		if (lastCalledScript == null)
 			return false;
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		var lua:State = lastCalledScript.lua;
 		if (lua == null)
 			return false;
@@ -1947,7 +1947,7 @@ class FunkinLua
 
 		var sharedPath:String = Paths.getSharedPath(scriptFile);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(scriptFile);
 		if (FileSystem.exists(modPath))
 			return modPath;
@@ -1961,7 +1961,7 @@ class FunkinLua
 
 	public function getErrorMessage(status:Int):String
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		var v:String = Lua.tostring(lua, -1);
 		Lua.pop(lua, 1);
 
@@ -1989,7 +1989,7 @@ class FunkinLua
 
 	public function addLocalCallback(name:String, myFunction:Dynamic)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		callbacks.set(name, myFunction);
 		Convert.addCallback(lua, name, null); // just so that it gets called
 		#end
@@ -2016,7 +2016,7 @@ class FunkinLua
 		}
 
 		var foldersToCheck:Array<String> = [];
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			foldersToCheck.push(Paths.mods(Mods.currentModDirectory + '/shaders/'));
 		for (mod in Mods.getGlobalMods())
@@ -2077,6 +2077,6 @@ class FunkinLua
 	}
 }
 
-#if LUA_ALLOWED
+#if FEATURE_LUA
 typedef State = cpp.RawPointer<Lua_State>;
 #end

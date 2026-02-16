@@ -1,11 +1,13 @@
 package objects;
 
 import flixel.addons.effects.FlxSkewedSprite;
+import shaders.ColorSwap;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
 class StrumNote extends FlxSkewedSprite
 {
+	public var colorSwap:ColorSwap = null;
 	public var rgbShader:RGBShaderReference;
 	public var resetAnim:Float = 0;
 
@@ -33,22 +35,30 @@ class StrumNote extends FlxSkewedSprite
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
 	{
-		rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
-		rgbShader.enabled = false;
-		if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)
-			useRGBShader = false;
-
-		var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
-		if (PlayState.isPixelStage)
-			arr = ClientPrefs.data.arrowRGBPixel[leData];
-
-		if (leData <= arr.length)
+		if (ClientPrefs.data.disableRGBNotes) 
 		{
-			@:bypassAccessor
+			colorSwap = new ColorSwap();
+			shader = colorSwap.shader;
+		}
+		else
+		{
+			rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
+			rgbShader.enabled = false;
+			if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
+				useRGBShader = false;
+
+			var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
+			if (PlayState.isPixelStage)
+				arr = ClientPrefs.data.arrowRGBPixel[leData];
+
+			if (leData <= arr.length)
 			{
-				rgbShader.r = arr[0];
-				rgbShader.g = arr[1];
-				rgbShader.b = arr[2];
+				@:bypassAccessor
+				{
+					rgbShader.r = arr[0];
+					rgbShader.g = arr[1];
+					rgbShader.b = arr[2];
+				}
 			}
 		}
 
@@ -180,7 +190,31 @@ class StrumNote extends FlxSkewedSprite
 			centerOffsets();
 			centerOrigin();
 		}
-		if (useRGBShader)
+		if (ClientPrefs.data.disableRGBNotes)
+		{
+			if (animation.curAnim == null || animation.curAnim.name == 'static')
+			{
+				colorSwap.hue = 0;
+				colorSwap.saturation = 0;
+				colorSwap.brightness = 0;
+			}
+			else
+			{
+				if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+				{
+					colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+					colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+					colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+				}
+
+				if (animation.curAnim != null)
+				{
+					if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage)
+						centerOrigin();
+				}
+			}
+		}
+		else if (useRGBShader)
 			rgbShader.enabled = (animation.curAnim != null && animation.curAnim.name != 'static');
 	}
 }

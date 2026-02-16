@@ -1,5 +1,6 @@
 package states;
 
+import backend.InputFormatter;
 import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
@@ -57,7 +58,7 @@ class FreeplayState extends MusicBeatState
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -165,11 +166,11 @@ class FreeplayState extends MusicBeatState
 
 		if (controls.mobileC)
 		{
-			leText = "Press X to listen to the Song / Press C to open the Gameplay Changers Menu / Press Y to Reset your Score and Accuracy.";
+			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.';
 		}
 		else
 		{
-			leText = "Press SPACE to listen to the Song / Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
+			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
 		}
 		bottomString = leText;
 		var size:Int = 16;
@@ -184,7 +185,9 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		updateTexts();
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_C_X_Y_Z");
+		#end
 		super.create();
 	}
 
@@ -193,8 +196,10 @@ class FreeplayState extends MusicBeatState
 		changeSelection(0, false);
 		persistentUpdate = true;
 		super.closeSubState();
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "A_B_C_X_Y_Z");
+		#end
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int)
@@ -242,12 +247,12 @@ class FreeplayState extends MusicBeatState
 		}
 
 		var shiftMult:Int = 1;
-		if ((FlxG.keys.pressed.SHIFT || touchPad.buttonZ.pressed) && !player.playingMusic)
+		if ((FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end) && !player.playingMusic)
 			shiftMult = 3;
 
 		if (!player.playingMusic)
 		{
-			scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+			scoreText.text = 'PERSONAL BEST: ' + FlxStringUtil.formatMoney(lerpScore, false) + ' (' + ratingSplit.join('.') + '%)';
 			positionHighscore();
 
 			if (songs.length > 1)
@@ -331,13 +336,15 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if ((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
+		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK)) && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubstate());
+			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
+			#end
 		}
-		else if (FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
+		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(START))
 		{
 			if (instPlaying != curSelected && !player.playingMusic)
 			{
@@ -435,15 +442,17 @@ class FreeplayState extends MusicBeatState
 			LoadingState.loadAndSwitchState(new PlayState());
 			// FlxG.sound.music.volume = 0;
 			destroyFreeplayVocals();
-			#if (MODS_ALLOWED && DISCORD_ALLOWED)
+			#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 			DiscordClient.loadModRPC();
 			#end
 		}
-		else if ((controls.RESET || touchPad.buttonY.justPressed) && !player.playingMusic)
+		else if ((controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
+			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
+			#end
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
 		updateTexts(elapsed);

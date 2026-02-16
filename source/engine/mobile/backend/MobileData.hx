@@ -1,5 +1,6 @@
 package mobile.backend;
 
+#if FEATURE_MOBILE_CONTROLS
 import haxe.ds.Map;
 import haxe.io.Path;
 import openfl.utils.Assets;
@@ -24,9 +25,9 @@ class MobileData
 		save = new FlxSave();
 		save.bind('MobileControls', CoolUtil.getSavePath());
 
-		readFilesFromDirectory(Paths.getSharedPath('mobile/DPadModes'), dpadModes);
-		readFilesFromDirectory(Paths.getSharedPath('mobile/ActionModes'), actionModes);
-		#if MODS_ALLOWED
+		readDirectory(Paths.getSharedPath('mobile/DPadModes'), dpadModes);
+		readDirectory(Paths.getSharedPath('mobile/ActionModes'), actionModes);
+		#if FEATURE_MODS
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'mobile/'))
 		{
 			readFilesFromDirectory(Path.join([folder, 'DPadModes']), dpadModes);
@@ -156,3 +157,4 @@ enum ExtraActions
 	DOUBLE;
 	NONE;
 }
+#end

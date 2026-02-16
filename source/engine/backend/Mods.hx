@@ -50,7 +50,7 @@ class Mods
 	inline public static function getModDirectories():Array<String>
 	{
 		var list:Array<String> = [];
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modsFolder:String = Paths.mods();
 		if (FileSystem.exists(modsFolder))
 		{
@@ -105,7 +105,7 @@ class Mods
 		if (FileSystem.exists(path + fileToFind))
 			foldersToCheck.push(path + fileToFind);
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (mods)
 		{
 			// Global mods first
@@ -135,7 +135,7 @@ class Mods
 
 	public static function getPack(?folder:String = null):Dynamic
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (folder == null)
 			folder = Mods.currentModDirectory;
 
@@ -165,7 +165,7 @@ class Mods
 			updateModList();
 		var list:ModsList = {enabled: [], disabled: [], all: []};
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		try
 		{
 			for (mod in CoolUtil.coolTextFile(#if mobile Sys.getCwd() + #end 'modsList.txt'))
@@ -192,7 +192,7 @@ class Mods
 
 	private static function updateModList()
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		// Find all that are already ordered
 		var list:Array<Array<Dynamic>> = [];
 		var added:Array<String> = [];
@@ -251,7 +251,7 @@ class Mods
 	{
 		Mods.currentModDirectory = '';
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (!FileSystem.exists(Paths.mods('')))
 			FileSystem.createDirectory(Paths.mods(''));
 		var list:Array<String> = Mods.parseList().enabled;

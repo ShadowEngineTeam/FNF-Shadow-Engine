@@ -133,8 +133,10 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			updateTextFrom(optionsArray[i]);
 		}
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_C");
 		addTouchPadCamera(false);
+		#end
 
 		changeSelection();
 		reloadCheckboxes();
@@ -291,7 +293,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				}
 			}
 
-			if (controls.RESET || touchPad.buttonC.justPressed)
+			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				for (i in 0...optionsArray.length)
 				{
@@ -327,11 +329,13 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		{
 			nextAccept -= 1;
 		}
+		#if FEATURE_MOBILE_CONTROLS
 		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
 		{
 			addTouchPad("LEFT_FULL", "A_B_C");
 			addTouchPadCamera(false);
 		}
+		#end
 		super.update(elapsed);
 	}
 

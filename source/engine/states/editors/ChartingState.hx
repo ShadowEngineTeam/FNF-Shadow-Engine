@@ -221,7 +221,7 @@ class ChartingState extends MusicBeatState
 
 		// Paths.clearMemory();
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 		#end
@@ -388,7 +388,9 @@ class ChartingState extends MusicBeatState
 
 		updateGrid();
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "CHART_EDITOR");
+		#end
 
 		super.create();
 	}
@@ -427,7 +429,7 @@ class ChartingState extends MusicBeatState
 
 		// Build character list
 		var directories:Array<String> = [];
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			directories.push(Paths.mods(Mods.currentModDirectory + '/characters/'));
 		for (mod in Mods.getGlobalMods())
@@ -469,7 +471,7 @@ class ChartingState extends MusicBeatState
 
 		// Build stage list
 		var stageDirectories:Array<String> = [];
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			stageDirectories.push(Paths.mods(Mods.currentModDirectory + '/stages/'));
 		for (mod in Mods.getGlobalMods())
@@ -618,7 +620,7 @@ class ChartingState extends MusicBeatState
 			var songName:String = Paths.formatToSongPath(_song.song);
 			var baseFile:String = Paths.json(songName + '/events');
 			var exists:Bool = false;
-			#if MODS_ALLOWED
+			#if FEATURE_MODS
 			var modFile:String = Paths.modsJson(songName + '/events');
 			if (FileSystem.exists(modFile))
 				exists = true;
@@ -978,12 +980,12 @@ class ChartingState extends MusicBeatState
 				var extLen:Int = 4;
 				var isValid:Bool = false;
 
-				#if LUA_ALLOWED
+				#if FEATURE_LUA
 				if (fileName.endsWith('.lua'))
 					isValid = true;
 				#end
 
-				#if HSCRIPT_ALLOWED
+				#if FEATURE_HSCRIPT
 				if (!isValid)
 				{
 					for (dynamicExt in cast(hscriptExtensions, Array<Dynamic>))
@@ -1062,12 +1064,12 @@ class ChartingState extends MusicBeatState
 		tab_group.add(noteTypeDropDown);
 
 		var row3:Int = row2 + rowStep;
-		var check_disableNoteRGB:ShadowCheckbox = new ShadowCheckbox(pad, row3, "Disable Note RGB", (_song.disableNoteRGB == true), function(checked:Bool)
+		var check_disableNoteCustomColor:ShadowCheckbox = new ShadowCheckbox(pad, row3, "Disable Note Custom Color", (_song.disableNoteCustomColor == true), function(checked:Bool)
 		{
-			_song.disableNoteRGB = checked;
+			_song.disableNoteCustomColor = checked;
 			updateGrid();
 		});
-		tab_group.add(check_disableNoteRGB);
+		tab_group.add(check_disableNoteCustomColor);
 
 		var row4:Int = row3 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
 		tab_group.add(new ShadowLabel(pad, row4, "Note Texture (Player):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
@@ -1124,11 +1126,11 @@ class ChartingState extends MusicBeatState
 		var buttonWidth:Int = 30;
 		var buttonGap:Int = ShadowStyle.SPACING_SM;
 
-		#if (HSCRIPT_ALLOWED || LUA_ALLOWED)
+		#if (FEATURE_HSCRIPT || FEATURE_LUA)
 		var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
 		var directories:Array<String> = [];
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		directories.push(Paths.mods('custom_events/'));
 		directories.push(Paths.mods(Mods.currentModDirectory + '/custom_events/'));
 		for (mod in Mods.getGlobalMods())
@@ -1726,13 +1728,15 @@ class ChartingState extends MusicBeatState
 					opponentVocals.volume = 0;
 			}
 
-			#if DISCORD_ALLOWED
+			#if FEATURE_DISCORD_RPC
 			// Updating Discord Rich Presence
 			DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 			#end
 		}
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "CHART_EDITOR");
+		#end
 		super.closeSubState();
 	}
 
@@ -1812,8 +1816,9 @@ class ChartingState extends MusicBeatState
 			ClientPrefs.toggleVolumeKeys(false);
 			FlxG.mouse.enabled = false;
 
-			if ((FlxG.keys.justPressed.F1 || touchPad.buttonF.justPressed) || FlxG.keys.justPressed.ESCAPE)
+			if ((FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
 			{
+				#if FEATURE_MOBILE_CONTROLS
 				if (controls.mobileC)
 				{
 					touchPad.forEachAlive(function(button:TouchButton)
@@ -1822,6 +1827,7 @@ class ChartingState extends MusicBeatState
 							button.visible = !button.visible;
 					});
 				}
+				#end
 				UI_help.visible = false;
 				UI_help.active = false;
 				UI_helpOverlay.visible = false;
@@ -1832,8 +1838,9 @@ class ChartingState extends MusicBeatState
 			return;
 		}
 
-		if (FlxG.keys.justPressed.F1 || touchPad.buttonF.justPressed)
+		if (FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end)
 		{
+			#if FEATURE_MOBILE_CONTROLS
 			if (controls.mobileC)
 			{
 				touchPad.forEachAlive(function(button:TouchButton)
@@ -1842,6 +1849,7 @@ class ChartingState extends MusicBeatState
 						button.visible = !button.visible;
 				});
 			}
+			#end
 			UI_help.visible = true;
 			UI_help.active = true;
 			UI_helpOverlay.visible = true;
@@ -1904,11 +1912,12 @@ class ChartingState extends MusicBeatState
 						{
 							if (touch.overlaps(note))
 							{
+								#if FEATURE_MOBILE_CONTROLS
 								if (touchPad.buttonF.pressed)
 								{
 									selectNote(note);
 								}
-								else if (FlxG.keys.pressed.ALT)
+								else #end if (FlxG.keys.pressed.ALT)
 								{
 									selectNote(note);
 									curSelectedNote[3] = curNoteTypes[currentType];
@@ -1922,7 +1931,7 @@ class ChartingState extends MusicBeatState
 							}
 						});
 					}
-					else if (!touchPad.buttonF.pressed)
+					else if (#if FEATURE_MOBILE_CONTROLS !touchPad.buttonF.pressed #else true #end)
 					{
 						if (touch.x > gridBG.x
 							&& touch.x < gridBG.x + gridBG.width
@@ -1942,7 +1951,7 @@ class ChartingState extends MusicBeatState
 				{
 					dummyArrow.visible = true;
 					dummyArrow.x = Math.floor(touch.x / GRID_SIZE) * GRID_SIZE;
-					if (FlxG.keys.pressed.SHIFT || touchPad.buttonY.pressed)
+					if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.pressed #end)
 						dummyArrow.y = touch.y;
 					else
 						dummyArrow.y = Math.floor(touch.y / GRID_SIZE) * GRID_SIZE;
@@ -2017,7 +2026,7 @@ class ChartingState extends MusicBeatState
 
 		if (!blockInput)
 		{
-			if (FlxG.keys.justPressed.ESCAPE || touchPad.buttonC.justPressed)
+			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				if (FlxG.sound.music != null)
 					FlxG.sound.music.stop();
@@ -2037,10 +2046,12 @@ class ChartingState extends MusicBeatState
 				playtesting = true;
 				playtestingTime = Conductor.songPosition;
 				playtestingOnComplete = FlxG.sound.music.onComplete;
+				#if FEATURE_MOBILE_CONTROLS
 				touchPad.alpha = 0;
+				#end
 				openSubState(new states.editors.EditorPlayState(playbackSpeed));
 			}
-			else if (FlxG.keys.justPressed.ENTER || touchPad.buttonA.justPressed)
+			else if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 			{
 				autosaveSong();
 				FlxG.mouse.visible = false;
@@ -2058,17 +2069,17 @@ class ChartingState extends MusicBeatState
 
 			if (curSelectedNote != null && curSelectedNote[1] > -1)
 			{
-				if (touchPad.buttonDown2.justPressed || FlxG.keys.justPressed.E)
+				if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonDown2.justPressed || #end FlxG.keys.justPressed.E)
 				{
 					changeNoteSustain(Conductor.stepCrochet);
 				}
-				if (touchPad.buttonUp2.justPressed || FlxG.keys.justPressed.Q)
+				if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonUp2.justPressed || #end FlxG.keys.justPressed.Q)
 				{
 					changeNoteSustain(-Conductor.stepCrochet);
 				}
 			}
 
-			if (FlxG.keys.justPressed.BACKSPACE || touchPad.buttonB.justPressed)
+			if (FlxG.keys.justPressed.BACKSPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
 				// Protect against lost data when quickly leaving the chart editor.
 				autosaveSong();
@@ -2079,7 +2090,7 @@ class ChartingState extends MusicBeatState
 				return;
 			}
 
-			if (touchPad.buttonZ.justPressed || (FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL))
+			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonZ.justPressed || #end (FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL))
 			{
 				undo();
 			}
@@ -2089,12 +2100,12 @@ class ChartingState extends MusicBeatState
 				redo();
 			}
 
-			if (((FlxG.keys.justPressed.Z && !FlxG.keys.pressed.CONTROL) || touchPad.buttonV.justPressed) && curZoom > 0)
+			if (((FlxG.keys.justPressed.Z && !FlxG.keys.pressed.CONTROL) #if FEATURE_MOBILE_CONTROLS || touchPad.buttonV.justPressed #end) && curZoom > 0)
 			{
 				--curZoom;
 				updateZoom();
 			}
-			if ((FlxG.keys.justPressed.X || touchPad.buttonD.justPressed) && curZoom < zoomList.length - 1)
+			if ((FlxG.keys.justPressed.X #if FEATURE_MOBILE_CONTROLS || touchPad.buttonD.justPressed #end) && curZoom < zoomList.length - 1)
 			{
 				curZoom++;
 				updateZoom();
@@ -2116,7 +2127,7 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			if (FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
+			if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			{
 				if (vocals != null)
 					vocals.play();
@@ -2173,19 +2184,19 @@ class ChartingState extends MusicBeatState
 
 			// ARROW VORTEX SHIT NO DEADASS
 
-			if ((FlxG.keys.pressed.W || FlxG.keys.pressed.S) || (touchPad.buttonUp.pressed || touchPad.buttonDown.pressed))
+			if ((FlxG.keys.pressed.W || FlxG.keys.pressed.S) #if FEATURE_MOBILE_CONTROLS || (touchPad.buttonUp.pressed || touchPad.buttonDown.pressed) #end)
 			{
 				FlxG.sound.music.pause();
 
 				var holdingShift:Float = 1;
 				if (FlxG.keys.pressed.CONTROL)
 					holdingShift = 0.25;
-				else if (FlxG.keys.pressed.SHIFT || touchPad.buttonY.pressed)
+				else if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.pressed #end)
 					holdingShift = 4;
 
 				var daTime:Float = 700 * FlxG.elapsed * holdingShift;
 
-				FlxG.sound.music.time += daTime * ((FlxG.keys.pressed.W || touchPad.buttonUp.pressed) ? -1 : 1);
+				FlxG.sound.music.time += daTime * ((FlxG.keys.pressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.pressed #end) ? -1 : 1);
 
 				pauseAndSetVocalsTime();
 			}
@@ -2216,7 +2227,7 @@ class ChartingState extends MusicBeatState
 
 			var style:Int = currentType;
 
-			if (FlxG.keys.pressed.SHIFT || touchPad.buttonY.pressed)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.pressed #end)
 			{
 				style = 3;
 			}
@@ -2319,12 +2330,12 @@ class ChartingState extends MusicBeatState
 				}
 			}
 			var shiftThing:Int = 1;
-			if (FlxG.keys.pressed.SHIFT || touchPad.buttonY.pressed)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.pressed #end)
 				shiftThing = 4;
 
-			if (FlxG.keys.justPressed.D || touchPad.buttonRight.justPressed)
+			if (FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end)
 				changeSection(curSec + shiftThing);
-			if (FlxG.keys.justPressed.A || touchPad.buttonLeft.justPressed)
+			if (FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end)
 			{
 				if (curSec <= 0)
 				{
@@ -2381,7 +2392,7 @@ class ChartingState extends MusicBeatState
 			playbackSpeed -= 0.01;
 		if (!holdingShift && pressedRB || holdingShift && holdingRB)
 			playbackSpeed += 0.01;
-		if (touchPad.buttonG.justPressed || (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB)))
+		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonG.justPressed || #end (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB)))
 			playbackSpeed = 1;
 
 		if (playbackSpeed <= 0.5)
@@ -2974,7 +2985,7 @@ class ChartingState extends MusicBeatState
 		var characterPath:String = 'characters/' + char + '.json';
 		var path:String;
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(characterPath);
 		if (FileSystem.exists(modPath))
 			path = modPath;

@@ -6,8 +6,10 @@ import options.Option;
 
 class MobileOptionsSubState extends BaseOptionsMenu
 {
+	#if FEATURE_MOBILE_CONTROLS
 	final exControlTypes:Array<String> = ["NONE", "SINGLE", "DOUBLE"];
 	final hintOptions:Array<String> = ["No Gradient", "No Gradient (Old)", "Gradient", "Hidden"];
+	#end
 	var option:Option;
 
 	public function new()
@@ -15,6 +17,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		title = 'Mobile Options';
 		rpcTitle = 'Mobile Options Menu'; // for Discord Rich Presence, fuck it
 
+		#if FEATURE_MOBILE_CONTROLS
 		option = new Option('Extra Controls', 'Select how many extra buttons you prefer to have?\nThey can be used for mechanics with LUA or HScript.',
 			'extraButtons', 'string', exControlTypes);
 		addOption(option);
@@ -32,6 +35,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			ClientPrefs.toggleVolumeKeys();
 		};
 		addOption(option);
+		#end
 
 		#if mobile
 		option = new Option('Allow Phone Screensaver',
@@ -46,6 +50,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		addOption(option);
 		#end
 
+		#if FEATURE_MOBILE_CONTROLS
 		if (MobileData.mode == 3)
 		{
 			option = new Option('Hitbox Design', 'Choose how your hitbox should look like.', 'hitboxType', 'string', hintOptions);
@@ -60,6 +65,7 @@ class MobileOptionsSubState extends BaseOptionsMenu
 			'If checked, the mobile controls color will be set to the notes color in your settings.\n(have effect during gameplay only)', 'dynamicColors',
 			'bool');
 		addOption(option);
+		#end
 
 		super();
 	}

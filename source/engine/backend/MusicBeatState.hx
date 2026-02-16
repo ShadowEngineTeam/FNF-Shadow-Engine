@@ -18,7 +18,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public var hscriptArray:Array<HScript> = [];
 	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
 	public var instancesExclude:Array<String> = [];
@@ -32,11 +32,11 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 	public var modchartCameras:Map<String, FlxCamera> = new Map<String, FlxCamera>();
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public var luaArray:Array<FunkinLua> = [];
 	#end
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	private var luaDebugCam:FlxCamera;
 	private var currentClassName:String;
@@ -51,6 +51,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return Controls.instance;
 	}
 
+	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
 	public var touchPadCam:FlxCamera;
 	public var luaTouchPad:TouchPad;
@@ -254,14 +255,17 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		}
 		return false;
 	}
+	#end
 
 	override function destroy()
 	{
+		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		removeLuaTouchPad();
 		removeMobileControls();
+		#end
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		for (lua in luaArray)
 		{
 			lua.call('onDestroy', []);
@@ -271,7 +275,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		FunkinLua.customFunctions.clear();
 		#end
 
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		for (script in hscriptArray)
 			if (script != null)
 			{
@@ -291,7 +295,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	public function new()
 	{
 		stateInstance = this;
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this))).replace('states.', '').replace('.', '/');
 		#end
 		callOnScripts('onNew');
@@ -302,14 +306,14 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	override function create()
 	{
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		Mods.updatedOnState = false;
 		#end
 
 		if (!_psychCameraInitialized)
 			initPsychCamera();
 
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
 		luaDebugCam = new FlxCamera();
 		luaDebugCam.bgColor.alpha = 0;
@@ -318,10 +322,10 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		add(luaDebugGroup);
 		#end
 
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		startLuasNamed('statescripts/' + currentClassName + '.lua');
 		#end
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		startHScriptsNamed('statescripts/' + currentClassName);
 		#end
 
@@ -563,7 +567,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return val == null ? 4 : val;
 	}
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	public function addTextToDebug(text:String, color:FlxColor)
 	{
 		if (luaDebugGroup == null)
@@ -591,7 +595,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
 			return modchartSprites.get(tag);
 		if (text && modchartTexts.exists(tag))
@@ -602,11 +606,11 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return null;
 	}
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public function startLuasNamed(luaFile:String)
 	{
 		var luaToLoad:String = '';
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		luaToLoad = Paths.modFolders(luaFile);
 		if (!FileSystem.exists(luaToLoad))
 		#end
@@ -625,7 +629,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	}
 	#end
 
-	#if HSCRIPT_ALLOWED
+	#if FEATURE_HSCRIPT
 	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool)
 	{
 		function doFile(file:String):Bool
@@ -636,12 +640,15 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			if (doFileMethod != null)
 				return doFileMethod(scriptFile);
 
-			var scriptToLoad:String = '';
-			#if MODS_ALLOWED
-			scriptToLoad = Paths.modFolders(file);
+			var scriptToLoad:String = file;
 			if (!FileSystem.exists(scriptToLoad))
-			#end
-			scriptToLoad = Paths.getSharedPath(file);
+			{
+				#if FEATURE_MODS
+				scriptToLoad = Paths.modFolders(file);
+				if (!FileSystem.exists(scriptToLoad))
+				#end
+					scriptToLoad = Paths.getSharedPath(file);
+			}
 
 			if (FileSystem.exists(scriptToLoad))
 			{
@@ -744,7 +751,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (args == null)
 			args = [];
 		if (exclusions == null)
@@ -792,7 +799,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;
 
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		if (exclusions == null)
 			exclusions = new Array();
 		if (excludeValues == null)
@@ -854,7 +861,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if LUA_ALLOWED
+		#if FEATURE_LUA
 		if (exclusions == null)
 			exclusions = [];
 		for (script in luaArray)
@@ -869,7 +876,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if HSCRIPT_ALLOWED
+		#if FEATURE_HSCRIPT
 		if (exclusions == null)
 			exclusions = [];
 		for (script in hscriptArray)

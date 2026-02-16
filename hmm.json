@@ -3,93 +3,73 @@
     {
       "name": "lime",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/lime"
+      "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "dir": null,
-      "ref": "5399946b68fd98f345d6b3e52b95ed6b78bf427c",
+      "ref": "08c14760bbcce4e2ac7f9e5e87965901a592745f",
       "url": "https://github.com/FunkinCrew/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/flixel"
+      "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/flixel-addons"
+      "url": "https://github.com/ShadowEngineTeam/flixel-addons"
     },
     {
       "name": "hxcpp",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/hxcpp"
+      "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/SScript"
+      "url": "https://github.com/ShadowEngineTeam/SScript"
     },
     {
       "name": "hxdiscord_rpc",
       "type": "git",
-      "dir": null,
       "ref": "2ca5930e9647c5de8c220f98427b5c50ddd244dd",
       "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
       "name": "hxluajit",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/hxluajit"
+      "url": "https://github.com/ShadowEngineTeam/hxluajit"
     },
     {
       "name": "hxgamemode",
       "type": "git",
-      "dir": null,
       "ref": "faf17c6522bf85f7be4ce38376a8c41812a3c9bf",
       "url": "https://github.com/MAJigsaw77/hxgamemode"
     },
     {
       "name": "format",
       "type": "git",
-      "dir": null,
       "ref": "9d69fb342d030fa120d2deafafbbffad248332b8",
       "url": "https://github.com/HaxeFoundation/format"
     },
     {
       "name": "hxp",
       "type": "git",
-      "dir": null,
       "ref": "47ef5ae6569cb0961761a2fbb416694df067124c",
       "url": "https://github.com/openfl/hxp"
     },
     {
       "name": "hxvlc",
       "type": "git",
-      "dir": null,
-      "ref": null,
-      "url": "https://github.com/FNF-SE/hxvlc"
+      "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
-	{
+    {
       "name": "flixel-animate",
       "type": "git",
-      "dir": null,
-      "ref": "a31d1aaa73cf9397f9c70e5747c623ab86c8d419",
+      "ref": "c5e3393c70b71a191f20fa902114cea92042e486",
       "url": "https://github.com/MaybeMaru/flixel-animate"
-	}
+    }
   ]
 }

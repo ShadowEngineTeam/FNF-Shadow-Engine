@@ -1,6 +1,7 @@
 package mobile.objects;
 
-// I wanted to delete this but i have no idea how i coded MobileControlSelectSubState so idk how to implement IMobileControls into it... yet...
+#if FEATURE_MOBILE_CONTROLS
+// I wanted to delete this but I have no idea how I coded MobileControlSelectSubState so idk how to implement IMobileControls into it... yet... - Karim Akra
 
 /**
  * ...
@@ -73,3 +74,4 @@ class MobileControls extends FlxTypedSpriteGroup<MobileInputManager>
 		MobileData.forcedMode = null;
 	}
 }
+#end

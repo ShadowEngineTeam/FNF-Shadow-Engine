@@ -1,11 +1,12 @@
 package objects;
 
+import shaders.ColorSwap;
 import shaders.RGBPalette;
 import shaders.PixelSplashShader.PixelSplashShaderRef;
 
 class SustainSplash extends FlxSprite
 {
-	public static var DEFAULT_TEXTURE:String = 'holdCover';
+	public static var DEFAULT_TEXTURE(get, never):String;
 
 	public static var startCrochet:Float;
 	public static var frameRate:Int;
@@ -13,12 +14,17 @@ class SustainSplash extends FlxSprite
 	@:isVar
 	public static var texture(get, set):String = null;
 	public static var useRGBShader:Bool = true;
+	public static var forcePixelStage:Bool = false;
 	public static var noRGBTextures(default, null):Array<String> = [];
+
+	public static var playerTexture:String = null;
+	public static var opponentTexture:String = null;
 
 	public var strumNote(default, set):StrumNote;
 	public var noteData(default, null):Int;
 	public var targetStrumTime(default, null):Float;
 	public var mustPress(default, null):Bool = true;
+	public var colorSwap:ColorSwap;
 	public var rgbShaders(default, null):Array<Array<PixelSplashShaderRef>> = [[], []];
 
 	private var curTexture:String = null;
@@ -31,15 +37,20 @@ class SustainSplash extends FlxSprite
 		SustainSplash.frameRate = frameRate;
 		SustainSplash.mainGroup = group;
 
-		final textures:Array<String> = [texture];
-		if (!useRGBShader)
+		final textures:Array<String> = [];
+		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
-			textures.pop();
 			textures.push('${texture}Purple');
 			textures.push('${texture}Blue');
 			textures.push('${texture}Green');
 			textures.push('${texture}Red');
 		}
+		else
+			textures.push(texture);
+
+		if (PlayState.isPixelStage || forcePixelStage)
+			for (i in 0...textures.length)
+				textures[i] = 'pixelUI/' + textures[i];
 
 		for (img in textures)
 			Paths.getSparrowAtlas(img);
@@ -112,7 +123,7 @@ class SustainSplash extends FlxSprite
 
 		initRGBShader();
 
-		reloadSustainSplash(getTextureNameFromData(noteData));
+		reloadSustainSplash(getTextureNameFromData(noteData, mustPress));
 	}
 
 	public function reloadSustainSplash(texture:String, force:Bool = false):Void
@@ -134,6 +145,9 @@ class SustainSplash extends FlxSprite
 		// SHADOW TODO: This breaks offsets need to figure it out later
 		// flipY = ClientPrefs.data.downScroll;
 
+		if (PlayState.isPixelStage || forcePixelStage)
+			texture = 'pixelUI/' + texture;
+
 		frames = Paths.getSparrowAtlas(texture);
 		animation.finishCallback = (name:String) ->
 		{
@@ -150,63 +164,101 @@ class SustainSplash extends FlxSprite
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);
 		animation.play('start', true, false, 0);
 
-		antialiasing = PlayState.isPixelStage ? false : ClientPrefs.data.antialiasing;
-		offset.set(PlayState.isPixelStage ? 112.5 : 106.25, 100);
+		if (PlayState.isPixelStage || forcePixelStage)
+		{
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom / 2.5));
+			updateHitbox();
+		}
+
+		antialiasing = PlayState.isPixelStage || forcePixelStage ? false : ClientPrefs.data.antialiasing;
+		offset.set(PlayState.isPixelStage || forcePixelStage ? -46 : 106.25, PlayState.isPixelStage || forcePixelStage ? -40 : 100);
 	}
 
 	private function initRGBShader():Void
 	{
 		if (strumNote != null)
 		{
-			if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)
+			if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
 				useRGBShader = false;
 
 			var shaderID:Int = mustPress ? 0 : 1;
 
-			if (rgbShaders[shaderID][noteData] == null)
+			if (ClientPrefs.data.disableRGBNotes)
 			{
-				var rgbShader = new PixelSplashShaderRef();
-				rgbShaders[shaderID][noteData] = rgbShader;
+				if (colorSwap == null)
+					colorSwap = new ColorSwap();
+				shader = colorSwap.shader;
+				if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+				{
+					colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+					colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+					colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+				}
 			}
+			else
+			{
+				if (rgbShaders[shaderID][noteData] == null)
+				{
+					rgbShader = new PixelSplashShaderRef();
+					rgbShaders[shaderID][noteData] = rgbShader;
+				}
 
-			if (rgbShader != null)
-				rgbShader.shader.mult.value[0] = 0.0;
+				if (rgbShader != null)
+					rgbShader.shader.mult.value[0] = 0.0;
 
-			rgbShader = rgbShaders[shaderID][noteData];
-			this.shader = rgbShader.shader;
-			rgbShader.copyValues(useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null);
+				rgbShader = rgbShaders[shaderID][noteData];
+				shader = rgbShader.shader;
+				rgbShader.copyValues(useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null);
+			}
 		}
 	}
 
 	private function precacheSustainSplash():Void
 	{
-		final textures:Array<String> = [texture];
-		if (!useRGBShader)
+		final textures:Array<String> = [];
+		var texToUse:String = texture;
+		if (mustPress && playerTexture != null)
+			texToUse = playerTexture;
+		else if (!mustPress && opponentTexture != null)
+			texToUse = opponentTexture;
+
+		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
-			textures.pop();
-			textures.push('${texture}Purple');
-			textures.push('${texture}Blue');
-			textures.push('${texture}Green');
-			textures.push('${texture}Red');
+			textures.push('${texToUse}Purple');
+			textures.push('${texToUse}Blue');
+			textures.push('${texToUse}Green');
+			textures.push('${texToUse}Red');
 		}
+		else
+			textures.push(texToUse);
+
+		if (PlayState.isPixelStage || forcePixelStage)
+			for (i in 0...textures.length)
+				textures[i] = 'pixelUI/' + textures[i];
 
 		for (img in textures)
 			Paths.getSparrowAtlas(img);
 	}
 
-	private static function getTextureNameFromData(noteData:Int):String
+	private static function getTextureNameFromData(noteData:Int, mustPress:Bool):String
 	{
-		if (useRGBShader)
-			return texture;
-		else
+		var tex:String = mustPress ? playerTexture : opponentTexture;
+		if (tex == null)
+			tex = texture;
+
+		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
+		{
 			return switch (noteData)
 			{
-				case 0: '${texture}Purple';
-				case 1: '${texture}Blue';
-				case 2: '${texture}Green';
-				case 3: '${texture}Red';
-				default: texture;
+				case 0: '${tex}Purple';
+				case 1: '${tex}Blue';
+				case 2: '${tex}Green';
+				case 3: '${tex}Red';
+				default: tex;
 			}
+		}
+		else
+			return tex;
 	}
 
 	override function update(elapsed:Float)
@@ -247,11 +299,6 @@ class SustainSplash extends FlxSprite
 	{
 		super.kill();
 
-		for (arr in rgbShaders)
-			for (shader in arr)
-				if (shader != null)
-					shader.shader.mult.value[0] = 0.0;
-
 		noteData = -1;
 		targetStrumTime = 0;
 		strumNote = null;
@@ -274,7 +321,7 @@ class SustainSplash extends FlxSprite
 
 		for (splash in SustainSplash.mainGroup.members)
 			if (splash.exists && splash.alive)
-				splash.reloadSustainSplash(getTextureNameFromData(splash.noteData), true);
+				splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
 
 		return value;
 	}
@@ -298,4 +345,7 @@ class SustainSplash extends FlxSprite
 	@:noCompletion
 	override function set_angle(value:Float):Float
 		return value;
+
+	public static function get_DEFAULT_TEXTURE():String
+		return 'holdCovers/holdCover';
 }

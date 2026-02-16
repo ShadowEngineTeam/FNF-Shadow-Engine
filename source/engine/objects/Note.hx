@@ -1,5 +1,6 @@
 package objects;
 
+import shaders.ColorSwap;
 import backend.NoteTypesConfig;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
@@ -67,6 +68,7 @@ class Note extends FlxSkewedSprite
 	public var eventVal1:String = '';
 	public var eventVal2:String = '';
 
+	public var colorSwap:ColorSwap;
 	public var rgbShader:RGBShaderReference;
 
 	public static var globalRgbShaders:Array<RGBPalette> = [];
@@ -79,17 +81,21 @@ class Note extends FlxSkewedSprite
 	public var lateHitMult:Float = 1;
 	public var lowPriority:Bool = false;
 
+	public var noteSplashHue:Float = 0;
+	public var noteSplashSaturation:Float = 0;
+	public var noteSplashBrightness:Float = 0;
+
 	public static var SUSTAIN_SIZE:Int = 44;
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
-	public static var defaultNoteSkin(default, never):String = 'noteSkins/NOTE_assets';
+	public static var defaultNoteSkin(get, never):String;
 
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
 		texture: null,
 		antialiasing: !PlayState.isPixelStage,
 		useGlobalShader: false,
-		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteRGB == true) : true,
+		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteCustomColor == true) : true,
 		r: -1,
 		g: -1,
 		b: -1,
@@ -168,7 +174,15 @@ class Note extends FlxSkewedSprite
 	private function set_noteType(value:String):String
 	{
 		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
-		defaultRGB();
+		if (ClientPrefs.data.disableRGBNotes)
+			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+			{
+				colorSwap.hue = noteSplashHue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+				colorSwap.saturation = noteSplashSaturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+				colorSwap.brightness = noteSplashBrightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+			}
+		else
+			defaultRGB();
 
 		if (noteData > -1 && noteType != value)
 		{
@@ -176,19 +190,29 @@ class Note extends FlxSkewedSprite
 			{
 				case 'Hurt Note':
 					ignoreNote = mustPress;
-					// reloadNote('HURTNOTE_assets');
-					// this used to change the note texture to HURTNOTE_assets.png,
-					// but i've changed it to something more optimized with the implementation of RGBPalette:
 
-					// note colors
-					rgbShader.r = 0xFF101010;
-					rgbShader.g = 0xFFFF0000;
-					rgbShader.b = 0xFF990022;
+					if (ClientPrefs.data.disableRGBNotes)
+					{
+						reloadNote('HURTNOTE_assets');
+						// note and splash data colors
+						colorSwap.hue = noteSplashHue = 0;
+						colorSwap.saturation = noteSplashSaturation = 0;
+						colorSwap.brightness = noteSplashBrightness = 0;
 
-					// splash data and colors
-					noteSplashData.r = 0xFFFF0000;
-					noteSplashData.g = 0xFF101010;
-					noteSplashData.texture = 'noteSplashes/noteSplashes-electric';
+						noteSplashData.texture = 'HURTnoteSplashes';
+					}
+					else
+					{
+						// note colors
+						rgbShader.r = 0xFF101010;
+						rgbShader.g = 0xFFFF0000;
+						rgbShader.b = 0xFF990022;
+
+						// splash data and colors
+						noteSplashData.r = 0xFFFF0000;
+						noteSplashData.g = 0xFF101010;
+						noteSplashData.texture = 'noteSplashes/noteSplashes-electric';
+					}
 
 					// gameplay data
 					lowPriority = true;
@@ -210,6 +234,7 @@ class Note extends FlxSkewedSprite
 				Paths.sound(hitsound); // precache new sound for being idiot-proof
 			noteType = value;
 		}
+
 		return value;
 	}
 
@@ -241,9 +266,17 @@ class Note extends FlxSkewedSprite
 		if (noteData > -1)
 		{
 			texture = '';
-			rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
-			if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)
-				rgbShader.enabled = false;
+			if (ClientPrefs.data.disableRGBNotes)
+			{
+				colorSwap = new ColorSwap();
+				shader = colorSwap.shader;
+			}
+			else
+			{
+				rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
+				if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
+					rgbShader.enabled = false;
+			}
 
 			x += swagWidth * (noteData);
 			if (!isSustainNote && noteData < colArray.length) // Doing this 'if' check to fix the warnings on Senpai songs
@@ -424,7 +457,7 @@ class Note extends FlxSkewedSprite
 	{
 		if (isSustainNote)
 		{
-			attemptToAddAnimationByPrefix('purpleholdend', 'pruple end hold', 24, true); // this fixes some retarded typo from the original note .FLA
+			attemptToAddAnimationByPrefix('purpleholdend', 'pruple end hold', 24, true); // this fixes some restarted typo from the original note fla
 			animation.addByPrefix(colArray[noteData] + 'holdend', colArray[noteData] + ' hold end', 24, true);
 			animation.addByPrefix(colArray[noteData] + 'hold', colArray[noteData] + ' hold piece', 24, true);
 		}
@@ -561,4 +594,7 @@ class Note extends FlxSkewedSprite
 
 		return rect;
 	}
+
+	private static function get_defaultNoteSkin():String
+		return !ClientPrefs.data.disableRGBNotes ? 'noteSkins/NOTE_assets' : 'NOTE_assets';
 }

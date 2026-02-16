@@ -42,7 +42,7 @@ class NoteOffsetState extends MusicBeatState
 
 	override public function create()
 	{
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Delay/Combo Offset Menu", null);
 		#end
 
@@ -184,8 +184,10 @@ class NoteOffsetState extends MusicBeatState
 		});
 		#end
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_C");
 		addTouchPadCamera(false);
+		#end
 
 		super.create();
 	}
@@ -370,7 +372,7 @@ class NoteOffsetState extends MusicBeatState
 				}
 			}
 
-			if (controls.RESET || touchPad.buttonC.justPressed)
+			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				for (i in 0...ClientPrefs.data.comboOffset.length)
 				{
@@ -410,7 +412,7 @@ class NoteOffsetState extends MusicBeatState
 				updateNoteDelay();
 			}
 
-			if (controls.RESET || touchPad.buttonC.justPressed)
+			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				holdTime = 0;
 				barPercent = 0;

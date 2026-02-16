@@ -107,7 +107,7 @@ class Main extends Sprite
 		if (game.zoom == -1.0)
 			game.zoom = 1.0;
 
-		#if VIDEOS_ALLOWED
+		#if FEATURE_VIDEOS
 		hxvlc.util.Handle.init();
 		#end
 
@@ -143,7 +143,7 @@ class Main extends Sprite
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, hotReload);
 		#end
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.prepare();
 		#end
 

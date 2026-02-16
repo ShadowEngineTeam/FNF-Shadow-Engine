@@ -94,10 +94,10 @@ class WeekData
 	{
 		weeksList = [];
 		weeksLoaded.clear();
-		var directories:Array<String> = [#if MODS_ALLOWED Paths.mods(), #end Paths.getSharedPath()];
+		var directories:Array<String> = [#if FEATURE_MODS Paths.mods(), #end Paths.getSharedPath()];
 		var originalLength:Int = directories.length;
 
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		for (mod in Mods.parseList().enabled)
 			directories.push(Paths.mods(mod + '/'));
 		#end
@@ -115,7 +115,7 @@ class WeekData
 					{
 						var weekFile:WeekData = new WeekData(week, sexList[i]);
 
-						#if MODS_ALLOWED
+						#if FEATURE_MODS
 						if (j >= originalLength)
 							weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length - 1);
 						#end
@@ -191,7 +191,7 @@ class WeekData
 				var weekFile:WeekData = new WeekData(week, weekToCheck);
 				if (i >= originalLength)
 				{
-					#if MODS_ALLOWED
+					#if FEATURE_MODS
 					weekFile.folder = directory.substring(Paths.mods().length, directory.length - 1);
 					#end
 				}

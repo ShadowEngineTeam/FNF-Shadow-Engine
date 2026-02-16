@@ -35,7 +35,7 @@ class ResultsScreen extends MusicBeatSubstate
 
 	override function create()
 	{
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Results", null);
 		#end
@@ -80,7 +80,7 @@ class ResultsScreen extends MusicBeatSubstate
 		if (PlayState.instance.cpuControlled)
 			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nHighest Combo: ${PlayState.instance.maxCombo}\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
 		else
-			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.instance.songMisses)}\nHighest Combo: ${PlayState.instance.maxCombo}\nScore: ${PlayState.instance.songScore}\nAccuracy: ${CoolUtil.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
+			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.instance.songMisses)}\nHighest Combo: ${PlayState.instance.maxCombo}\nScore: ${FlxStringUtil.formatMoney(PlayState.instance.songScore, false)}\nAccuracy: ${CoolUtil.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
 
 		comboText = new FlxText(20, -75, 0, comboTxt);
 		comboText.setFormat(Paths.font("Comfortaa-Bold.ttf"), 28, FlxColor.WHITE);
@@ -164,8 +164,10 @@ class ResultsScreen extends MusicBeatSubstate
 		{
 			obj.cameras = [fuckingCamera];
 		});
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
 		addTouchPadCamera(false);
+		#end
 		super.create();
 	}
 
@@ -183,7 +185,7 @@ class ResultsScreen extends MusicBeatSubstate
 			PlayState.instance.endCallback();
 		}
 
-		if (touchPad.buttonB.justPressed || controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end controls.RESET)
 		{
 			PlayState.instance.paused = true; // For lua
 			FlxG.sound.music.volume = 0;

@@ -38,7 +38,7 @@ class NoteSplashDebugState extends MusicBeatState
 	var UI_settingsPanel:ShadowPanel;
 	var camOther:FlxCamera;
 
-	public static final defaultTexture:String = 'noteSplashes';
+	public static var defaultTexture:String = 'noteSplashes/noteSplashes';
 
 	override function create()
 	{
@@ -53,6 +53,9 @@ class NoteSplashDebugState extends MusicBeatState
 		selection = new FlxSprite(0, 270).makeGraphic(150, 150, FlxColor.BLACK);
 		selection.alpha = 0.4;
 		add(selection);
+
+		if (ClientPrefs.data.disableRGBNotes)
+			defaultTexture = 'noteSplashes';
 
 		notes = new FlxTypedGroup<StrumNote>();
 		add(notes);
@@ -71,7 +74,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 			var splash:FlxSprite = new FlxSprite(x, y);
 			splash.setPosition(splash.x - Note.swagWidth * 0.95, splash.y - Note.swagWidth);
-			splash.shader = note.rgbShader.parent.shader;
+			splash.shader = ClientPrefs.data.disableRGBNotes ? note.colorSwap.shader : note.rgbShader.parent.shader;
 			splash.antialiasing = ClientPrefs.data.antialiasing;
 			splashes.add(splash);
 		}
@@ -96,9 +99,9 @@ class NoteSplashDebugState extends MusicBeatState
 		imageInputText = new ShadowTextInput(innerX, innerY + 22, 360, defaultTexture);
 		imageInputText.input.callback = function(text:String, action:String)
 		{
-			if (action == ShadowInputText.ENTER_ACTION)
-			{
-				imageInputText.setFocus(false);
+			/*if (action == ShadowInputText.ENTER_ACTION)
+			{*/
+				//imageInputText.setFocus(false);
 				textureName = text;
 				try
 				{
@@ -114,7 +117,7 @@ class NoteSplashDebugState extends MusicBeatState
 					missingText.screenCenter(Y);
 					missingText.visible = true;
 					missingTextBG.visible = true;
-					FlxG.sound.play(Paths.sound('cancelMenu'));
+					//FlxG.sound.play(Paths.sound('cancelMenu'));
 
 					new FlxTimer().start(2.5, function(tmr:FlxTimer)
 					{
@@ -122,11 +125,11 @@ class NoteSplashDebugState extends MusicBeatState
 						missingTextBG.visible = false;
 					});
 				}
-			}
+			/*}
 			else
 			{
 				trace('changed image to $text');
-			}
+			}*/
 		};
 		UI_settingsPanel.add(imageInputText);
 
@@ -214,7 +217,9 @@ class NoteSplashDebugState extends MusicBeatState
 		loadFrames();
 		changeSelection();
 		super.create();
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NOTE_SPLASH_DEBUG", "NOTE_SPLASH_DEBUG");
+		#end
 		FlxG.mouse.visible = true;
 	}
 
@@ -228,7 +233,7 @@ class NoteSplashDebugState extends MusicBeatState
 		{
 			ClientPrefs.toggleVolumeKeys(false);
 			FlxG.mouse.enabled = false;
-			if (touchPad.buttonF.justPressed || (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
+			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonF.justPressed || #end (FlxG.keys.justPressed.F1 || FlxG.keys.justPressed.ESCAPE))
 			{
 				UI_help.visible = false;
 				UI_helpOverlay.visible = false;
@@ -263,9 +268,9 @@ class NoteSplashDebugState extends MusicBeatState
 		if (!notTyping)
 			return;
 
-		if (FlxG.keys.justPressed.A || touchPad.buttonUp.justPressed)
+		if (FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end)
 			changeSelection(-1);
-		else if (FlxG.keys.justPressed.D || touchPad.buttonDown.justPressed)
+		else if (FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end)
 			changeSelection(1);
 
 		if (maxAnims < 1)
@@ -275,17 +280,17 @@ class NoteSplashDebugState extends MusicBeatState
 		{
 			var movex:Int = 0;
 			var movey:Int = 0;
-			if (FlxG.keys.justPressed.LEFT || touchPad.buttonLeft2.justPressed)
+			if (FlxG.keys.justPressed.LEFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft2.justPressed #end)
 				movex = -1;
-			else if (FlxG.keys.justPressed.RIGHT || touchPad.buttonRight2.justPressed)
+			else if (FlxG.keys.justPressed.RIGHT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight2.justPressed #end)
 				movex = 1;
 
-			if (FlxG.keys.justPressed.UP || touchPad.buttonUp2.justPressed)
+			if (FlxG.keys.justPressed.UP #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp2.justPressed #end)
 				movey = 1;
-			else if (FlxG.keys.justPressed.DOWN || touchPad.buttonDown2.justPressed)
+			else if (FlxG.keys.justPressed.DOWN #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown2.justPressed #end)
 				movey = -1;
 
-			if (FlxG.keys.pressed.SHIFT || touchPad.buttonZ.pressed)
+			if (FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end)
 			{
 				movex *= 10;
 				movey *= 10;
@@ -302,7 +307,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (FlxG.keys.pressed.CONTROL || idk)
 		{
-			if (FlxG.keys.justPressed.C || touchPad.buttonC.justPressed)
+			if (FlxG.keys.justPressed.C #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				var arr:Array<Float> = selectedArray();
 				if (copiedArray == null)
@@ -310,7 +315,7 @@ class NoteSplashDebugState extends MusicBeatState
 				copiedArray[0] = arr[0];
 				copiedArray[1] = arr[1];
 			}
-			else if ((FlxG.keys.justPressed.V || touchPad.buttonV.justPressed))
+			else if ((FlxG.keys.justPressed.V #if FEATURE_MOBILE_CONTROLS || touchPad.buttonV.justPressed #end))
 			{
 				if (copiedArray != null)
 				{
@@ -331,7 +336,7 @@ class NoteSplashDebugState extends MusicBeatState
 				savedText.visible = false;
 		}
 
-		if (FlxG.keys.justPressed.ENTER || touchPad.buttonA.justPressed)
+		if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 		{
 			if (controls.mobileC)
 			{
@@ -357,18 +362,18 @@ class NoteSplashDebugState extends MusicBeatState
 		}
 
 		// Reset anim & change anim
-		if (FlxG.keys.justPressed.SPACE || touchPad.buttonY.justPressed)
+		if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			changeAnim();
-		else if (FlxG.keys.justPressed.S || touchPad.buttonLeft.justPressed)
+		else if (FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end)
 			changeAnim(-1);
-		else if (FlxG.keys.justPressed.W || touchPad.buttonRight.justPressed)
+		else if (FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end)
 			changeAnim(1);
 
 		// Force frame
 		var updatedFrame:Bool = false;
-		if (updatedFrame = FlxG.keys.justPressed.Q || touchPad.buttonX.justPressed)
+		if (updatedFrame = FlxG.keys.justPressed.Q #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			forceFrame--;
-		else if (updatedFrame = FlxG.keys.justPressed.E || touchPad.buttonE.justPressed)
+		else if (updatedFrame = FlxG.keys.justPressed.E #if FEATURE_MOBILE_CONTROLS || touchPad.buttonE.justPressed #end)
 			forceFrame++;
 
 		if (updatedFrame)
@@ -400,17 +405,14 @@ class NoteSplashDebugState extends MusicBeatState
 
 	function loadFrames()
 	{
-		texturePath = 'noteSplashes/' + textureName;
-		if (!Paths.fileExists('images/' + texturePath + '.${Paths.IMAGE_EXT}', IMAGE) && !Paths.fileExists('images/' + texturePath + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
-			texturePath = textureName;
 		splashes.forEachAlive(function(spr:FlxSprite)
 		{
-			spr.frames = Paths.getSparrowAtlas(texturePath);
+			spr.frames = Paths.getSparrowAtlas(textureName);
 		});
 
 		// Initialize config
 		NoteSplash.configs.clear();
-		config = NoteSplash.precacheConfig(texturePath);
+		config = NoteSplash.precacheConfig(textureName);
 		if (config == null)
 			config = NoteSplash.precacheConfig(NoteSplash.defaultNoteSplash);
 		nameInputText.text = config.anim;
@@ -435,7 +437,7 @@ class NoteSplashDebugState extends MusicBeatState
 		for (offGroup in config.offsets)
 			strToSave += '\n' + offGroup[0] + ' ' + offGroup[1];
 
-		var pathSplit:Array<String> = (Paths.getPath('images/$texturePath.png', IMAGE, true).split('.png')[0]).split(':');
+		var pathSplit:Array<String> = (Paths.getPath('images/$textureName.png', IMAGE, true).split('.png')[0]).split(':');
 		var path:String = pathSplit[pathSplit.length - 1].trim() + '.txt';
 		var assetsDir:String = '';
 		savedText.text = 'Saved to: $path';

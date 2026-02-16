@@ -7,7 +7,7 @@ class CustomSubstate extends MusicBeatSubstate
 	public static var name:String = 'unnamed';
 	public static var instance:CustomSubstate;
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public static function implement(funk:FunkinLua)
 	{
 		var lua = funk.lua;
@@ -53,7 +53,7 @@ class CustomSubstate extends MusicBeatSubstate
 		if (instance != null)
 		{
 			var tagObject:FlxObject = cast(FunkinLua.getCurrentMusicState().variables.get(tag), FlxObject);
-			#if LUA_ALLOWED
+			#if FEATURE_LUA
 			if (tagObject == null)
 				tagObject = cast(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), FlxObject);
 			#end
@@ -70,6 +70,7 @@ class CustomSubstate extends MusicBeatSubstate
 		return false;
 	}
 
+	#if FEATURE_MOBILE_CONTROLS
 	public static function insertLuaTpad(?pos:Int = -1)
 	{
 		if (instance != null)
@@ -87,6 +88,7 @@ class CustomSubstate extends MusicBeatSubstate
 		}
 		return false;
 	}
+	#end
 
 	override function create()
 	{

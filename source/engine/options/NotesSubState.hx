@@ -53,7 +53,7 @@ class NotesSubState extends MusicBeatSubstate
 
 		super();
 
-		#if DISCORD_ALLOWED
+		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Note Colors Menu", null);
 		#end
 
@@ -196,10 +196,12 @@ class NotesSubState extends MusicBeatSubstate
 		controllerPointer.visible = controls.controllerMode;
 		_lastControllerMode = controls.controllerMode;
 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "B_C");
 		touchPad.buttonB.x = FlxG.width - 132;
 		touchPad.buttonC.x = 0;
 		touchPad.buttonC.y = FlxG.height - 135;
+		#end
 	}
 
 	function updateTip()
@@ -546,7 +548,7 @@ class NotesSubState extends MusicBeatSubstate
 				}
 			}
 		}
-		else if (touchPad.buttonC.justPressed || controls.RESET && hexTypeNum < 0)
+		else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET && hexTypeNum < 0)
 		{
 			if (FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER))
 			{

@@ -1,9 +1,0 @@
-bf
-bf-dead
-gf
-bf-pixel
-bf-pixel-dead
-gf-pixel
-bf-pixel-opponent
-pico
-pico-player

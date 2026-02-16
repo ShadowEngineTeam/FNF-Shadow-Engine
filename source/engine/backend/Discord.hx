@@ -1,6 +1,6 @@
 package backend;
 
-#if DISCORD_ALLOWED
+#if FEATURE_DISCORD_RPC
 import Sys.sleep;
 import lime.app.Application;
 import hxdiscord_rpc.Discord;
@@ -131,7 +131,7 @@ class DiscordClient
 		return newID;
 	}
 
-	#if (MODS_ALLOWED && DISCORD_ALLOWED)
+	#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 	public static function loadModRPC()
 	{
 		var pack:Dynamic = Mods.getPack();
@@ -143,7 +143,7 @@ class DiscordClient
 	}
 	#end
 
-	#if LUA_ALLOWED
+	#if FEATURE_LUA
 	public static function addLuaCallbacks(funk:psychlua.FunkinLua)
 	{
 		funk.set("changeDiscordPresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float)

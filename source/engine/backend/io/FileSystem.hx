@@ -43,7 +43,7 @@ class FileSystem
 
 	public static function exists(path:String):Bool
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -72,7 +72,7 @@ class FileSystem
 
 	public static function rename(path:String, newPath:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -89,7 +89,7 @@ class FileSystem
 
 	public static function stat(path:String):Null<FileStat>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -111,7 +111,7 @@ class FileSystem
 
 	public static function fullPath(path:String):String
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -128,7 +128,7 @@ class FileSystem
 
 	public static function absolutePath(path:String):String
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -145,7 +145,7 @@ class FileSystem
 
 	public static function isDirectory(path:String):Bool
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -174,7 +174,7 @@ class FileSystem
 
 	public static function createDirectory(path:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		if (!SysFileSystem.exists(cwd(path)))
 			SysFileSystem.createDirectory(cwd(path));
 		#end
@@ -182,7 +182,7 @@ class FileSystem
 
 	public static function deleteFile(path:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -199,7 +199,7 @@ class FileSystem
 
 	public static function deleteDirectory(path:String):Void
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -216,7 +216,7 @@ class FileSystem
 
 	public static function readDirectory(path:String):Array<String>
 	{
-		#if MODS_ALLOWED
+		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
@@ -273,7 +273,7 @@ class FileSystem
 	}
 	#end
 
-	#if (linux && MODS_ALLOWED)
+	#if (linux && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
 	{
 		if (SysFileSystem.exists(path))

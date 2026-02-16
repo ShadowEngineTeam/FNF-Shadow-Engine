@@ -1,5 +1,6 @@
 package mobile.input;
 
+#if FEATURE_MOBILE_CONTROLS
 import flixel.system.macros.FlxMacroUtil;
 
 /**
@@ -78,3 +79,4 @@ enum abstract MobileInputID(Int) from Int to Int
 		return toStringMap.get(this);
 	}
 }
+#end
