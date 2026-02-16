@@ -259,7 +259,7 @@ class Paths
 				return currentTrackedAssets.get(file);
 			}
 			else if (FileSystem.exists(file))
-				bitmap = getBitmapData(file);
+				bitmap = getBitmapDataFromFile(file);
 
 			if (bitmap == null)
 			{
@@ -269,9 +269,9 @@ class Paths
 					localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
-				else if (Assets.exists(file, getImageAssetType(IMAGE_EXT)))
+				else if (FileSystem.exists(file))
 				{
-					bitmap = Assets.getBitmapData(file);
+					bitmap = getBitmapDataFromFile(file);
 				}
 			}
 		}
