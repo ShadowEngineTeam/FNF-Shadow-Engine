@@ -1,7 +1,5 @@
 package backend;
 
-import haxe.io.Path;
-import lime.media.AudioBuffer;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
