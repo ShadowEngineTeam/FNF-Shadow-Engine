@@ -5,6 +5,7 @@ package mobile.backend.io.android;
  * This class implements IO methods from the Android NDK's AAssetManager to read bundled app assets.
  */
 #if android
+import cpp.UInt8;
 import haxe.io.Bytes;
 import lime.system.JNI;
 import sys.FileStat;
@@ -336,7 +337,7 @@ class Assets
 
 	public static function getBytes(file:String):Bytes
 	{
-		final data:Array<cpp.UInt8> = __getBytes(file);
+		final data:Array<UInt8> = __getBytes(file);
 
 		if (data == null || data.length <= 0)
 			throw 'file_contents, $file';
@@ -386,7 +387,7 @@ class Assets
 
 	@:noCompletion
 	@:native('mobile::backend::io::android::Assets_obj::native_getBytes')
-	private static function __getBytes(file:String):Array<cpp.UInt8>
+	private static function __getBytes(file:String):Array<UInt8>
 		return null;
 
 	@:noCompletion
