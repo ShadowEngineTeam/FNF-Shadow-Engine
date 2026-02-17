@@ -218,6 +218,9 @@ class Project extends HXProject
 		FEATURE_DCE.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
 
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+			FEATURE_HSCRIPT.integrate(true);
+
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
 			setHaxedef("FLX_NO_DEBUG");
