@@ -37,23 +37,17 @@ import openfl.Lib;
 	{
 		super(context);
 		var gl = __context.gl;
-		var astcExtension = gl.getExtension("KHR_texture_compression_astc_hdr");
+		var astcExtension = gl.getExtension("KHR_texture_compression_astc_ldr");
 
 		if (astcExtension == null)
 		{
-			//trace("HDR is null");
-			astcExtension = gl.getExtension("KHR_texture_compression_astc_ldr");
-
-			if (astcExtension == null)
+			if (!__warned)
 			{
-				if (!__warned)
-				{
-					Lib.current.stage.window.alert("ASTC compression is not available on this device.", "Rendering Error!");
-					__warned = true;
-				}
-
-				supported = false;
+				Lib.current.stage.window.alert("ASTC compression is not available on this device.", "Rendering Error!");
+				__warned = true;
 			}
+
+			supported = false;
 		}
 
 		if (supported)
