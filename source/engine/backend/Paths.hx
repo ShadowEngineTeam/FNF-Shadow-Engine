@@ -303,11 +303,7 @@ class Paths
 			bitmap.disposeImage();
 			bitmap = BitmapData.fromTexture(texture);
 		}*/
-		var newGraphic:FlxGraphic;
-		if (bitmap.readable)
-			newGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
-		else
-			/* logic for GPU */
+		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
 		currentTrackedAssets.set(file, newGraphic);
