@@ -12,12 +12,12 @@ temp_premult = "temp_premult"
 def get_compressonator_path():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     exe_name = "compressonatorcli.exe" if os.name == "nt" else "compressonatorcli"
-	 compressonator_path = os.path.join(script_dir, "compressonatorcli", exe_name)
+    compressonator_path = os.path.join(script_dir, "compressonatorcli", exe_name)
     if not os.path.isfile(compressonator_path):
         print("Error: '{exe_name}' not found. Please install it from https://github.com/GPUOpen-Tools/compressonator/releases")
         sys.exit(1)
 
-    return exe_path
+    return compressonator_path
 
 def premultiply_alpha(input_path, output_path):
     img = Image.open(input_path).convert("RGBA")
@@ -31,7 +31,7 @@ def premultiply_alpha(input_path, output_path):
 
 def run_command(command):
     try:
-		if os.name != "nt":
+        if os.name != "nt":
             command = ["bash", "-c", " ".join(command)]
         subprocess.run(command, check=True)
     except subprocess.CalledProcessError as e:
