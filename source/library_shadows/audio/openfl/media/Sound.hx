@@ -361,6 +361,23 @@ class Sound extends EventDispatcher
 	}
 
 	/**
+		Creates a new Sound from a ByteArray containing compressed audio data (e.g., MP3).
+
+		@param	bytes	A ByteArray containing the audio data
+		@returns	A new Sound, or null if the data could not be loaded
+	**/
+	public static function fromBytes(bytes:ByteArray):Sound
+	{
+		#if lime
+		var sound = new Sound();
+		sound.__buffer = AudioBuffer.fromBytes(bytes);
+		return sound;
+		#else
+		return null;
+		#end
+	}
+
+	/**
 		Initiates loading of an external MP3 file from the specified URL. If you
 		provide a valid URLRequest object to the Sound constructor, the
 		constructor calls `Sound.load()` for you. You only need to call

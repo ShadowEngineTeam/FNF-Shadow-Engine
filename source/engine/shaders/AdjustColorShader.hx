@@ -12,7 +12,7 @@ class AdjustColorShader extends FlxRuntimeShader
 
 	public function new()
 	{
-		super(Assets.getText(Paths.getPath('shaders/adjustColor.frag', TEXT, null, false)));
+		super(File.getContent(Paths.getPath('shaders/adjustColor.frag', TEXT, null, false)));
 		hue = 0;
 		saturation = 0;
 		brightness = 0;
