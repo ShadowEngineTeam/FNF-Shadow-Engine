@@ -316,7 +316,7 @@ class Project extends HXProject
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
-		final textureFormats:Array<String> = ["ASTC", "S3TC", "PNG"];
+		final textureFormats:Array<String> = ["ASTC", "BPTC", "PNG"];
 		var hasFormat:Bool = false;
 
 		for (format in textureFormats)
