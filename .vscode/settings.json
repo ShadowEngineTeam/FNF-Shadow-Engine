@@ -12,9 +12,9 @@
   	"lime.projectFile": "project.hxp",
 	"lime.targetConfigurations": [
 		{
-			"label": "Windows (S3TC)",
+			"label": "Windows (BPTC)",
 			"target": "windows",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BPTC"]
 		},
 		{
 			"label": "Windows (ASTC)",
@@ -22,9 +22,9 @@
 			"args": ["-D", "ASTC"]
 		},
 		{
-			"label": "Linux (S3TC)",
+			"label": "Linux (BPTC)",
 			"target": "linux",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BPTC"]
 		},
 		{
 			"label": "Linux (ASTC)",
@@ -32,9 +32,9 @@
 			"args": ["-D", "ASTC"]
 		},
 		{
-			"label": "MacOS (S3TC)",
+			"label": "MacOS (BPTC)",
 			"target": "macos",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BPTC"]
 		},
 		{
 			"label": "MacOS (ASTC)",
@@ -77,5 +77,5 @@
 			"args": ["-D", "PNG"]
 		}
 	],
-	"lime.defaultTargetConfiguration": "Windows (S3TC)"
+	"lime.defaultTargetConfiguration": "Windows (BPTC)"
 }

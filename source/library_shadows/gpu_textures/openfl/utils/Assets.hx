@@ -144,7 +144,7 @@ class Assets
 				final texture = switch (ext)
 				{
 					case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(Assets.getBytes(textureName));
-					case 'dds': openfl.Lib.current.stage.context3D.createS3TCTexture(Assets.getBytes(textureName));
+					case 'dds': openfl.Lib.current.stage.context3D.createBPTCTexture(Assets.getBytes(textureName));
 					default: null;
 				}
 

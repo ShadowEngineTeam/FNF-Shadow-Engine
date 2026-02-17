@@ -16,7 +16,7 @@ import animate.FlxAnimateFrames;
 class Paths
 {
 	public static final IMAGE_EXT:String = "png";
-	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif S3TC "dds" #else IMAGE_EXT #end;
+	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BPTC "dds" #else IMAGE_EXT #end;
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
@@ -340,7 +340,7 @@ class Paths
 					var texture = switch (ext)
 					{
 						case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(bytes);
-						case 'dds': openfl.Lib.current.stage.context3D.createS3TCTexture(bytes);
+						case 'dds': openfl.Lib.current.stage.context3D.createBPTCTexture(bytes);
 						default: null;
 					};
 
