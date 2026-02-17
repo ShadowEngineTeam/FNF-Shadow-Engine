@@ -362,8 +362,8 @@ class Project extends HXProject
 			includeHaxelib("hxdiscord_rpc");
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 		{
-			includeHaxelib("funkin.vis");
-			includeHaxelib("grig.audio");
+			//includeHaxelib("funkin.vis");
+			//includeHaxelib("grig.audio");
 		}
 
 		if (isDebug() && isCPP())
