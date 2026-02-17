@@ -207,9 +207,6 @@ class Paths
 		if (!ignoreMods)
 		{
 			var modKey:String = key;
-			if (library == "songs")
-				modKey = 'songs/$key';
-
 			for (mod in Mods.getGlobalMods())
 				if (FileSystem.exists(mods('$mod/$modKey')))
 					return true;
@@ -291,13 +288,6 @@ class Paths
 		{
 			if (FileSystem.exists(file))
 				bitmap = getBitmapDataFromFile(file);
-			else
-			{
-				if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
-					bitmap = Assets.getBitmapData(file);
-				else if (Assets.exists(file, getImageAssetType(IMAGE_EXT)))
-					bitmap = Assets.getBitmapData(file);
-			}
 
 			if (bitmap == null)
 				return null;
@@ -313,7 +303,11 @@ class Paths
 			bitmap.disposeImage();
 			bitmap = BitmapData.fromTexture(texture);
 		}*/
-		var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
+		var newGraphic:FlxGraphic;
+		if (bitmap.readable)
+			newGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
+		else
+			/* logic for GPU */
 		newGraphic.persist = true;
 		newGraphic.destroyOnNoUse = false;
 		currentTrackedAssets.set(file, newGraphic);
@@ -372,10 +366,6 @@ class Paths
 		var sharedPath:String = getSharedPath(key);
 		if (FileSystem.exists(sharedPath))
 			return File.getContent(sharedPath);
-
-		var path:String = getPath(key, TEXT);
-		if (Assets.exists(path, TEXT))
-			return Assets.getText(path);
 
 		return null;
 	}
@@ -437,8 +427,8 @@ class Paths
 		{
 			var retKey:String = (path != null) ? '$path/$key' : key;
 			retKey = getPath('$retKey.ogg', SOUND, library);
-			if (Assets.exists(retKey, SOUND))
-				currentTrackedSounds.set(gottenPath, Assets.getSound(retKey));
+			if (FileSystem.exists(retKey))
+				currentTrackedSounds.set(gottenPath, Sound.fromBytes(File.getBytes(retKey)));
 		}
 
 		localTrackedAssets.push(gottenPath);

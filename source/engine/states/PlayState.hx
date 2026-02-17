@@ -1447,11 +1447,8 @@ class PlayState extends MusicBeatState
 		noteData = songData.notes;
 
 		var file:String = Paths.json(songName + '/events');
-		#if FEATURE_MODS
-		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file))
-		#else
-		if (Assets.exists(file))
-		#end
+		
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
 		{
 			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
 			for (event in eventsData) // Event Notes

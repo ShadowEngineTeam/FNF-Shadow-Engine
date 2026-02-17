@@ -244,13 +244,13 @@ class LoadingState extends MusicBeatState
 			prepare((!ClientPrefs.data.lowQuality || stageData.preload.images_low) ? stageData.preload.images : stageData.preload.images_low,
 				stageData.preload.sounds, stageData.preload.music);
 
-		songsToPrepare.push('$folder/Inst');
+		songsToPrepare.push('$folder/Inst' + Difficulty.getSongPrefix());
 
 		var player1:String = song.player1;
 		var player2:String = song.player2;
 		var gfVersion:String = song.gfVersion;
 		var needsVoices:Bool = song.needsVoices;
-		var prefixVocals:String = needsVoices ? '$folder/Voices' : null;
+		var prefixVocals:String = needsVoices ? '$folder/Voices' + Difficulty.getSongPrefix() : null;
 		if (gfVersion == null)
 			gfVersion = 'gf';
 
@@ -271,7 +271,7 @@ class LoadingState extends MusicBeatState
 		// clearInvalidFrom(imagesToPrepare, 'images', '.${Paths.IMAGE_EXT}', Paths.IMAGE_ASSETTYPE);
 		clearInvalidFrom(soundsToPrepare, 'sounds', '.ogg', SOUND);
 		clearInvalidFrom(musicToPrepare, 'music', ' .ogg', SOUND);
-		clearInvalidFrom(songsToPrepare, 'songs', '.ogg', SOUND, 'songs');
+		clearInvalidFrom(songsToPrepare, 'songs', '.ogg', SOUND);
 
 		for (arr in [imagesToPrepare, soundsToPrepare, musicToPrepare, songsToPrepare])
 			while (arr.contains(null))
@@ -299,8 +299,6 @@ class LoadingState extends MusicBeatState
 		{
 			var member:String = arr[i];
 			var myKey = '$prefix/$member$ext';
-			if (library == 'songs')
-				myKey = '$member$ext';
 
 			// trace('attempting on $prefix: $myKey');
 			var doTrace:Bool = false;
@@ -359,7 +357,7 @@ class LoadingState extends MusicBeatState
 		{
 			try
 			{
-				var ret:Dynamic = Paths.returnSound(null, song, 'songs');
+				var ret:Dynamic = Paths.returnSound(null, 'songs/$song');
 				if (ret != null)
 					trace('finished preloading song $song');
 				else
@@ -397,8 +395,8 @@ class LoadingState extends MusicBeatState
 						loaded++;
 						continue;
 					}
-					else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
-						bitmap = OpenFlAssets.getBitmapData(file);
+					else if (FileSystem.exists(file))
+						bitmap = Paths.getBitmapDataFromFile(file);
 					else
 					{
 						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
@@ -407,8 +405,8 @@ class LoadingState extends MusicBeatState
 							loaded++;
 							continue;
 						}
-						else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.IMAGE_EXT)))
-							bitmap = OpenFlAssets.getBitmapData(file);
+						else if (FileSystem.exists(file))
+							bitmap = Paths.getBitmapDataFromFile(file);
 						else
 						{
 							trace('no such image $image exists');
@@ -435,7 +433,7 @@ class LoadingState extends MusicBeatState
 		for (music in musicToPrepare)
 			initThread(() -> Paths.music(music), 'music $music');
 		for (song in songsToPrepare)
-			initThread(() -> Paths.returnSound(null, song, 'songs'), 'song $song');
+			initThread(() -> Paths.returnSound(null, 'songs/$song'), 'song $song');
 
 		for (image in imagesToPrepare)
 		{
@@ -482,8 +480,8 @@ class LoadingState extends MusicBeatState
 							#end
 							return;
 						}
-						else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
-							bitmap = OpenFlAssets.getBitmapData(file);
+						else if (FileSystem.exists(file))
+							bitmap = Paths.getBitmapDataFromFile(file);
 						else
 						{
 							file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
@@ -499,8 +497,8 @@ class LoadingState extends MusicBeatState
 								#end
 								return;
 							}
-							else if (OpenFlAssets.exists(file, Paths.getImageAssetType(Paths.IMAGE_EXT)))
-								bitmap = OpenFlAssets.getBitmapData(file);
+							else if (FileSystem.exists(file))
+								bitmap = Paths.getBitmapDataFromFile(file);
 							else
 							{
 								trace('no such image $image exists');
@@ -592,7 +590,7 @@ class LoadingState extends MusicBeatState
 			imagesToPrepare.push(character.image);
 			if (prefixVocals != null && character.vocals_file != null)
 			{
-				songsToPrepare.push(prefixVocals + "-" + character.vocals_file);
+				songsToPrepare.push(prefixVocals + "-" + character.vocals_file + Difficulty.getSongPrefix());
 				if (char == PlayState.SONG.player1)
 					dontPreloadDefaultVoices = true;
 			}
