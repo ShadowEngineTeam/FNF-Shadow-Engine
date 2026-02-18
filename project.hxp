@@ -327,7 +327,7 @@ class Project extends HXProject
 			addAssetPath("assets/funkin_resources/shared", 'assets/shared', false);
 		}
 
-		final textureFormats:Array<String> = ["ASTC", "BPTC", "PNG"];
+		final textureFormats:Array<String> = ["ASTC", "BC", "PNG"];
 		var hasFormat:Bool = false;
 
 		for (format in textureFormats)

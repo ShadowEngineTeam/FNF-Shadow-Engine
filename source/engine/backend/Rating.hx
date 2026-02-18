@@ -6,7 +6,7 @@ class Rating
 	public var image:String = '';
 	public var hitWindow:Null<Int> = 0; // ms
 	public var ratingMod:Float = 1;
-	//public var score(get, set):Int;
+	public var score(get, set):Int;
 	public var noteSplash:Bool = true;
 	public var hits:Int = 0;
 
@@ -14,7 +14,7 @@ class Rating
 	public static var SCORING_OFFSET:Float = 54.99;
 	public static var SCORING_SLOPE:Float = 0.080;
 	public static var MIN_SCORE:Float = 9.0;
-	public static var MISS_SCORE:Int = -100;
+	public static var MISS_SCORE:Int = 500;
 	public static var PERFECT_THRESHOLD:Float = 5.0; // 5ms
 	public static var SICK_THRESHOLD:Float = 45.0;
 	public static var GOOD_THRESHOLD:Float = 90.0;
@@ -89,7 +89,7 @@ class Rating
 		}
 	}
 
-	/*@:noCompletion
+	@:noCompletion
 	private function get_score():Int
 		return MAX_SCORE;
 
@@ -98,5 +98,5 @@ class Rating
 	{
 		MAX_SCORE = value;
 		return value;
-	}*/
+	}
 }
