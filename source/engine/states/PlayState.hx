@@ -178,12 +178,13 @@ class PlayState extends MusicBeatState
 	public var cameraSpeed:Float = 1;
 
 	public var songScore:Int = 0;
+	public var displayScore:Float = 0;
+
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
 	public var scoreTxt:FlxText;
 
 	var timeTxt:FlxText;
-	var scoreTxtTween:FlxTween;
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
@@ -569,7 +570,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
-		updateScore(false);
+		updateScore();
 		uiGroup.add(scoreTxt);
 
 		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, "BOTPLAY", 32);
@@ -629,7 +630,6 @@ class PlayState extends MusicBeatState
 		#end
 
 		startCallback();
-		RecalculateRating();
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
@@ -1215,9 +1215,9 @@ class PlayState extends MusicBeatState
 	// `updateScore = function(miss:Bool = false) { ... }
 	// its like if it was a variable but its just a function!
 	// cool right? -Crow
-	public dynamic function updateScore(miss:Bool = false)
+	public dynamic function updateScore()
 	{
-		var ret:Dynamic = callOnScripts('preUpdateScore', [miss], true);
+		var ret:Dynamic = callOnScripts('preUpdateScore', [], true);
 		if (ret == LuaUtils.Function_Stop)
 			return;
 
@@ -1228,15 +1228,12 @@ class PlayState extends MusicBeatState
 			str += ' (${percent}%) - ${ratingFC}';
 		}
 
-		var tempScore:String = 'Score: ${FlxStringUtil.formatMoney(songScore, false)}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
+		var tempScore:String = 'Score: ${FlxStringUtil.formatMoney(displayScore, false)}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
 		// "tempScore" variable is used to prevent another memory leak, just in case
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
 
-		if (!miss && !cpuControlled)
-			doScoreBop();
-
-		callOnScripts('onUpdateScore', [miss]);
+		callOnScripts('onUpdateScore', []);
 	}
 
 	public dynamic function fullComboFunction()
@@ -1263,24 +1260,6 @@ class PlayState extends MusicBeatState
 			else
 				ratingFC = 'Clear';
 		}
-	}
-
-	public function doScoreBop():Void
-	{
-		if (!ClientPrefs.data.scoreZoom)
-			return;
-
-		if (scoreTxtTween != null)
-			scoreTxtTween.cancel();
-
-		scoreTxt.scale.x = 1.075;
-		scoreTxt.scale.y = 1.075;
-		scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
-			onComplete: function(twn:FlxTween)
-			{
-				scoreTxtTween = null;
-			}
-		});
 	}
 
 	public function setSongTime(time:Float)
@@ -1903,6 +1882,12 @@ class PlayState extends MusicBeatState
 
 			if (ClientPrefs.data.timeBarType != 'Song Name')
 				timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+
+			if (!endingSong && displayScore != songScore)
+			{
+				displayScore = Std.int(FlxMath.lerp(displayScore, songScore, Math.exp(-elapsed * 24)));
+				recalculateRating();
+			}
 		}
 
 		if (camZooming)
@@ -2668,7 +2653,7 @@ class PlayState extends MusicBeatState
 		camZooming = false;
 		inCutscene = false;
 		updateTime = false;
-		NoteSplash.forcePixelStage = SustainSplash.forcePixelStage = characterPlayingAsDad = false;
+		characterPlayingAsDad = false;
 
 		deathCounter = 0;
 		seenCutscene = false;
@@ -2868,7 +2853,6 @@ class PlayState extends MusicBeatState
 			{
 				songHits++;
 				totalPlayed++;
-				RecalculateRating(false);
 			}
 		}
 
@@ -3388,7 +3372,6 @@ class PlayState extends MusicBeatState
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
-		RecalculateRating(true);
 
 		// play character anims
 		var char:Character = (!characterPlayingAsDad) ? boyfriend : dad;
@@ -3594,6 +3577,9 @@ class PlayState extends MusicBeatState
 			gainHealth = false;
 		if (gainHealth)
 			health += note.hitHealth * healthGain;
+
+		if (note.isSustainNote && !cpuControlled)
+			songScore += 10;
 
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
 		var result:Dynamic = callOnLuas('goodNoteHit', args);
@@ -3824,7 +3810,7 @@ class PlayState extends MusicBeatState
 	public var ratingPercent:Float;
 	public var ratingFC:String;
 
-	public function RecalculateRating(badHit:Bool = false)
+	public function recalculateRating()
 	{
 		setOnScripts('score', songScore);
 		setOnScripts('misses', songMisses);
@@ -3853,7 +3839,7 @@ class PlayState extends MusicBeatState
 			}
 			fullComboFunction();
 		}
-		updateScore(badHit); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce
+		updateScore(); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce
 		setOnScripts('rating', ratingPercent);
 		setOnScripts('ratingName', ratingName);
 		setOnScripts('ratingFC', ratingFC);
@@ -3875,7 +3861,7 @@ class PlayState extends MusicBeatState
 		}
 
 		var arr:Array<String> = runtimeShaders.get(name);
-		return new FlxRuntimeShader(arr[0], arr[1], lime.graphics.opengl.GL.getParameter(lime.graphics.opengl.GL.SHADING_LANGUAGE_VERSION).contains("GLSL ES 1.00") ? "100" : "300 es");
+		return new FlxRuntimeShader(arr[0], arr[1]);
 		#else
 		FlxG.log.warn("Platform unsupported for Runtime Shaders!");
 		return null;

@@ -2,9 +2,6 @@ package shaders;
 
 class OverlayShader extends FlxShader
 {
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentSource('
 		#pragma header
 		uniform vec4 uBlendColor;

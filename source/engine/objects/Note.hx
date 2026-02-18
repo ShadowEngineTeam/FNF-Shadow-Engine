@@ -90,10 +90,12 @@ class Note extends FlxSkewedSprite
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	public static var defaultNoteSkin(get, never):String;
 
+	public static var usePixelTextures:Null<Bool>;
+
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
 		texture: null,
-		antialiasing: !PlayState.isPixelStage,
+		antialiasing: !usePixelTextures,
 		useGlobalShader: false,
 		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteCustomColor == true) : true,
 		r: -1,
@@ -160,7 +162,7 @@ class Note extends FlxSkewedSprite
 	public function defaultRGB()
 	{
 		var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[noteData];
-		if (PlayState.isPixelStage)
+		if (usePixelTextures)
 			arr = ClientPrefs.data.arrowRGBPixel[noteData];
 
 		if (noteData > -1 && noteData <= arr.length)
@@ -240,6 +242,9 @@ class Note extends FlxSkewedSprite
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
 	{
+		if (usePixelTextures == null)
+			usePixelTextures = PlayState.isPixelStage;
+
 		super();
 
 		antialiasing = ClientPrefs.data.antialiasing;
@@ -307,7 +312,7 @@ class Note extends FlxSkewedSprite
 
 			offsetX -= width / 2;
 
-			if (PlayState.isPixelStage)
+			if (usePixelTextures)
 				offsetX += 30;
 
 			if (prevNote.isSustainNote)
@@ -318,7 +323,7 @@ class Note extends FlxSkewedSprite
 				if (createdFrom != null && createdFrom.songSpeed != null)
 					prevNote.scale.y *= createdFrom.songSpeed;
 
-				if (PlayState.isPixelStage)
+				if (usePixelTextures)
 				{
 					prevNote.scale.y *= 1.19;
 					prevNote.scale.y *= (6 / height); // Auto adjust note size
@@ -327,7 +332,7 @@ class Note extends FlxSkewedSprite
 				// prevNote.setGraphicSize();
 			}
 
-			if (PlayState.isPixelStage)
+			if (usePixelTextures)
 			{
 				scale.y *= PlayState.daPixelZoom;
 				updateHitbox();
@@ -349,7 +354,7 @@ class Note extends FlxSkewedSprite
 			var newRGB:RGBPalette = new RGBPalette();
 			globalRgbShaders[noteData] = newRGB;
 
-			var arr:Array<FlxColor> = (!PlayState.isPixelStage) ? ClientPrefs.data.arrowRGB[noteData] : ClientPrefs.data.arrowRGBPixel[noteData];
+			var arr:Array<FlxColor> = (!usePixelTextures) ? ClientPrefs.data.arrowRGB[noteData] : ClientPrefs.data.arrowRGBPixel[noteData];
 			if (noteData > -1 && noteData <= arr.length)
 			{
 				newRGB.r = arr[0];
@@ -390,7 +395,7 @@ class Note extends FlxSkewedSprite
 		var lastScaleY:Float = scale.y;
 		var skinPostfix:String = getNoteSkinPostfix();
 		var customSkin:String = skin + skinPostfix;
-		var path:String = PlayState.isPixelStage ? 'pixelUI/' : '';
+		var path:String = usePixelTextures ? 'pixelUI/' : '';
 
 		var fullPath:String = 'images/' + path + customSkin;
 
@@ -399,7 +404,7 @@ class Note extends FlxSkewedSprite
 
 		var graphic:FlxGraphic;
 
-		if (PlayState.isPixelStage)
+		if (usePixelTextures)
 		{
 			var imgPath = 'pixelUI/' + skinPixel + (skinPostfix != '' ? skinPostfix : '');
 			if (isSustainNote)
@@ -547,7 +552,7 @@ class Note extends FlxSkewedSprite
 			y = strumY + offsetY + correctionOffset + Math.sin(angleDir) * distance;
 			if (myStrum.downScroll && isSustainNote)
 			{
-				if (PlayState.isPixelStage)
+				if (usePixelTextures)
 				{
 					y -= PlayState.daPixelZoom * 9.5;
 				}

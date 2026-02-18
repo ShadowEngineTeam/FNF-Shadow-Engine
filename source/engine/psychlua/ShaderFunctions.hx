@@ -49,7 +49,7 @@ class ShaderFunctions
 			@:privateAccess {
 				if (camera._filters == null)
 					camera._filters = [];
-				var filter = new ShaderFilter(new FlxRuntimeShader(arr[0], arr[1], lime.graphics.opengl.GL.getParameter(lime.graphics.opengl.GL.SHADING_LANGUAGE_VERSION).contains("GLSL ES 1.00") ? "100" : "300 es"));
+				var filter = new ShaderFilter(new FlxRuntimeShader(arr[0], arr[1]));
 				storedFilters.set(index, filter);
 				camera._filters.push(filter);
 			}

@@ -85,10 +85,6 @@ class VisualsUISubState extends BaseOptionsMenu
 		var option:Option = new Option('Camera Zooms', "If unchecked, the camera won't zoom in on a beat hit.", 'camZooms', 'bool');
 		addOption(option);
 
-		var option:Option = new Option('Score Text Zoom on Hit', "If unchecked, disables the Score text zooming\neverytime you hit a note.", 'scoreZoom',
-			'bool');
-		addOption(option);
-
 		var option:Option = new Option('Health Bar Opacity', 'How much transparent should the health bar and icons be.', 'healthBarAlpha', 'percent');
 		option.scrollSpeed = 1.6;
 		option.minValue = 0.0;

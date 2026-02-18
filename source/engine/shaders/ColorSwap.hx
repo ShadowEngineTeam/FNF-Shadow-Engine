@@ -37,9 +37,6 @@ class ColorSwap
 
 class ColorSwapShader extends FlxShader
 {
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentSource('
 		varying float openfl_Alphav;
 		varying vec4 openfl_ColorMultiplierv;

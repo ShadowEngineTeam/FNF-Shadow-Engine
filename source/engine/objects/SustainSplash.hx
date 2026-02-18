@@ -14,7 +14,7 @@ class SustainSplash extends FlxSprite
 	@:isVar
 	public static var texture(get, set):String = null;
 	public static var useRGBShader:Bool = true;
-	public static var forcePixelStage:Bool = false;
+	public static var usePixelTextures:Null<Bool>;
 	public static var noRGBTextures(default, null):Array<String> = [];
 
 	public static var playerTexture:String = null;
@@ -48,7 +48,7 @@ class SustainSplash extends FlxSprite
 		else
 			textures.push(texture);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (usePixelTextures)
 			for (i in 0...textures.length)
 				textures[i] = 'pixelUI/' + textures[i];
 
@@ -108,6 +108,8 @@ class SustainSplash extends FlxSprite
 
 	public function new():Void
 	{
+		if (usePixelTextures == null)
+			usePixelTextures = PlayState.isPixelStage;
 		super();
 	}
 
@@ -145,7 +147,7 @@ class SustainSplash extends FlxSprite
 		// SHADOW TODO: This breaks offsets need to figure it out later
 		// flipY = ClientPrefs.data.downScroll;
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (usePixelTextures)
 			texture = 'pixelUI/' + texture;
 
 		frames = Paths.getSparrowAtlas(texture);
@@ -164,14 +166,14 @@ class SustainSplash extends FlxSprite
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);
 		animation.play('start', true, false, 0);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (usePixelTextures)
 		{
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom / 2.5));
 			updateHitbox();
 		}
 
-		antialiasing = PlayState.isPixelStage || forcePixelStage ? false : ClientPrefs.data.antialiasing;
-		offset.set(PlayState.isPixelStage || forcePixelStage ? -46 : 106.25, PlayState.isPixelStage || forcePixelStage ? -40 : 100);
+		antialiasing = usePixelTextures ? false : ClientPrefs.data.antialiasing;
+		offset.set(usePixelTextures ? -46 : 106.25, usePixelTextures ? -40 : 100);
 	}
 
 	private function initRGBShader():Void
@@ -232,7 +234,7 @@ class SustainSplash extends FlxSprite
 		else
 			textures.push(texToUse);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (usePixelTextures)
 			for (i in 0...textures.length)
 				textures[i] = 'pixelUI/' + textures[i];
 

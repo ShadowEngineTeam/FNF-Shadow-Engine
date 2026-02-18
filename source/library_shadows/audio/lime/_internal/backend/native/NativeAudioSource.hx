@@ -728,7 +728,8 @@ class NativeAudioSource
 			return;
 		}
 
-		completeTimer.stop();
+		if (completeTimer != null)
+			completeTimer.stop();
 
 		if (loops == 0)
 			return complete();

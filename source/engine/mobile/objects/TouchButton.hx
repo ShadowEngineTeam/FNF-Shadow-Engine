@@ -635,9 +635,6 @@ class ButtonBrightnessShader extends FlxShader
 {
 	public var color(default, set):Null<FlxColor> = FlxColor.WHITE;
 
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentSource('
 		#pragma header
 

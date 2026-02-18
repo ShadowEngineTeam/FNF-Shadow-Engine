@@ -12,9 +12,6 @@ class Context3DAlphaMaskShader extends Shader
 {
 	public static var opaqueBitmapData:BitmapData = new BitmapData(1, 1, false, 0);
 
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentSource("varying vec2 openfl_TextureCoordv;
 
 		uniform sampler2D openfl_Texture;

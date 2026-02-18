@@ -259,32 +259,32 @@ class FunkinLua
 			set("addScore", function(value:Int = 0)
 			{
 				cast(game, PlayState).songScore += value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("addMisses", function(value:Int = 0)
 			{
 				cast(game, PlayState).songMisses += value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("addHits", function(value:Int = 0)
 			{
 				cast(game, PlayState).songHits += value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("setScore", function(value:Int = 0)
 			{
 				cast(game, PlayState).songScore = value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("setMisses", function(value:Int = 0)
 			{
 				cast(game, PlayState).songMisses = value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("setHits", function(value:Int = 0)
 			{
 				cast(game, PlayState).songHits = value;
-				cast(game, PlayState).RecalculateRating();
+				cast(game, PlayState).recalculateRating();
 			});
 			set("getScore", function()
 			{
@@ -573,7 +573,6 @@ class FunkinLua
 		set('ghostTapping', ClientPrefs.data.ghostTapping);
 		set('hideHud', ClientPrefs.data.hideHud);
 		set('timeBarType', ClientPrefs.data.timeBarType);
-		set('scoreZoom', ClientPrefs.data.scoreZoom);
 		set('cameraZoomOnBeat', ClientPrefs.data.camZooms);
 		set('flashingLights', ClientPrefs.data.flashing);
 		set('noteOffset', ClientPrefs.data.noteOffset);
