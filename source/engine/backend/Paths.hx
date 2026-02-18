@@ -16,7 +16,7 @@ import animate.FlxAnimateFrames;
 class Paths
 {
 	public static final IMAGE_EXT:String = "png";
-	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BPTC "dds" #else IMAGE_EXT #end;
+	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BC "dds" #else IMAGE_EXT #end;
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
@@ -316,11 +316,15 @@ class Paths
 		{
 			var graphic = currentTrackedAssets.get(file);
 			if (graphic != null && graphic.bitmap != null)
+			{
+				localTrackedAssets.push(file);
 				return graphic.bitmap;
+			}
 		}
 
+		var bitmap:BitmapData = null;
 		var ext:String = haxe.io.Path.extension(file).toLowerCase();
-		if (ext == 'astc' || ext == 'dds')
+		if (ext == GPU_IMAGE_EXT)
 		{
 			try
 			{
@@ -330,12 +334,12 @@ class Paths
 					var texture = switch (ext)
 					{
 						case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(bytes);
-						case 'dds': openfl.Lib.current.stage.context3D.createBPTCTexture(bytes);
+						case 'dds': openfl.Lib.current.stage.context3D.createBCTexture(bytes);
 						default: null;
 					};
 
 					if (texture != null)
-						return BitmapData.fromTexture(texture);
+						bitmap = BitmapData.fromTexture(texture);
 				}
 			}
 			catch (e:Dynamic)
@@ -344,8 +348,17 @@ class Paths
 				return null;
 			}
 		}
+		else
+			bitmap = BitmapData.fromFile(file);
 
-		return BitmapData.fromFile(file);
+		if (bitmap != null)
+		{
+			var cachedGraphic = cacheBitmap(file, bitmap);
+			if (cachedGraphic != null && cachedGraphic.bitmap != null)
+				return cachedGraphic.bitmap;
+		}
+
+		return bitmap;
 	}
 
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
