@@ -170,7 +170,7 @@ class EditorPlayState extends MusicBeatSubstate
 		});
 		#end
 
-		RecalculateRating();
+		recalculateRating();
 	}
 
 	override function update(elapsed:Float)
@@ -618,7 +618,7 @@ class EditorPlayState extends MusicBeatSubstate
 		{
 			songHits++;
 			totalPlayed++;
-			RecalculateRating(false);
+			recalculateRating(false);
 		}
 
 		var pixelShitPart1:String = "";
@@ -1084,7 +1084,7 @@ class EditorPlayState extends MusicBeatSubstate
 		// score and data
 		songMisses++;
 		totalPlayed++;
-		RecalculateRating(true);
+		recalculateRating(true);
 		vocals.volume = 0;
 		combo = 0;
 	}
@@ -1154,7 +1154,7 @@ class EditorPlayState extends MusicBeatSubstate
 		opponentVocals.play();
 	}
 
-	function RecalculateRating(badHit:Bool = false)
+	function recalculateRating(badHit:Bool = false)
 	{
 		if (totalPlayed != 0) // Prevent divide by 0
 			ratingPercent = Math.min(1, Math.max(0, totalNotesHit / totalPlayed));

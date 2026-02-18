@@ -56,6 +56,7 @@ import states.TitleState;
 
 	public var ghostTapping:Bool = true;
 	public var timeBarType:String = 'Time Left';
+	public var scoreZoom:Bool = true;
 	public var noReset:Bool = false;
 	public var healthBarAlpha:Float = 1;
 	public var hitsoundVolume:Float = 0;
