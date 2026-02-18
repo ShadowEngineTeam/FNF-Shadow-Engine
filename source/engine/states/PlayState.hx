@@ -178,13 +178,13 @@ class PlayState extends MusicBeatState
 	public var cameraSpeed:Float = 1;
 
 	public var songScore:Int = 0;
-	public var displayScore:Float = 0;
 
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
 	public var scoreTxt:FlxText;
 
 	var timeTxt:FlxText;
+	var scoreTxtTween:FlxTween;
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
@@ -1228,7 +1228,7 @@ class PlayState extends MusicBeatState
 			str += ' (${percent}%) - ${ratingFC}';
 		}
 
-		var tempScore:String = 'Score: ${FlxStringUtil.formatMoney(displayScore, false)}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
+		var tempScore:String = 'Score: ${FlxStringUtil.formatMoney(songScore, false)}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
 		// "tempScore" variable is used to prevent another memory leak, just in case
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
@@ -1260,6 +1260,24 @@ class PlayState extends MusicBeatState
 			else
 				ratingFC = 'Clear';
 		}
+	}
+
+	public function doScoreBop():Void
+	{
+		if (!ClientPrefs.data.scoreZoom)
+			return;
+
+		if (scoreTxtTween != null)
+			scoreTxtTween.cancel();
+
+		scoreTxt.scale.x = 1.075;
+		scoreTxt.scale.y = 1.075;
+		scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
+			onComplete: function(twn:FlxTween)
+			{
+				scoreTxtTween = null;
+			}
+		});
 	}
 
 	public function setSongTime(time:Float)
@@ -1883,11 +1901,7 @@ class PlayState extends MusicBeatState
 			if (ClientPrefs.data.timeBarType != 'Song Name')
 				timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 
-			if (!endingSong && displayScore != songScore)
-			{
-				displayScore = Std.int(FlxMath.lerp(displayScore, songScore, Math.exp(-elapsed * 24)));
-				recalculateRating();
-			}
+			recalculateRating();
 		}
 
 		if (camZooming)
@@ -3585,6 +3599,9 @@ class PlayState extends MusicBeatState
 		var result:Dynamic = callOnLuas('goodNoteHit', args);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('goodNoteHit', [note]);
+
+		if (!note.isSustainNote && !cpuControlled)
+			doScoreBop();
 
 		spawnHoldSplashOnNote(note);
 
