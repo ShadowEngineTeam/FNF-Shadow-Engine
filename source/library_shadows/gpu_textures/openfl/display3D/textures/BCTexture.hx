@@ -37,14 +37,16 @@ import openfl.Lib;
 
 		__detectBCFormat(data);
 
+		var dxt1Extension = gl.getExtension("EXT_texture_compression_dxt1");
 		var s3tcExtension = gl.getExtension("EXT_texture_compression_s3tc");
+		var s3tcSRGBExtension = gl.getExtension("EXT_texture_compression_s3tc_srgb");
 		var rgtcExtension = gl.getExtension("EXT_texture_compression_rgtc");
 		var bptcExtension = gl.getExtension("EXT_texture_compression_bptc");
 
 		var extensionSupported = switch (__bcFormat)
 		{
 			case "BC1", "BC2", "BC3":
-				s3tcExtension != null;
+				dxt1Extension != null && s3tcExtension != null && s3tcSRGBExtension != null;
 			case "BC4", "BC5":
 				rgtcExtension != null;
 			case "BC6H", "BC7":
@@ -66,11 +68,11 @@ import openfl.Lib;
 		__format = switch (__bcFormat)
 		{
 			case "BC1":
-				__isSRGB ? s3tcExtension.COMPRESSED_SRGB_S3TC_DXT1_EXT : s3tcExtension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+				__isSRGB ? s3tcSRGBExtension.COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT : dxt1Extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
 			case "BC2":
-				__isSRGB ? s3tcExtension.COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT : s3tcExtension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+				__isSRGB ? s3tcSRGBExtension.COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT : s3tcExtension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
 			case "BC3":
-				__isSRGB ? s3tcExtension.COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : s3tcExtension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				__isSRGB ? s3tcSRGBExtension.COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : s3tcExtension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			case "BC4":
 				__isSRGB ? rgtcExtension.COMPRESSED_RED_RGTC1_EXT : rgtcExtension.COMPRESSED_SIGNED_RED_RGTC1_EXT;
 			case "BC5":
