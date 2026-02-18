@@ -21,6 +21,8 @@ class StrumNote extends FlxSkewedSprite
 
 	public var texture(default, set):String = null;
 
+	public static var usePixelTextures:Null<Bool>;
+
 	private function set_texture(value:String):String
 	{
 		if (texture != value)
@@ -35,6 +37,9 @@ class StrumNote extends FlxSkewedSprite
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
 	{
+		if (usePixelTextures == null)
+			usePixelTextures = PlayState.isPixelStage;
+
 		if (ClientPrefs.data.disableRGBNotes) 
 		{
 			colorSwap = new ColorSwap();
@@ -48,7 +53,7 @@ class StrumNote extends FlxSkewedSprite
 				useRGBShader = false;
 
 			var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
-			if (PlayState.isPixelStage)
+			if (usePixelTextures)
 				arr = ClientPrefs.data.arrowRGBPixel[leData];
 
 			if (leData <= arr.length)
@@ -71,7 +76,7 @@ class StrumNote extends FlxSkewedSprite
 		var skin:String = if (daTexture != null && daTexture.length > 1) daTexture else Note.defaultNoteSkin;
 		var customSkin:String = skin + skinPostfix;
 
-		if (Paths.fileExists('images/${PlayState.isPixelStage ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || Paths.fileExists('images/${PlayState.isPixelStage ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+		if (Paths.fileExists('images/${usePixelTextures ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || Paths.fileExists('images/${usePixelTextures ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 		else
 			skin = Note.defaultNoteSkin;
@@ -86,7 +91,7 @@ class StrumNote extends FlxSkewedSprite
 		if (animation.curAnim != null)
 			lastAnim = animation.curAnim.name;
 
-		if (PlayState.isPixelStage)
+		if (usePixelTextures)
 		{
 			loadGraphic(Paths.image('pixelUI/' + texture));
 			width = width / 4;
@@ -209,7 +214,7 @@ class StrumNote extends FlxSkewedSprite
 
 				if (animation.curAnim != null)
 				{
-					if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage)
+					if (animation.curAnim.name == 'confirm' && !usePixelTextures)
 						centerOrigin();
 				}
 			}

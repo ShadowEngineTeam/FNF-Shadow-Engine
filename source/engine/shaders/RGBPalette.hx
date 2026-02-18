@@ -134,9 +134,6 @@ class RGBShaderReference
 
 class RGBPaletteShader extends FlxShader
 {
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentHeader('
 		#pragma header
 		

@@ -64,9 +64,6 @@ class WiggleEffect
 
 class WiggleShader extends FlxShader
 {
-	#if (!ios && !macos)
-	@:glVersion('100')
-	#end
 	@:glFragmentSource('
 		#pragma header
 		//uniform float tx, ty; // x,y waves phase

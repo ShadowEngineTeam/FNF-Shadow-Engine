@@ -33,6 +33,17 @@ class OpenFLSprite extends FlxSprite
 
 	public function updateDisplay()
 	{
-		pixels.draw(flSprite);
+		if (flSprite != null && pixels != null)
+		{
+			try
+			{
+				pixels.draw(flSprite);
+			}
+			catch (e:Dynamic)
+			{
+				trace('Error drawing OpenFL Sprite: $e');
+				// Optionally, set a fallback graphic or skip
+			}
+		}
 	}
 }
