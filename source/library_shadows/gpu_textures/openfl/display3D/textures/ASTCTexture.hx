@@ -169,8 +169,8 @@ import openfl.Lib;
 		bytes.position = 7;
 		var flags = bytes.readUnsignedByte() >> 4;
 
-		__isSRGB = (flags & 0x1) != 0;
-		// SHADOW TODO: better HDR implement
+		// SHADOW TODO: better sRGB and HDR implement
+		// __isSRGB = (flags & 0x1) != 0;
 		// __isHDR = (flags & 0x2) != 0;
 	}
 }
