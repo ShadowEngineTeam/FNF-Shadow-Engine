@@ -40,7 +40,10 @@ class ChartingState extends MusicBeatState
 	var undos = [];
 	var redos = [];
 	var eventStuff:Array<Dynamic> = [
-		['', "Nothing. Yep, that's right."],
+		[
+			'',
+			"Nothing. Yep, that's right."
+		],
 		[
 			'Hey!',
 			"Plays the \"Hey!\" animation from Bopeebo,\nValue 1: BF = Only Boyfriend, GF = Only Girlfriend,\nSomething else = Both.\nValue 2: Custom animation duration,\nleave it blank for 0.6s"
@@ -52,6 +55,10 @@ class ChartingState extends MusicBeatState
 		[
 			'Add Camera Zoom',
 			"Used on MILF on that one \"hard\" part\nValue 1: Camera zoom add (Default: 0.015)\nValue 2: UI zoom add (Default: 0.03)\nLeave the values blank if you want to use Default."
+		],
+		[
+			'Play Animation',
+			"Plays an animation on a Character,\nonce the animation is completed,\nthe animation changes to Idle\n\nValue 1: Animation to play.\nValue 2: Character (Dad, BF, GF)"
 		],
 		[
 			'Camera Follow Pos',
@@ -73,7 +80,10 @@ class ChartingState extends MusicBeatState
 			'Change Scroll Speed',
 			"Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."
 		],
-		['Set Property', "Value 1: Variable name\nValue 2: New value"],
+		[
+			'Set Property',
+			"Value 1: Variable name\nValue 2: New value"
+		],
 		[
 			'Play Sound',
 			"Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"
