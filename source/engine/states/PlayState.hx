@@ -3384,7 +3384,7 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= 100;
+			songScore -= Rating.MISS_SCORE;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
