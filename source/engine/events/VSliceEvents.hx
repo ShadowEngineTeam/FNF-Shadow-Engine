@@ -10,26 +10,6 @@ class VSliceEvents extends BaseStage
 	{
 		switch (eventName)
 		{
-			case 'Vslice Scroll Speed':
-				if (game.songSpeedType != "constant")
-				{
-					if (flValue1 == null)
-						flValue1 = 1;
-					if (flValue2 == null)
-						flValue2 = 0;
-
-					var newValue:Float = ClientPrefs.getGameplaySetting('scrollspeed', 1.0) * flValue1;
-					if (flValue2 <= 0)
-						game.songSpeed = newValue;
-					else
-						game.songSpeedTween = FlxTween.tween(game, {songSpeed: newValue}, flValue2 / game.playbackRate, {
-							ease: FlxEase.quadInOut,
-							onComplete: function(twn:FlxTween)
-							{
-								game.songSpeedTween = null;
-							}
-						});
-				}
 			case 'Set Camera Bopping': // P-slice event notes
 				var val1 = Std.parseFloat(value1);
 				var val2 = Std.parseFloat(value2);

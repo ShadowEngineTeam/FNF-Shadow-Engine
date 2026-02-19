@@ -131,7 +131,6 @@ class PlayState extends MusicBeatState
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
-	public var camZoomingFrequency:Float = 4;
 	public var camZoomingDecay:Float = 1;
 
 	private var curSong:String = "";
@@ -384,8 +383,6 @@ class PlayState extends MusicBeatState
 			case 'nothing':
 				new states.stages.Nothing();
 		}
-
-		new events.VSliceEvents();
 
 		if (isPixelStage)
 		{
@@ -3728,12 +3725,6 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && (curBeat % camZoomingFrequency) == 0)
-		{
-			FlxG.camera.zoom += 0.015 * camZoomingMult;
-			camHUD.zoom += 0.03 * camZoomingMult;
-		}
-
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
@@ -3783,8 +3774,7 @@ class PlayState extends MusicBeatState
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
 				moveCameraSection();
 
-			var vsliceCondition:Bool = (curBeat % camZoomingFrequency) == 0;
-			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && !vsliceCondition)
+			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms)
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
