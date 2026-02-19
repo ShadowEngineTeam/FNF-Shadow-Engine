@@ -186,6 +186,9 @@ class PlayState extends MusicBeatState
 	var timeTxt:FlxText;
 	var scoreTxtTween:FlxTween;
 
+	var zoomTween:FlxTween;
+	var camTween:FlxTween;
+
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
 	public static var seenCutscene:Bool = false;
@@ -384,8 +387,6 @@ class PlayState extends MusicBeatState
 			case 'nothing':
 				new states.stages.Nothing();
 		}
-
-		new events.VSliceEvents();
 
 		if (isPixelStage)
 		{
@@ -1329,6 +1330,7 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
+		camZooming = true;
 
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
@@ -2545,11 +2547,136 @@ class PlayState extends MusicBeatState
 				if (flValue2 == null)
 					flValue2 = 1;
 				FlxG.sound.play(Paths.sound(value1), flValue2);
+
+			case 'Set Camera Bopping':
+				var val1:Float = Std.parseFloat(value1);
+				var val2:Float = Std.parseFloat(value2);
+				camZoomingMult = !Math.isNaN(val2) ? val2 : 1;
+				camZoomingFrequency = !Math.isNaN(val1) ? val1 : 4;
+
+			case 'Focus Camera': // P-slice focus camera event notes val1: char val2: x,y,dur,ease
+				isCameraOnForcedPos = false;
+				var keyValues:Array<String> = value2.split(",");
+				if (keyValues.length != 4)
+				{
+					trace("INVALID EVENT VALUE");
+					return;
+				}
+				var ease:String = keyValues.pop().toLowerCase();
+				var floaties:Array<Float> = keyValues.map(s -> Std.parseFloat(s));
+				if (findIndex(floaties, s -> Math.isNaN(s)) != -1)
+				{
+					trace("INVALID FLOATIES");
+					return;
+				}
+				isCameraOnForcedPos = true;
+
+				var targetX:Float = floaties[0];
+				var targetY:Float = floaties[1];
+				var duration:Float = floaties[2] * (Conductor.stepCrochet / 1000);
+				switch (value1.toString().toLowerCase())
+				{
+					case "bf" | "0": {
+						targetX += boyfriend.getMidpoint().x - 100 - boyfriend.cameraPosition[0] + boyfriendCameraOffset[0];
+						targetY += boyfriend.getMidpoint().y - 100 + boyfriend.cameraPosition[1] + boyfriendCameraOffset[1];
+					}
+					case "dad" | "1": {
+						targetX += dad.getMidpoint().x + 150 + dad.cameraPosition[0] + opponentCameraOffset[0];
+						targetY += dad.getMidpoint().y - 100 + dad.cameraPosition[1] + opponentCameraOffset[1];
+					}
+					case "gf" | "2": {
+						targetX += gf.getMidpoint().x + gf.cameraPosition[0] - girlfriendCameraOffset[0];
+						targetY += gf.getMidpoint().y + gf.cameraPosition[1] - girlfriendCameraOffset[1];
+					}
+				}
+
+				if (ease == "classic" || ease == "instant")
+				{
+					camFollow.x = targetX;
+					camFollow.y = targetY;
+					if (ease == "instant")
+						FlxG.camera.snapToTarget();
+				}
+				else
+				{
+					var easeFunc = psychlua.LuaUtils.getTweenEaseByString(ease);
+					camTween?.cancel();
+					camTween = FlxTween.tween(camFollow, {x: targetX, y: targetY}, duration, {
+						ease: easeFunc,
+						onComplete: s ->
+						{
+							camTween = null;
+						}
+					});
+				}
+
+			case 'Zoom Camera': // P-slice zoom camera event notes val1: dur,zoom val2: ease
+				var keyValues:Array<String> = value1.split(",");
+				if (keyValues.length != 2)
+				{
+					trace("INVALID EVENT VALUE");
+					return;
+				}
+
+				var floaties:Array<Float> = keyValues.map(s -> Std.parseFloat(s));
+				if (findIndex(floaties, s -> Math.isNaN(s)) != -1)
+				{
+					trace("INVALID FLOATIES");
+					return;
+				}
+
+				var targetZoom:Float = floaties[1];
+				if (targetZoom <= 0)
+				{
+					trace("INVALID TARGET ZOOM: " + targetZoom);
+					return;
+				}
+
+				var easeStr:String = (value2 != null) ? value2.toLowerCase() : "";
+				if (easeStr == "classic" || easeStr == "instant")
+				{
+					defaultCamZoom = targetZoom;
+
+					if (easeStr == "instant")
+						FlxG.camera.zoom = targetZoom;
+
+					return;
+				}
+
+				var easeFunc = psychlua.LuaUtils.getTweenEaseByString(value2);
+
+				if (zoomTween != null)
+					zoomTween.cancel();
+
+				zoomTween = FlxTween.tween(this, {defaultCamZoom: targetZoom}, (Conductor.stepCrochet / 1000) * floaties[0], {
+					onStart: (x) ->
+					{
+						// camZooming = false;
+						camZoomingDecay = 7;
+					},
+					ease: easeFunc,
+					onComplete: (x) ->
+					{
+						defaultCamZoom = targetZoom;
+						camZoomingDecay = 1;
+						// camZooming = true;
+						zoomTween = null;
+					}
+				});
 		}
 
 		final args:Array<Dynamic> = [eventName, value1, value2, strumTime];
 		stagesFunc(function(stage:BaseStage) stage.eventCalled(eventName, value1, value2, flValue1, flValue2, strumTime));
 		callOnScripts('onEvent', args);
+	}
+
+	private static function findIndex<T>(array:Array<T>, predicate:T->Bool):Int
+	{
+		for (i in 0...array.length)
+			if (predicate(array[i]))
+				return i;
+
+		return -1;
 	}
 
 	function moveCameraSection(?sec:Null<Int>):Void
@@ -3425,8 +3552,6 @@ class PlayState extends MusicBeatState
 		var result:Dynamic = callOnLuas('opponentNoteHitPre', args);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('opponentNoteHitPre', [note]);
-
-		camZooming = true;
 
 		var char:Character = (!characterPlayingAsDad) ? dad : boyfriend;
 

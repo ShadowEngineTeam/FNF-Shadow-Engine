@@ -94,10 +94,10 @@ class ChartingState extends MusicBeatState
 		],
 		[
 			'Zoom Camera',
-			"An attempt to emulate V-slice camera zoom.\nNot really accurate, but whatever.\n\nValue 1: Zoom length (in steps) and zoom scale.\n[separated with ',']\n\nValue 2: Zooming ease"
+			"An attempt to emulate V-slice camera zoom.\nNot really accurate, but oh well.\n\nValue 1: Zoom length (in steps) and zoom scale.\n[separated with ',']\n\nValue 2: Zooming ease"
 		],
 		[
-			'Target Camera',
+			'Focus Camera',
 			"Focus camera on the specific point.\nThis will also lock the camera (like Camera Follow Pos)\n\nValue1:character to focus\nValue2: separated with ',' x, y, duration, ease"
 		]
 	];
