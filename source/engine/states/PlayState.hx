@@ -1330,7 +1330,6 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
-		camZooming = true;
 
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
@@ -3552,6 +3551,8 @@ class PlayState extends MusicBeatState
 		var result:Dynamic = callOnLuas('opponentNoteHitPre', args);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('opponentNoteHitPre', [note]);
+
+		camZooming = true;
 
 		var char:Character = (!characterPlayingAsDad) ? dad : boyfriend;
 
