@@ -3654,7 +3654,6 @@ class PlayState extends MusicBeatState
 
 	override function destroy()
 	{
-		NoteSplash.mainGroup = null;
 		instance = null;
 
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
@@ -3662,6 +3661,10 @@ class PlayState extends MusicBeatState
 
 		FlxG.animationTimeScale = 1;
 
+		NoteSplash.mainGroup = null;
+		NoteSplash.usePixelTextures = null;
+		StrumNote.usePixelTextures = null;
+		Note.usePixelTextures = null;
 		Note.globalRgbShaders = [];
 		SustainSplash.close();
 		backend.NoteTypesConfig.clearNoteTypesData();

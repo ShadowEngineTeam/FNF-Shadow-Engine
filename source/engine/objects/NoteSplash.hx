@@ -5,6 +5,8 @@ import shaders.RGBPalette;
 import shaders.PixelSplashShader.PixelSplashShaderRef;
 import flixel.graphics.frames.FlxFrame;
 
+using backend.CoolUtil;
+
 typedef NoteSplashConfig =
 {
 	anim:String,
@@ -31,9 +33,6 @@ class NoteSplash extends FlxSprite
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
-		if (usePixelTextures == null)
-			usePixelTextures = PlayState.isPixelStage;
-
 		super(x, y);
 
 		var skin:String = null;
@@ -82,7 +81,7 @@ class NoteSplash extends FlxSprite
 
 		var config:NoteSplashConfig = null;
 		if (_textureLoaded != texture)
-			config = loadAnims((usePixelTextures ? 'pixelUI/' : '') + texture);
+			config = loadAnims((PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture);
 		else
 			config = precacheConfig(_configLoaded);
 
@@ -138,10 +137,10 @@ class NoteSplash extends FlxSprite
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
-		if (usePixelTextures || !ClientPrefs.data.antialiasing)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures) || !ClientPrefs.data.antialiasing)
 			antialiasing = false;
 
-		_textureLoaded = (usePixelTextures ? 'pixelUI/' : '') + texture;
+		_textureLoaded = (PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture;
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, maxAnims);
@@ -272,11 +271,11 @@ class NoteSplash extends FlxSprite
 		return !ClientPrefs.data.disableRGBNotes ? 'noteSplashes/noteSplashes' : 'noteSplashes';
 
 	@:noCompletion
-	private static function set_usePixelTextures(value:Bool):Bool
+	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
 	{
-		usePixelTextures = value;
-		if (mainGroup != null)
+		if (mainGroup != null && usePixelTextures != value)
 		{
+			usePixelTextures = value;
 			mainGroup.forEachAlive(function(splash:NoteSplash)
 			{
 				splash._textureLoaded = null;
