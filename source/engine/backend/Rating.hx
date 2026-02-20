@@ -15,6 +15,8 @@ class Rating
 	public static var SCORING_SLOPE:Float = 0.080;
 	public static var MIN_SCORE:Float = 9.0;
 	public static var MISS_SCORE:Int = 500;
+	public static var SUSTAIN_SCORE:Int = 1;
+	public static var SUSTAIN_MISS_SCORE:Int = 10;
 	public static var PERFECT_THRESHOLD:Float = 5.0; // 5ms
 	public static var SICK_THRESHOLD:Float = 45.0;
 	public static var GOOD_THRESHOLD:Float = 90.0;

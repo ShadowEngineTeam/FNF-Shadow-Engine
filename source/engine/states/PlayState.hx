@@ -3309,7 +3309,6 @@ class PlayState extends MusicBeatState
 			return; // fuck it we ball
 
 		noteMissCommon(direction);
-		FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 		callOnScripts('noteMissPress', [direction]);
 	}
 
@@ -3365,6 +3364,9 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		if (note.mustPress)
+			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+
 		if (instakillOnMiss)
 		{
 			vocals.volume = 0;
@@ -3379,7 +3381,7 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= Rating.MISS_SCORE;
+			songScore -= (note.isSustainNote) ? Rating.SUSTAIN_MISS_SCORE : Rating.MISS_SCORE;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
@@ -3590,7 +3592,7 @@ class PlayState extends MusicBeatState
 			health += note.hitHealth * healthGain;
 
 		if (note.isSustainNote && !cpuControlled)
-			songScore += 10;
+			songScore += Rating.SUSTAIN_SCORE;
 
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
 		var result:Dynamic = callOnLuas('goodNoteHit', args);
