@@ -1,5 +1,6 @@
 package backend;
 
+import flixel.system.FlxAssets;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
@@ -247,27 +248,18 @@ class Paths
 		else
 		#end
 		{
-			file = getPath('images/$key.$GPU_IMAGE_EXT', getImageAssetType(GPU_IMAGE_EXT), library);
-			if (currentTrackedAssets.exists(file))
+			for (IMG_EXT in [GPU_IMAGE_EXT, IMAGE_EXT])
 			{
-				localTrackedAssets.push(file);
-				return currentTrackedAssets.get(file);
-			}
-			else if (FileSystem.exists(file))
-				bitmap = getBitmapDataFromFile(file);
-
-			if (bitmap == null)
-			{
-				file = getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library);
+				file = getPath('images/$key.$IMG_EXT', getImageAssetType(IMG_EXT), library);
 				if (currentTrackedAssets.exists(file))
 				{
 					localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
-				{
 					bitmap = getBitmapDataFromFile(file);
-				}
+
+				if (bitmap != null) break;
 			}
 		}
 
@@ -279,7 +271,14 @@ class Paths
 		}
 
 		trace('Failed to load image: $file');
-		return null;
+		
+		if (currentTrackedAssets.exists('__flixel_logo'))
+		{
+			localTrackedAssets.push('__flixel_logo');
+			return currentTrackedAssets.get('__flixel_logo');
+		}
+
+		return cacheBitmap('__flixel_logo', FlxAssets.getBitmapFromClass(GraphicLogo));
 	}
 
 	public static function cacheBitmap(file:String, ?bitmap:BitmapData = null):FlxGraphic

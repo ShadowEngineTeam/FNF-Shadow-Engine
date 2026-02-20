@@ -12,11 +12,6 @@ import openfl.utils.Future;
 import openfl.utils._internal.UInt8Array;
 import lime.media.AudioBuffer;
 import lime.media.AudioSource;
-#if lime_vorbis
-import haxe.io.Bytes;
-import lime.media.vorbis.VorbisFile;
-import lime.media.vorbis.VorbisInfo;
-#end
 #end
 
 /**
@@ -375,46 +370,6 @@ class Sound extends EventDispatcher
 	{
 		#if lime
 		var sound = new Sound();
-		#if lime_vorbis
-		var limeBytes:Bytes = bytes; 
-		if (limeBytes.get(0) == 0x4F && limeBytes.get(1) == 0x67 && limeBytes.get(2) == 0x67 && limeBytes.get(3) == 0x53)
-		{
-			var vorbisFile:VorbisFile = VorbisFile.fromBytes(limeBytes);
-			if (vorbisFile != null)
-			{
-				var info:VorbisInfo = vorbisFile.info();
-				var pcmTotal:haxe.Int64 = vorbisFile.pcmTotal(-1);
-				
-				var totalSamples:Int = Std.int((pcmTotal.high * 4294967296 + pcmTotal.low));
-
-				if (totalSamples > 0)
-				{
-					var totalBytes:Int = totalSamples * info.channels * 2;
-					var pcmData:Bytes = Bytes.alloc(totalBytes);
-
-					var totalRead:Int = 0;
-					var chunkSize = 0x4000;
-
-					while (totalRead < totalSamples)
-					{
-						if (totalRead + chunkSize > totalSamples)
-							chunkSize = totalSamples - totalRead;
-
-						var readSamples:Int = vorbisFile.read(pcmData, totalRead, chunkSize, false, 2, true);
-						
-						if (readSamples <= 0) break;
-						totalRead += readSamples;
-					}
-
-					var outputByteArray:ByteArray = new ByteArray();
-					outputByteArray.writeBytes(pcmData, 0, pcmData.length);
-					outputByteArray.position = 0;
-					sound.loadPCMFromByteArray(outputByteArray, totalSamples, "16bit", info.channels > 1, info.rate);
-					return sound;
-				}
-			}
-		}
-		#end
 		sound.__buffer = AudioBuffer.fromBytes(bytes);
 		return sound;
 		#else

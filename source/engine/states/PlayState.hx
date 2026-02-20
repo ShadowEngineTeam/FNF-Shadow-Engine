@@ -2986,14 +2986,11 @@ class PlayState extends MusicBeatState
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if (!practiceMode && !cpuControlled)
+		if (!practiceMode && !cpuControlled && !note.ratingDisabled)
 		{
 			songScore += score;
-			if (!note.ratingDisabled)
-			{
-				songHits++;
-				totalPlayed++;
-			}
+			songHits++;
+			totalPlayed++;
 		}
 
 		var uiPrefix:String = "";
@@ -3783,7 +3780,6 @@ class PlayState extends MusicBeatState
 
 	override function destroy()
 	{
-		NoteSplash.mainGroup = null;
 		instance = null;
 
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
@@ -3791,6 +3787,8 @@ class PlayState extends MusicBeatState
 
 		FlxG.animationTimeScale = 1;
 
+		NoteSplash.mainGroup = null;
+		NoteSplash.usePixelTextures = StrumNote.usePixelTextures = Note.usePixelTextures = null;
 		Note.globalRgbShaders = [];
 		SustainSplash.close();
 		backend.NoteTypesConfig.clearNoteTypesData();
