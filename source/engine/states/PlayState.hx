@@ -2857,14 +2857,11 @@ class PlayState extends MusicBeatState
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if (!practiceMode && !cpuControlled)
+		if (!practiceMode && !cpuControlled && !note.ratingDisabled)
 		{
 			songScore += score;
-			if (!note.ratingDisabled)
-			{
-				songHits++;
-				totalPlayed++;
-			}
+			songHits++;
+			totalPlayed++;
 		}
 
 		var uiPrefix:String = "";
