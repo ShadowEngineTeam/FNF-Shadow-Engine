@@ -3659,9 +3659,7 @@ class PlayState extends MusicBeatState
 		FlxG.animationTimeScale = 1;
 
 		NoteSplash.mainGroup = null;
-		NoteSplash.usePixelTextures = null;
-		StrumNote.usePixelTextures = null;
-		Note.usePixelTextures = null;
+		NoteSplash.usePixelTextures = StrumNote.usePixelTextures = Note.usePixelTextures = null;
 		Note.globalRgbShaders = [];
 		SustainSplash.close();
 		backend.NoteTypesConfig.clearNoteTypesData();
