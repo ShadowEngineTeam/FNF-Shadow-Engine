@@ -2652,7 +2652,7 @@ class ChartingState extends MusicBeatState
 		else if (FlxG.save.data.chart_waveformOppVoices)
 			sound = opponentVocals;
 
-		if (sound != null && sound._sound != null && sound._sound.__buffer != null)
+		if (sound != null && sound._sound != null && sound._sound.__buffer != null && sound._sound.__buffer.data != null)
 		{
 			var bytes:Bytes = sound._sound.__buffer.data.toBytes();
 

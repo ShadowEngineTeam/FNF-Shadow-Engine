@@ -131,7 +131,6 @@ class PlayState extends MusicBeatState
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
-	public var camZoomingFrequency:Float = 4;
 	public var camZoomingDecay:Float = 1;
 
 	private var curSong:String = "";
@@ -3438,7 +3437,6 @@ class PlayState extends MusicBeatState
 			return; // fuck it we ball
 
 		noteMissCommon(direction);
-		FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 		callOnScripts('noteMissPress', [direction]);
 	}
 
@@ -3494,6 +3492,9 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		if (note.mustPress)
+			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+
 		if (instakillOnMiss)
 		{
 			vocals.volume = 0;
@@ -3508,7 +3509,7 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= Rating.MISS_SCORE;
+			songScore -= (note.isSustainNote) ? Rating.SUSTAIN_MISS_SCORE : Rating.MISS_SCORE;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
@@ -3719,7 +3720,7 @@ class PlayState extends MusicBeatState
 			health += note.hitHealth * healthGain;
 
 		if (note.isSustainNote && !cpuControlled)
-			songScore += 10;
+			songScore += Rating.SUSTAIN_SCORE;
 
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
 		var result:Dynamic = callOnLuas('goodNoteHit', args);
@@ -3854,12 +3855,6 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && (curBeat % camZoomingFrequency) == 0)
-		{
-			FlxG.camera.zoom += 0.015 * camZoomingMult;
-			camHUD.zoom += 0.03 * camZoomingMult;
-		}
-
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
@@ -3909,8 +3904,7 @@ class PlayState extends MusicBeatState
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
 				moveCameraSection();
 
-			var vsliceCondition:Bool = (curBeat % camZoomingFrequency) == 0;
-			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && !vsliceCondition)
+			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms)
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
