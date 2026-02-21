@@ -14,6 +14,7 @@ import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.geom.Rectangle;
+import lime.ui.FileDialog;
 import backend.Song;
 import backend.Section;
 import backend.StageData;
@@ -100,8 +101,6 @@ class ChartingState extends MusicBeatState
 			"Focus camera on the specific point.\nThis will also lock the camera (like Camera Follow Pos)\n\nValue1:character to focus\nValue2: separated with ',' x, y, duration, ease"
 		]
 	];
-
-	var _file:FileReference;
 
 	var UI_box:ShadowTabMenu;
 	var UI_help:ShadowPanel;
@@ -3588,18 +3587,8 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			#if mobile
 			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.onCancel.add(() -> onSaveCancel(null));
-			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data.trim(), null, Paths.formatToSongPath(_song.song) + ".json", null, "*/*");
-			#else
-			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
-			#end
+			fileDialog.save(data.trim(), null, Paths.formatToSongPath(_song.song) + ".json", null, "application/json");
 		}
 	}
 
@@ -3623,51 +3612,9 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			#if mobile
 			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.onCancel.add(() -> onSaveCancel(null));
-			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "*/*");
-			#else
-			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), "events" + (isDiffErect ? '-erect' : "") + ".json");
-			#end
+			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "application/json");
 		}
-	}
-
-	function onSaveComplete(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.notice("Successfully saved LEVEL DATA.");
-	}
-
-	/**
-	 * Called when the save file dialog is cancelled.
-	 */
-	function onSaveCancel(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-	}
-
-	/**
-	 * Called if there is an error while saving the gameplay recording.
-	 */
-	function onSaveError(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.error("Problem saving Level data");
 	}
 
 	function getSectionBeats(?section:Null<Int> = null)

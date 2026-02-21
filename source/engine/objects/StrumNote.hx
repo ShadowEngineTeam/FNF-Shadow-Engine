@@ -91,7 +91,7 @@ class StrumNote extends FlxSkewedSprite
 		var skin:String = if (daTexture != null && daTexture.length > 1) daTexture else Note.defaultNoteSkin;
 		var customSkin:String = skin + skinPostfix;
 
-		if (#if HAS_GPU_TEXTURES Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || #end Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+		if (#if USING_GPU_TEXTURES Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || #end Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 		else
 			skin = Note.defaultNoteSkin;

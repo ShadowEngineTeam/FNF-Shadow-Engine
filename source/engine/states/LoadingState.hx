@@ -389,7 +389,7 @@ class LoadingState extends MusicBeatState
 				else
 				#end
 				{
-					#if HAS_GPU_TEXTURES
+					#if USING_GPU_TEXTURES
 					file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
 					if (Paths.currentTrackedAssets.exists(file))
 					{
@@ -469,7 +469,7 @@ class LoadingState extends MusicBeatState
 					else
 					#end
 					{
-						#if HAS_GPU_TEXTURES
+						#if USING_GPU_TEXTURES
 						file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
 						if (Paths.currentTrackedAssets.exists(file))
 						{

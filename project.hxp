@@ -326,17 +326,12 @@ class Project extends HXProject
 			addAssetPath("assets/funkin_resources/shared", 'assets/shared', false);
 		}
 
-		final textureFormats:Array<String> = ["ASTC", "BC", "PNG"];
+		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
 
 		for (format in textureFormats)
 			if (defines.exists(format))
-				hasFormat = true;
-
-		if (!hasFormat)
-			setDefine("PNG");
-		else
-			setDefine("HAS_GPU_TEXTURES");
+				setHaxedef("USING_GPU_TEXTURES");
 
 		for (format in textureFormats)
 			if (defines.exists(format))

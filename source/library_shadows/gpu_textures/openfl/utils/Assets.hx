@@ -135,7 +135,7 @@ class Assets
 			}
 		}
 
-		#if HAS_GPU_TEXTURES
+		#if USING_GPU_TEXTURES
 		final extension:String = backend.Paths.GPU_IMAGE_EXT;
 		final textureName:String = haxe.io.Path.withoutExtension(id) + '.$extension';
 
