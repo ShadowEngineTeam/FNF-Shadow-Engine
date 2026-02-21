@@ -1440,11 +1440,12 @@ class PlayState extends MusicBeatState
 		// NEW SHIT
 		noteData = songData.notes;
 
-		var file:String = Paths.json(songName + '/events');
+		final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
+		var file:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
 		
-		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events' + (isDiffErect ? '-erect' : ""))) || #end FileSystem.exists(file))
 		{
-			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
+			var eventsData:Array<Dynamic> = Song.loadFromJson('events' + (isDiffErect ? '-erect' : ""), songName).events;
 			for (event in eventsData) // Event Notes
 				for (i in 0...event[1].length)
 					makeEvent(event, i);

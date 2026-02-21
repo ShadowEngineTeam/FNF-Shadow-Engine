@@ -194,6 +194,8 @@ class ChartingState extends MusicBeatState
 
 	public var mouseQuant:Bool = false;
 
+	private final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
+
 	override function create()
 	{
 		if (PlayState.SONG != null)
@@ -616,10 +618,10 @@ class ChartingState extends MusicBeatState
 		var loadEventJson:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap + 75, row5, "Load Events", function()
 		{
 			var songName:String = Paths.formatToSongPath(_song.song);
-			var baseFile:String = Paths.json(songName + '/events');
+			var baseFile:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
 			var exists:Bool = false;
 			#if FEATURE_MODS
-			var modFile:String = Paths.modsJson(songName + '/events');
+			var modFile:String = Paths.modsJson(songName + '/events' + (isDiffErect ? '-erect' : ""));
 			if (FileSystem.exists(modFile))
 				exists = true;
 			else if (FileSystem.exists(baseFile))
@@ -632,7 +634,7 @@ class ChartingState extends MusicBeatState
 			if (exists)
 			{
 				clearEvents();
-				var events:SwagSong = Song.loadFromJson("events", songName);
+				var events:SwagSong = Song.loadFromJson("events" + (isDiffErect ? '-erect' : ""), songName);
 				_song.events = events.events;
 				changeSection(curSec);
 			}
@@ -3181,7 +3183,8 @@ class ChartingState extends MusicBeatState
 		else // Event note
 		{
 			note.loadGraphic(Paths.image('eventArrow'));
-			note.rgbShader.enabled = false;
+			if (note.rgbShader != null)
+				note.rgbShader.enabled = false;
 			note.eventName = getEventName(i[1]);
 			note.eventLength = i[1].length;
 			if (i[1].length < 2)
@@ -3613,13 +3616,13 @@ class ChartingState extends MusicBeatState
 			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 			fileDialog.onCancel.add(() -> onSaveCancel(null));
 			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data.trim(), null, "events.json", null, "*/*");
+			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "*/*");
 			#else
 			_file = new FileReference();
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), "events.json");
+			_file.save(data.trim(), "events" + (isDiffErect ? '-erect' : "") + ".json");
 			#end
 		}
 	}
