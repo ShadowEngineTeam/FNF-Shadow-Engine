@@ -316,17 +316,12 @@ class Project extends HXProject
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
-		final textureFormats:Array<String> = ["ASTC", "BC", "PNG"];
+		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
 
 		for (format in textureFormats)
 			if (defines.exists(format))
-				hasFormat = true;
-
-		if (!hasFormat)
-			setDefine("PNG");
-		else
-			setDefine("USING_GPU_TEXTURES");
+				setHaxedef("USING_GPU_TEXTURES");
 
 		for (format in textureFormats)
 			if (defines.exists(format))
