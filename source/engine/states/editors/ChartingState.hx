@@ -14,7 +14,6 @@ import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.geom.Rectangle;
-import openfl.net.FileReference;
 import backend.Song;
 import backend.Section;
 import backend.StageData;

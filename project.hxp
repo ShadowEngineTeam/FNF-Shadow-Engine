@@ -335,6 +335,8 @@ class Project extends HXProject
 
 		if (!hasFormat)
 			setDefine("PNG");
+		else
+			setDefine("HAS_GPU_TEXTURES");
 
 		for (format in textureFormats)
 			if (defines.exists(format))

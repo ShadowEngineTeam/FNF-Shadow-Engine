@@ -426,12 +426,14 @@ class WeekEditorState extends MusicBeatState
 				}
 				else
 				{
+					#if HAS_GPU_TEXTURES
 					var baseGpuPath:String = Paths.getPath('images/storymenu/' + assetName + Paths.GPU_IMAGE_EXT, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
 					if (FileSystem.exists(baseGpuPath))
 					{
 						weekThing.loadGraphic(baseGpuPath);
 						isMissing = false;
 					}
+					#end
 				}
 			}
 		}

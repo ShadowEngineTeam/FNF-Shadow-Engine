@@ -99,6 +99,7 @@ class Character extends FlxAnimate
 		animOffsets = new Map<String, Array<Dynamic>>();
 		curCharacter = character;
 		this.isPlayer = isPlayer;
+		useRenderTexture = true;
 		switch (curCharacter)
 		{
 			// case 'your character name in case you want to hardcode them instead':
@@ -166,7 +167,7 @@ class Character extends FlxAnimate
 		else
 		{
 			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE)
-				&& !Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, Paths.GPU_IMAGE_EXT)}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
+				#if HAS_GPU_TEXTURES && !Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, Paths.GPU_IMAGE_EXT)}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) #end)
 			{
 				spriteType = TEXTURE_ATLAS;
 				isAnimateAtlas = true;
