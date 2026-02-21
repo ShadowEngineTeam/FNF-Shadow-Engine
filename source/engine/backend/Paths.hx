@@ -17,7 +17,9 @@ import animate.FlxAnimateFrames;
 class Paths
 {
 	public static final IMAGE_EXT:String = "png";
+	#if USING_GPU_TEXTURES
 	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BC "dds" #else IMAGE_EXT #end;
+	#end
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
@@ -25,7 +27,9 @@ class Paths
 
 	public static final dumpExclusions:Array<String> = [
 		'assets/shared/images/touchpad/bg.$IMAGE_EXT',
+		#if USING_GPU_TEXTURES
 		'assets/shared/images/touchpad/bg.$GPU_IMAGE_EXT',
+		#end
 		'assets/shared/music/freakyMenu.ogg'
 	];
 
@@ -248,7 +252,7 @@ class Paths
 		else
 		#end
 		{
-			for (IMG_EXT in [GPU_IMAGE_EXT, IMAGE_EXT])
+			for (IMG_EXT in [#if USING_GPU_TEXTURES GPU_IMAGE_EXT, #end IMAGE_EXT])
 			{
 				file = getPath('images/$key.$IMG_EXT', getImageAssetType(IMG_EXT), library);
 				if (currentTrackedAssets.exists(file))
@@ -323,7 +327,7 @@ class Paths
 
 		var bitmap:BitmapData = null;
 		var ext:String = haxe.io.Path.extension(file).toLowerCase();
-		if (ext == GPU_IMAGE_EXT)
+		if (#if USING_GPU_TEXTURES ext == GPU_IMAGE_EXT && #end ext != IMAGE_EXT)
 		{
 			try
 			{
@@ -570,9 +574,11 @@ class Paths
 
 	inline public static function modsImages(key:String):String
 	{
+		#if USING_GPU_TEXTURES
 		var gpuFile:String = modFolders('images/' + key + '.${GPU_IMAGE_EXT}');
 		if (FileSystem.exists(gpuFile))
 			return gpuFile;
+		#end
 
 		return modFolders('images/' + key + '.${IMAGE_EXT}');
 	}

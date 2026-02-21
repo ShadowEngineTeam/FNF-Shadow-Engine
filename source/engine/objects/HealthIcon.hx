@@ -33,10 +33,10 @@ class HealthIcon extends FlxSprite
 		{
 			var name:String = 'icons/' + char;
 			if (!Paths.fileExists('images/' + name + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT))
-				&& !Paths.fileExists('images/' + name + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
+				#if USING_GPU_TEXTURES && !Paths.fileExists('images/' + name + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) #end)
 				name = 'icons/icon-' + char; // Older versions of psych engine's support
 			if (!Paths.fileExists('images/' + name + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT))
-				&& !Paths.fileExists('images/' + name + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)))
+				#if USING_GPU_TEXTURES && !Paths.fileExists('images/' + name + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) #end)
 				name = 'icons/icon-face'; // Prevents crash from missing icon
 
 			var graphic = Paths.image(name);

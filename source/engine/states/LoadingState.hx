@@ -389,6 +389,7 @@ class LoadingState extends MusicBeatState
 				else
 				#end
 				{
+					#if USING_GPU_TEXTURES
 					file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
 					if (Paths.currentTrackedAssets.exists(file))
 					{
@@ -398,6 +399,7 @@ class LoadingState extends MusicBeatState
 					else if (FileSystem.exists(file))
 						bitmap = Paths.getBitmapDataFromFile(file);
 					else
+					#end
 					{
 						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 						if (Paths.currentTrackedAssets.exists(file))
@@ -467,6 +469,7 @@ class LoadingState extends MusicBeatState
 					else
 					#end
 					{
+						#if USING_GPU_TEXTURES
 						file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
 						if (Paths.currentTrackedAssets.exists(file))
 						{
@@ -483,6 +486,7 @@ class LoadingState extends MusicBeatState
 						else if (FileSystem.exists(file))
 							bitmap = Paths.getBitmapDataFromFile(file);
 						else
+						#end
 						{
 							file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 							if (Paths.currentTrackedAssets.exists(file))

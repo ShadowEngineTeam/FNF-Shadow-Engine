@@ -1,9 +1,8 @@
 package states.editors;
 
-import openfl.net.FileReference;
+import lime.ui.FileDialog;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import openfl.net.FileFilter;
 import lime.system.Clipboard;
 import objects.TypedAlphabet;
 import cutscenes.DialogueBoxPsych;
@@ -846,28 +845,16 @@ class DialogueCharacterEditorState extends MusicBeatState
 		super.update(elapsed);
 	}
 
-	var _file:FileReference = null;
-
 	function loadCharacter()
 	{
-		#if mobile
 		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
 		fileDialog.onOpen.add((file) -> onLoadComplete(file));
-		fileDialog.onCancel.add(() -> onLoadCancel(true));
 		fileDialog.open('json');
-		#else
-		var jsonFilter:FileFilter = new FileFilter('JSON', 'json');
-		_file = new FileReference();
-		_file.addEventListener(Event.COMPLETE, onLoadComplete);
-		_file.addEventListener(Event.CANCEL, onLoadCancel);
-		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-		_file.browse([jsonFilter]);
-		#end
 	}
 
-	function onLoadComplete(#if mobile file:haxe.io.Bytes #else _ #end):Void
+	function onLoadComplete(file:haxe.io.Bytes):Void
 	{
-		#if mobile
+		#if sys
 		if (file != null && file.length > 0)
 		{
 			var jsonStr:String = file.getString(0, file.length);
@@ -888,73 +875,9 @@ class DialogueCharacterEditorState extends MusicBeatState
 				return;
 			}
 		}
-		#elseif sys
-		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
-		_file.removeEventListener(Event.CANCEL, onLoadCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-
-		var fullPath:String = null;
-		@:privateAccess
-		if (_file.__path != null)
-			fullPath = _file.__path;
-
-		if (fullPath != null)
-		{
-			var rawJson:String = File.getContent(fullPath);
-			if (rawJson != null)
-			{
-				var loadedChar:DialogueCharacterFile = cast Json.parse(rawJson, fullPath);
-				if (loadedChar.dialogue_pos != null) // Make sure it's really a dialogue character
-				{
-					var cutName:String = _file.name.substr(0, _file.name.length - 5);
-					trace("Successfully loaded file: " + cutName);
-					character.jsonFile = loadedChar;
-					reloadCharacter();
-					reloadAnimationsDropDown();
-					updateCharTypeBox();
-					updateTextBox();
-					daText.resetDialogue();
-					imageInputText.text = character.jsonFile.image;
-					scaleStepper.value = character.jsonFile.scale;
-					xStepper.value = character.jsonFile.position[0];
-					yStepper.value = character.jsonFile.position[1];
-					_file = null;
-					return;
-				}
-			}
-		}
-		_file = null;
 		#else
-		trace("File couldn't be loaded! You aren't on Desktop, are you?");
+		trace("File couldn't be loaded! You aren't on Native, are you?");
 		#end
-	}
-
-	/**
-	 * Called when the save file dialog is cancelled.
-	 */
-	function onLoadCancel(_):Void
-	{
-		#if !mobile
-		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
-		_file.removeEventListener(Event.CANCEL, onLoadCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-		_file = null;
-		#end
-		trace("Cancelled file loading.");
-	}
-
-	/**
-	 * Called if there is an error while saving the gameplay recording.
-	 */
-	function onLoadError(_):Void
-	{
-		#if !mobile
-		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
-		_file.removeEventListener(Event.CANCEL, onLoadCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-		_file = null;
-		#end
-		trace("Problem loading file");
 	}
 
 	function saveCharacter()
@@ -964,55 +887,12 @@ class DialogueCharacterEditorState extends MusicBeatState
 		{
 			var splittedImage:Array<String> = imageInputText.text.trim().split('_');
 			var characterName:String = splittedImage[0].toLowerCase().replace(' ', '');
-
-			#if mobile
 			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.onCancel.add(() -> onSaveCancel(null));
-			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data, null, characterName + ".json", null, "*/*");
-			#else
-			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, characterName + ".json");
-			#end
+			fileDialog.save(data, null, characterName + ".json", null, "application/json");
 		}
 	}
 
-	function onSaveComplete(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.notice("Successfully saved file.");
-	}
-
-	/**
-	 * Called when the save file dialog is cancelled.
-	 */
-	function onSaveCancel(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-	}
-
-	/**
-	 * Called if there is an error while saving the gameplay recording.
-	 */
-	function onSaveError(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.error("Problem saving file");
-	}
-
-	function ClipboardAdd(prefix:String = ''):String
+	function clipboardAdd(prefix:String = ''):String
 	{
 		if (prefix.toLowerCase().endsWith('v')) // probably copy paste attempt
 		{
