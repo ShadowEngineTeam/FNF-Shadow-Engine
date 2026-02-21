@@ -232,7 +232,6 @@ class Project extends HXProject
 
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");
-		setHaxedef("HXCPP_STACK_IDS");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
 		if (FEATURE_DCE.isDisabled())
