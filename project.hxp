@@ -34,6 +34,7 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+	static final FEATURE_WEBVIEW:CompileFlag = CompileFlag.get("FEATURE_WEBVIEW");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -215,6 +216,7 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
+		FEATURE_WEBVIEW.integrate(isDesktop());
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -316,6 +318,9 @@ class Project extends HXProject
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
+		if (FEATURE_WEBVIEW.isEnabled())
+			addAssetPath("monaco", null, false);
+
 		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
 
@@ -360,6 +365,9 @@ class Project extends HXProject
 			includeHaxelib("hxvlc");
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
+
+		if (FEATURE_WEBVIEW.isEnabled())
+			includeHaxelib('hxwebview');
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");

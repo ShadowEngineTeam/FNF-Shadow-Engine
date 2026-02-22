@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    html, body, #container {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+  var require = {
+    paths: { vs: "/vs" }
+  };
+</script>
+
+<script src="/vs/loader.js"></script>
+
+<script>
+  require(["vs/editor/editor.main"], function () {
+    monaco.editor.create(document.getElementById("container"), {
+      value: "package;\n\nclass Main\n{\n  public static function main()\n  {\n    trace('hello world');\n  }\n}",
+      language: "javascript",
+      theme: "vs-dark",
+      automaticLayout: true
+    });
+  });
+</script>
+
+</body>
+</html>
+index.html
