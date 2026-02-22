@@ -30,8 +30,8 @@ class MobileData
 		#if FEATURE_MODS
 		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'mobile/'))
 		{
-			readDirectory(Path.join([folder, 'DPadModes']), dpadModes);
-			readDirectory(Path.join([folder, 'ActionModes']), actionModes);
+			readFilesFromDirectory(Path.join([folder, 'DPadModes']), dpadModes);
+			readFilesFromDirectory(Path.join([folder, 'ActionModes']), actionModes);
 		}
 		#end
 
@@ -97,7 +97,7 @@ class MobileData
 		return buttonsInstance;
 	}
 
-	public static function readDirectory(folder:String, map:Dynamic)
+	public static function readFilesFromDirectory(folder:String, map:Dynamic)
 	{
 		folder = folder.contains(':') ? folder.split(':')[1] : folder;
 
