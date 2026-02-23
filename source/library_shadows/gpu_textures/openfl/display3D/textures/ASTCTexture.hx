@@ -22,7 +22,6 @@ import openfl.Lib;
 @:access(openfl.display3D.Context3D)
 @:final class ASTCTexture extends TextureBase
 {
-	@:noCompletion private static var __lowMemoryMode:Bool = false;
 	@:noCompletion private static var __warned:Bool = false;
 	public static inline final ASTC_MAGIC_NUMBER:Int = 0x5CA1AB13;
 	public static inline final IMAGE_DATA_OFFSET = 16;

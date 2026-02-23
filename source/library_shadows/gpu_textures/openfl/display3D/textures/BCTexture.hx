@@ -21,6 +21,7 @@ import openfl.Lib;
 @:access(openfl.display3D.Context3D)
 @:final class BCTexture extends TextureBase
 {
+	@:noCompletion private static var __warned:Bool = false;
 	public static inline final BC_MAGIC_NUMBER:Int = 0x20534444;
 	public static inline final IMAGE_DATA_OFFSET = 148;
 
@@ -58,7 +59,11 @@ import openfl.Lib;
 
 		if (!extensionSupported)
 		{
-			Lib.current.stage.window.alert('BC compression for $__bcFormat is not available on this device.', "Rendering Error!");
+			if (!__warned)
+			{
+				Lib.current.stage.window.alert('BC compression for $__bcFormat is not available on this device.', "Rendering Error!");
+				__warned = true;
+			}
 			supported = false;
 			return;
 		}
