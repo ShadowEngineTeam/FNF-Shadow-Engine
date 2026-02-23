@@ -323,13 +323,24 @@ class Project extends HXProject
 			if (defines.exists(format))
 				setHaxedef("USING_GPU_TEXTURES");
 
+		var needsPNG:Bool = true;
 		for (format in textureFormats)
+		{
 			if (defines.exists(format))
 			{
+				needsPNG = false;
 				if (FEATURE_MOBILE_CONTROLS.isEnabled())
 					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/mobile', false);
 				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
 			}
+		}
+
+		if (needsPNG)
+		{
+			if (FEATURE_MOBILE_CONTROLS.isEnabled())
+				addAssetPath('assets/mobile-images/png', 'assets/shared/mobile', false);
+			addAssetPath('assets/images-png', 'assets/shared/images');
+		}
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");

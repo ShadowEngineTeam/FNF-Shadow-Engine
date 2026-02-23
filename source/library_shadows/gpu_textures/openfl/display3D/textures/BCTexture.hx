@@ -21,6 +21,7 @@ import openfl.Lib;
 @:access(openfl.display3D.Context3D)
 @:final class BCTexture extends TextureBase
 {
+	public static inline final BC_MAGIC_NUMBER:Int = 0x20534444;
 	public static inline final IMAGE_DATA_OFFSET = 148;
 
 	public var supported:Bool = true;
@@ -222,6 +223,14 @@ import openfl.Lib;
 					__bcFormat = "BC7"; // assuming DX10 if not legacy
 			}
 		}
+	}
+
+	public static function isBytesBC(bytes:ByteArray)
+	{
+		bytes.position = 0;
+		var magic = bytes.readUnsignedInt();
+
+		return magic == BC_MAGIC_NUMBER;
 	}
 }
 #end

@@ -24,6 +24,7 @@ import openfl.Lib;
 {
 	@:noCompletion private static var __lowMemoryMode:Bool = false;
 	@:noCompletion private static var __warned:Bool = false;
+	public static inline final ASTC_MAGIC_NUMBER:Int = 0x5CA1AB13;
 	public static inline final IMAGE_DATA_OFFSET = 16;
 
 	public var supported:Bool = true;
@@ -151,7 +152,7 @@ import openfl.Lib;
 		bytes.position = 0;
 
 		var magic = bytes.readUnsignedInt();
-		if (magic != 0x5CA1AB13)
+		if (magic != ASTC_MAGIC_NUMBER)
 		{
 			trace('[ERROR] Invalid ASTC file: magic number mismatch!');
 			supported = false;
@@ -172,6 +173,13 @@ import openfl.Lib;
 		// SHADOW TODO: better sRGB and HDR implement
 		// __isSRGB = (flags & 0x1) != 0;
 		// __isHDR = (flags & 0x2) != 0;
+	}
+
+	public static function isBytesASTC(bytes:ByteArray)
+	{
+		bytes.position = 0;
+		var magic = bytes.readUnsignedInt();
+		return magic == ASTC_MAGIC_NUMBER;
 	}
 }
 #end
