@@ -25,26 +25,6 @@ class StorageUtil
 	}
 	#end
 
-	public static function saveContent(fileName:String, fileData:String, ?alert:Bool = true):Void
-	{
-		final folder:String = Sys.getCwd() + 'saves/';
-
-		try
-		{
-			if (!FileSystem.exists(folder))
-				FileSystem.createDirectory(folder);
-
-			File.saveContent('$folder$fileName', fileData);
-			if (alert)
-				CoolUtil.showPopUp('$fileName has been saved.', "Success!");
-		}
-		catch (e:Dynamic)
-			if (alert)
-				CoolUtil.showPopUp('$fileName couldn\'t be saved.\n(${e.message})', "Error!")
-			else
-				trace('$fileName couldn\'t be saved. (${e.message})');
-	}
-
 	#if android
 	public static function requestPermissions():Void
 	{
