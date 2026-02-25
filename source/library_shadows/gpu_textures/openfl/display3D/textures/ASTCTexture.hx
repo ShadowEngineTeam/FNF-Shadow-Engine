@@ -22,8 +22,8 @@ import openfl.Lib;
 @:access(openfl.display3D.Context3D)
 @:final class ASTCTexture extends TextureBase
 {
-	@:noCompletion private static var __lowMemoryMode:Bool = false;
 	@:noCompletion private static var __warned:Bool = false;
+	public static inline final ASTC_MAGIC_NUMBER:Int = 0x5CA1AB13;
 	public static inline final IMAGE_DATA_OFFSET = 16;
 
 	public var supported:Bool = true;
@@ -33,37 +33,64 @@ import openfl.Lib;
 	public var blockDimY:Int = -1;
 	public var blockDimZ:Int = -1;
 
+	private var __isSRGB:Bool = false;
+	private var __isHDR:Bool = false;
+
 	@:noCompletion private function new(context:Context3D, data:ByteArray)
 	{
 		super(context);
 		var gl = __context.gl;
-		var astcExtension = gl.getExtension("KHR_texture_compression_astc_ldr");
 
-		if (astcExtension == null)
+		var astcLdrExtension = gl.getExtension("KHR_texture_compression_astc_ldr");
+		var astcHdrExtension = gl.getExtension("KHR_texture_compression_astc_hdr");
+
+		if (astcLdrExtension == null && astcHdrExtension == null)
 		{
 			if (!__warned)
 			{
-				Lib.current.stage.window.alert("ASTC compression is not available on this device.", "Rendering Error!");
+				backend.CoolUtil.showPopUp("ASTC compression (LDR and HDR) is not available on this device.", "Rendering Error!");
 				__warned = true;
 			}
-
 			supported = false;
 		}
 
 		if (supported)
 		{
+			__parseASTCHeader(data);
 			__getImageSize(data);
 			__getImageDimensions(data);
 
-			var formatName = 'COMPRESSED_RGBA_ASTC_${blockDimX}x${blockDimY}_KHR';
-			if (!Reflect.fields(astcExtension).contains(formatName))
+			var formatName:String;
+			if (__isHDR)
 			{
-				trace('[ERROR] format: $formatName is invalid!');
+				// HDR: RGBA
+				formatName = 'COMPRESSED_RGBA_ASTC_${blockDimX}x${blockDimY}_KHR';
+				if (!Reflect.fields(astcHdrExtension).contains(formatName))
+				{
+					trace('[ERROR] HDR format: $formatName is invalid!');
+					supported = false;
+					return;
+				}
+				__format = Reflect.getProperty(astcHdrExtension, formatName);
+			}
+			else
+			{
+				// LDR: SRGB or RGBA
+				if (__isSRGB)
+					formatName = 'COMPRESSED_SRGB8_ALPHA8_ASTC_${blockDimX}x${blockDimY}_KHR';
+				else
+					formatName = 'COMPRESSED_RGBA_ASTC_${blockDimX}x${blockDimY}_KHR';
+
+				if (!Reflect.fields(astcLdrExtension).contains(formatName))
+				{
+					trace('[ERROR] LDR format: $formatName is invalid!');
+					supported = false;
+					return;
+				}
+				__format = Reflect.getProperty(astcLdrExtension, formatName);
 			}
 
-			var format = Reflect.getProperty(astcExtension, formatName);
-			__format = format;
-			__internalFormat = format;
+			__internalFormat = __format;
 			__optimizeForRenderToTexture = false;
 			__streamingLevels = 0;
 
@@ -117,6 +144,41 @@ import openfl.Lib;
 
 		var totalBlocks = blocksX * blocksY * blocksZ;
 		imageSize = totalBlocks * 16;
+	}
+
+	@:noCompletion private function __parseASTCHeader(bytes:ByteArray):Void
+	{
+		bytes.position = 0;
+
+		var magic = bytes.readUnsignedInt();
+		if (magic != ASTC_MAGIC_NUMBER)
+		{
+			trace('[ERROR] Invalid ASTC file: magic number mismatch!');
+			supported = false;
+			return;
+		}
+
+		bytes.position = 4;
+		blockDimX = bytes.readUnsignedByte();
+		blockDimY = bytes.readUnsignedByte();
+		blockDimZ = bytes.readUnsignedByte();
+
+		bytes.position = 7;
+		bytes.position += 9;
+
+		bytes.position = 7;
+		var flags = bytes.readUnsignedByte() >> 4;
+
+		// SHADOW TODO: better sRGB and HDR implement
+		// __isSRGB = (flags & 0x1) != 0;
+		// __isHDR = (flags & 0x2) != 0;
+	}
+
+	public static function isBytesASTC(bytes:ByteArray)
+	{
+		bytes.position = 0;
+		var magic = bytes.readUnsignedInt();
+		return magic == ASTC_MAGIC_NUMBER;
 	}
 }
 #end

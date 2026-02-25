@@ -1,5 +1,6 @@
 package backend;
 
+import flixel.system.FlxAssets;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
@@ -16,7 +17,9 @@ import animate.FlxAnimateFrames;
 class Paths
 {
 	public static final IMAGE_EXT:String = "png";
-	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif S3TC "dds" #else IMAGE_EXT #end;
+	#if USING_GPU_TEXTURES
+	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BC "dds" #else IMAGE_EXT #end;
+	#end
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
@@ -24,7 +27,9 @@ class Paths
 
 	public static final dumpExclusions:Array<String> = [
 		'assets/shared/images/touchpad/bg.$IMAGE_EXT',
+		#if USING_GPU_TEXTURES
 		'assets/shared/images/touchpad/bg.$GPU_IMAGE_EXT',
+		#end
 		'assets/shared/music/freakyMenu.ogg'
 	];
 
@@ -207,9 +212,6 @@ class Paths
 		if (!ignoreMods)
 		{
 			var modKey:String = key;
-			if (library == "songs")
-				modKey = 'songs/$key';
-
 			for (mod in Mods.getGlobalMods())
 				if (FileSystem.exists(mods('$mod/$modKey')))
 					return true;
@@ -245,32 +247,23 @@ class Paths
 		}
 		else if (FileSystem.exists(file))
 		{
-			bitmap = getBitmapDataFromFile(file);
+			bitmap = BitmapData.fromBytes(File.getBytes(file));
 		}
 		else
 		#end
 		{
-			file = getPath('images/$key.$GPU_IMAGE_EXT', getImageAssetType(GPU_IMAGE_EXT), library);
-			if (currentTrackedAssets.exists(file))
+			for (IMG_EXT in [#if USING_GPU_TEXTURES GPU_IMAGE_EXT, #end IMAGE_EXT])
 			{
-				localTrackedAssets.push(file);
-				return currentTrackedAssets.get(file);
-			}
-			else if (FileSystem.exists(file))
-				bitmap = getBitmapDataFromFile(file);
-
-			if (bitmap == null)
-			{
-				file = getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library);
+				file = getPath('images/$key.$IMG_EXT', getImageAssetType(IMG_EXT), library);
 				if (currentTrackedAssets.exists(file))
 				{
 					localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
-				{
-					bitmap = getBitmapDataFromFile(file);
-				}
+					bitmap = BitmapData.fromBytes(File.getBytes(file));
+
+				if (bitmap != null) break;
 			}
 		}
 
@@ -282,7 +275,14 @@ class Paths
 		}
 
 		trace('Failed to load image: $file');
-		return null;
+		
+		if (currentTrackedAssets.exists('__flixel_logo'))
+		{
+			localTrackedAssets.push('__flixel_logo');
+			return currentTrackedAssets.get('__flixel_logo');
+		}
+
+		return cacheBitmap('__flixel_logo', FlxAssets.getBitmapFromClass(GraphicLogo));
 	}
 
 	public static function cacheBitmap(file:String, ?bitmap:BitmapData = null):FlxGraphic
@@ -290,14 +290,7 @@ class Paths
 		if (bitmap == null)
 		{
 			if (FileSystem.exists(file))
-				bitmap = getBitmapDataFromFile(file);
-			else
-			{
-				if (Assets.exists(file, getImageAssetType(GPU_IMAGE_EXT)))
-					bitmap = Assets.getBitmapData(file);
-				else if (Assets.exists(file, getImageAssetType(IMAGE_EXT)))
-					bitmap = Assets.getBitmapData(file);
-			}
+				bitmap = BitmapData.fromBytes(File.getBytes(file));
 
 			if (bitmap == null)
 				return null;
@@ -320,44 +313,6 @@ class Paths
 		return newGraphic;
 	}
 
-	public static function getBitmapDataFromFile(file:String, useCache:Bool = true):BitmapData
-	{
-		if (useCache && currentTrackedAssets.exists(file))
-		{
-			var graphic = currentTrackedAssets.get(file);
-			if (graphic != null && graphic.bitmap != null)
-				return graphic.bitmap;
-		}
-
-		var ext:String = haxe.io.Path.extension(file).toLowerCase();
-		if (ext == 'astc' || ext == 'dds')
-		{
-			try
-			{
-				var bytes = sys.io.File.getBytes(file);
-				if (bytes != null)
-				{
-					var texture = switch (ext)
-					{
-						case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(bytes);
-						case 'dds': openfl.Lib.current.stage.context3D.createS3TCTexture(bytes);
-						default: null;
-					};
-
-					if (texture != null)
-						return BitmapData.fromTexture(texture);
-				}
-			}
-			catch (e:Dynamic)
-			{
-				//trace('Failed to load compressed texture from $file: $e');
-				return null;
-			}
-		}
-
-		return BitmapData.fromFile(file);
-	}
-
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
 		#if FEATURE_MODS
@@ -372,10 +327,6 @@ class Paths
 		var sharedPath:String = getSharedPath(key);
 		if (FileSystem.exists(sharedPath))
 			return File.getContent(sharedPath);
-
-		var path:String = getPath(key, TEXT);
-		if (Assets.exists(path, TEXT))
-			return Assets.getText(path);
 
 		return null;
 	}
@@ -437,8 +388,8 @@ class Paths
 		{
 			var retKey:String = (path != null) ? '$path/$key' : key;
 			retKey = getPath('$retKey.ogg', SOUND, library);
-			if (Assets.exists(retKey, SOUND))
-				currentTrackedSounds.set(gottenPath, Assets.getSound(retKey));
+			if (FileSystem.exists(retKey))
+				currentTrackedSounds.set(gottenPath, Sound.fromBytes(File.getBytes(retKey)));
 		}
 
 		localTrackedAssets.push(gottenPath);
@@ -572,9 +523,11 @@ class Paths
 
 	inline public static function modsImages(key:String):String
 	{
+		#if USING_GPU_TEXTURES
 		var gpuFile:String = modFolders('images/' + key + '.${GPU_IMAGE_EXT}');
 		if (FileSystem.exists(gpuFile))
 			return gpuFile;
+		#end
 
 		return modFolders('images/' + key + '.${IMAGE_EXT}');
 	}

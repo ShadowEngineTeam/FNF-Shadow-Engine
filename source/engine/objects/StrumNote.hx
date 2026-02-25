@@ -5,6 +5,8 @@ import shaders.ColorSwap;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
+using backend.CoolUtil;
+
 class StrumNote extends FlxSkewedSprite
 {
 	public var colorSwap:ColorSwap = null;
@@ -31,6 +33,22 @@ class StrumNote extends FlxSkewedSprite
 		return value;
 	}
 
+	public static var _activeStrumNotes:Array<StrumNote> = [];
+	
+	public static var usePixelTextures(default, set):Null<Bool>;
+
+	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
+	{
+		if (usePixelTextures != value)
+		{
+			usePixelTextures = value;
+			for (note in _activeStrumNotes)
+				note.reloadNote();
+		}
+
+		return value;
+	}
+
 	public var useRGBShader:Bool = true;
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
@@ -48,7 +66,7 @@ class StrumNote extends FlxSkewedSprite
 				useRGBShader = false;
 
 			var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
-			if (PlayState.isPixelStage)
+			if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 				arr = ClientPrefs.data.arrowRGBPixel[leData];
 
 			if (leData <= arr.length)
@@ -67,11 +85,13 @@ class StrumNote extends FlxSkewedSprite
 		this.noteData = leData;
 		super(x, y);
 
+		_activeStrumNotes.push(this);
+
 		var skinPostfix:String = Note.getNoteSkinPostfix();
 		var skin:String = if (daTexture != null && daTexture.length > 1) daTexture else Note.defaultNoteSkin;
 		var customSkin:String = skin + skinPostfix;
 
-		if (Paths.fileExists('images/${PlayState.isPixelStage ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || Paths.fileExists('images/${PlayState.isPixelStage ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+		if (#if USING_GPU_TEXTURES Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || #end Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 		else
 			skin = Note.defaultNoteSkin;
@@ -86,7 +106,7 @@ class StrumNote extends FlxSkewedSprite
 		if (animation.curAnim != null)
 			lastAnim = animation.curAnim.name;
 
-		if (PlayState.isPixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
 			loadGraphic(Paths.image('pixelUI/' + texture));
 			width = width / 4;
@@ -209,12 +229,18 @@ class StrumNote extends FlxSkewedSprite
 
 				if (animation.curAnim != null)
 				{
-					if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage)
+					if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage.priorityBool(usePixelTextures))
 						centerOrigin();
 				}
 			}
 		}
 		else if (useRGBShader)
 			rgbShader.enabled = (animation.curAnim != null && animation.curAnim.name != 'static');
+	}
+
+	override function destroy():Void
+	{
+		_activeStrumNotes.remove(this);
+		super.destroy();
 	}
 }

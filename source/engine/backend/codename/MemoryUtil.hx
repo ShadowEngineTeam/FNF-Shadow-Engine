@@ -198,7 +198,7 @@ final class MemoryUtil
 		if (process.exitCode() == 0)
 			return reg.matched(1);
 		#elseif android
-		// MTODO: Do get mem type for android smh?
+		// SHADOW TODO: Do get mem type for android smh?
 		#elseif linux
 		/*var process = new Process("sudo", ["dmidecode", "--type", "17"]);
 		if (process.exitCode() != 0) return "Unknown";

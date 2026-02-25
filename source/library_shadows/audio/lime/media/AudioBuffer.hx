@@ -186,7 +186,11 @@ class AudioBuffer
 		#elseif (lime_cffi && !macro)
 		#if lime_vorbis
 		var vorbisFile = VorbisFile.fromBytes(bytes);
-		if (vorbisFile != null) return fromVorbisFile(vorbisFile);
+		if (vorbisFile != null)
+		{
+			var buffer = fromVorbisFile(vorbisFile);
+			buffer.data = UInt8Array.fromBytes(bytes);
+		}
 		#end
 		#if !cs
 		var audioBuffer = new AudioBuffer();

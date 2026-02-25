@@ -18,7 +18,7 @@ class Project extends HXProject
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.6.0";
+	static final VERSION:String = "0.7.0";
 	static final COMPANY:String = "ShadowEngineTeam";
 	static final PACKAGE:String = "org.shadowengineteam.fnf";
 	static final MAIN_CLASS:String = "backend.Main";
@@ -318,19 +318,31 @@ class Project extends HXProject
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
 
-		final textureFormats:Array<String> = ["ASTC", "S3TC", "PNG"];
+		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
 
 		for (format in textureFormats)
 			if (defines.exists(format))
-				hasFormat = true;
+				setHaxedef("USING_GPU_TEXTURES");
 
-		if (!hasFormat)
-			setDefine("PNG");
-
+		var needsPNG:Bool = true;
 		for (format in textureFormats)
+		{
 			if (defines.exists(format))
+			{
+				needsPNG = false;
+				if (FEATURE_MOBILE_CONTROLS.isEnabled())
+					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', false);
 				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
+			}
+		}
+
+		if (needsPNG)
+		{
+			if (FEATURE_MOBILE_CONTROLS.isEnabled())
+				addAssetPath('assets/mobile-images/png', 'assets/shared/images', false);
+			addAssetPath('assets/images-png', 'assets/shared/images');
+		}
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");

@@ -5,6 +5,8 @@ import shaders.RGBPalette;
 import shaders.PixelSplashShader.PixelSplashShaderRef;
 import flixel.graphics.frames.FlxFrame;
 
+using backend.CoolUtil;
+
 typedef NoteSplashConfig =
 {
 	anim:String,
@@ -22,7 +24,7 @@ class NoteSplash extends FlxSprite
 	private var _textureLoaded:String = null;
 	private var _configLoaded:String = null;
 
-	public static var forcePixelStage(default, set):Bool = false;
+	public static var usePixelTextures(default, set):Null<Bool>;
 
 	public static var defaultNoteSplash(get, never):String;
 	public static var configs:Map<String, NoteSplashConfig> = new Map<String, NoteSplashConfig>();
@@ -79,7 +81,7 @@ class NoteSplash extends FlxSprite
 
 		var config:NoteSplashConfig = null;
 		if (_textureLoaded != texture)
-			config = loadAnims((PlayState.isPixelStage || forcePixelStage ? 'pixelUI/' : '') + texture);
+			config = loadAnims((PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture);
 		else
 			config = precacheConfig(_configLoaded);
 
@@ -135,10 +137,10 @@ class NoteSplash extends FlxSprite
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
-		if ((PlayState.isPixelStage || forcePixelStage) || !ClientPrefs.data.antialiasing)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures) || !ClientPrefs.data.antialiasing)
 			antialiasing = false;
 
-		_textureLoaded = (PlayState.isPixelStage || forcePixelStage ? 'pixelUI/' : '') + texture;
+		_textureLoaded = (PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture;
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, maxAnims);
@@ -269,11 +271,11 @@ class NoteSplash extends FlxSprite
 		return !ClientPrefs.data.disableRGBNotes ? 'noteSplashes/noteSplashes' : 'noteSplashes';
 
 	@:noCompletion
-	private static function set_forcePixelStage(value:Bool):Bool
+	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
 	{
-		forcePixelStage = value;
-		if (mainGroup != null)
+		if (mainGroup != null && usePixelTextures != value)
 		{
+			usePixelTextures = value;
 			mainGroup.forEachAlive(function(splash:NoteSplash)
 			{
 				splash._textureLoaded = null;

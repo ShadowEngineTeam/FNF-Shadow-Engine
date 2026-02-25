@@ -16,7 +16,6 @@ class Context3DAlphaMaskShader extends Shader
 
 		uniform sampler2D openfl_Texture;
 
-		// remove this if #version 100
 		out vec4 openfl_FragColor;
 
 		void main(void) {

@@ -18,31 +18,31 @@ jobs:
           - name: Windows i686
             os: windows-2025
             buildArgs: "windows -final -32 -D HXCPP_M32 -D officialBuild"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-i686
             artifactPath: export\release\windows\bin\*
           - name: Windows x86_64
             os: windows-2025
             buildArgs: "windows -final -64 -D HXCPP_M64 -D officialBuild"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-x86_64
             artifactPath: export\release\windows\bin\*
           - name: Windows ARM64
             os: windows-2025
             buildArgs: "windows -final -arm64 -D HXCPP_ARM64 -D officialBuild"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-arm64
             artifactPath: export\release\windows\bin\*
           - name: Linux i686
             os: ubuntu-22.04
             buildArgs: "linux -final -32 -D HXCPP_M32 -D officialBuild"
-            assetType: S3TC
+            assetType: BC
             artifactName: linuxBuild-i686
             artifactPath: export/release/linux/bin/*
           - name: Linux x86_64
             os: ubuntu-22.04
             buildArgs: "linux -final -64 -D HXCPP_M64 -D officialBuild"
-            assetType: S3TC
+            assetType: BC
             artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
           - name: Linux ARMV7
@@ -87,7 +87,7 @@ jobs:
       name: macOS x86_64
       os: macos-15
       buildArgs: "mac -64 -D HXCPP_M64"
-      assetType: S3TC
+      assetType: BC
       artifactName: macOSBuild-x86_64
       artifactPath: export/release/macos/bin/*
 
@@ -98,7 +98,7 @@ jobs:
       name: macOS ARM64
       os: macos-15
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
-      assetType: S3TC
+      assetType: BC
       artifactName: macOSBuild-arm64
       artifactPath: export/release/macos/bin/*
 
@@ -112,13 +112,13 @@ jobs:
       - name: Download x86_64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-x86_64-S3TC
+          name: macOSBuild-x86_64-BC
           path: intel
 
       - name: Download ARM64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-arm64-S3TC
+          name: macOSBuild-arm64-BC
           path: arm
 
       - name: Remove ARM64 and x86_64 artifacts
@@ -139,7 +139,7 @@ jobs:
       - name: Upload Universal macOS bundle
         uses: actions/upload-artifact@main
         with:
-          name: macOSBuild-Universal-S3TC
+          name: macOSBuild-Universal-BC
           path: ShadowEngine.app
 
   Releaser:
@@ -168,24 +168,24 @@ jobs:
       - name: Download Linux i686 Build
         uses: actions/download-artifact@main
         with:
-          name: linuxBuild-i686-S3TC
+          name: linuxBuild-i686-BC
           path: /home/runner/linuxBuild-i686
 
       - name: Tar Linux i686 Build For Release
         run: |
           cd /home/runner/linuxBuild-i686
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-linux-i686.tar" .
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-BC-linux-i686.tar" .
 
       - name: Download Linux x86_64 Build
         uses: actions/download-artifact@main
         with:
-          name: linuxBuild-x86_64-S3TC
+          name: linuxBuild-x86_64-BC
           path: /home/runner/linuxBuild-x86_64
 
       - name: Tar Linux x86_64 Build For Release
         run: |
           cd /home/runner/linuxBuild-x86_64
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-linux-x86_64.tar" .
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-BC-linux-x86_64.tar" .
 
       - name: Download Linux ARMV7 Build
         uses: actions/download-artifact@main
@@ -212,52 +212,52 @@ jobs:
       - name: Download macOS Universal Build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-Universal-S3TC
+          name: macOSBuild-Universal-BC
           path: /home/runner/macOSBuild-Universal
 
       - name: Tar macOS Universal Build For Release
         run: |
           cd /home/runner/macOSBuild-Universal
-          tar czf "/home/runner/${{ env.PROJECT_NAME }}-S3TC-macOS-Universal.tar" .
+          tar czf "/home/runner/${{ env.PROJECT_NAME }}-BC-macOS-Universal.tar" .
 
       - name: Download Windows i686 Build
         uses: actions/download-artifact@main
         with:
-          name: windowsBuild-i686-S3TC
+          name: windowsBuild-i686-BC
           path: /home/runner/windowsBuild-i686
 
       - name: Zip Windows i686 Build For Release
         run: |
           cd /home/runner/windowsBuild-i686
-          zip -r "/home/runner/${{ env.PROJECT_NAME }}-S3TC-windows-i686.zip" .
+          zip -r "/home/runner/${{ env.PROJECT_NAME }}-BC-windows-i686.zip" .
 
       - name: Download Windows x86_64 Build
         uses: actions/download-artifact@main
         with:
-          name: windowsBuild-x86_64-S3TC
+          name: windowsBuild-x86_64-BC
           path: /home/runner/windowsBuild-x86_64
 
       - name: Zip Windows x86_64 Build For Release
         run: |
           cd /home/runner/windowsBuild-x86_64
-          zip -r "/home/runner/${{ env.PROJECT_NAME }}-S3TC-windows-x86_64.zip" .
+          zip -r "/home/runner/${{ env.PROJECT_NAME }}-BC-windows-x86_64.zip" .
 
       - name: Download Windows ARM64 Build
         uses: actions/download-artifact@main
         with:
-          name: windowsBuild-arm64-S3TC
+          name: windowsBuild-arm64-BC
           path: /home/runner/windowsBuild-arm64
 
       - name: Zip Windows ARM64 Build For Release
         run: |
           cd /home/runner/windowsBuild-arm64
-          zip -r "/home/runner/${{ env.PROJECT_NAME }}-S3TC-windows-arm64.zip" .
+          zip -r "/home/runner/${{ env.PROJECT_NAME }}-BC-windows-arm64.zip" .
 
       - name: Publish The Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "0.6.0"
-          tag_name: "0.6.0"
+          name: "0.7.0"
+          tag_name: "0.7.0"
           prerelease: false
           files: |
             /home/runner/*.apk

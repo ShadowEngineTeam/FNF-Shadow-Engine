@@ -296,4 +296,9 @@ class CoolUtil
 			return 1.0;
 		return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2);
 	}
+
+	public static function priorityBool(a:Bool, ?b:Null<Bool>):Bool
+	{
+		return b == null ? a : b;
+	}
 }

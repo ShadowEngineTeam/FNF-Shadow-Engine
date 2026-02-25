@@ -463,6 +463,7 @@ class ShaderMacro
 		var texture2DKeyword:EReg = ~/\btexture2D\b/g;
 		var glFragColorKeyword:EReg = ~/\bgl_FragColor\b/g;
 		var glVersionCleaner:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
+		var outFragColorKeyword:EReg = ~/\bout\s+vec4\s+openfl_FragColor\s*;\s*/g;
 
 		switch (glVersionCleaner.replace(glVersion, '$1'))
 		{
@@ -484,7 +485,10 @@ class ShaderMacro
 
 				return result;
 			default:
-				return source;
+				var result = source;
+
+				result = outFragColorKeyword.replace(result, "");
+				return result;
 		}
 	}
 

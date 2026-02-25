@@ -462,10 +462,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	public static function parseDialogue(path:String):DialogueFile
 	{
 		if (FileSystem.exists(path))
-		{
 			return cast Json.parse(File.getContent(path), path);
-		}
-		return cast Json.parse(Assets.getText(path), path);
+
+		return null;
 	}
 
 	// Had to make it static because of the editors

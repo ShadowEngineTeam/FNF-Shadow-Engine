@@ -1,7 +1,7 @@
 package states.editors;
 
 import flixel.graphics.FlxGraphic;
-import openfl.net.FileReference;
+import lime.ui.FileDialog;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import flixel.FlxCamera;
@@ -1625,51 +1625,8 @@ class CharacterEditorState extends MusicBeatState
 	}
 
 	// save
-	var _file:FileReference;
-
-	function onSaveComplete(_):Void
-	{
-		if (_file == null)
-			return;
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.notice("Successfully saved file.");
-	}
-
-	/**
-	 * Called when the save file dialog is cancelled.
-	 */
-	function onSaveCancel(_):Void
-	{
-		if (_file == null)
-			return;
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-	}
-
-	/**
-	 * Called if there is an error while saving the gameplay recording.
-	 */
-	function onSaveError(_):Void
-	{
-		if (_file == null)
-			return;
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
-		FlxG.log.error("Problem saving file");
-	}
-
 	function saveCharacter()
 	{
-		if (_file != null)
-			return;
-
 		var json:Dynamic = {
 			"animations": character.animationsArray,
 			"image": character.imageFile,
@@ -1691,18 +1648,8 @@ class CharacterEditorState extends MusicBeatState
 
 		if (data.length > 0)
 		{
-			#if mobile
 			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.onCancel.add(() -> onSaveCancel(null));
-			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data, null, '$_char' + ".json", null, "*/*");
-			#else
-			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, '$_char.json');
-			#end
+			fileDialog.save(data, null, '$_char' + ".json", null, "application/json");
 		}
 	}
 }

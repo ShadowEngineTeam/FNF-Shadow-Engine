@@ -1,5 +1,6 @@
 package states;
 
+import backend.EaseUtil;
 import backend.Highscore;
 import backend.StageData;
 import backend.WeekData;
@@ -131,7 +132,6 @@ class PlayState extends MusicBeatState
 
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
-	public var camZoomingFrequency:Float = 4;
 	public var camZoomingDecay:Float = 1;
 
 	private var curSong:String = "";
@@ -178,6 +178,7 @@ class PlayState extends MusicBeatState
 	public var cameraSpeed:Float = 1;
 
 	public var songScore:Int = 0;
+
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
 	public var scoreTxt:FlxText;
@@ -384,8 +385,6 @@ class PlayState extends MusicBeatState
 				new states.stages.Nothing();
 		}
 
-		new events.VSliceEvents();
-
 		if (isPixelStage)
 		{
 			introSoundsSuffix = '-pixel';
@@ -569,7 +568,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
-		updateScore(false);
+		updateScore();
 		uiGroup.add(scoreTxt);
 
 		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, "BOTPLAY", 32);
@@ -629,7 +628,6 @@ class PlayState extends MusicBeatState
 		#end
 
 		startCallback();
-		RecalculateRating();
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
@@ -1151,7 +1149,7 @@ class PlayState extends MusicBeatState
 		spr.antialiasing = antialias;
 		insert(members.indexOf(noteGroup), spr);
 		FlxTween.tween(spr, {/*y: spr.y + 100,*/ alpha: 0}, Conductor.crochet / 1000, {
-			ease: FlxEase.cubeInOut,
+			ease: isPixelStage ? EaseUtil.stepped(8) : FlxEase.cubeInOut,
 			onComplete: function(twn:FlxTween)
 			{
 				remove(spr);
@@ -1215,9 +1213,9 @@ class PlayState extends MusicBeatState
 	// `updateScore = function(miss:Bool = false) { ... }
 	// its like if it was a variable but its just a function!
 	// cool right? -Crow
-	public dynamic function updateScore(miss:Bool = false)
+	public dynamic function updateScore()
 	{
-		var ret:Dynamic = callOnScripts('preUpdateScore', [miss], true);
+		var ret:Dynamic = callOnScripts('preUpdateScore', [], true);
 		if (ret == LuaUtils.Function_Stop)
 			return;
 
@@ -1233,10 +1231,7 @@ class PlayState extends MusicBeatState
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
 
-		if (!miss && !cpuControlled)
-			doScoreBop();
-
-		callOnScripts('onUpdateScore', [miss]);
+		callOnScripts('onUpdateScore', []);
 	}
 
 	public dynamic function fullComboFunction()
@@ -1446,14 +1441,12 @@ class PlayState extends MusicBeatState
 		// NEW SHIT
 		noteData = songData.notes;
 
-		var file:String = Paths.json(songName + '/events');
-		#if FEATURE_MODS
-		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file))
-		#else
-		if (Assets.exists(file))
-		#end
+		final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
+		var file:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
+		
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events' + (isDiffErect ? '-erect' : ""))) || #end FileSystem.exists(file))
 		{
-			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
+			var eventsData:Array<Dynamic> = Song.loadFromJson('events' + (isDiffErect ? '-erect' : ""), songName).events;
 			for (event in eventsData) // Event Notes
 				for (i in 0...event[1].length)
 					makeEvent(event, i);
@@ -1906,6 +1899,8 @@ class PlayState extends MusicBeatState
 
 			if (ClientPrefs.data.timeBarType != 'Song Name')
 				timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+
+			recalculateRating();
 		}
 
 		if (camZooming)
@@ -2671,7 +2666,7 @@ class PlayState extends MusicBeatState
 		camZooming = false;
 		inCutscene = false;
 		updateTime = false;
-		NoteSplash.forcePixelStage = SustainSplash.forcePixelStage = characterPlayingAsDad = false;
+		characterPlayingAsDad = false;
 
 		deathCounter = 0;
 		seenCutscene = false;
@@ -2864,15 +2859,11 @@ class PlayState extends MusicBeatState
 		if (daRating.noteSplash && !note.noteSplashData.disabled)
 			spawnNoteSplashOnNote(note);
 
-		if (!practiceMode && !cpuControlled)
+		if (!practiceMode && !cpuControlled && !note.ratingDisabled)
 		{
 			songScore += score;
-			if (!note.ratingDisabled)
-			{
-				songHits++;
-				totalPlayed++;
-				RecalculateRating(false);
-			}
+			songHits++;
+			totalPlayed++;
 		}
 
 		var uiPrefix:String = "";
@@ -2967,7 +2958,8 @@ class PlayState extends MusicBeatState
 
 				noteTimingRatingTween = FlxTween.tween(noteTimingRating, {alpha: 0}, 0.2 / playbackRate, {
 					startDelay: Conductor.crochet * 0.001 / playbackRate,
-					onComplete: (t) -> noteTimingRating.active = false
+					onComplete: (t) -> noteTimingRating.active = false,
+					ease: isPixelStage ? EaseUtil.stepped(2) : null
 				});
 			}
 
@@ -3023,7 +3015,8 @@ class PlayState extends MusicBeatState
 					{
 						numScore.destroy();
 					},
-					startDelay: Conductor.crochet * 0.002 / playbackRate
+					startDelay: Conductor.crochet * 0.002 / playbackRate,
+					ease: isPixelStage ? EaseUtil.stepped(2) : null
 				});
 
 				daLoop++;
@@ -3032,7 +3025,8 @@ class PlayState extends MusicBeatState
 			}
 			comboSpr.x = xThing + 50;
 			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
-				startDelay: Conductor.crochet * 0.001 / playbackRate
+				startDelay: Conductor.crochet * 0.001 / playbackRate,
+				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 
 			FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
@@ -3041,7 +3035,8 @@ class PlayState extends MusicBeatState
 					comboSpr.destroy();
 					rating.destroy();
 				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
+				startDelay: Conductor.crochet * 0.002 / playbackRate,
+				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 		}
 	}
@@ -3317,7 +3312,6 @@ class PlayState extends MusicBeatState
 			return; // fuck it we ball
 
 		noteMissCommon(direction);
-		FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 		callOnScripts('noteMissPress', [direction]);
 	}
 
@@ -3373,6 +3367,9 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		if (note.mustPress)
+			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+
 		if (instakillOnMiss)
 		{
 			vocals.volume = 0;
@@ -3387,11 +3384,10 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= 100;
+			songScore -= (note.isSustainNote) ? Rating.SUSTAIN_MISS_SCORE : Rating.MISS_SCORE;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
-		RecalculateRating(true);
 
 		// play character anims
 		var char:Character = (!characterPlayingAsDad) ? boyfriend : dad;
@@ -3598,10 +3594,16 @@ class PlayState extends MusicBeatState
 		if (gainHealth)
 			health += note.hitHealth * healthGain;
 
+		if (note.isSustainNote && !cpuControlled)
+			songScore += Rating.SUSTAIN_SCORE;
+
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
 		var result:Dynamic = callOnLuas('goodNoteHit', args);
 		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
 			callOnHScript('goodNoteHit', [note]);
+
+		if (!note.isSustainNote && !cpuControlled)
+			doScoreBop();
 
 		spawnHoldSplashOnNote(note);
 
@@ -3655,7 +3657,6 @@ class PlayState extends MusicBeatState
 
 	override function destroy()
 	{
-		NoteSplash.mainGroup = null;
 		instance = null;
 
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
@@ -3663,6 +3664,8 @@ class PlayState extends MusicBeatState
 
 		FlxG.animationTimeScale = 1;
 
+		NoteSplash.mainGroup = null;
+		NoteSplash.usePixelTextures = StrumNote.usePixelTextures = Note.usePixelTextures = null;
 		Note.globalRgbShaders = [];
 		SustainSplash.close();
 		backend.NoteTypesConfig.clearNoteTypesData();
@@ -3728,12 +3731,6 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && (curBeat % camZoomingFrequency) == 0)
-		{
-			FlxG.camera.zoom += 0.015 * camZoomingMult;
-			camHUD.zoom += 0.03 * camZoomingMult;
-		}
-
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
@@ -3783,8 +3780,7 @@ class PlayState extends MusicBeatState
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
 				moveCameraSection();
 
-			var vsliceCondition:Bool = (curBeat % camZoomingFrequency) == 0;
-			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && !vsliceCondition)
+			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms)
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
@@ -3827,7 +3823,7 @@ class PlayState extends MusicBeatState
 	public var ratingPercent:Float;
 	public var ratingFC:String;
 
-	public function RecalculateRating(badHit:Bool = false)
+	public function recalculateRating()
 	{
 		setOnScripts('score', songScore);
 		setOnScripts('misses', songMisses);
@@ -3856,7 +3852,7 @@ class PlayState extends MusicBeatState
 			}
 			fullComboFunction();
 		}
-		updateScore(badHit); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce
+		updateScore(); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce
 		setOnScripts('rating', ratingPercent);
 		setOnScripts('ratingName', ratingName);
 		setOnScripts('ratingFC', ratingFC);

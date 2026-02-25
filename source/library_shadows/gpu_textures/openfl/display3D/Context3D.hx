@@ -7,9 +7,9 @@ import openfl.display3D._internal.GLFramebuffer;
 import openfl.display3D._internal.GLTexture;
 import openfl.display._internal.SamplerState;
 import openfl.display3D.textures.ASTCTexture;
+import openfl.display3D.textures.BCTexture;
 import openfl.display3D.textures.CubeTexture;
 import openfl.display3D.textures.RectangleTexture;
-import openfl.display3D.textures.S3TCTexture;
 import openfl.display3D.textures.TextureBase;
 import openfl.display3D.textures.Texture;
 import openfl.display3D.textures.VideoTexture;
@@ -133,9 +133,9 @@ import lime.math.Vector2;
 #end
 @:access(openfl.display3D._internal.Context3DState)
 @:access(openfl.display3D.textures.ASTCTexture)
+@:access(openfl.display3D.textures.BCTexture)
 @:access(openfl.display3D.textures.CubeTexture)
 @:access(openfl.display3D.textures.RectangleTexture)
-@:access(openfl.display3D.textures.S3TCTexture)
 @:access(openfl.display3D.textures.TextureBase)
 @:access(openfl.display3D.textures.Texture)
 @:access(openfl.display3D.textures.VideoTexture)
@@ -942,9 +942,9 @@ import lime.math.Vector2;
 		return new ASTCTexture(this, data);
 	}
 
-	public function createS3TCTexture(data:ByteArray):S3TCTexture
+	public function createBCTexture(data:ByteArray):BCTexture
 	{
-		return new S3TCTexture(this, data);
+		return new BCTexture(this, data);
 	}
 
 	/**

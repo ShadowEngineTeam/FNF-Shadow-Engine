@@ -10,6 +10,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.math.FlxRect;
 
 using StringTools;
+using backend.CoolUtil;
 
 typedef EventNote =
 {
@@ -90,10 +91,12 @@ class Note extends FlxSkewedSprite
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	public static var defaultNoteSkin(get, never):String;
 
+	public static var usePixelTextures(default, set):Null<Bool>;
+
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
 		texture: null,
-		antialiasing: !PlayState.isPixelStage,
+		antialiasing: ClientPrefs.data.antialiasing && !PlayState.isPixelStage.priorityBool(usePixelTextures),
 		useGlobalShader: false,
 		useRGBShader: (PlayState.SONG != null) ? !(PlayState.SONG.disableNoteCustomColor == true) : true,
 		r: -1,
@@ -131,6 +134,20 @@ class Note extends FlxSkewedSprite
 	public var hitsoundChartEditor:Bool = true;
 	public var hitsound:String = 'hitsound';
 
+	private static var _activeNotes:Array<Note> = [];
+
+	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
+	{
+		if (usePixelTextures != value)
+		{
+			usePixelTextures = value;
+			for (note in _activeNotes)
+				note.reloadNote(note.texture);
+		}
+		
+		return value;
+	}
+
 	private function set_multSpeed(value:Float):Float
 	{
 		resizeByRatio(value / multSpeed);
@@ -160,7 +177,7 @@ class Note extends FlxSkewedSprite
 	public function defaultRGB()
 	{
 		var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[noteData];
-		if (PlayState.isPixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			arr = ClientPrefs.data.arrowRGBPixel[noteData];
 
 		if (noteData > -1 && noteData <= arr.length)
@@ -242,6 +259,8 @@ class Note extends FlxSkewedSprite
 	{
 		super();
 
+		_activeNotes.push(this);
+
 		antialiasing = ClientPrefs.data.antialiasing;
 		if (createdFrom == null)
 			createdFrom = PlayState.instance;
@@ -307,7 +326,7 @@ class Note extends FlxSkewedSprite
 
 			offsetX -= width / 2;
 
-			if (PlayState.isPixelStage)
+			if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 				offsetX += 30;
 
 			if (prevNote.isSustainNote)
@@ -318,7 +337,7 @@ class Note extends FlxSkewedSprite
 				if (createdFrom != null && createdFrom.songSpeed != null)
 					prevNote.scale.y *= createdFrom.songSpeed;
 
-				if (PlayState.isPixelStage)
+				if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 				{
 					prevNote.scale.y *= 1.19;
 					prevNote.scale.y *= (6 / height); // Auto adjust note size
@@ -327,7 +346,7 @@ class Note extends FlxSkewedSprite
 				// prevNote.setGraphicSize();
 			}
 
-			if (PlayState.isPixelStage)
+			if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			{
 				scale.y *= PlayState.daPixelZoom;
 				updateHitbox();
@@ -349,7 +368,7 @@ class Note extends FlxSkewedSprite
 			var newRGB:RGBPalette = new RGBPalette();
 			globalRgbShaders[noteData] = newRGB;
 
-			var arr:Array<FlxColor> = (!PlayState.isPixelStage) ? ClientPrefs.data.arrowRGB[noteData] : ClientPrefs.data.arrowRGBPixel[noteData];
+			var arr:Array<FlxColor> = (!PlayState.isPixelStage.priorityBool(usePixelTextures)) ? ClientPrefs.data.arrowRGB[noteData] : ClientPrefs.data.arrowRGBPixel[noteData];
 			if (noteData > -1 && noteData <= arr.length)
 			{
 				newRGB.r = arr[0];
@@ -390,16 +409,16 @@ class Note extends FlxSkewedSprite
 		var lastScaleY:Float = scale.y;
 		var skinPostfix:String = getNoteSkinPostfix();
 		var customSkin:String = skin + skinPostfix;
-		var path:String = PlayState.isPixelStage ? 'pixelUI/' : '';
+		var path:String = (PlayState.isPixelStage.priorityBool(usePixelTextures)) ? 'pixelUI/' : '';
 
 		var fullPath:String = 'images/' + path + customSkin;
 
-		if (Paths.fileExists(fullPath + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || Paths.fileExists(fullPath + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+		if (#if USING_GPU_TEXTURES Paths.fileExists(fullPath + '.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) || #end Paths.fileExists(fullPath + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 
 		var graphic:FlxGraphic;
 
-		if (PlayState.isPixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
 			var imgPath = 'pixelUI/' + skinPixel + (skinPostfix != '' ? skinPostfix : '');
 			if (isSustainNote)
@@ -547,7 +566,7 @@ class Note extends FlxSkewedSprite
 			y = strumY + offsetY + correctionOffset + Math.sin(angleDir) * distance;
 			if (myStrum.downScroll && isSustainNote)
 			{
-				if (PlayState.isPixelStage)
+				if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 				{
 					y -= PlayState.daPixelZoom * 9.5;
 				}
@@ -582,6 +601,12 @@ class Note extends FlxSkewedSprite
 			}
 			clipRect = swagRect;
 		}
+	}
+
+	override function destroy():Void
+	{
+		_activeNotes.remove(this);
+		super.destroy();
 	}
 
 	@:noCompletion

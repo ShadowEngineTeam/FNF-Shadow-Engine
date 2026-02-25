@@ -12,31 +12,31 @@ jobs:
           - name: Windows i686
             os: windows-2025
             buildArgs: "windows -32 -D HXCPP_M32"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-i686
             artifactPath: export\release\windows\bin\*
           - name: Windows x86_64
             os: windows-2025
             buildArgs: "windows -64 -D HXCPP_M64"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-x86_64
             artifactPath: export\release\windows\bin\*
           - name: Windows ARM64
             os: windows-2025
             buildArgs: "windows -arm64 -D HXCPP_ARM64"
-            assetType: S3TC
+            assetType: BC
             artifactName: windowsBuild-arm64
             artifactPath: export\release\windows\bin\*
           - name: Linux i686
             os: ubuntu-22.04
             buildArgs: "linux -32 -D HXCPP_M32"
-            assetType: S3TC
+            assetType: BC
             artifactName: linuxBuild-i686
             artifactPath: export/release/linux/bin/*
           - name: Linux x86_64
             os: ubuntu-22.04
             buildArgs: "linux -64 -D HXCPP_M64"
-            assetType: S3TC
+            assetType: BC
             artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
           - name: Linux ARMV7
@@ -81,7 +81,7 @@ jobs:
       name: macOS x86_64
       os: macos-15
       buildArgs: "mac -64 -D HXCPP_M64"
-      assetType: S3TC
+      assetType: BC
       artifactName: macOSBuild-x86_64
       artifactPath: export/release/macos/bin/*
 
@@ -92,7 +92,7 @@ jobs:
       name: macOS ARM64
       os: macos-15
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
-      assetType: S3TC
+      assetType: BC
       artifactName: macOSBuild-arm64
       artifactPath: export/release/macos/bin/*
 
@@ -106,13 +106,13 @@ jobs:
       - name: Download x86_64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-x86_64-S3TC
+          name: macOSBuild-x86_64-BC
           path: intel
 
       - name: Download ARM64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-arm64-S3TC
+          name: macOSBuild-arm64-BC
           path: arm
 
       - name: Remove ARM64 and x86_64 artifacts
@@ -133,5 +133,5 @@ jobs:
       - name: Upload Universal macOS bundle
         uses: actions/upload-artifact@main
         with:
-          name: macOSBuild-Universal-S3TC
+          name: macOSBuild-Universal-BC
           path: ShadowEngine.app

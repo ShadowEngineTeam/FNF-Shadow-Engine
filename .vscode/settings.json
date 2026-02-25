@@ -12,9 +12,9 @@
   	"lime.projectFile": "project.hxp",
 	"lime.targetConfigurations": [
 		{
-			"label": "Windows (S3TC)",
+			"label": "Windows (BC)",
 			"target": "windows",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BC"]
 		},
 		{
 			"label": "Windows (ASTC)",
@@ -22,9 +22,9 @@
 			"args": ["-D", "ASTC"]
 		},
 		{
-			"label": "Linux (S3TC)",
+			"label": "Linux (BC)",
 			"target": "linux",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BC"]
 		},
 		{
 			"label": "Linux (ASTC)",
@@ -32,9 +32,9 @@
 			"args": ["-D", "ASTC"]
 		},
 		{
-			"label": "MacOS (S3TC)",
+			"label": "MacOS (BC)",
 			"target": "macos",
-			"args": ["-D", "S3TC"]
+			"args": ["-D", "BC"]
 		},
 		{
 			"label": "MacOS (ASTC)",
@@ -50,32 +50,7 @@
 			"label": "iOS (ASTC)",
 			"target": "ios",
 			"args": ["-D", "ASTC"]
-		},
-		{
-			"label": "Windows (PNG)",
-			"target": "windows",
-			"args": ["-D", "PNG"]
-		},
-		{
-			"label": "Linux (PNG)",
-			"target": "linux",
-			"args": ["-D", "PNG"]
-		},
-		{
-			"label": "MacOS (PNG)",
-			"target": "macos",
-			"args": ["-D", "PNG"]
-		},
-		{
-			"label": "Android (PNG)",
-			"target": "android",
-			"args": ["-D", "PNG"]
-		},
-		{
-			"label": "iOS (PNG)",
-			"target": "ios",
-			"args": ["-D", "PNG"]
 		}
 	],
-	"lime.defaultTargetConfiguration": "Windows (S3TC)"
+	"lime.defaultTargetConfiguration": "Windows (BC)"
 }

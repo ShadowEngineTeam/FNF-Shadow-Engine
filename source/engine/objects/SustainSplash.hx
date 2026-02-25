@@ -1,8 +1,12 @@
+// this class is a rewriten and polished version of https://github.com/Psych-Slice/P-Slice/blob/master/source/objects/SustainSplash.hx
+
 package objects;
 
 import shaders.ColorSwap;
 import shaders.RGBPalette;
 import shaders.PixelSplashShader.PixelSplashShaderRef;
+
+using backend.CoolUtil;
 
 class SustainSplash extends FlxSprite
 {
@@ -14,7 +18,7 @@ class SustainSplash extends FlxSprite
 	@:isVar
 	public static var texture(get, set):String = null;
 	public static var useRGBShader:Bool = true;
-	public static var forcePixelStage:Bool = false;
+	public static var usePixelTextures(default, set):Null<Bool>;
 	public static var noRGBTextures(default, null):Array<String> = [];
 
 	public static var playerTexture:String = null;
@@ -48,7 +52,7 @@ class SustainSplash extends FlxSprite
 		else
 			textures.push(texture);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			for (i in 0...textures.length)
 				textures[i] = 'pixelUI/' + textures[i];
 
@@ -103,12 +107,8 @@ class SustainSplash extends FlxSprite
 		SustainSplash.startCrochet = 0;
 		SustainSplash.frameRate = 0;
 		SustainSplash.texture = DEFAULT_TEXTURE;
+		SustainSplash.usePixelTextures = null;
 		SustainSplash.mainGroup.destroy();
-	}
-
-	public function new():Void
-	{
-		super();
 	}
 
 	public function resetSustainSplash(strumNote:StrumNote, targetStrumTime:Float, mustPress:Bool = true):Void
@@ -145,7 +145,7 @@ class SustainSplash extends FlxSprite
 		// SHADOW TODO: This breaks offsets need to figure it out later
 		// flipY = ClientPrefs.data.downScroll;
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			texture = 'pixelUI/' + texture;
 
 		frames = Paths.getSparrowAtlas(texture);
@@ -164,14 +164,14 @@ class SustainSplash extends FlxSprite
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);
 		animation.play('start', true, false, 0);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom / 2.5));
 			updateHitbox();
 		}
 
-		antialiasing = PlayState.isPixelStage || forcePixelStage ? false : ClientPrefs.data.antialiasing;
-		offset.set(PlayState.isPixelStage || forcePixelStage ? -46 : 106.25, PlayState.isPixelStage || forcePixelStage ? -40 : 100);
+		antialiasing = PlayState.isPixelStage.priorityBool(usePixelTextures) ? false : ClientPrefs.data.antialiasing;
+		offset.set(PlayState.isPixelStage.priorityBool(usePixelTextures) ? -46 : 106.25, PlayState.isPixelStage.priorityBool(usePixelTextures) ? -40 : 100);
 	}
 
 	private function initRGBShader():Void
@@ -232,7 +232,7 @@ class SustainSplash extends FlxSprite
 		else
 			textures.push(texToUse);
 
-		if (PlayState.isPixelStage || forcePixelStage)
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			for (i in 0...textures.length)
 				textures[i] = 'pixelUI/' + textures[i];
 
@@ -322,6 +322,24 @@ class SustainSplash extends FlxSprite
 		for (splash in SustainSplash.mainGroup.members)
 			if (splash.exists && splash.alive)
 				splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
+
+		return value;
+	}
+
+	@:noCompletion
+	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
+	{
+		if (usePixelTextures != value)
+		{		
+			#if !haxe5
+			@:bypassAccessor
+			#end
+			usePixelTextures = value;
+	
+			for (splash in SustainSplash.mainGroup.members)
+				if (splash.exists && splash.alive)
+					splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
+		}
 
 		return value;
 	}
