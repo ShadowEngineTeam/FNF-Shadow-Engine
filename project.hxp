@@ -34,7 +34,7 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
-  static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
+	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -216,7 +216,7 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
-    USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
+		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
