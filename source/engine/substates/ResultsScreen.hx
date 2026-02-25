@@ -11,6 +11,9 @@ import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.text.TextField;
 
+/**
+ * we're so Kade Engine
+ */
 class ResultsScreen extends MusicBeatSubstate
 {
 	public var background:FlxSprite;
