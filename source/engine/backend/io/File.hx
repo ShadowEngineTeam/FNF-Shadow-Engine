@@ -3,6 +3,7 @@ package backend.io;
 #if USE_OPENFL_FILESYSTEM
 import lime.utils.Assets as LimeAssets;
 import openfl.Assets as OpenFLAssets;
+import openfl.utils.ByteArray as OpenFLByteArray;
 #end
 #if mobile
 import mobile.backend.io.Assets as MobileAssets;
@@ -60,7 +61,7 @@ class File
 
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
-			return OpenFLAssets.getText(openflcwd(path));
+			return OpenFLByteArray.fromFile(openflcwd(path)).toString();
 		#end
 
 		#if mobile
@@ -89,13 +90,7 @@ class File
 
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
-			switch (haxe.io.Path.extension(path).toLowerCase())
-			{
-				case 'otf' | 'ttf':
-					return openfl.utils.ByteArray.fromFile(openflcwd(path));
-				default:
-					return OpenFLAssets.getBytes(openflcwd(path));
-			}
+			return OpenFLByteArray.fromFile(openflcwd(path));
 		#end
 
 		#if mobile
