@@ -300,6 +300,9 @@ class Project extends HXProject
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
 
+		// see https://haxe.org/manual/cr-static-analyzer.html
+		setHaxedef("analyzer-optimize");
+
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
