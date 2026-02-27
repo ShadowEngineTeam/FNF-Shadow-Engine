@@ -21,4 +21,5 @@ Ready to be source-modded.
 > [!NOTE]
 > For the differences of this engine see [DIFFERENCES.md](./docs/DIFFERENCES.md).
 
-Discord server: https://discord.gg/krFK9WWYHg
+Discord server: https://discord.gg/krFK9WWYHg<br>
+Stoat server: https://stt.gg/nDJSFYmg
