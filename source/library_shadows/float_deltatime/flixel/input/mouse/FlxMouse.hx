@@ -26,7 +26,7 @@ import openfl.ui.MouseCursor;
 import flash.ui.MouseCursorData;
 #end
 
-@:bitmap("assets/images/ui/cursor.png")
+@:bitmap("assets/embed/images/ui/cursor.png")
 private class GraphicCursor extends BitmapData {}
 
 /**
