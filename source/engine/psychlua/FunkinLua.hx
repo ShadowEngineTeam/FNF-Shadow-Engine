@@ -903,6 +903,7 @@ class FunkinLua
 		// shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
 		set("getObjectOrder", function(obj:String)
 		{
+			// SHADOW TODO: broken in Flixel 6
 			var split:Array<String> = obj.split('.');
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(split[0]);
 			if (split.length > 1)
@@ -1106,12 +1107,12 @@ class FunkinLua
 		set("getMouseX", function(camera:String)
 		{
 			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
-			return FlxG.mouse.getScreenPosition(cam).x;
+			return FlxG.mouse.getViewPosition(cam).x;
 		});
 		set("getMouseY", function(camera:String)
 		{
 			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
-			return FlxG.mouse.getScreenPosition(cam).y;
+			return FlxG.mouse.getViewPosition(cam).y;
 		});
 
 		set("getMidpointX", function(variable:String)
@@ -1202,6 +1203,7 @@ class FunkinLua
 			{
 				leSprite.loadGraphic(Paths.image(image));
 			}
+
 			game.modchartSprites.set(tag, leSprite);
 			leSprite.active = true;
 		});

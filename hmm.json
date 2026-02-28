@@ -14,12 +14,14 @@
     {
       "name": "flixel",
       "type": "git",
-      "url": "https://github.com/ShadowEngineTeam/flixel"
+	  "ref": "c8e79d2a42f9c11c639519ef2a6fd7ef2379a8aa",
+      "url": "https://github.com/FunkinCrew/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
-      "url": "https://github.com/ShadowEngineTeam/flixel-addons"
+	  "ref": "6fa30b3f5209146c852c25f3d1003e08898083e2",
+      "url": "https://github.com/FunkinCrew/flixel-addons"
     },
     {
       "name": "hxcpp",

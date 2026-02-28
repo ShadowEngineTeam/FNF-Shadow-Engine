@@ -149,7 +149,7 @@ class SustainSplash extends FlxSprite
 			texture = 'pixelUI/' + texture;
 
 		frames = Paths.getSparrowAtlas(texture);
-		animation.finishCallback = (name:String) ->
+		animation.onFinish.add((name:String) ->
 		{
 			switch (name)
 			{
@@ -158,7 +158,7 @@ class SustainSplash extends FlxSprite
 				case 'end':
 					kill();
 			}
-		};
+		});
 		animation.addByPrefix('start', 'holdCoverStart0', 24, false);
 		animation.addByPrefix('hold', 'holdCover0', SustainSplash.frameRate, true);
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);

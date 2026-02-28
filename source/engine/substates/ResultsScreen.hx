@@ -308,7 +308,7 @@ class HitGraph extends Sprite
 		tf.wordWrap = false;
 		tf.embedFonts = true;
 		tf.selectable = false;
-		tf.defaultTextFormat = new TextFormat("assets/fonts/vcr.ttf", Size, Color.to24Bit());
+		tf.defaultTextFormat = new TextFormat("assets/fonts/vcr.ttf", Size, Color.rgb);
 		tf.alpha = Color.alphaFloat;
 		tf.autoSize = TextFieldAutoSize.LEFT;
 		return tf;
