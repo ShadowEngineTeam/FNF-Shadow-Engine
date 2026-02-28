@@ -18,14 +18,14 @@ class Project extends HXProject
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
 	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.6.0";
+	static final VERSION:String = "0.7.0";
 	static final COMPANY:String = "ShadowEngineTeam";
 	static final PACKAGE:String = "org.shadowengineteam.fnf";
 	static final MAIN_CLASS:String = "backend.Main";
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
-	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "float_deltatime", "gpu_textures"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "flixel_animate", "float_deltatime", "gpu_textures"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -302,6 +302,9 @@ class Project extends HXProject
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
 
+		// see https://haxe.org/manual/cr-static-analyzer.html
+		// setHaxedef("analyzer-optimize");
+
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
@@ -335,7 +338,7 @@ class Project extends HXProject
 			{
 				needsPNG = false;
 				if (FEATURE_MOBILE_CONTROLS.isEnabled())
-					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/mobile', false);
+					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', false);
 				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
 			}
 		}
@@ -343,7 +346,7 @@ class Project extends HXProject
 		if (needsPNG)
 		{
 			if (FEATURE_MOBILE_CONTROLS.isEnabled())
-				addAssetPath('assets/mobile-images/png', 'assets/shared/mobile', false);
+				addAssetPath('assets/mobile-images/png', 'assets/shared/images', false);
 			addAssetPath('assets/images-png', 'assets/shared/images');
 		}
 

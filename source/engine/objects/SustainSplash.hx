@@ -1,3 +1,5 @@
+// this class is a rewriten and polished version of https://github.com/Psych-Slice/P-Slice/blob/master/source/objects/SustainSplash.hx
+
 package objects;
 
 import shaders.ColorSwap;

@@ -147,6 +147,7 @@ class FunkinPreloader extends FlxBasePreloader
 			progressLeftText.y = this._height - BAR_PADDING - BAR_HEIGHT - 290;
 			progressLeftText.width = this._width - BAR_PADDING * 2;
 		}
+
 		if (progressRightText != null)
 		{
 			progressRightText.x = BAR_PADDING;

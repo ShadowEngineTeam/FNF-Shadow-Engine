@@ -22,7 +22,6 @@ import openfl.Lib;
 @:access(openfl.display3D.Context3D)
 @:final class ASTCTexture extends TextureBase
 {
-	@:noCompletion private static var __lowMemoryMode:Bool = false;
 	@:noCompletion private static var __warned:Bool = false;
 	public static inline final ASTC_MAGIC_NUMBER:Int = 0x5CA1AB13;
 	public static inline final IMAGE_DATA_OFFSET = 16;
@@ -49,7 +48,7 @@ import openfl.Lib;
 		{
 			if (!__warned)
 			{
-				Lib.current.stage.window.alert("ASTC compression (LDR and HDR) is not available on this device.", "Rendering Error!");
+				backend.CoolUtil.showPopUp("ASTC compression (LDR and HDR) is not available on this device.", "Rendering Error!");
 				__warned = true;
 			}
 			supported = false;

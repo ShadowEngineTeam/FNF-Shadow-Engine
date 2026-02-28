@@ -1,5 +1,6 @@
 package states;
 
+import backend.EaseUtil;
 import backend.Highscore;
 import backend.StageData;
 import backend.WeekData;
@@ -1148,7 +1149,7 @@ class PlayState extends MusicBeatState
 		spr.antialiasing = antialias;
 		insert(members.indexOf(noteGroup), spr);
 		FlxTween.tween(spr, {/*y: spr.y + 100,*/ alpha: 0}, Conductor.crochet / 1000, {
-			ease: FlxEase.cubeInOut,
+			ease: isPixelStage ? EaseUtil.stepped(8) : FlxEase.cubeInOut,
 			onComplete: function(twn:FlxTween)
 			{
 				remove(spr);
@@ -2957,7 +2958,8 @@ class PlayState extends MusicBeatState
 
 				noteTimingRatingTween = FlxTween.tween(noteTimingRating, {alpha: 0}, 0.2 / playbackRate, {
 					startDelay: Conductor.crochet * 0.001 / playbackRate,
-					onComplete: (t) -> noteTimingRating.active = false
+					onComplete: (t) -> noteTimingRating.active = false,
+					ease: isPixelStage ? EaseUtil.stepped(2) : null
 				});
 			}
 
@@ -3013,7 +3015,8 @@ class PlayState extends MusicBeatState
 					{
 						numScore.destroy();
 					},
-					startDelay: Conductor.crochet * 0.002 / playbackRate
+					startDelay: Conductor.crochet * 0.002 / playbackRate,
+					ease: isPixelStage ? EaseUtil.stepped(2) : null
 				});
 
 				daLoop++;
@@ -3022,7 +3025,8 @@ class PlayState extends MusicBeatState
 			}
 			comboSpr.x = xThing + 50;
 			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
-				startDelay: Conductor.crochet * 0.001 / playbackRate
+				startDelay: Conductor.crochet * 0.001 / playbackRate,
+				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 
 			FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
@@ -3031,7 +3035,8 @@ class PlayState extends MusicBeatState
 					comboSpr.destroy();
 					rating.destroy();
 				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
+				startDelay: Conductor.crochet * 0.002 / playbackRate,
+				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 		}
 	}
