@@ -9,6 +9,7 @@
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
+- ACTUALLY accurate memory usage (Psych and other FNF engines gets GC memory which isn't accurate, see [memory.h](https://github.com/ShadowEngineTeam/FNF-Shadow-Engine/blob/main/source/engine/external/memory/include/memory.h))
 - Unironically winning icons support
 - Uses PBOT1 scoring system instead of fixed scoring (like 300 for every sick)
 - Improved Controller Support
