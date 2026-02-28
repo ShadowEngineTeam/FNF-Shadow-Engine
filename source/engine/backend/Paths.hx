@@ -247,7 +247,7 @@ class Paths
 		}
 		else if (FileSystem.exists(file))
 		{
-			bitmap = getBitmapDataFromFile(file);
+			bitmap = BitmapData.fromBytes(File.getBytes(file));
 		}
 		else
 		#end
@@ -261,7 +261,7 @@ class Paths
 					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
-					bitmap = getBitmapDataFromFile(file);
+					bitmap = BitmapData.fromBytes(File.getBytes(file));
 
 				if (bitmap != null) break;
 			}
@@ -290,7 +290,7 @@ class Paths
 		if (bitmap == null)
 		{
 			if (FileSystem.exists(file))
-				bitmap = getBitmapDataFromFile(file);
+				bitmap = BitmapData.fromBytes(File.getBytes(file));
 
 			if (bitmap == null)
 				return null;
@@ -311,57 +311,6 @@ class Paths
 		newGraphic.destroyOnNoUse = false;
 		currentTrackedAssets.set(file, newGraphic);
 		return newGraphic;
-	}
-
-	public static function getBitmapDataFromFile(file:String, useCache:Bool = true):BitmapData
-	{
-		if (useCache && currentTrackedAssets.exists(file))
-		{
-			var graphic = currentTrackedAssets.get(file);
-			if (graphic != null && graphic.bitmap != null)
-			{
-				localTrackedAssets.push(file);
-				return graphic.bitmap;
-			}
-		}
-
-		var bitmap:BitmapData = null;
-		var ext:String = haxe.io.Path.extension(file).toLowerCase();
-		if (#if USING_GPU_TEXTURES ext == GPU_IMAGE_EXT && #end ext != IMAGE_EXT)
-		{
-			try
-			{
-				var bytes = File.getBytes(file);
-				if (bytes != null)
-				{
-					var texture = switch (ext)
-					{
-						case 'astc': openfl.Lib.current.stage.context3D.createASTCTexture(bytes);
-						case 'dds': openfl.Lib.current.stage.context3D.createBCTexture(bytes);
-						default: null;
-					};
-
-					if (texture != null)
-						bitmap = BitmapData.fromTexture(texture);
-				}
-			}
-			catch (e:Dynamic)
-			{
-				trace('Failed to load compressed texture from $file: $e');
-				return null;
-			}
-		}
-		else
-			bitmap = BitmapData.fromFile(file);
-
-		if (bitmap != null)
-		{
-			var cachedGraphic = cacheBitmap(file, bitmap);
-			if (cachedGraphic != null && cachedGraphic.bitmap != null)
-				return cachedGraphic.bitmap;
-		}
-
-		return bitmap;
 	}
 
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String

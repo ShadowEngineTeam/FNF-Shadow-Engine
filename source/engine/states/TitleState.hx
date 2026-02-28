@@ -427,7 +427,7 @@ class TitleState extends MusicBeatState
 				case 2:
 					createCoolText(['Shadow Engine by'], 40);
 				case 4:
-					addMoreText('Lily', 40);
+					addMoreText('Homura', 40);
 					addMoreText('Karim', 40);
 				case 5:
 					deleteCoolText();
