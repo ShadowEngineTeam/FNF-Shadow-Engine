@@ -6,7 +6,6 @@ import lime.ui.Haptic;
 import psychlua.FunkinLua;
 import psychlua.LuaUtils;
 import mobile.backend.TouchUtil;
-#if android import mobile.backend.PsychJNI; #end
 
 /**
  * ...
@@ -365,27 +364,6 @@ class AndroidFunctions
 		funk.set("menuPressed", FlxG.android.pressed.MENU);
 		funk.set("menuJustReleased", FlxG.android.justReleased.MENU);
 
-		funk.set("getCurrentOrientation", () -> PsychJNI.getCurrentOrientationAsString());
-		funk.set("setOrientation", function(?hint:String):Void
-		{
-			switch (hint.toLowerCase())
-			{
-				case 'portrait':
-					hint = 'Portrait';
-				case 'portraitupsidedown' | 'upsidedownportrait' | 'upsidedown':
-					hint = 'PortraitUpsideDown';
-				case 'landscapeleft' | 'leftlandscape':
-					hint = 'LandscapeLeft';
-				case 'landscaperight' | 'rightlandscape' | 'landscape':
-					hint = 'LandscapeRight';
-				default:
-					hint = null;
-			}
-			if (hint == null)
-				return FunkinLua.luaTrace('setOrientation: No orientation specified.');
-			PsychJNI.setOrientation(FlxG.stage.stageWidth, FlxG.stage.stageHeight, false, hint);
-		});
-
 		funk.set("minimizeWindow", () -> AndroidTools.minimizeWindow());
 
 		funk.set("showToast", function(text:String, ?duration:Int, ?xOffset:Int, ?yOffset:Int) /* , ?gravity:Int*/
@@ -401,26 +379,6 @@ class AndroidFunctions
 				yOffset = 0;
 
 			AndroidToast.makeText(text, duration, -1, xOffset, yOffset);
-		});
-
-		funk.set("isScreenKeyboardShown", () -> PsychJNI.isScreenKeyboardShown());
-
-		funk.set("clipboardHasText", () -> PsychJNI.clipboardHasText());
-		funk.set("clipboardGetText", () -> PsychJNI.clipboardGetText());
-		funk.set("clipboardSetText", function(?text:String):Void
-		{
-			if (text != null)
-				return FunkinLua.luaTrace('clipboardSetText: No text specified.');
-			PsychJNI.clipboardSetText(text);
-		});
-
-		funk.set("manualBackButton", () -> PsychJNI.manualBackButton());
-
-		funk.set("setActivityTitle", function(text:String):Void
-		{
-			if (text != null)
-				return FunkinLua.luaTrace('setActivityTitle: No text specified.');
-			PsychJNI.setActivityTitle(text);
 		});
 	}
 }
