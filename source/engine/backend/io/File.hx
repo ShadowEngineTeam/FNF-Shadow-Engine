@@ -1,7 +1,14 @@
 package backend.io;
 
-import openfl.Assets;
-#if sys
+#if USE_OPENFL_FILESYSTEM
+import lime.utils.Assets as LimeAssets;
+import openfl.Assets as OpenFLAssets;
+import openfl.utils.ByteArray as OpenFLByteArray;
+#end
+#if mobile
+import mobile.backend.io.Assets as MobileAssets;
+#end
+#if (sys && MODS_ALLOWED)
 import sys.FileSystem as SysFileSystem;
 import sys.FileStat;
 import sys.io.File as SysFile;
@@ -24,15 +31,17 @@ class File
 		return path;
 	}
 
+	#if USE_OPENFL_FILESYSTEM
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
-		for (library in lime.utils.Assets.libraries.keys())
-			if (Assets.exists('$library:$path') && !path.startsWith('$library:'))
+		for (library in LimeAssets.libraries.keys())
+			if (OpenFLAssets.exists('$library:$path') && !path.startsWith('$library:'))
 				return '$library:$path';
 
 		return path;
 	}
+	#end
 
 	public static function getContent(path:String):Null<String>
 	{
@@ -50,8 +59,15 @@ class File
 		#end
 		#end
 
-		if (Assets.exists(openflcwd(path)))
-			return Assets.getText(openflcwd(path));
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.exists(openflcwd(path)))
+			return OpenFLByteArray.fromFile(openflcwd(path)).toString();
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.getContent(path);
+		#end
 
 		return null;
 	}
@@ -72,14 +88,15 @@ class File
 		#end
 		#end
 
-		if (Assets.exists(openflcwd(path)))
-			switch (haxe.io.Path.extension(path).toLowerCase())
-			{
-				case 'otf' | 'ttf':
-					return openfl.utils.ByteArray.fromFile(openflcwd(path));
-				default:
-					return Assets.getBytes(openflcwd(path));
-			}
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.exists(openflcwd(path)))
+			return OpenFLByteArray.fromFile(openflcwd(path));
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.getBytes(path);
+		#end
 
 		return null;
 	}
@@ -110,9 +127,11 @@ class File
 		#else
 		return SysFile.read(cwd(path), binary);
 		#end
-		#else
-		return null;
 		#end
+		#if mobile
+		// SHADOW TODO
+		#end
+		return null;
 	}
 
 	public static function write(path:String, binary:Bool = true):Null<FileOutput>

@@ -1,7 +1,13 @@
 package backend.io;
 
-import openfl.Assets;
-#if sys
+#if USE_OPENFL_FILESYSTEM
+import lime.utils.Assets as LimeAssets;
+import openfl.Assets as OpenFLAssets;
+#end
+#if mobile
+import mobile.backend.io.Assets as MobileAssets;
+#end
+#if (sys && MODS_ALLOWED)
 import sys.FileSystem as SysFileSystem;
 import sys.FileStat;
 #end
@@ -23,15 +29,17 @@ class FileSystem
 		return path;
 	}
 
+	#if USE_OPENFL_FILESYSTEM
 	static function openflcwd(path:String):String
 	{
 		@:privateAccess
-		for (library in lime.utils.Assets.libraries.keys())
-			if (Assets.exists('$library:$path') && !path.startsWith('$library:'))
+		for (library in LimeAssets.libraries.keys())
+			if (OpenFLAssets.exists('$library:$path') && !path.startsWith('$library:'))
 				return '$library:$path';
 
 		return path;
 	}
+	#end
 
 	public static function exists(path:String):Bool
 	{
@@ -49,10 +57,17 @@ class FileSystem
 		#end
 		#end
 
-		if (Assets.exists(openflcwd(path)))
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
 			return true;
+		#end
 
-		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
+		#if mobile
+		if (MobileAssets.exists(path))
+			return true;
+		#end
+
+		return false;
 	}
 
 	public static function rename(path:String, newPath:String):Void
@@ -80,13 +95,18 @@ class FileSystem
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
 			actualPath = path;
-		return SysFileSystem.stat(actualPath);
+		if (SysFileSystem.exists(actualPath))
+			return SysFileSystem.stat(actualPath);
 		#else
-		return SysFileSystem.stat(cwd(path));
+		if (SysFileSystem.exists(cwd(path)))
+			return SysFileSystem.stat(cwd(path));
 		#end
-		#else
+		#end
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.stat(path);
+		#end
 		return null;
-		#end
 	}
 
 	public static function fullPath(path:String):String
@@ -139,7 +159,17 @@ class FileSystem
 		#end
 		#end
 
-		return Assets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0;
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+			return true;
+		#end
+
+		#if mobile
+		if (MobileAssets.isDirectory(path))
+			return true;
+		#end
+
+		return false;
 	}
 
 	public static function createDirectory(path:String):Void
@@ -200,7 +230,23 @@ class FileSystem
 		#end
 		#end
 
-		var filteredList:Array<String> = Assets.list().filter(f -> f.startsWith(path));
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+			return openflReadDirectory(path);
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path) && MobileAssets.isDirectory(path))
+			return MobileAssets.readDirectory(path);
+		#end
+
+		return null;
+	}
+
+	#if USE_OPENFL_FILESYSTEM
+	static function openflReadDirectory(path:String):Array<String>
+	{
+		var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path));
 		var results:Array<String> = [];
 		for (i in filteredList.copy())
 		{
@@ -214,17 +260,18 @@ class FileSystem
 		for (item in filteredList)
 		{
 			@:privateAccess
-			for (library in lime.utils.Assets.libraries.keys())
+			for (library in LimeAssets.libraries.keys())
 			{
 				var libPath:String = '$library:$item';
 				if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
 					results.push(libPath);
-				else if (Assets.exists(item) && !results.contains(item))
+				else if (OpenFLAssets.exists(item) && !results.contains(item))
 					results.push(item);
 			}
 		}
 		return results.map(f -> f.substr(f.lastIndexOf("/") + 1));
 	}
+	#end
 
 	#if (linux && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
