@@ -2220,7 +2220,23 @@ class Stage extends DisplayObjectContainer #if lime implements IModule #end
 		#end
 
 		__renderable = true;
-		__enterFrame(__deltaTime);
+
+		if (__uncaughtErrorEvents.__enabled)
+		{
+			try
+			{
+				__enterFrame(__deltaTime);
+			}
+			catch (e:Dynamic)
+			{
+				__handleError(e);
+			}
+		}
+		else
+		{
+			__enterFrame(__deltaTime);
+		}
+
 		__deltaTime = 0;
 
 		var cancelled = __render(context);
