@@ -3,6 +3,7 @@
     {
       "name": "lime",
       "type": "git",
+	  "ref": "959ed7f55e091ba57f7158f5008b12a46b91a1bb",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -14,21 +15,25 @@
     {
       "name": "flixel",
       "type": "git",
+	  "ref": "c8e79d2a42f9c11c639519ef2a6fd7ef2379a8aa",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
+	  "ref": "6fa30b3f5209146c852c25f3d1003e08898083e2",
       "url": "https://github.com/ShadowEngineTeam/flixel-addons"
     },
     {
       "name": "hxcpp",
       "type": "git",
+	  "ref": "564ba330b628e07bf9f7cb12011782b1104944c5",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
+	  "ref": "bdcda5c1eac91399ab28f2612c2ac2070a69ec1c",
       "url": "https://github.com/ShadowEngineTeam/SScript"
     },
     {
@@ -40,6 +45,7 @@
     {
       "name": "hxluajit",
       "type": "git",
+	  "ref": "d167f92694b8b9413af167675f4e596f82234e79",
       "url": "https://github.com/ShadowEngineTeam/hxluajit"
     },
     {
@@ -77,6 +83,7 @@
     {
       "name": "hxvlc",
       "type": "git",
+	  "ref": "caaefc1e58e9edfeec13da4664550dc1f74bbb43",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
