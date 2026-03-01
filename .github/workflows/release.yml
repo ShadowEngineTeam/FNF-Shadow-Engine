@@ -30,7 +30,7 @@ jobs:
           - name: Windows ARM64
             os: windows-2025
             buildArgs: "windows -final -arm64 -D HXCPP_ARM64 -D officialBuild"
-            assetType: BC
+            assetType: ASTC
             artifactName: windowsBuild-arm64
             artifactPath: export\release\windows\bin\*
           - name: Linux i686
@@ -245,7 +245,7 @@ jobs:
       - name: Download Windows ARM64 Build
         uses: actions/download-artifact@main
         with:
-          name: windowsBuild-arm64-BC
+          name: windowsBuild-arm64-ASTC
           path: /home/runner/windowsBuild-arm64
 
       - name: Zip Windows ARM64 Build For Release
