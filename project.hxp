@@ -64,6 +64,8 @@ class Project extends HXProject
 		configureAssets();
 		configureLibs();
 		configureIcons();
+		if (!isDisplay())
+			checkLibraries();
 		trace("Configured project successfully!");
 		trace("Starting build...");
 		trace("");
@@ -507,7 +509,127 @@ class Project extends HXProject
 		}
 		catch (e:Dynamic)
 		{
-			return "ASCII Art Load Failed";
+			return "ASCII Art Load Failed.";
+		}
+	}
+
+	function checkLibraries():Void
+	{
+		var diffs = new Map<String, Array<String>>();
+		var data:Dynamic = haxe.Json.parse(sys.io.File.getContent(#if ios '../../../../../' #end 'hmm.json'));
+		var dependencies:Array<Dynamic> = data.dependencies;
+
+		inline function hbPath(libName:String, ?file:String)
+		{
+			return haxe.io.Path.join([Sys.getCwd(), ".haxelib", libName, if (file != null) file else ""]);
+		}
+
+		inline function read(libName:String, file:String):String
+		{
+			var path = hbPath(libName, file);
+			return sys.FileSystem.exists(path) ? sys.io.File.getContent(path).trim() : "";
+		}
+
+		function getGitHash(libName:String):String
+		{
+			var gitDir = hbPath(libName, "git");
+			var pathToCheck = sys.FileSystem.exists(gitDir) ? gitDir : null;
+
+			if (pathToCheck == null)
+			{
+				var devContent = read(libName, ".dev");
+				if (devContent != "" && sys.FileSystem.exists(devContent)) pathToCheck = devContent;
+			}
+
+			if (pathToCheck == null)
+				return "";
+
+			try
+			{
+				var p = new sys.io.Process("git", ["-C", pathToCheck, "rev-parse", "HEAD"]);
+				var hash = p.stdout.readAll().toString().trim();
+				p.close();
+				return hash;
+			}
+			catch (e)
+				return "";
+		}
+
+		for (lib in dependencies)
+		{
+			var name:String = lib.name;
+			var key = name.replace(".", ",");
+
+			var devFile = read(key, ".dev");
+			var currentVer = read(key, ".current");
+			var gitHash = getGitHash(key);
+
+			var isLocalGitDev = false;
+			if (devFile != "" && sys.FileSystem.exists(hbPath(key, "git"))) {
+				isLocalGitDev = Path.normalize(devFile).startsWith(Path.normalize(hbPath(key, "git")));
+			}
+
+			if (devFile != "" && !isLocalGitDev)
+			{
+				var current = gitHash;
+				var expected = (lib.type == "git") ? lib.ref : lib.version;
+
+				if (lib.type == "git" ? (current != expected) : true) {
+					diffs.set(key, [devFile, current, expected, lib.type]);
+				}
+			}
+			else
+			{
+				if (lib.type == "haxelib")
+				{
+					if (currentVer != lib.version)
+					{
+						diffs.set(key, ["", currentVer, lib.version, "haxelib"]);
+					}
+				}
+				else if (lib.type == "git")
+				{
+					if (gitHash != lib.ref)
+					{
+						diffs.set(key, ["", gitHash, lib.ref, "git"]);
+					}
+				}
+			}
+		}
+
+		if (Lambda.count(diffs) > 0)
+		{
+			Sys.println("Some libraries differ from the versions defined in hmm.json.");
+			Sys.println("To ensure consistency, it's recommended to stop the build and run `hmm reinstall [library]`.");
+			Sys.println("");
+
+			for (key in diffs.keys())
+			{
+				var info = diffs.get(key);
+				if (info == null)
+					continue;
+
+				var devPath = info[0];
+				var current = info[1];
+				var expected = info[2];
+				var type = info[3];
+				var displayName = key.replace(",", ".");
+
+				if (haxe.io.Path.isAbsolute(devPath))
+				{
+					Sys.println('- $displayName (Development Build)');
+					Sys.println('   Path:     ${haxe.io.Path.removeTrailingSlashes(devPath)}');
+				}
+				else
+				{
+					Sys.println('- $displayName');
+				}
+
+				Sys.println('   Current:  $current');
+				Sys.println('   Expected: $expected');
+			}
+
+			Sys.println("");
 		}
 	}
 

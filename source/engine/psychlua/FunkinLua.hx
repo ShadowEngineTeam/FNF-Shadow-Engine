@@ -901,38 +901,68 @@ class FunkinLua
 		});
 
 		// shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
-		set("getObjectOrder", function(obj:String)
+		set("getObjectOrder", function(obj:String, ?group:String = null)
 		{
-			var split:Array<String> = obj.split('.');
-			var leObj:FlxBasic = LuaUtils.getObjectDirectly(split[0]);
-			if (split.length > 1)
-			{
-				leObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
-			}
-
+			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				return LuaUtils.getTargetInstance().members.indexOf(leObj);
+				if (group != null)
+				{
+					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
+					if (groupOrArray != null)
+					{
+						switch (Type.typeof(groupOrArray))
+						{
+							case TClass(Array): // Is Array
+								return groupOrArray.indexOf(leObj);
+							default: // Is Group
+								return Reflect.getProperty(groupOrArray, 'members').indexOf(leObj); // Has to use a Reflect here because of FlxTypedSpriteGroup
+						}
+					}
+					else
+					{
+						luaTrace('getObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
+						return -1;
+					}
+				}
+				var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
+				return groupOrArray.members.indexOf(leObj);
 			}
-			luaTrace("getObjectOrder: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+			luaTrace('getObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 			return -1;
 		});
-		set("setObjectOrder", function(obj:String, position:Int)
+		set("setObjectOrder", function(obj:String, position:Int, ?group:String = null)
 		{
-			var split:Array<String> = obj.split('.');
-			var leObj:FlxBasic = LuaUtils.getObjectDirectly(split[0]);
-			if (split.length > 1)
-			{
-				leObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
-			}
-
+			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				LuaUtils.getTargetInstance().remove(leObj, true);
-				LuaUtils.getTargetInstance().insert(position, leObj);
+				if (group != null)
+				{
+					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
+					if (groupOrArray != null)
+					{
+						switch (Type.typeof(groupOrArray))
+						{
+							case TClass(Array): // Is Array
+								groupOrArray.remove(leObj);
+								groupOrArray.insert(position, leObj);
+							default: // Is Group
+								groupOrArray.remove(leObj, true);
+								groupOrArray.insert(position, leObj);
+						}
+					}
+					else
+						luaTrace('setObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
+				}
+				else
+				{
+					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
+					groupOrArray.remove(leObj, true);
+					groupOrArray.insert(position, leObj);
+				}
 				return;
 			}
-			luaTrace("setObjectOrder: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+			luaTrace('setObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 		});
 
 		// gay ass tweens
