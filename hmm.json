@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-	  "ref": "37ed7e527b191d1b4bc9fd4b26876bd378255711",
+	  "ref": "a881b280cbae1916a0cfdf8e0ffa60f42213d658",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-	  "ref": "f75660775b6215a74d1ba4b02f702c8554763c16",
+	  "ref": "34c32a953d8782fb0a1cc51875ff6265b7ee7b48",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
