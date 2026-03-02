@@ -901,65 +901,30 @@ class FunkinLua
 		});
 
 		// shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
-		set("getObjectOrder", function(obj:String, ?group:String = null)
+		// You ain't no epic coda i am :3
+		set("getObjectOrder", function(obj:String, ?group:String)
 		{
+			if (group != null)
+				luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, false, FlxColor.YELLOW);
+	
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				if (group != null)
-				{
-					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
-					if (groupOrArray != null)
-					{
-						switch (Type.typeof(groupOrArray))
-						{
-							case TClass(Array): // Is Array
-								return groupOrArray.indexOf(leObj);
-							default: // Is Group
-								return Reflect.getProperty(groupOrArray, 'members').indexOf(leObj); // Has to use a Reflect here because of FlxTypedSpriteGroup
-						}
-					}
-					else
-					{
-						luaTrace('getObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
-						return -1;
-					}
-				}
-				var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
-				return groupOrArray.members.indexOf(leObj);
+				if (leObj.zIndex == -1)
+					luaTrace('getObjectOrder: Object $obj doesn\'t belong to any group!', false, false, FlxColor.RED);
+
+				return leObj.zIndex;
 			}
 			luaTrace('getObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 			return -1;
 		});
-		set("setObjectOrder", function(obj:String, position:Int, ?group:String = null)
+		set("setObjectOrder", function(obj:String, position:Int, ?group:String)
 		{
+			luaTrace('setObjectOrder: Third optional argument "group" argument is deprecated.', false, false, FlxColor.YELLOW);
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				if (group != null)
-				{
-					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
-					if (groupOrArray != null)
-					{
-						switch (Type.typeof(groupOrArray))
-						{
-							case TClass(Array): // Is Array
-								groupOrArray.remove(leObj);
-								groupOrArray.insert(position, leObj);
-							default: // Is Group
-								groupOrArray.remove(leObj, true);
-								groupOrArray.insert(position, leObj);
-						}
-					}
-					else
-						luaTrace('setObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
-				}
-				else
-				{
-					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
-					groupOrArray.remove(leObj, true);
-					groupOrArray.insert(position, leObj);
-				}
+				leObj.zIndex = position;
 				return;
 			}
 			luaTrace('setObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
