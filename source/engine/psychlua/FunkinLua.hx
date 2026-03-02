@@ -920,7 +920,7 @@ class FunkinLua
 		});
 		set("setObjectOrder", function(obj:String, position:Int, ?group:String)
 		{
-			luaTrace('setObjectOrder: Third optional argument "group" argument is deprecated.', false, false, FlxColor.YELLOW);
+			luaTrace('setObjectOrder: Third optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
