@@ -181,7 +181,7 @@ class Project extends HXProject
 		for (shadowName in LIBRARY_SHADOWS_LIST)
 			SOURCE_FOLDERS.push('source/library_shadows/${shadowName}');
 
-		sources = SOURCE_FOLDERS;
+		sources = sources.concat(SOURCE_FOLDERS);
 		templatePaths.push("templates");
 
 		window.width = 1280;
