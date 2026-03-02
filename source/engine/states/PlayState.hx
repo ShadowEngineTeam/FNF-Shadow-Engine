@@ -503,6 +503,7 @@ class PlayState extends MusicBeatState
 		uiGroup.add(timeTxt);
 
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
+		strumLineNotes.autoRefresh = strumLineNotes.useZIndex = false;
 		noteGroup.add(strumLineNotes);
 
 		if (ClientPrefs.data.timeBarType == 'Song Name')

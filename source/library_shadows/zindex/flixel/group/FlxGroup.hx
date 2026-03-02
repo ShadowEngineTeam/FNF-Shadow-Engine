@@ -89,6 +89,11 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 	public var memberRemoved(get, never):FlxTypedSignal<T->Void>;
 
 	/**
+	 * Wether to sort the objects in this `FlxGroup` based on their zIndex.
+	 */
+	public var useZIndex:Bool = true;
+
+	/**
 	 * Wether to always refresh the group's basics order based on their zIndex when a member is added/removed.
 	 */
 	public var autoRefresh:Bool = true;
@@ -211,7 +216,7 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 			return basic;
 
 		// First, try adding the object in it's requested zIndex.
-		if (basic.zIndex > -1)
+		if (basic.zIndex > -1 && useZIndex)
 		{
 			// If the group is full, return the basic
 			if (maxSize > 0 && length >= maxSize)
@@ -226,7 +231,8 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 			final index:Int = getFirstNull();
 			if (index != -1)
 			{
-				basic._zIndex = index;
+				if (useZIndex)
+					basic._zIndex = index;
 				members[index] = basic;
 	
 				if (index >= length)
@@ -244,12 +250,15 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 				return basic;
 	
 			// If we made it this far, we need to add the basic to the group.
-			basic._zIndex = members.push(basic);
+			members.push(basic);
+
+			if (useZIndex)
+				basic._zIndex = members.length - 1;
 		}
 
 		length++;
 
-		if (autoRefresh)
+		if (autoRefresh && useZIndex)
 			refresh();
 
 		onMemberAdd(basic);
@@ -285,6 +294,8 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 		if (position < length && members[position] == null)
 		{
 			members[position] = object;
+			if (useZIndex)
+				object._zIndex = position;
 			onMemberAdd(object);
 			
 			return object;
@@ -296,7 +307,24 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 
 		// If we made it this far, we need to insert the object into the group at the specified position.
 		members.insert(position, object);
+
+		if (useZIndex)
+			object._zIndex = members.indexOf(object);
+		
 		length++;
+
+		// To properly apply the ordering we must updated the zIndexes based on the array to avoid conflict when 2 objects have the same zIndex
+		if (autoRefresh && useZIndex)
+		{
+			for (i in (position + 1)...length)
+    		{
+        		if (members[i] != null)
+            		members[i]._zIndex = i; 
+    		}
+
+			refresh();
+		}
+
 		onMemberAdd(object);
 
 		return object;
@@ -397,10 +425,10 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
 		else
 			members[index] = null;
 
-		if (!basic.zIndexSet)
+		if (!basic.zIndexSet && useZIndex)
 			basic._zIndex = -1;
 		
-		if (autoRefresh)
+		if (autoRefresh && useZIndex)
 			refresh();
 
 		onMemberRemove(basic);
@@ -452,6 +480,7 @@ class FlxTypedGroup<T:FlxBasic> extends FlxBasic
     */
 	public inline function refresh():Void
 	{
+		if (!useZIndex) return;
 	    sort(function(order:Int, a:T, b:T):Int
   		{
     		if (a == null || b == null) return 0;

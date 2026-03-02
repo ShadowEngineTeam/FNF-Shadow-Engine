@@ -918,13 +918,42 @@ class FunkinLua
 			luaTrace('getObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 			return -1;
 		});
-		set("setObjectOrder", function(obj:String, position:Int, ?group:String)
+		set("setObjectOrder", function(obj:String, ?position:Int, ?group:String)
 		{
-			luaTrace('setObjectOrder: Third optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
+			if (position != null && position < 0) position = 0;
+			if (position == null) position = -1;
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				leObj.zIndex = position;
+				if (group != null)
+				{
+					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
+					if (groupOrArray != null)
+					{
+						switch (Type.typeof(groupOrArray))
+						{
+							case TClass(Array): // Is Array
+								function sortZIndex(order:Int, a:FlxBasic, b:FlxBasic):Int
+								{
+									if (a == null || b == null) return 0;
+									return flixel.util.FlxSort.byValues(order, a.zIndex, b.zIndex);
+								}
+								leObj.zIndex = position;
+								groupOrArray.sort(sortZIndex.bind(flixel.util.FlxSort.ASCENDING));
+							default: // Is Group
+								leObj.zIndex = position;
+								groupOrArray.refresh();
+						}
+					}
+					else
+						luaTrace('setObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
+				}
+				else
+				{
+					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
+					leObj.zIndex = position;
+					groupOrArray.refresh();
+				}
 				return;
 			}
 			luaTrace('setObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
