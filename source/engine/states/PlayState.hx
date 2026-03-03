@@ -3579,8 +3579,8 @@ class PlayState extends MusicBeatState
 			++combo;
 			if (maxCombo < combo)
 				++maxCombo;
-			if (combo > 9999)
-				combo = 9999;
+			//if (combo > 9999)
+			//	combo = 9999;
 			popUpScore(note);
 
 			for (i in anas)
