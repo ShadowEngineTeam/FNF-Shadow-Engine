@@ -30,6 +30,8 @@ class Paths
 		#if USING_GPU_TEXTURES
 		'assets/shared/images/touchpad/bg.$GPU_IMAGE_EXT',
 		#end
+		'assets/shared/images/ui/cursor.png',
+		'assets/shared/images/ui/cursorCross.png',
 		'assets/shared/music/freakyMenu.ogg'
 	];
 

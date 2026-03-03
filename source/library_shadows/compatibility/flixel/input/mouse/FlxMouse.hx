@@ -10,6 +10,7 @@ import openfl.events.MouseEvent;
 import openfl.Lib;
 import openfl.ui.Mouse;
 import flixel.FlxG;
+import flixel.graphics.FlxGraphic;
 import flixel.input.IFlxInputManager;
 import flixel.input.FlxInput.FlxInputState;
 import flixel.input.mouse.FlxMouseButton.FlxMouseButtonID;
@@ -25,9 +26,6 @@ import openfl.geom.Point;
 import openfl.ui.MouseCursor;
 import flash.ui.MouseCursorData;
 #end
-
-@:bitmap("assets/embed/images/ui/cursor.png")
-private class GraphicCursor extends BitmapData {}
 
 /**
  * This class helps contain and track the mouse pointer in your game.
@@ -326,7 +324,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 
 		if (Graphic == null)
 		{
-			Graphic = new GraphicCursor(0, 0);
+			Graphic = backend.Paths.image('ui/cursor');
 		}
 
 		if ((Graphic is Class))
@@ -341,9 +339,10 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 		{
 			cursor = new Bitmap(FlxG.assets.getBitmapData(Graphic, false));
 		}
-		else
+		else if (Graphic is FlxGraphic)
 		{
-			cursor = new Bitmap(new GraphicCursor(0, 0));
+			var graph:FlxGraphic = cast Graphic;
+			cursor = new Bitmap(graph.bitmap);
 		}
 
 		cursor.x = XOffset;

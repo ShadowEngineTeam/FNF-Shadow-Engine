@@ -158,7 +158,7 @@ class Main extends Sprite
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
 
-		FlxSprite.defaultAntialiasing = true;
+		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
