@@ -902,7 +902,7 @@ class FunkinLua
 
 		// shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
 		// You ain't no epic coda i am :3
-		set("getObjectOrder", function(obj:String, ?group:String)
+		set("getObjectOrder", function(obj:String, ?group:String = null)
 		{
 			if (group != null)
 				luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
