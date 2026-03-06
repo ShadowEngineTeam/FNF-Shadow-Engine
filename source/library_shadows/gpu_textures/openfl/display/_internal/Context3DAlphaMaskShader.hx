@@ -12,11 +12,10 @@ class Context3DAlphaMaskShader extends Shader
 {
 	public static var opaqueBitmapData:BitmapData = new BitmapData(1, 1, false, 0);
 
-	@:glFragmentSource("varying vec2 openfl_TextureCoordv;
+	@:glFragmentHeader("varying vec2 openfl_TextureCoordv;
 
-		uniform sampler2D openfl_Texture;
-
-		out vec4 openfl_FragColor;
+		uniform sampler2D openfl_Texture;")
+	@:glFragmentSource("#pragma header
 
 		void main(void) {
 
@@ -33,11 +32,12 @@ class Context3DAlphaMaskShader extends Shader
 			}
 
 		}")
-	@:glVertexSource("attribute vec4 openfl_Position;
+	@:glVertexHeader("attribute vec4 openfl_Position;
 		attribute vec2 openfl_TextureCoord;
 		varying vec2 openfl_TextureCoordv;
 
-		uniform mat4 openfl_Matrix;
+		uniform mat4 openfl_Matrix;")
+	@:glVertexSource("#pragma header
 
 		void main(void) {
 
