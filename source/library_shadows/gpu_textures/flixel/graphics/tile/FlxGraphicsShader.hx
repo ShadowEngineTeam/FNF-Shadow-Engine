@@ -9,7 +9,7 @@ class FlxGraphicsShader extends GraphicsShader
 		attribute vec4 colorMultiplier;
 		attribute vec4 colorOffset;
 		uniform bool hasColorTransform;
-	", true)
+	")
 	@:glVertexBody("
 		openfl_Alphav = openfl_Alpha * alpha;
 
@@ -26,7 +26,7 @@ class FlxGraphicsShader extends GraphicsShader
 				openfl_ColorMultiplierv = colorMultiplier;
 			}
 		}
-	", true)
+	")
 	@:glFragmentHeader("
 		uniform bool hasTransform;  // TODO: Is this still needed? Apparently, yes!
 		uniform bool hasColorTransform;
@@ -54,7 +54,7 @@ class FlxGraphicsShader extends GraphicsShader
 
 			return color * openfl_Alphav;
 		}
-	", true)
+	")
 	@:glFragmentSource("
 		#pragma header
 
@@ -62,7 +62,7 @@ class FlxGraphicsShader extends GraphicsShader
 		{
 			gl_FragColor = flixel_texture2D(bitmap, openfl_TextureCoordv);
 		}
-	", true)
+	")
 	public function new()
 	{
 		super();

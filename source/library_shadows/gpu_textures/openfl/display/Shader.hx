@@ -267,6 +267,11 @@ class Shader
 	**/
 	public var program:Program3D;
 
+	/**
+	 * Wether to process the fragment and vertex strings in runtime.
+	 */
+	public var process(default, null):Bool = true;
+
 	@:noCompletion private var __alpha:ShaderParameter<Float>;
 	@:noCompletion private var __bitmap:ShaderInput<BitmapData>;
 	@:noCompletion private var __colorMultiplier:ShaderParameter<Float>;
@@ -288,6 +293,7 @@ class Shader
 	@:noCompletion private var __hasColorTransform:ShaderParameter<Bool>;
 	@:noCompletion private var __inputBitmapData:Array<ShaderInput<BitmapData>>;
 	@:noCompletion private var __isGenerated:Bool;
+	@:noCompletion private var __macroProcessed:Bool;
 	@:noCompletion private var __matrix:ShaderParameter<Float>;
 	@:noCompletion private var __numPasses:Int;
 	@:noCompletion private var __paramBool:Array<ShaderParameter<Bool>>;
@@ -353,8 +359,10 @@ class Shader
 
 		@param code The raw shader bytecode to link to the Shader.
 	**/
-	public function new(code:ByteArray = null)
+	public function new(code:ByteArray = null, ?process:Bool = true)
 	{
+		this.process = process;
+		
 		byteCode = code;
 		precisionHint = FULL;
 
@@ -665,20 +673,17 @@ class Shader
 
 		var prefix = "#version "
 			+ __glVersion
-			+ "
-      "
+			+ "\n"
 			+ extensions
-			+ "
-				#ifdef GL_ES
-				"
-			+ (precisionHint == FULL ? "#ifdef GL_FRAGMENT_PRECISION_HIGH
-					precision highp float;
-				#else
-					precision mediump float;
-				#endif" : "precision lowp float;")
-			+ "
-				#endif
-				";
+			+ "#ifdef GL_ES\n"
+			+ (precisionHint == FULL ?
+				"#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
+				+ "precision highp float;\n"
+				+ "#else\n"
+				+ "precision mediump float;\n"
+				+ "#endif\n"
+				: "precision lowp float;\n")
+			+ "#endif\n";
 
 		if (complexBlendsSupported)
 		{
@@ -708,6 +713,12 @@ class Shader
 
 		if (__context != null && program == null)
 		{
+			if (process && __macroProcessed == false)
+			{
+				trace('processing in runtime!!!')
+				__initProcessing(glFragmentSource, glVertexSource);
+				return;
+			}
 			var gl = __context.gl;
 
 			var vertex = __buildSourcePrefix(false) + glVertexSource;
@@ -740,7 +751,9 @@ class Shader
 					}
 				}
 				else
+				{
 					program.__glProgram = __createGLProgram(vertex, fragment);
+				}
 
 				__context.__programs.set(id, program);
 			}
@@ -1185,6 +1198,149 @@ class Shader
 
 				intIndex++;
 			}
+		}
+	}
+
+	private function __initProcessing(glFragmentSource:String, glVertexSource:String)
+	{
+		var start = haxe.Timer.stamp();
+		var vertex = __buildSourcePrefix(false) + __buildGLSLHeader(glVersion, glVertexSource) + __processGLSL(glVertexSource, glVersion, false);
+		var fragment = __buildSourcePrefix(true) + __buildGLSLHeader(glVersion, glFragmentSource) + __processGLSL(glFragmentSource, glVersion, true);
+		trace('Finished processing shader. Time spent: ${haxe.Timer.stamp() -  start}');
+		var gl = __context.gl;
+		var id = vertex + fragment;
+		if (__context.__programs.exists(id))
+		{
+			program = __context.__programs.get(id);
+		}
+		else
+		{
+			program = __context.createProgram(GLSL);
+
+			if (Lib.current.stage.__uncaughtErrorEvents.__enabled)
+			{
+				try
+				{
+					program.__glProgram = __createGLProgram(vertex, fragment);
+				}
+				catch (e:Dynamic)
+				{
+					Lib.current.stage.__handleError(e);
+
+					program.__glProgram = null;
+				}
+			}
+			else
+			{
+				program.__glProgram = __createGLProgram(vertex, fragment);
+			}
+
+			__context.__programs.set(id, program);
+		}
+
+		if (program != null)
+		{
+			glProgram = program.__glProgram;
+
+			for (input in __inputBitmapData)
+			{
+				if (input.__isUniform)
+				{
+					input.index = gl.getUniformLocation(glProgram, input.name);
+				}
+				else
+				{
+					input.index = gl.getAttribLocation(glProgram, input.name);
+				}
+			}
+
+			for (parameter in __paramBool)
+			{
+				if (parameter.__isUniform)
+				{
+					parameter.index = gl.getUniformLocation(glProgram, parameter.name);
+				}
+				else
+				{
+					parameter.index = gl.getAttribLocation(glProgram, parameter.name);
+				}
+			}
+
+			for (parameter in __paramFloat)
+			{
+				if (parameter.__isUniform)
+				{
+					parameter.index = gl.getUniformLocation(glProgram, parameter.name);
+				}
+				else
+				{
+					parameter.index = gl.getAttribLocation(glProgram, parameter.name);
+				}
+			}
+
+			for (parameter in __paramInt)
+			{
+				if (parameter.__isUniform)
+				{
+					parameter.index = gl.getUniformLocation(glProgram, parameter.name);
+				}
+				else
+				{
+					parameter.index = gl.getAttribLocation(glProgram, parameter.name);
+				}
+			}
+		}
+	}
+
+	private static function __buildGLSLHeader(glVersion:String, source:String):String
+	{
+		var glVersionClean:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
+
+		switch (glVersionClean.replace(glVersion, '$1'))
+		{
+			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
+				if (StringTools.contains(source, 'out vec4 openfl_FragColor;')) return '';
+				return "out vec4 openfl_FragColor;\n";
+			default:
+				return "";
+		}
+	}
+
+	private static function __processGLSL(source:String, glVersion:String, isFragment:Bool)
+	{
+		if (glVersion == "" || glVersion == null) return __processGLSL(source, #if mobile '100' #else '120' #end, isFragment);
+
+		var attributeKeyword:EReg = ~/\battribute\s+([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
+		var varyingKeyword:EReg = ~/\bvarying\s+(?:lowp|mediump|highp\s+)?([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
+		var texture2DKeyword:EReg = ~/\btexture2D\b/g;
+		var glFragColorKeyword:EReg = ~/\bgl_FragColor\b/g;
+		var glVersionClean:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
+		var outFragColorKeyword:EReg = ~/\bout\s+vec4\s+openfl_FragColor\s*;\s*/g;
+
+		switch (glVersionClean.replace(glVersion, '$1'))
+		{
+			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
+				var result = source;
+
+				if (isFragment)
+				{
+					result = varyingKeyword.replace(result, "in $1 $2");
+				}
+				else
+				{
+					result = attributeKeyword.replace(result, "in $1 $2");
+					result = varyingKeyword.replace(result, "out $1 $2");
+				}
+
+				result = texture2DKeyword.replace(result, "texture");
+				result = glFragColorKeyword.replace(result, "openfl_FragColor");
+
+				return result;
+			default:
+				var result = source;
+
+				result = outFragColorKeyword.replace(result, "");
+				return result;
 		}
 	}
 
