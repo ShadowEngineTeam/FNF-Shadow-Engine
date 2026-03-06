@@ -211,8 +211,8 @@ class ShadowPanel extends FlxSpriteGroup
 
 		super.update(elapsed);
 
-		var mx:Int = FlxG.mouse.screenX;
-		var my:Int = FlxG.mouse.screenY;
+		var mx:Int = FlxG.mouse.viewX;
+		var my:Int = FlxG.mouse.viewY;
 
 		updateHeaderLayout();
 

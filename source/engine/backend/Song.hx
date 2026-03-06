@@ -136,8 +136,9 @@ class Song
 		}
 
 		// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
-		while (!rawJson.endsWith("}"))
-			rawJson = rawJson.substr(0, rawJson.length - 1);
+		if (rawJson != null)
+			while (!rawJson.endsWith("}"))
+				rawJson = rawJson.substr(0, rawJson.length - 1);
 
 		var songJson:Dynamic = parseJSONshit(rawJson, path);
 

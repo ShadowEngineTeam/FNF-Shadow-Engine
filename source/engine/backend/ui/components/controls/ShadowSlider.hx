@@ -151,7 +151,7 @@ class ShadowSlider extends FlxSpriteGroup
 
 	function getValueFromMouseX():Float
 	{
-		FlxG.mouse.getScreenPosition(camera, _mousePos);
+		FlxG.mouse.getViewPosition(camera, _mousePos);
 		var localX:Float = _mousePos.x - (this.x + _thumbWidth / 2);
 		var usableWidth:Int = _width - _thumbWidth;
 

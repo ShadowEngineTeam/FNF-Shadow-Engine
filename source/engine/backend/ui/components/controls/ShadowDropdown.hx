@@ -204,7 +204,7 @@ class ShadowDropdown extends FlxSpriteGroup
 		if (s == null || !s.visible)
 			return false;
 
-		FlxG.mouse.getScreenPosition(cam, _tmpMouse);
+		FlxG.mouse.getViewPosition(cam, _tmpMouse);
 		s.getScreenPosition(_tmpBg, cam);
 
 		return _tmpMouse.x >= _tmpBg.x
@@ -224,7 +224,7 @@ class ShadowDropdown extends FlxSpriteGroup
 		if (!isMouseOverList(cam))
 			return -1;
 
-		FlxG.mouse.getScreenPosition(cam, _tmpMouse);
+		FlxG.mouse.getViewPosition(cam, _tmpMouse);
 		listBg.getScreenPosition(_tmpBg, cam);
 
 		var localY:Float = _tmpMouse.y - _tmpBg.y;

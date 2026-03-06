@@ -25,7 +25,7 @@ class Project extends HXProject
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
-	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "flixel_animate", "float_deltatime", "gpu_textures"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "compatibility", "flixel_animate", "gpu_textures"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -181,7 +181,7 @@ class Project extends HXProject
 		for (shadowName in LIBRARY_SHADOWS_LIST)
 			SOURCE_FOLDERS.push('source/library_shadows/${shadowName}');
 
-		sources = SOURCE_FOLDERS;
+		sources = sources.concat(SOURCE_FOLDERS);
 		templatePaths.push("templates");
 
 		window.width = 1280;

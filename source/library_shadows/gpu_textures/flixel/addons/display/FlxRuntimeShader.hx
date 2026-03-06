@@ -11,6 +11,7 @@ import flixel.graphics.tile.FlxGraphicsShader;
 import lime.utils.Float32Array;
 #end
 import openfl.display.BitmapData;
+import openfl.display.Shader;
 import openfl.display.ShaderInput;
 import openfl.display.ShaderParameter;
 
@@ -57,13 +58,8 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	 * @param vertexSource The vertex shader source.
 	 * Note you also need to `initialize()` the shader MANUALLY! It can't be done automatically.
 	 */
-	public function new(?fragmentSource:String, ?vertexSource:String, ?glslVersion:String):Void
+	public function new(?fragmentSource:String, ?vertexSource:String):Void
 	{
-		if (glslVersion != null) {
-			// Don't set the value (use getDefaultGLVersion) if it's null.
-			this.glVersion = glslVersion;
-		}
-
 		if (fragmentSource == null)
 		{
 			this.glFragmentSource = __processFragmentSource(glFragmentSourceRaw);
@@ -97,7 +93,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	 */
 	@:noCompletion private function __processFragmentSource(input:String):String
 	{
-        switch (glVersionCleaner.replace(glVersion, '$1'))
+        switch (glVersionCleaner.replace(Shader.glVersion, '$1'))
 		{
             case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
 				input = varyingKeyword.replace(input, "in $1 $2");
@@ -118,7 +114,7 @@ class FlxRuntimeShader extends FlxGraphicsShader
 	 */
 	@:noCompletion private function __processVertexSource(input:String):String
 	{
-        switch (glVersionCleaner.replace(glVersion, '$1'))
+        switch (glVersionCleaner.replace(Shader.glVersion, '$1'))
 		{
            case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
                 input = attributeKeyword.replace(input, "in $1 $2");

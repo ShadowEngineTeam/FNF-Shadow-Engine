@@ -503,6 +503,7 @@ class PlayState extends MusicBeatState
 		uiGroup.add(timeTxt);
 
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
+		strumLineNotes.autoRefresh = strumLineNotes.useZIndex = false;
 		noteGroup.add(strumLineNotes);
 
 		if (ClientPrefs.data.timeBarType == 'Song Name')
@@ -3578,8 +3579,8 @@ class PlayState extends MusicBeatState
 			++combo;
 			if (maxCombo < combo)
 				++maxCombo;
-			if (combo > 9999)
-				combo = 9999;
+			//if (combo > 9999)
+			//	combo = 9999;
 			popUpScore(note);
 
 			for (i in anas)

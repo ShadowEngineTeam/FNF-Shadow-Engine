@@ -13,6 +13,7 @@
 - Unironically winning icons support
 - Uses PBOT1 scoring system instead of fixed scoring (like 300 for every sick)
 - Improved Controller Support
+- Removes 9999 combo limit
 - Some 0.6.3 and 1.0 compability
 - Little bit Null Safety
 - Linux ARM support (FNF on Raspberry Pi baby)

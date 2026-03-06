@@ -2,15 +2,13 @@ package states.editors;
 
 import flixel.graphics.FlxGraphic;
 import lime.ui.FileDialog;
+import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import flixel.FlxCamera;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
-
-@:bitmap("assets/images/debugger/cursorCross.png")
-private class GraphicCursorCross extends openfl.display.BitmapData {}
 
 class CharacterEditorState extends MusicBeatState
 {
@@ -107,8 +105,9 @@ class CharacterEditorState extends MusicBeatState
 
 		addCharacter();
 
-		cameraFollowPointer = new FlxSprite().loadGraphic(FlxGraphic.fromClass(GraphicCursorCross));
+		cameraFollowPointer = new FlxSprite().loadGraphic(Paths.image('ui/cursorCross'));
 		cameraFollowPointer.setGraphicSize(40, 40);
+		cameraFollowPointer.antialiasing = false;
 		cameraFollowPointer.updateHitbox();
 		add(cameraFollowPointer);
 
@@ -1232,10 +1231,10 @@ class CharacterEditorState extends MusicBeatState
 		else
 			holdingArrowsTime = 0;
 
-		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0))
+		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaViewX != 0 || FlxG.mouse.deltaViewY != 0))
 		{
-			character.offset.x -= FlxG.mouse.deltaScreenX;
-			character.offset.y -= FlxG.mouse.deltaScreenY;
+			character.offset.x -= FlxG.mouse.deltaViewX;
+			character.offset.y -= FlxG.mouse.deltaViewY;
 			changedOffset = true;
 		}
 
