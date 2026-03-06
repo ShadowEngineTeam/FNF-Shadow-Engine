@@ -505,6 +505,11 @@ class Shader
 		}
 		else
 			Log.debug('Info compiling $typeName shader $message');
+
+		#if !macro
+		@:privateAccess // I'm lazy
+		backend.CrashHandler.saveErrorMessage('Error compiling $typeName shader $message\n\nSource:\n$source');
+		#end
 	}
 
 	@:noCompletion private function __createGLProgram(vertexSource:String, fragmentSource:String):GLProgram
