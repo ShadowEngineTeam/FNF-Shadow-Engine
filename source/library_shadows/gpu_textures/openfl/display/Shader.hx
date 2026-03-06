@@ -715,7 +715,7 @@ class Shader
 		{
 			if (process && __macroProcessed == false)
 			{
-				trace('processing in runtime!!!')
+				trace('processing in runtime!!!');
 				__initProcessing(glFragmentSource, glVertexSource);
 				return;
 			}
