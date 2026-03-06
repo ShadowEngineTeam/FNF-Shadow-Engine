@@ -440,7 +440,7 @@ class ShaderMacro
 							});
 						}
 
-						block.push(macro __macroProcessed = $v{hadToProcess});
+						//block.push(macro __macroProcessed = $v{hadToProcess});
 
 						block.push(Context.parse("__initGL ()", pos));
 
@@ -459,7 +459,7 @@ class ShaderMacro
 	{
 		// Specify the default glVersion.
 		// We can use compile defines to guess the value that prevents crashes in the majority of cases.
-		return "300 es";
+		return "100";
 	}
 
 	/**

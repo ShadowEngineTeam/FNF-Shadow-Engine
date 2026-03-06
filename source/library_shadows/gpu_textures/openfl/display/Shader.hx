@@ -149,10 +149,9 @@ class Shader
 	/**
 		Get or set the GLSL version used in the header when compiling with GLSL.
 
-		- `120` is required for initialization (i.e. providing a default value for) `uniform` variables
 		@default The default value is determined at compile time.
 	**/
-	public var glVersion(get, set):String;
+	public static var glVersion(get, never):String;
 
 	/**
 		Provides additional `#extension` directives to insert in the vertex and fragment shaders.
@@ -322,7 +321,7 @@ class Shader
 			},
 			"glVersion": {
 				get: untyped #if haxe4 js.Syntax.code #else __js__ #end ("function () { return this.get_glVersion (); }"),
-				set: untyped #if haxe4 js.Syntax.code #else __js__ #end ("function (v) { return this.set_glVersion (v); }")
+				//set: untyped #if haxe4 js.Syntax.code #else __js__ #end ("function (v) { return this.set_glVersion (v); }")
 			},
 			"glFragmentHeaderRaw": {
 				get: untyped #if haxe4 js.Syntax.code #else __js__ #end ("function () { return this.get_glFragmentHeaderRaw (); }"),
@@ -646,11 +645,11 @@ class Shader
 		#if lime
 		if (__context.__context.type == OPENGL)
 		{
-			complexBlendsSupported = complexBlendsSupported && (__glVersion == "150" || !StringTools.startsWith(__glVersion, "1"));
+			complexBlendsSupported = complexBlendsSupported && (glVersion == "150" || !StringTools.startsWith(glVersion, "1"));
 		}
 		else if (__context.__context.type == OPENGLES)
 		{
-			complexBlendsSupported = complexBlendsSupported && !StringTools.startsWith(__glVersion, "1");
+			complexBlendsSupported = complexBlendsSupported && !StringTools.startsWith(glVersion, "1");
 		}
 		#end
 
@@ -672,7 +671,7 @@ class Shader
 		// while #extension directives must be before any non-preprocessor tokens.
 
 		var prefix = "#version "
-			+ __glVersion
+			+ glVersion
 			+ "\n"
 			+ extensions
 			+ "#ifdef GL_ES\n"
@@ -715,7 +714,7 @@ class Shader
 		{
 			if (process && __macroProcessed == false)
 			{
-				trace('processing in runtime!!!');
+				//trace('processing inside Shader!!!');
 				__initProcessing(glFragmentSource, glVertexSource);
 				return;
 			}
@@ -1203,10 +1202,9 @@ class Shader
 
 	private function __initProcessing(glFragmentSource:String, glVertexSource:String)
 	{
-		var start = haxe.Timer.stamp();
 		var vertex = __buildSourcePrefix(false) + __buildGLSLHeader(glVersion, glVertexSource) + __processGLSL(glVertexSource, glVersion, false);
 		var fragment = __buildSourcePrefix(true) + __buildGLSLHeader(glVersion, glFragmentSource) + __processGLSL(glFragmentSource, glVersion, true);
-		trace('Finished processing shader. Time spent: ${haxe.Timer.stamp() -  start}');
+
 		var gl = __context.gl;
 		var id = vertex + fragment;
 		if (__context.__programs.exists(id))
@@ -1292,23 +1290,24 @@ class Shader
 		}
 	}
 
-	private static function __buildGLSLHeader(glVersion:String, source:String):String
+	private static function __buildGLSLHeader(glVersionFunc:String, source:String):String
 	{
+		var outFragColorKeyword:EReg = ~/\bout\s+vec4\s+openfl_FragColor\s*;\s*/g;
 		var glVersionClean:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
 
-		switch (glVersionClean.replace(glVersion, '$1'))
+		switch (glVersionClean.replace(glVersionFunc, '$1'))
 		{
 			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
-				if (StringTools.contains(source, 'out vec4 openfl_FragColor;')) return '';
+				if (outFragColorKeyword.match(source)) return "";
 				return "out vec4 openfl_FragColor;\n";
 			default:
 				return "";
 		}
 	}
 
-	private static function __processGLSL(source:String, glVersion:String, isFragment:Bool)
+	private static function __processGLSL(source:String, glVersionFunc:String, isFragment:Bool)
 	{
-		if (glVersion == "" || glVersion == null) return __processGLSL(source, #if mobile '100' #else '120' #end, isFragment);
+		if (glVersionFunc == "" || glVersionFunc == null) return __processGLSL(source, glVersion, isFragment);
 
 		var attributeKeyword:EReg = ~/\battribute\s+([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
 		var varyingKeyword:EReg = ~/\bvarying\s+(?:lowp|mediump|highp\s+)?([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)/g;
@@ -1317,7 +1316,7 @@ class Shader
 		var glVersionClean:EReg = ~/\b(\d+)\s*(?:core|es|compatibility)\b/g;
 		var outFragColorKeyword:EReg = ~/\bout\s+vec4\s+openfl_FragColor\s*;\s*/g;
 
-		switch (glVersionClean.replace(glVersion, '$1'))
+		switch (glVersionClean.replace(glVersionFunc, '$1'))
 		{
 			case "300", "310", "320", "330", "400", "410", "420", "430", "440", "450", "460":
 				var result = source;
@@ -1380,9 +1379,30 @@ class Shader
 		return __glFragmentSource;
 	}
 
-	@:noCompletion private function get_glVersion():String
+	@:noCompletion private static function get_glVersion():String
 	{
-		return __glVersion;
+		#if !macro
+		var str:String = lime.graphics.opengl.GL.getParameter(lime.graphics.opengl.GL.SHADING_LANGUAGE_VERSION);
+		var reg:EReg = ~/GLSL\s+ES\s+(\d+)\.(\d+)/i;
+		var fallbackReg:EReg = ~/(\d+)\.(\d+)/;
+
+		if (reg.match(str))
+		{
+			var major:Int = Std.parseInt(reg.matched(1));
+			if (major >= 3)
+				return "300 es";
+			return "100";
+		}
+
+		if (fallbackReg.match(str))
+		{
+			var major:Int = Std.parseInt(fallbackReg.matched(1));
+			if (major >= 3)
+				return "300 es";
+		}
+		#end
+
+		return "100";
 	}
 
 	@:noCompletion private function get_glVertexExtensions():Array<{name:String, behavior:String}>
@@ -1403,16 +1423,6 @@ class Shader
 		}
 
 		return __glFragmentSource = value;
-	}
-
-	@:noCompletion private function set_glVersion(value:String):String
-	{
-		if (value != __glVersion)
-		{
-			__glSourceDirty = true;
-		}
-
-		return __glVersion = value;
 	}
 
 	@:noCompletion private function set_glVertexExtensions(value:Array<{name:String, behavior:String}>):Array<{name:String, behavior:String}>
