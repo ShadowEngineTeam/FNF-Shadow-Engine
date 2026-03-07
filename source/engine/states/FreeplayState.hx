@@ -387,9 +387,6 @@ class FreeplayState extends MusicBeatState
 					trace('ERROR! $e');
 
 					var errorStr:String = e.toString();
-					if (errorStr.startsWith('[lime.utils.Assets] ERROR:'))
-						errorStr = 'Missing file: ' + errorStr.substring(errorStr.indexOf(Paths.formatToSongPath(songs[curSelected].songName)), errorStr.length - 1); // Missing chart
-
 					missingText.text = 'ERROR WHILE LOADING CHART:\n$errorStr';
 					missingText.screenCenter(Y);
 					missingText.visible = true;
@@ -427,8 +424,6 @@ class FreeplayState extends MusicBeatState
 			{
 				trace('ERROR! $e');
 				var errorStr:String = e.toString();
-				if (errorStr.startsWith('[lime.utils.Assets] ERROR:'))
-					errorStr = 'Missing file: ' + errorStr.substring(errorStr.indexOf(songLowercase), errorStr.length - 1); // Missing chart
 				missingText.text = 'ERROR WHILE LOADING CHART:\n$errorStr';
 				missingText.screenCenter(Y);
 				missingText.visible = true;
