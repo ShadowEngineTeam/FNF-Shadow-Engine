@@ -3605,18 +3605,11 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			#if mobile
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.onCancel.add(() -> onSaveCancel(null));
-			fileDialog.onSave.add((path) -> onSaveComplete(null));
-			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "*/*");
-			#else
 			_file = new FileReference();
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 			_file.save(data.trim(), "events" + (isDiffErect ? '-erect' : "") + ".json");
-			#end
 		}
 	}
 
