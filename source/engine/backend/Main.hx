@@ -20,9 +20,6 @@ import lime.ui.WindowVSyncMode;
 #end
 import states.TitleState;
 import openfl.events.KeyboardEvent;
-#if (linux && !debug)
-import hxgamemode.GamemodeClient;
-#end
 
 class Main extends Sprite
 {
@@ -37,20 +34,6 @@ class Main extends Sprite
 	};
 
 	public static var fpsVar:Framerate;
-
-	@:noCompletion
-	private static function __init__():Void
-	{
-		#if (linux && !debug)
-		if (GamemodeClient.request_start() != 0)
-		{
-			Sys.println('Failed to request gamemode start: ${GamemodeClient.error_string()}...');
-			// Sys.exit(1);
-		}
-		else
-			Sys.println('Succesfully requested gamemode to start...');
-		#end
-	}
 
 	public static function main():Void
 	{

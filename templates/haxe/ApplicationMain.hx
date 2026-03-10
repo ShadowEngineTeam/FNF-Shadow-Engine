@@ -7,6 +7,9 @@ import haxe.macro.Expr;
 #end
 
 #if ((linux || mac) && !macro)
+#if (linux && cpp)
+import hxgamemode.GamemodeClient;
+#end
 @:image('icons/desktop/iconOG.png')
 class ApplicationIcon extends lime.graphics.Image {}
 #end
@@ -44,6 +47,14 @@ class ApplicationMain
 	{
 		var app = new openfl.display.Application();
 
+		#if (linux && cpp)
+		GamemodeClient.request_start();
+		#end
+
+		::if (WIN_ORIENTATION != "auto")::
+		lime.system.System.setHint("ORIENTATIONS", ::if (WIN_ORIENTATION == "portrait")::"Portrait PortraitUpsideDown"::else::"LandscapeLeft LandscapeRight"::end::);
+		::end::
+
 		app.meta.set("build", "::meta.buildNumber::");
 		app.meta.set("company", "::meta.company::");
 		app.meta.set("file", "::APP_FILE::");
@@ -74,6 +85,7 @@ class ApplicationMain
 		var attributes:lime.ui.WindowAttributes = {
 			allowHighDPI: ::allowHighDPI::,
 			alwaysOnTop: ::alwaysOnTop::,
+			transparent: ::transparent::,
 			borderless: ::borderless::,
 			element: null,
 			frameRate: ::fps::,
@@ -137,7 +149,6 @@ class ApplicationMain
 		Native.setConsoleOutputToUTF8();
 		Native.disableWindowsGhosting();
 		Native.disableErrorReporting();
-		Native.setDarkMode(true);
 		#end
 		
 		var preloader = getPreloader();
@@ -172,6 +183,10 @@ class ApplicationMain
 
 		#if (sys && !ios && !nodejs && !emscripten)
 		lime.system.System.exit(result);
+		#end
+
+		#if (linux && cpp)
+		GamemodeClient.request_end();
 		#end
 	}
 
