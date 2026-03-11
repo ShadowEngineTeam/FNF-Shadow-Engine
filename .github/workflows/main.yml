@@ -39,18 +39,18 @@ jobs:
             assetType: BC
             artifactName: linuxBuild-x86_64
             artifactPath: export/release/linux/bin/*
-          - name: Linux ARMV7
-            os: ubuntu-22.04-arm
-            buildArgs: "linux -armv7 -D HXCPP_ARMV7"
-            assetType: ASTC
-            artifactName: linuxBuild-armv7
-            artifactPath: export/release/linux/bin/*
-          - name: Linux ARM64
-            os: ubuntu-22.04-arm
-            buildArgs: "linux -arm64 -D HXCPP_ARM64"
-            assetType: ASTC
-            artifactName: linuxBuild-arm64
-            artifactPath: export/release/linux/bin/*
+          # - name: Linux ARMV7
+            # os: ubuntu-22.04-arm
+            # buildArgs: "linux -armv7 -D HXCPP_ARMV7"
+            # assetType: ASTC
+            # artifactName: linuxBuild-armv7
+            # artifactPath: export/release/linux/bin/*
+          # - name: Linux ARM64
+            # os: ubuntu-22.04-arm
+            # buildArgs: "linux -arm64 -D HXCPP_ARM64"
+            # assetType: ASTC
+            # artifactName: linuxBuild-arm64
+            # artifactPath: export/release/linux/bin/*
           - name: Android
             os: macos-26
             buildArgs: "android -ONLY_ARM64"
