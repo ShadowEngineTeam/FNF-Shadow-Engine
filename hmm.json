@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-	  "ref": "4ff5fdfdaa0b39494378cdb8aa79ccda78dfae87",
+	  "ref": "e8757db5d018a69db8b9a294aaeccf42a9368cdc",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-	  "ref": "ab6cc8c14878be3a1a918d85668efc3b6a6263f2",
+	  "ref": "f7b94eebf7dbb452a929d0c67ab31a9cbd71d3a0",
       "url": "https://github.com/FunkinCrew/flixel"
     },
     {
