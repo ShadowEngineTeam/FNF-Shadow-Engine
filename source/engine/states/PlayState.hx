@@ -112,6 +112,12 @@ class PlayState extends MusicBeatState
 	public var vocals:FlxSound;
 	public var opponentVocals:FlxSound;
 
+	public var intro3Sound:FlxSound;
+	public var intro2Sound:FlxSound;
+	public var intro1Sound:FlxSound;
+	public var introGoSound:FlxSound;
+	public var missnoteSound:FlxSound
+
 	public var dad:Character = null;
 	public var gf:Character = null;
 	public var boyfriend:Character = null;
@@ -699,6 +705,8 @@ class PlayState extends MusicBeatState
 			if (opponentVocals._sound != null)
 				opponentVocals.pitch = value;
 			FlxG.sound.music.pitch = value;
+			for (pluh in [intro3Sound, intro2Sound, intro1Sound, introGoSound, missnoteSound])
+				if (pluh != null) pluh.pitch = value;
 
 			var ratio:Float = playbackRate / value; // funny word huh
 			if (ratio != 1)
@@ -1096,20 +1104,36 @@ class PlayState extends MusicBeatState
 				switch (swagCounter)
 				{
 					case 0:
-						FlxG.sound.play(Paths.sound('intro3' + introSoundsSuffix), 0.6);
+						intro3Sound = FlxG.sound.play(Paths.sound('intro3' + introSoundsSuffix), 0.6);
+						#if FLX_PITCH
+						if (intro3Sound != null) intro3Sound.pitch = playbackRate;
+						#end
 						tick = THREE;
+						
 					case 1:
 						countdownReady = createCountdownSprite(introAlts[0], antialias);
-						FlxG.sound.play(Paths.sound('intro2' + introSoundsSuffix), 0.6);
+						intro2Sound = FlxG.sound.play(Paths.sound('intro2' + introSoundsSuffix), 0.6);
+						#if FLX_PITCH
+						if (intro2Sound != null) intro2Sound.pitch = playbackRate;
+						#end
 						tick = TWO;
+						
 					case 2:
 						countdownSet = createCountdownSprite(introAlts[1], antialias);
-						FlxG.sound.play(Paths.sound('intro1' + introSoundsSuffix), 0.6);
+						intro1Sound = FlxG.sound.play(Paths.sound('intro1' + introSoundsSuffix), 0.6);
+						#if FLX_PITCH
+						if (intro1Sound != null) intro1Sound.pitch = playbackRate;
+						#end
 						tick = ONE;
+						
 					case 3:
 						countdownGo = createCountdownSprite(introAlts[2], antialias);
-						FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
+						introGoSound = FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
+						#if FLX_PITCH
+						if (introGoSound != null) introGoSound.pitch = playbackRate;
+						#end
 						tick = GO;
+						
 					case 4:
 						tick = START;
 				}
@@ -3369,7 +3393,13 @@ class PlayState extends MusicBeatState
 		}
 
 		if (note.mustPress)
-			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+		{
+			missnoteSound = FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+			#if FLX_PITCH
+			if (missnoteSound != null)
+				missnoteSound.pitch = playbackRate;
+			#end
+		}
 
 		if (instakillOnMiss)
 		{
