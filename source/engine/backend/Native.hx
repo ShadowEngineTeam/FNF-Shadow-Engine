@@ -36,19 +36,6 @@ class Native
 		#end
 	}
 
-	public static function setDarkMode(enable:Bool):Void
-	{
-		#if (cpp && windows)
-		untyped __cpp__('
-			HWND window = GetActiveWindow();
-			int darkMode = {0} ? 1 : 0;
-			if (DwmSetWindowAttribute(window, 20, &darkMode, sizeof(darkMode)) != S_OK)
-				DwmSetWindowAttribute(window, 19, &darkMode, sizeof(darkMode));
-			UpdateWindow(window);
-		', enable);
-		#end
-	}
-
 	public static function setConsoleOutputToUTF8():Void
 	{
 		#if (cpp && windows)

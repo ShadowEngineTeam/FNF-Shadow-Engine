@@ -14,7 +14,7 @@ import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.geom.Rectangle;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import backend.Song;
 import backend.Section;
 import backend.StageData;
@@ -89,6 +89,8 @@ class ChartingState extends MusicBeatState
 			"Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"
 		]
 	];
+
+	var _file:FileReference;
 
 	var UI_box:ShadowTabMenu;
 	var UI_help:ShadowPanel;
@@ -3575,8 +3577,11 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data.trim(), null, Paths.formatToSongPath(_song.song) + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
 		}
 	}
 
@@ -3600,9 +3605,44 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data.trim(), "events" + (isDiffErect ? '-erect' : "") + ".json");
 		}
+	}
+
+	function onSaveComplete(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved LEVEL DATA.");
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onSaveCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onSaveError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving Level data");
 	}
 
 	function getSectionBeats(?section:Null<Int> = null)

@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import haxe.Json;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileFilter;
@@ -571,31 +571,69 @@ class DialogueEditorState extends MusicBeatState
 		}
 	}
 
+	var _file:FileReference = null;
+
 	function loadDialogue()
 	{
-		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-		fileDialog.onOpen.add((file) -> onLoadComplete(file));
-		fileDialog.open('json');
+		var jsonFilter:FileFilter = new FileFilter('JSON', 'json');
+		_file = new FileReference();
+		_file.addEventListener(Event.COMPLETE, onLoadComplete);
+		_file.addEventListener(Event.CANCEL, onLoadCancel);
+		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file.browse([jsonFilter]);
 	}
 
-	function onLoadComplete(file:haxe.io.Bytes):Void
+	function onLoadComplete(_):Void
 	{
 		#if sys
-		if (file != null && file.length > 0)
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+
+		var fullPath:String = null;
+		@:privateAccess
+		if (_file.__path != null)
+			fullPath = _file.__path;
+
+		if (fullPath != null)
 		{
-			var jsonStr:String = file.getString(0, file.length);
-			var loadedDialog:DialogueFile = cast Json.parse(jsonStr);
-			if (loadedDialog.dialogue != null && loadedDialog.dialogue.length > 0)
+			var rawJson:String = File.getContent(fullPath);
+			if (rawJson != null)
 			{
-				trace("Successfully loaded file.");
-				dialogueFile = loadedDialog;
-				changeText();
-				return;
+				var loadedDialog:DialogueFile = cast Json.parse(rawJson);
+				if (loadedDialog.dialogue != null && loadedDialog.dialogue.length > 0)
+				{
+					var cutName:String = _file.name.substr(0, _file.name.length - 5);
+					trace("Successfully loaded file: " + cutName);
+					dialogueFile = loadedDialog;
+					changeText();
+					_file = null;
+					return;
+				}
 			}
 		}
+		_file = null;
 		#else
-		trace("File couldn't be loaded! You aren't on Native, are you?");
+		trace("File couldn't be loaded! You aren't on Desktop, are you?");
 		#end
+	}
+
+	function onLoadCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Cancelled file loading.");
+	}
+
+	function onLoadError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Problem loading file");
 	}
 
 	function saveDialogue()
@@ -603,8 +641,37 @@ class DialogueEditorState extends MusicBeatState
 		var data:String = Json.stringify(dialogueFile, null, "\t");
 		if (data.length > 0)
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data, null, "dialogue.json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, "dialogue.json");
 		}
+	}
+
+	function onSaveComplete(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved file.");
+	}
+
+	function onSaveCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	function onSaveError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving file");
 	}
 }
