@@ -116,7 +116,7 @@ class PlayState extends MusicBeatState
 	public var intro2Sound:FlxSound;
 	public var intro1Sound:FlxSound;
 	public var introGoSound:FlxSound;
-	public var missnoteSound:FlxSound
+	public var missnoteSound:FlxSound;
 
 	public var dad:Character = null;
 	public var gf:Character = null;
