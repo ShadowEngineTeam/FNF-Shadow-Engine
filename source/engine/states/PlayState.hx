@@ -117,6 +117,7 @@ class PlayState extends MusicBeatState
 	public var intro1Sound:FlxSound;
 	public var introGoSound:FlxSound;
 	public var missnoteSound:FlxSound;
+	public var hitsoundSound:FlxSound;
 
 	public var dad:Character = null;
 	public var gf:Character = null;
@@ -3545,7 +3546,13 @@ class PlayState extends MusicBeatState
 		note.wasGoodHit = true;
 
 		if (ClientPrefs.data.hitsoundVolume > 0 && !note.hitsoundDisabled)
-			FlxG.sound.play(Paths.sound(note.hitsound), ClientPrefs.data.hitsoundVolume);
+		{
+			hitsoundSound = FlxG.sound.play(Paths.sound(note.hitsound), ClientPrefs.data.hitsoundVolume);
+			#if FLX_PITCH
+			if (hitsoundSound != null)
+				hitsoundSound.pitch = playbackRate;
+			#end
+		}
 
 		if (note.hitCausesMiss)
 		{
