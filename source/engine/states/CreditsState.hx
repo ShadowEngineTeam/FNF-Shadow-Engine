@@ -17,6 +17,122 @@ class CreditsState extends MusicBeatState
 
 	var offsetThing:Float = -75;
 
+	public var defaultList:Array<Array<String>> = [
+		/*
+			NAME
+			ICON NAME
+			DESC
+			LINK
+			COLOR
+		*/
+		["Shadow Engine Team"],
+		[
+			"Homura",
+			"homura",
+			"Main Programmer and Head of Shadow Engine",
+			"https://www.youtube.com/@HomuHomu833",
+			"FFFFFF"
+		],
+		[
+			"Karim Akra",
+			"karim",
+			"Lead Programmer and Co-Owner of Shadow Engine",
+			"https://www.youtube.com/@Karim-Akra",
+			"FFFFFF"
+		],
+		[""],
+		["Engine Contributors"],
+		[
+			"Chaos",
+			"",
+			"",
+			"",
+			""
+		],
+		[
+			"Modeus",
+			"",
+			"",
+			"",
+			""
+		],
+		[
+			"Zanxt",
+			"",
+			"",
+			"",
+			""
+		],
+		[""],
+		["Funkin' Crew"],
+		[
+			"ninjamuffin99",
+			"ninjamuffin99",
+			"Programmer of Friday Night Funkin'",
+			"https://x.com/ninja_muffin99",
+			"CF2D2D"
+		],
+		[
+			"PhantomArcade",
+			"phantomarcade",
+			"Artist/Animator of Friday Night Funkin'",
+			"https://x.com/PhantomArcade3K",
+			"FADC45"
+		],
+		[
+			"evilsk8r",
+			"evilsk8r",
+			"Artist of Friday Night Funkin'",
+			"https://x.com/evilsk8r",
+			"5ABD4B"
+		],
+		[
+			"kawaisprite",
+			"kawaisprite",
+			"Composer of Friday Night Funkin'",
+			"https://x.com/kawaisprite",
+			"378FC7"
+		],
+		[""],
+		["Funkin' Crew Mobile Team"],
+		[
+			"MoonDroid",
+			"",
+			"",
+			"",
+			""
+		],
+		[
+			"MAJigsaw77",
+			"",
+			"",
+			"",
+			""
+		],
+		[
+			"Luckydog7",
+			"",
+			"",
+			"",
+			""
+		],
+		[
+			"Karim Akra",
+			"",
+			"",
+			"https://www.youtube.com/@Karim-Akra",
+			""
+		],
+		[
+			"sector_5",
+			"",
+			"",
+			"",
+			""
+		],
+		[""]
+	];
+
 	override function create()
 	{
 		#if FEATURE_DISCORD_RPC
@@ -37,85 +153,6 @@ class CreditsState extends MusicBeatState
 		for (mod in Mods.parseList().enabled)
 			pushModCreditsToList(mod);
 		#end
-
-		var defaultList:Array<Array<String>> = [
-			/*
-				NAME
-				ICON NAME
-				DESC
-				LINK
-				COLOR
-			*/
-			["Shadow Engine Team"],
-			[
-				"Homura",
-				"homura",
-				"Main Programmer and Head of Shadow Engine",
-				"https://www.youtube.com/@HomuHomu833",
-				"FFFFFF"
-			],
-			[
-				"Karim",
-				"karim",
-				"Lead Programmer and Co-Owner of Shadow Engine",
-				"https://www.youtube.com/@Karim-Akra",
-				"FFFFFF"
-			],
-			[""],
-			["Engine Contributors"],
-			[
-				"Chaos",
-				"",
-				"",
-				"",
-				""
-			],
-			[
-				"Modeus",
-				"",
-				"",
-				"",
-				""
-			],
-			[
-				"Zanxt",
-				"",
-				"",
-				"",
-				""
-			],
-			[""],
-			["Funkin' Crew"],
-			[
-				"ninjamuffin99",
-				"ninjamuffin99",
-				"Programmer of Friday Night Funkin'",
-				"https://x.com/ninja_muffin99",
-				"CF2D2D"
-			],
-			[
-				"PhantomArcade",
-				"phantomarcade",
-				"Animator of Friday Night Funkin'",
-				"https://x.com/PhantomArcade3K",
-				"FADC45"
-			],
-			[
-				"evilsk8r",
-				"evilsk8r",
-				"Artist of Friday Night Funkin'",
-				"https://x.com/evilsk8r",
-				"5ABD4B"
-			],
-			[
-				"kawaisprite",
-				"kawaisprite",
-				"Composer of Friday Night Funkin'",
-				"https://x.com/kawaisprite",
-				"378FC7"
-			],
-			[""]
-		];
 
 		for (i in defaultList)
 			creditsStuff.push(i);
@@ -178,6 +215,9 @@ class CreditsState extends MusicBeatState
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 		changeSelection();
+		#if FEATURE_MOBILE_CONTROLS
+		addVirtualPad("UP_DOWN", "A_B_C");
+		#end
 		super.create();
 	}
 
@@ -196,7 +236,7 @@ class CreditsState extends MusicBeatState
 			if (creditsStuff.length > 1)
 			{
 				var shiftMult:Int = 1;
-				if (FlxG.keys.pressed.SHIFT)
+				if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.pressed || #end FlxG.keys.pressed.SHIFT)
 					shiftMult = 3;
 
 				var upP = controls.UI_UP_P;
