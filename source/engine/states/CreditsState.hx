@@ -47,10 +47,43 @@ class CreditsState extends MusicBeatState
 				COLOR
 			*/
 			["Shadow Engine Team"],
-			[""], // SHADOW TODO
+			[
+				"Homura",
+				"homura",
+				"Main Programmer and Head of Shadow Engine",
+				"https://www.youtube.com/@HomuHomu833",
+				"FFFFFF"
+			],
+			[
+				"Karim",
+				"karim",
+				"Lead Programmer and Co-Owner of Shadow Engine",
+				"https://www.youtube.com/@Karim-Akra",
+				"FFFFFF"
+			],
 			[""],
 			["Engine Contributors"],
-			[""], // SHADOW TODO
+			[
+				"Chaos",
+				"",
+				"",
+				"",
+				""
+			],
+			[
+				"Modeus",
+				"",
+				"",
+				"",
+				""
+			],
+			[
+				"Zanxt",
+				"",
+				"",
+				"",
+				""
+			],
 			[""],
 			["Funkin' Crew"],
 			[
