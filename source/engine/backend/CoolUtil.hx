@@ -197,33 +197,6 @@ class CoolUtil
 		/*#if android
 		AndroidTools.showAlertDialog(title, message, {name: "OK", func: null}, null);
 		#else*/
-		#if linux
-		function tryRun(cmd:String, args:Array<String>):Bool
-		{
-			try
-			{
-				var p:Process = new Process(cmd, args);
-				p.exitCode();
-				p.close();
-				return true;
-			}
-			catch (e:Dynamic)
-			{
-				return false;
-			}
-		}
-
-		if (tryRun("kdialog", ["--title", title, "--error", message]))
-			return;
-		if (tryRun("zenity", ["--error", "--title", title, "--text", message]))
-			return;
-		if (tryRun("yad", ["--error", "--title", title, "--text", message, "--button=OK:0"]))
-			return;
-		if (tryRun("xmessage", ["-center", title + "\n\n" + message]))
-			return;
-
-		trace('$title\n$message\n');
-		#else
 		FlxG.stage.window.alert(message, title);
 		#end
 	}

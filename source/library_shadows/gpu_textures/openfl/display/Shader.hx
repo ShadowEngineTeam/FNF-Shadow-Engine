@@ -755,9 +755,7 @@ class Shader
 					}
 				}
 				else
-				{
 					program.__glProgram = __createGLProgram(vertex, fragment);
-				}
 
 				__context.__programs.set(id, program);
 			}
@@ -963,11 +961,10 @@ class Shader
 
 						Reflect.setField(__data, name, parameter);
 
-						if (__isGenerated && thisHasField(name)) Reflect.setProperty(this, name, parameter);
-
 						try
 						{
 							if (__isGenerated) Reflect.setField(this, name, parameter);
+							if (__isGenerated && thisHasField(name)) Reflect.setProperty(this, name, parameter);
 						}
 						catch (e:Dynamic)
 						{

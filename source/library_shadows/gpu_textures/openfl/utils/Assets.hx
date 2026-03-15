@@ -45,6 +45,7 @@ import lime.media.vorbis.VorbisFile;
 #end
 @:access(openfl.display.BitmapData)
 @:access(openfl.display.Sprite)
+@:access(openfl.events.Event)
 @:access(openfl.text.Font)
 @:access(openfl.utils.AssetLibrary)
 class Assets
@@ -306,10 +307,17 @@ class Assets
 	{
 		#if (lime_vorbis && lime > "7.9.0")
 		var path = getPath(id);
-		// TODO: What if it is a WAV or non-Vorbis file?
 		var vorbisFile = VorbisFile.fromFile(path);
-		var buffer = AudioBuffer.fromVorbisFile(vorbisFile);
-		return Sound.fromAudioBuffer(buffer);
+		if (vorbisFile != null)
+		{
+			var buffer = AudioBuffer.fromVorbisFile(vorbisFile);
+			return Sound.fromAudioBuffer(buffer);
+		}
+		else
+		{
+			// TODO: Streaming sound
+			return getSound(id, useCache);
+		}
 		#else
 		// TODO: Streaming sound
 		return getSound(id, useCache);
@@ -965,6 +973,17 @@ class Assets
 	// Event Handlers
 	@:noCompletion private static function LimeAssets_onChange():Void
 	{
-		dispatchEvent(new Event(Event.CHANGE));
+		#if (openfl_pool_events && !flash)
+		var changeEvent = Event.__pool.get();
+		changeEvent.type = Event.CHANGE;
+		#else
+		var changeEvent = new Event(Event.CHANGE);
+		#end
+
+		dispatchEvent(changeEvent);
+
+		#if (openfl_pool_events && !flash)
+		Event.__pool.release(changeEvent);
+		#end
 	}
 }
