@@ -198,7 +198,7 @@ class CoolUtil
 		AndroidTools.showAlertDialog(title, message, {name: "OK", func: null}, null);
 		#else*/
 		FlxG.stage.window.alert(message, title);
-		#end
+		//#end
 	}
 
 	private static var sizeLabels:Array<String> = ["B", "KB", "MB", "GB", "TB"];
