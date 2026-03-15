@@ -463,7 +463,17 @@ class AudioBuffer
 
 	private static function __getCodec(bytes:Bytes):String
 	{
-		var signature = bytes.getString(0, 4);
+		var signature:String = null;
+		try
+		{
+			signature = bytes.getString(0, 4);
+		}
+		catch (e:Dynamic)
+		{
+			// if the bytes don't represent a valid UTF-8 string, getString()
+			// may throw an exception. in that case, we expect to end up in
+			// the default switch case below where it tries to detect MP3.
+		
 
 		switch (signature)
 		{
