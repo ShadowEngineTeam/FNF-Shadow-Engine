@@ -1935,7 +1935,9 @@ class FunkinLua
 			{
 				return;
 			}
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			FunkinLua.getCurrentMusicState().addTextToDebug(text, color);
+			#end
 		}
 	}
 

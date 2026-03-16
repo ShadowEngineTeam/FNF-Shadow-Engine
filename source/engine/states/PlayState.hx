@@ -785,9 +785,9 @@ class PlayState extends MusicBeatState
 	function startCharacterScripts(name:String)
 	{
 		// Lua
+		var doPush:Bool = false;
 		#if FEATURE_LUA
 		var luaFile:String = 'characters/$name.lua';
-		var doPush:Bool = false;
 
 		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(luaFile);
@@ -4001,8 +4001,10 @@ class PlayState extends MusicBeatState
 						note.texture = skin;
 				});
 			}
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			else
 				addTextToDebug("ERROR!! couldn't change opponent note skin because the inserted value is null.", FlxColor.RED);
+			#end
 		}
 		if (player)
 		{
@@ -4019,8 +4021,10 @@ class PlayState extends MusicBeatState
 						note.texture = skin;
 				});
 			}
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			else
 				addTextToDebug("ERROR!! couldn't change player note skin because the inserted value is null.", FlxColor.RED);
+			#end
 		}
 	}
 
@@ -4028,7 +4032,9 @@ class PlayState extends MusicBeatState
 	{
 		if (skin == null || skin == '')
 		{
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			addTextToDebug("ERROR!! couldn't change sustain splash skin because the inserted value is null.", FlxColor.RED);
+			#end
 			return;
 		}
 
