@@ -362,7 +362,10 @@ class Project extends HXProject
 		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
 		if (FEATURE_VIDEOS.isEnabled())
+		{
+			setHaxedef("HXVLC_EXPORT_DIR", '${app.path}');
 			includeHaxelib("hxvlc");
+		}
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
 
