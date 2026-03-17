@@ -40,7 +40,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	private var luaDebugCam:FlxCamera;
+	private var luaDebugCam:ShadowCamera;
 	private var currentClassName:String;
 	#end
 
@@ -53,11 +53,11 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
-	public var touchPadCam:FlxCamera;
+	public var touchPadCam:ShadowCamera;
 	public var luaTouchPad:TouchPad;
-	public var luaTouchPadCam:FlxCamera;
+	public var luaTouchPadCam:ShadowCamera;
 	public var mobileControls:IMobileControls;
-	public var mobileControlsCam:FlxCamera;
+	public var mobileControlsCam:ShadowCamera;
 
 	public function addTouchPad(DPad:String, Action:String)
 	{
@@ -97,7 +97,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		}
 
 		mobileControls.instance = MobileData.setButtonsColors(mobileControls.instance);
-		mobileControlsCam = new FlxCamera();
+		mobileControlsCam = new ShadowCamera();
 		mobileControlsCam.bgColor.alpha = 0;
 		FlxG.cameras.add(mobileControlsCam, defaultDrawTarget);
 
@@ -126,7 +126,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		if (touchPad != null)
 		{
-			touchPadCam = new FlxCamera();
+			touchPadCam = new ShadowCamera();
 			touchPadCam.bgColor.alpha = 0;
 			FlxG.cameras.add(touchPadCam, defaultDrawTarget);
 			touchPad.cameras = [touchPadCam];
@@ -158,7 +158,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		if (luaTouchPad != null)
 		{
-			luaTouchPadCam = new FlxCamera();
+			luaTouchPadCam = new ShadowCamera();
 			luaTouchPadCam.bgColor.alpha = 0;
 			FlxG.cameras.add(luaTouchPadCam, defaultDrawTarget);
 			luaTouchPad.cameras = [luaTouchPadCam];
@@ -312,7 +312,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		luaDebugCam = new FlxCamera();
+		luaDebugCam = new ShadowCamera();
 		luaDebugCam.bgColor.alpha = 0;
 		FlxG.cameras.add(luaDebugCam, false);
 		luaDebugGroup.cameras = [luaDebugCam];

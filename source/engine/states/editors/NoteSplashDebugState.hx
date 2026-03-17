@@ -36,7 +36,7 @@ class NoteSplashDebugState extends MusicBeatState
 	var UI_helpOverlay:FlxSprite;
 	var UI_infoPanel:ShadowPanel;
 	var UI_settingsPanel:ShadowPanel;
-	var camOther:FlxCamera;
+	var camOther:ShadowCamera;
 
 	public static var defaultTexture:String = 'noteSplashes/noteSplashes';
 
@@ -45,7 +45,7 @@ class NoteSplashDebugState extends MusicBeatState
 		initPsychCamera();
 		FlxG.camera.bgColor = FlxColor.fromHSL(0, 0, 0.5);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		camOther.visible = false;
 		FlxG.cameras.add(camOther, false);

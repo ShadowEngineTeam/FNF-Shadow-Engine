@@ -320,7 +320,7 @@ class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 		return false;
 	}
 
-	function checkInput(pointer:FlxPointer, input:IFlxInput, justPressedPosition:FlxPoint, camera:FlxCamera):Bool
+	function checkInput(pointer:FlxPointer, input:IFlxInput, justPressedPosition:FlxPoint, camera:ShadowCamera):Bool
 	{
 		/*var worldPos = pointer.getWorldPosition(camera, _point);
 		if (worldPos.x < x - width / 2 || worldPos.x > x + width / 2 || worldPos.y < y - height / 2 || worldPos.y > y + height / 2)

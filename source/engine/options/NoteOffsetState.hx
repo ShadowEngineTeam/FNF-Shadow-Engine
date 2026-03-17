@@ -16,9 +16,9 @@ class NoteOffsetState extends MusicBeatState
 	var boyfriend:Character;
 	var gf:Character;
 
-	public var camHUD:FlxCamera;
-	public var camGame:FlxCamera;
-	public var camOther:FlxCamera;
+	public var camHUD:ShadowCamera;
+	public var camGame:ShadowCamera;
+	public var camOther:ShadowCamera;
 
 	var coolText:FlxText;
 	var rating:FlxSprite;
@@ -49,11 +49,11 @@ class NoteOffsetState extends MusicBeatState
 		// Cameras
 		camGame = initPsychCamera();
 
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
 

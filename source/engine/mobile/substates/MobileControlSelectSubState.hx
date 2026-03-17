@@ -19,7 +19,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	var positionText:FlxText;
 	var positionTextBg:FlxSprite;
 	var bg:FlxBackdrop;
-	var ui:FlxCamera;
+	var ui:ShadowCamera;
 	var curOption:Int = MobileData.mode;
 	var buttonBinded:Bool = false;
 	var bindButton:TouchButton;
@@ -49,7 +49,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 		FlxG.mouse.visible = !FlxG.onMobile;
 
-		ui = new FlxCamera();
+		ui = new ShadowCamera();
 		ui.bgColor.alpha = 0;
 		ui.alpha = 0;
 		FlxG.cameras.add(ui, false);

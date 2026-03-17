@@ -36,9 +36,9 @@ class BaseStage extends FlxBasic
 	public var dadGroup(get, never):FlxSpriteGroup;
 	public var gfGroup(get, never):FlxSpriteGroup;
 
-	public var camGame(get, never):FlxCamera;
-	public var camHUD(get, never):FlxCamera;
-	public var camOther(get, never):FlxCamera;
+	public var camGame(get, never):ShadowCamera;
+	public var camHUD(get, never):ShadowCamera;
+	public var camOther(get, never):ShadowCamera;
 
 	public var defaultCamZoom(get, set):Float;
 	public var camFollow(get, never):FlxObject;
@@ -235,13 +235,13 @@ class BaseStage extends FlxBasic
 	inline private function get_gfGroup():FlxSpriteGroup
 		return game.gfGroup;
 
-	inline private function get_camGame():FlxCamera
+	inline private function get_camGame():ShadowCamera
 		return game.camGame;
 
-	inline private function get_camHUD():FlxCamera
+	inline private function get_camHUD():ShadowCamera
 		return game.camHUD;
 
-	inline private function get_camOther():FlxCamera
+	inline private function get_camOther():ShadowCamera
 		return game.camOther;
 
 	inline private function get_defaultCamZoom():Float

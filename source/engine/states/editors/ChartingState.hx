@@ -97,8 +97,8 @@ class ChartingState extends MusicBeatState
 	var UI_helpOverlay:FlxSprite;
 	var UI_infoPanel:ShadowPanel;
 
-	private var camMain:FlxCamera;
-	private var camOther:FlxCamera;
+	private var camMain:ShadowCamera;
+	private var camOther:ShadowCamera;
 
 	public static var goToPlayState:Bool = false;
 
@@ -675,7 +675,7 @@ class ChartingState extends MusicBeatState
 
 		initPsychCamera().follow(camPos, LOCKON, 999);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		camOther.visible = false;
 		FlxG.cameras.add(camOther, false);

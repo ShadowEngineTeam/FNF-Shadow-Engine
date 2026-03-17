@@ -16,8 +16,8 @@ class MenuCharacterEditorState extends MusicBeatState
 	var characterFile:MenuCharacterFile = null;
 	var defaultCharacters:Array<String> = ['dad', 'bf', 'gf'];
 
-	var camEditor:FlxCamera;
-	var camHUD:FlxCamera;
+	var camEditor:ShadowCamera;
+	var camHUD:ShadowCamera;
 
 	var UI_offsetPanel:ShadowPanel;
 	var UI_offsetLabel:ShadowLabel;
@@ -34,7 +34,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		};
 
 		camEditor = initPsychCamera();
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 
 		FlxG.cameras.add(camHUD, false);

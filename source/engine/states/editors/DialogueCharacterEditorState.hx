@@ -22,8 +22,8 @@ class DialogueCharacterEditorState extends MusicBeatState
 	var offsetIdleText:FlxText;
 	var animText:FlxText;
 
-	var camGame:FlxCamera;
-	var camHUD:FlxCamera;
+	var camGame:ShadowCamera;
+	var camHUD:ShadowCamera;
 
 	var mainGroup:FlxSpriteGroup;
 	var hudGroup:FlxSpriteGroup;
@@ -42,7 +42,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 		camGame = initPsychCamera();
 		camGame.bgColor = FlxColor.fromHSL(0, 0, 0.5);
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 

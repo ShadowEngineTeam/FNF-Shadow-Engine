@@ -1,8 +1,8 @@
-package backend;
+package backend.rendering;
 
 // PsychCamera handles followLerp based on elapsed
 // and stops camera from snapping at higher framerates
-class PsychCamera extends FlxCamera
+class PsychCamera extends ShadowCamera
 {
 	override public function update(elapsed:Float):Void
 	{
