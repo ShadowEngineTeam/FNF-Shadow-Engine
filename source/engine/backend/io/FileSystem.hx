@@ -72,7 +72,7 @@ class FileSystem
 		#end
 	}
 
-	public static function stat(path:String):Null<FileStat>
+	public static function stat(path:String):Null<#if sys FileStat #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux

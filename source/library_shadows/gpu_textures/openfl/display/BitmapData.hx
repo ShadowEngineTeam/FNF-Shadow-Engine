@@ -1312,7 +1312,19 @@ class BitmapData implements IBitmapDrawable
 	public static function fromBytes(bytes:ByteArray, rawAlpha:ByteArray = null):BitmapData
 	{
 		#if (js && html5)
-		return null;
+		var bitmapData = new BitmapData(0, 0, true, 0);
+		loadFromBytes(bytes, rawAlpha).onComplete(function(decoded:BitmapData)
+		{
+			if (decoded != null)
+			{
+				bitmapData.__fromImage(decoded.image);
+				bitmapData.width = decoded.width;
+				bitmapData.height = decoded.height;
+				bitmapData.image = decoded.image;
+				bitmapData.readable = true;
+			}
+		});
+		return bitmapData;
 		#else
 		if (ASTCTexture.isBytesASTC(bytes) || BCTexture.isBytesBC(bytes))
 		{

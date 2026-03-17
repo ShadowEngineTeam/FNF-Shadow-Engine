@@ -292,7 +292,6 @@ class Shader
 	@:noCompletion private var __hasColorTransform:ShaderParameter<Bool>;
 	@:noCompletion private var __inputBitmapData:Array<ShaderInput<BitmapData>>;
 	@:noCompletion private var __isGenerated:Bool;
-	@:noCompletion private var __macroProcessed:Bool;
 	@:noCompletion private var __matrix:ShaderParameter<Float>;
 	@:noCompletion private var __numPasses:Int;
 	@:noCompletion private var __paramBool:Array<ShaderParameter<Bool>>;
@@ -506,7 +505,7 @@ class Shader
 		else
 			Log.debug('Info compiling $typeName shader $message');
 
-		#if !macro
+		#if (sys && !macro)
 		@:privateAccess // I'm lazy
 		backend.CrashHandler.saveErrorMessage('Error compiling $typeName shader $message\n\nSource:\n$source');
 		#end
@@ -717,7 +716,7 @@ class Shader
 
 		if (__context != null && program == null)
 		{
-			if (process && __macroProcessed == false)
+			if (process)
 			{
 				//trace('processing inside Shader!!!');
 				__initProcessing(glFragmentSource, glVertexSource);

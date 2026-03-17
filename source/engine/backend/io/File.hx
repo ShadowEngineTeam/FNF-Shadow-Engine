@@ -73,13 +73,7 @@ class File
 		#end
 
 		if (Assets.exists(openflcwd(path)))
-			switch (haxe.io.Path.extension(path).toLowerCase())
-			{
-				case 'otf' | 'ttf':
-					return openfl.utils.ByteArray.fromFile(openflcwd(path));
-				default:
-					return Assets.getBytes(openflcwd(path));
-			}
+			return openfl.utils.ByteArray.fromFile(openflcwd(path));
 
 		return null;
 	}
@@ -98,7 +92,7 @@ class File
 		#end
 	}
 
-	public static function read(path:String, binary:Bool = true):Null<FileInput>
+	public static function read(path:String, binary:Bool = true):Null<#if sys FileInput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -115,7 +109,7 @@ class File
 		#end
 	}
 
-	public static function write(path:String, binary:Bool = true):Null<FileOutput>
+	public static function write(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -132,7 +126,7 @@ class File
 		#end
 	}
 
-	public static function append(path:String, binary:Bool = true):Null<FileOutput>
+	public static function append(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -149,7 +143,7 @@ class File
 		#end
 	}
 
-	public static function update(path:String, binary:Bool = true):Null<FileOutput>
+	public static function update(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux

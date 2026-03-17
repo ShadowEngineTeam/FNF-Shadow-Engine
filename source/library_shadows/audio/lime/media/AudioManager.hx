@@ -182,7 +182,7 @@ class AudioManager
 	@:noCompletion
 	private static function setupConfig():Void
 	{
-		#if (windows || mac || linux || android || ios)
+		#if (lime_openal || lime_openalsoft)
 		final alConfig:Array<String> = [];
 
 		alConfig.push('[General]');

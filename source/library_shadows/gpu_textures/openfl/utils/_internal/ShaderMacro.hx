@@ -440,8 +440,6 @@ class ShaderMacro
 							});
 						}
 
-						//block.push(macro __macroProcessed = $v{hadToProcess});
-
 						block.push(Context.parse("__initGL ()", pos));
 
 					default:

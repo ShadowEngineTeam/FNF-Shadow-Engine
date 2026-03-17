@@ -2,12 +2,22 @@ package openfl.media;
 
 #if !flash
 import haxe.Int64;
+import openfl.errors.IOError;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.IOErrorEvent;
+import openfl.events.ProgressEvent;
 import openfl.net.URLRequest;
 import openfl.utils.ByteArray;
 import openfl.utils.Future;
+#if (js && html5)
+import lime.media.AudioManager;
+import lime.media.WebAudioContext;
+#end
+#if lime_openal
+import lime.media.AudioManager;
+import lime.media.OpenALAudioContext;
+#end
 #if lime
 import openfl.utils._internal.UInt8Array;
 import lime.media.AudioBuffer;
@@ -20,7 +30,7 @@ import lime.media.AudioSource;
 	that object, close the sound stream, and access data about the sound, such
 	as information about the number of bytes in the stream and ID3 metadata.
 	More detailed control of the sound is performed through the sound source
-	 -  the SoundChannel or Microphone object for the sound  -  and through the
+	 -  the SoundChannel or Microphone object for the sound — and through the
 	properties in the SoundTransform class that control the output of the sound
 	to the computer's speakers.
 
@@ -36,8 +46,8 @@ import lime.media.AudioSource;
 	To control sounds that are embedded in a SWF file, use the properties in
 	the SoundMixer class.
 
-	**Note**: The ActionScript 3.0 Sound API differs from ActionScript
-	2.0. In ActionScript 3.0, you cannot take sound objects and arrange them in
+	**Note**: The OpenFL Sound API differs from ActionScript
+	2.0. In OpenFL, you cannot take sound objects and arrange them in
 	a hierarchy to control their properties.
 
 	When you use this class, consider the following security model:
@@ -58,21 +68,28 @@ import lime.media.AudioSource;
 
 
 	However, in Adobe AIR, content in the `application` security
-	sandbox(content installed with the AIR application) are not restricted by
+	sandbox (content installed with the AIR application) are not restricted by
 	these security limitations.
 
 	For more information related to security, see the Flash Player Developer
 	Center Topic: [Security](http://www.adobe.com/go/devnet_security_en).
 
 	@event complete   Dispatched when data has loaded successfully.
-	@event id3		Dispatched by a Sound object when ID3 data is available
+	@event id3        Dispatched by a Sound object when ID3 data is available
 					  for an MP3 sound.
-	@event ioError	Dispatched when an input/output error occurs that causes
+	@event ioError    Dispatched when an input/output error occurs that causes
 					  a load operation to fail.
-	@event open	   Dispatched when a load operation starts.
+	@event open       Dispatched when a load operation starts.
 	@event progress   Dispatched when data is received as a load operation
 					  progresses.
 	@event sampleData Dispatched when the runtime requests new audio data.
+
+	@see [Working with sound](https://books.openfl.org/openfl-developers-guide/working-with-sound/)
+	@see [Playing sounds](https://books.openfl.org/openfl-developers-guide/working-with-sound/playing-sounds.html)
+	@see [Loading external sound files](https://books.openfl.org/openfl-developers-guide/working-with-sound/loading-external-sound-files.html)
+	@see [Working with sound assets](https://books.openfl.org/openfl-developers-guide/working-with-sound/working-with-sound-assets.html)
+	@see [Controlling sound volume and panning](https://books.openfl.org/openfl-developers-guide/working-with-sound/controlling-sound-volume-and-panning.html)
+	@see [Working with dynamically generated audio](https://books.openfl.org/openfl-developers-guide/working-with-sound/working-with-dynamically-generated-audio.html)
 **/
 #if !openfl_debug
 @:fileXml('tags="haxe,release"')
@@ -80,8 +97,9 @@ import lime.media.AudioSource;
 #end
 @:access(lime.media.AudioBuffer)
 @:access(lime.utils.AssetLibrary)
+@:access(openfl.events.Event)
 @:access(openfl.media.SoundMixer)
-@:access(openfl.media.SoundChannel.new)
+@:access(openfl.media.SoundChannel)
 @:autoBuild(openfl.utils._internal.AssetsMacro.embedSound())
 class Sound extends EventDispatcher
 {
@@ -109,8 +127,8 @@ class Sound extends EventDispatcher
 		provides access to these tags through the format `my_sound.id3.COMM`,
 		`my_sound.id3.TIME`, and so on. The first table describes tags that
 		can be accessed either through the ID3 2.0 property name or the
-		ActionScript property name. The second table describes ID3 tags that
-		are supported but do not have predefined properties in ActionScript.
+		Haxe property name. The second table describes ID3 tags that
+		are supported but do not have predefined properties in Haxe.
 
 		| ID3 2.0 tag | Corresponding Sound class property |
 		| --- | --- |
@@ -179,9 +197,7 @@ class Sound extends EventDispatcher
 		these security limitations.
 
 		For more information related to security, see the Flash Player
-		Developer Center Topic: <a
-		href="http://www.adobe.com/go/devnet_security_en"
-		scope="external">Security</a>.
+		Developer Center Topic: [Security](http://www.adobe.com/go/devnet_security_en).
 	**/
 	public var id3(get, never):ID3Info;
 
@@ -228,8 +244,24 @@ class Sound extends EventDispatcher
 	**/
 	public var url(default, null):String;
 
+	@:noCompletion private var __urlLoading:Bool = false;
+
 	#if lime
+	@:noCompletion private var __pendingSoundChannel:SoundChannel;
+	@:noCompletion private var __pendingAudioSource:AudioSource;
 	@:noCompletion private var __buffer:AudioBuffer;
+	#end
+
+	#if (js && html5)
+	public var sampleRate(get, never):Int;
+
+	private var __webAudioContext:WebAudioContext = null;
+	#end
+
+	#if lime_openal
+	public var sampleRate(get, never):Int;
+
+	private var __alAudioContext:OpenALAudioContext = null;
 	#end
 
 	#if openfljs
@@ -259,7 +291,7 @@ class Sound extends EventDispatcher
 
 		@param stream  The URL that points to an external MP3 file.
 		@param context An optional SoundLoader context object, which can define
-					   the buffer time(the minimum number of milliseconds of MP3
+					   the buffer time (the minimum number of milliseconds of MP3
 					   data to hold in the Sound object's buffer) and can specify
 					   whether the application should check for a cross-domain
 					   policy file prior to loading the sound.
@@ -277,6 +309,28 @@ class Sound extends EventDispatcher
 		{
 			load(stream, context);
 		}
+		#if (js && html5)
+		if (stream == null && AudioManager.context != null)
+		{
+			switch (AudioManager.context.type)
+			{
+				case WEB:
+					__webAudioContext = AudioManager.context.web;
+				default:
+			}
+		}
+		#end
+		#if lime_openal
+		if (stream == null && AudioManager.context != null)
+		{
+			switch (AudioManager.context.type)
+			{
+				case OPENAL:
+					__alAudioContext = AudioManager.context.openal;
+				default:
+			}
+		}
+		#end
 	}
 
 	/**
@@ -291,6 +345,7 @@ class Sound extends EventDispatcher
 		#if lime
 		if (__buffer != null)
 		{
+			SoundMixer.__unregisterSoundChannelByBuffer(__buffer);
 			__buffer.dispose();
 			__buffer = null;
 		}
@@ -315,7 +370,7 @@ class Sound extends EventDispatcher
 		@param target A ByteArray object in which the extracted sound samples
 					  are placed.
 		@param length The number of sound samples to extract. A sample
-					  contains both the left and right channels נthat is,
+					  contains both the left and right channels — that is,
 					  two 32-bit floating-point values.
 		@return The number of samples written to the ByteArray specified in
 				the `target` parameter.
@@ -354,7 +409,12 @@ class Sound extends EventDispatcher
 	public static function fromFile(path:String):Sound
 	{
 		#if lime
-		return fromAudioBuffer(AudioBuffer.fromFile(path));
+		var buffer = AudioBuffer.fromFile(path);
+		if (buffer == null)
+		{
+			throw new IOError("Error loading sound from file: " + path);
+		}
+		return fromAudioBuffer(buffer);
 		#else
 		return null;
 		#end
@@ -396,22 +456,22 @@ class Sound extends EventDispatcher
 		* Access from the local-trusted or local-with-networking sandbox
 		requires permission from a website through a URL policy file.
 		* You cannot connect to commonly reserved ports. For a complete list
-		of blocked ports, see "Restricting Networking APIs" in the _ActionScript
-		3.0 Developer's Guide_.
+		of blocked ports, see "Restricting Networking APIs" in the _OpenFL
+		Developer's Guide_.
 		* You can prevent a SWF file from using this method by setting the
 		`allowNetworking` parameter of the `object` and
 		`embed` tags in the HTML page that contains the SWF
 		content.
 
-		 In Flash Player 10 and later, if you use a multipart Content-Type(for
-		example "multipart/form-data") that contains an upload(indicated by a
+		 In Flash Player 10 and later, if you use a multipart Content-Type (for
+		example "multipart/form-data") that contains an upload (indicated by a
 		"filename" parameter in a "content-disposition" header within the POST
 		body), the POST operation is subject to the security rules applied to
 		uploads:
 
 		* The POST operation must be performed in response to a user-initiated
 		action, such as a mouse click or key press.
-		* If the POST operation is cross-domain(the POST target is not on the
+		* If the POST operation is cross-domain (the POST target is not on the
 		same server as the SWF file that is sending the POST request), the target
 		server must provide a URL policy file that permits cross-domain
 		access.
@@ -431,49 +491,74 @@ class Sound extends EventDispatcher
 
 		@param stream  A URL that points to an external MP3 file.
 		@param context An optional SoundLoader context object, which can define
-					   the buffer time(the minimum number of milliseconds of MP3
+					   the buffer time (the minimum number of milliseconds of MP3
 					   data to hold in the Sound object's buffer) and can specify
 					   whether the application should check for a cross-domain
 					   policy file prior to loading the sound.
-		@throws IOError	   A network error caused the load to fail.
-		@throws IOError	   The `digest` property of the
+		@throws IOError       A network error caused the load to fail.
+		@throws IOError       The `digest` property of the
 							  `stream` object is not `null`.
 							  You should only set the `digest` property
 							  of a URLRequest object when calling the
 							  `URLLoader.load()` method when loading a
-							  SWZ file(an Adobe platform component).
+							  SWZ file (an Adobe platform component).
 		@throws SecurityError Local untrusted files may not communicate with the
 							  Internet. You can work around this by reclassifying
 							  this file as local-with-networking or trusted.
 		@throws SecurityError You cannot connect to commonly reserved ports. For a
 							  complete list of blocked ports, see "Restricting
-							  Networking APIs" in the _ActionScript 3.0
+							  Networking APIs" in the _OpenFL
 							  Developer's Guide_.
+
+		@see [Loading external sound files](https://books.openfl.org/openfl-developers-guide/working-with-sound/loading-external-sound-files.html)
 	**/
 	public function load(stream:URLRequest, context:SoundLoaderContext = null):Void
 	{
 		url = stream.url;
+		__urlLoading = true;
 
 		#if lime
+		#if openfl_pool_events
+		var openEvent = Event.__pool.get();
+		openEvent.type = Event.OPEN;
+		#else
+		var openEvent = new Event(Event.OPEN);
+		#end
+
+		dispatchEvent(openEvent);
+
+		#if openfl_pool_events
+		Event.__pool.release(openEvent);
+		#end
+
 		#if (js && html5)
-		var defaultLibrary = lime.utils.Assets.getLibrary("default");
+		var defaultLibrary = lime.utils.Assets.getLibrary("default"); // TODO: Improve this
 
 		if (defaultLibrary != null && defaultLibrary.cachedAudioBuffers.exists(url))
 		{
-			AudioBuffer_onURLLoad(defaultLibrary.cachedAudioBuffers.get(url));
+			var audioBuffer = defaultLibrary.cachedAudioBuffers.get(url);
+			var byteLength = (audioBuffer != null && audioBuffer.data != null) ? audioBuffer.data.byteLength : 0;
+			AudioBuffer_onURLProgress(byteLength, byteLength);
+			AudioBuffer_onURLLoad(audioBuffer);
 		}
 		else
 		{
-			AudioBuffer.loadFromFile(url).onComplete(AudioBuffer_onURLLoad).onError(function(_)
+			AudioBuffer.loadFromFile(url)
+				.onProgress(AudioBuffer_onURLProgress)
+				.onComplete(AudioBuffer_onURLLoad)
+				.onError(function(_)
+				{
+					AudioBuffer_onURLLoad(null);
+				});
+		}
+		#else
+		AudioBuffer.loadFromFile(url)
+			.onProgress(AudioBuffer_onURLProgress)
+			.onComplete(AudioBuffer_onURLLoad)
+			.onError(function(_)
 			{
 				AudioBuffer_onURLLoad(null);
 			});
-		}
-		#else
-		AudioBuffer.loadFromFile(url).onComplete(AudioBuffer_onURLLoad).onError(function(_)
-		{
-			AudioBuffer_onURLLoad(null);
-		});
 		#end
 		#end
 	}
@@ -511,7 +596,46 @@ class Sound extends EventDispatcher
 		}
 		else
 		{
-			dispatchEvent(new Event(Event.COMPLETE));
+			#if openfl_pool_events
+			var openEvent = Event.__pool.get();
+			openEvent.type = Event.OPEN;
+			#else
+			var openEvent = new Event(Event.OPEN);
+			#end
+
+			dispatchEvent(openEvent);
+
+			#if openfl_pool_events
+			Event.__pool.release(openEvent);
+			#end
+
+			#if openfl_pool_events
+			var progressEvent = ProgressEvent.__pool.get();
+			progressEvent.type = ProgressEvent.PROGRESS;
+			progressEvent.bytesLoaded = bytes.length;
+			progressEvent.bytesTotal = bytes.length;
+			#else
+			var progressEvent = new ProgressEvent(ProgressEvent.PROGRESS, false, false, bytes.length, bytes.length);
+			#end
+
+			dispatchEvent(progressEvent);
+
+			#if openfl_pool_events
+			ProgressEvent.__pool.release(progressEvent);
+			#end
+
+			#if openfl_pool_events
+			var completeEvent = Event.__pool.get();
+			completeEvent.type = Event.COMPLETE;
+			#else
+			var completeEvent = new Event(Event.COMPLETE);
+			#end
+
+			dispatchEvent(completeEvent);
+
+			#if openfl_pool_events
+			Event.__pool.release(completeEvent);
+			#end
 		}
 		#else
 		dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
@@ -610,7 +734,46 @@ class Sound extends EventDispatcher
 
 		__buffer = audioBuffer;
 
-		dispatchEvent(new Event(Event.COMPLETE));
+		#if openfl_pool_events
+		var openEvent = Event.__pool.get();
+		openEvent.type = Event.OPEN;
+		#else
+		var openEvent = new Event(Event.OPEN);
+		#end
+
+		dispatchEvent(openEvent);
+
+		#if openfl_pool_events
+		Event.__pool.release(openEvent);
+		#end
+
+		#if openfl_pool_events
+		var progressEvent = ProgressEvent.__pool.get();
+		progressEvent.type = ProgressEvent.PROGRESS;
+		progressEvent.bytesLoaded = bytes.length;
+		progressEvent.bytesTotal = bytes.length;
+		#else
+		var progressEvent = new ProgressEvent(ProgressEvent.PROGRESS, false, false, bytes.length, bytes.length);
+		#end
+
+		dispatchEvent(progressEvent);
+
+		#if openfl_pool_events
+		ProgressEvent.__pool.release(progressEvent);
+		#end
+
+		#if openfl_pool_events
+		var completeEvent = Event.__pool.get();
+		completeEvent.type = Event.COMPLETE;
+		#else
+		var completeEvent = new Event(Event.COMPLETE);
+		#end
+
+		dispatchEvent(completeEvent);
+
+		#if openfl_pool_events
+		Event.__pool.release(completeEvent);
+		#end
 		#else
 		dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
 		#end
@@ -622,9 +785,9 @@ class Sound extends EventDispatcher
 		monitor volume.(To control the volume, panning, and balance, access the
 		SoundTransform object assigned to the sound channel.)
 
-		@param startTime	The initial position in milliseconds at which playback
+		@param startTime    The initial position in milliseconds at which playback
 							should start.
-		@param loops		Defines the number of times a sound loops back to the
+		@param loops        Defines the number of times a sound loops back to the
 							`startTime` value before the sound channel
 							stops playback.
 		@param sndTransform The initial SoundTransform object assigned to the
@@ -633,11 +796,13 @@ class Sound extends EventDispatcher
 				method returns `null` if you have no sound card or if
 				you run out of available sound channels. The maximum number of
 				sound channels available at once is 32.
+
+		@see [Playing sounds](https://books.openfl.org/openfl-developers-guide/working-with-sound/playing-sounds.html)
 	**/
 	public function play(startTime:Float = 0.0, loops:Int = 0, sndTransform:SoundTransform = null):SoundChannel
 	{
 		#if lime
-		if (__buffer == null || SoundMixer.__soundChannels.length >= SoundMixer.MAX_ACTIVE_CHANNELS)
+		if (SoundMixer.__soundChannels.length >= SoundMixer.MAX_ACTIVE_CHANNELS)
 		{
 			return null;
 		}
@@ -654,26 +819,61 @@ class Sound extends EventDispatcher
 		var pan = SoundMixer.__soundTransform.pan + sndTransform.pan;
 
 		if (pan > 1) pan = 1;
-		else if (pan < -1) pan = -1;
+		if (pan < -1) pan = -1;
 
 		var volume = SoundMixer.__soundTransform.volume * sndTransform.volume;
 
-		var source = new AudioSource(__buffer);
-		source.offset = Std.int(startTime);
-		if (loops > 1) source.loops = loops - 1;
+		var audioSource = new AudioSource(__buffer);
+		audioSource.offset = Std.int(startTime);
+		if (loops > 1) audioSource.loops = loops - 1;
 
-		source.gain = volume;
+		audioSource.gain = volume;
 
-		var position = source.position;
+		var position = audioSource.position;
 		position.x = pan;
 		position.z = -1 * Math.sqrt(1 - Math.pow(pan, 2));
-		source.position = position;
+		audioSource.position = position;
 
-		return new SoundChannel(source, sndTransform);
+		var soundChannel = new SoundChannel(this, __urlLoading ? null : audioSource, sndTransform);
+		if (__urlLoading)
+		{
+			__pendingAudioSource = audioSource;
+			__pendingSoundChannel = soundChannel;
+		}
+		else if (__buffer == null)
+		{
+			#if (js && html5)
+			if (__webAudioContext != null)
+			{
+				soundChannel.__startSampleData();
+			}
+			#end
+			#if lime_openal
+			if (__alAudioContext != null)
+			{
+				soundChannel.__startSampleData();
+			}
+			#end
+		}
+		return soundChannel;
 		#else
 		return null;
 		#end
 	}
+
+	#if (js && html5)
+	private function get_sampleRate():Int
+	{
+		return Std.int(__webAudioContext.sampleRate);
+	}
+	#end
+
+	#if lime_openal
+	private function get_sampleRate():Int
+	{
+		return 44100;
+	}
+	#end
 
 	// Get & Set Methods
 	@:noCompletion private function get_id3():ID3Info
@@ -681,18 +881,27 @@ class Sound extends EventDispatcher
 		return new ID3Info();
 	}
 
-	@:noCompletion private function get_length():Float
+	@:noCompletion private function get_length():Int
 	{
 		#if lime
 		if (__buffer != null)
 		{
 			#if (js && html5 && howlerjs)
-			return __buffer.src.duration() * 1000;
+			return Std.int(__buffer.src.duration() * 1000);
 			#else
-			if (__buffer.data != null) return (__buffer.data.length >> 0) / __buffer.channels / (__buffer.bitsPerSample >> 3) / __buffer.sampleRate * 1000;
-			else if (__buffer.__srcVorbisFile != null) {
-				var x = __buffer.__srcVorbisFile.pcmTotal();
-				return (x.high * 4294967296. + (x.low >> 0)) / __buffer.sampleRate * 1000;
+			if (__buffer.data != null)
+			{
+				var samples = (__buffer.data.length * 8.0) / (__buffer.channels * __buffer.bitsPerSample);
+				return Std.int(samples / __buffer.sampleRate * 1000);
+			}
+			else if (__buffer.__srcVorbisFile != null)
+			{
+				var samples = Int64.toInt(__buffer.__srcVorbisFile.pcmTotal());
+				return Std.int(samples / __buffer.sampleRate * 1000);
+			}
+			else
+			{
+				return 0;
 			}
 			#end
 		}
@@ -705,6 +914,7 @@ class Sound extends EventDispatcher
 	#if lime
 	@:noCompletion private function AudioBuffer_onURLLoad(buffer:AudioBuffer):Void
 	{
+		__urlLoading = false;
 		if (buffer == null)
 		{
 			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
@@ -712,8 +922,69 @@ class Sound extends EventDispatcher
 		else
 		{
 			__buffer = buffer;
-			dispatchEvent(new Event(Event.COMPLETE));
+			var byteLength = 1;
+			if (__buffer.data != null)
+			{
+				byteLength = __buffer.data.length;
+			}
+
+			#if openfl_pool_events
+			var progressEvent = ProgressEvent.__pool.get();
+			progressEvent.type = ProgressEvent.PROGRESS;
+			progressEvent.bytesLoaded = byteLength;
+			progressEvent.bytesTotal = byteLength;
+			#else
+			var progressEvent = new ProgressEvent(ProgressEvent.PROGRESS, false, false, byteLength, byteLength);
+			#end
+
+			dispatchEvent(progressEvent);
+
+			#if openfl_pool_events
+			ProgressEvent.__pool.release(progressEvent);
+			#end
+
+			#if openfl_pool_events
+			var completeEvent = Event.__pool.get();
+			completeEvent.type = Event.COMPLETE;
+			#else
+			var completeEvent = new Event(Event.COMPLETE);
+			#end
+
+			dispatchEvent(completeEvent);
+
+			#if openfl_pool_events
+			Event.__pool.release(completeEvent);
+			#end
+
+			if (__pendingSoundChannel != null)
+			{
+				__pendingAudioSource.buffer = __buffer;
+				// ideally, Lime would call init() when setting buffer,
+				// similar to how it does in the AudioSource constructor
+				@:privateAccess __pendingAudioSource.init();
+				__pendingSoundChannel.__initAudioSource(__pendingAudioSource);
+			}
 		}
+		__pendingSoundChannel = null;
+		__pendingAudioSource = null;
+	}
+
+	@:noCompletion private function AudioBuffer_onURLProgress(bytesLoaded:Int, bytesTotal:Int)
+	{
+		#if openfl_pool_events
+		var progressEvent = ProgressEvent.__pool.get();
+		progressEvent.type = ProgressEvent.PROGRESS;
+		progressEvent.bytesLoaded = bytesLoaded;
+		progressEvent.bytesTotal = bytesTotal;
+		#else
+		var progressEvent = new ProgressEvent(ProgressEvent.PROGRESS, false, false, bytesLoaded, bytesTotal);
+		#end
+
+		dispatchEvent(progressEvent);
+
+		#if openfl_pool_events
+		ProgressEvent.__pool.release(progressEvent);
+		#end
 	}
 	#end
 }
