@@ -73,7 +73,13 @@ class File
 		#end
 
 		if (Assets.exists(openflcwd(path)))
-			return openfl.utils.ByteArray.fromFile(openflcwd(path));
+			switch (haxe.io.Path.extension(path).toLowerCase())
+			{
+				case 'otf' | 'ttf':
+					return openfl.utils.ByteArray.fromFile(openflcwd(path));
+				default:
+					return Assets.getBytes(openflcwd(path));
+			}
 
 		return null;
 	}
