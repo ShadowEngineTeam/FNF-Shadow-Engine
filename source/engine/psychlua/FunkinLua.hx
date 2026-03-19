@@ -904,8 +904,8 @@ class FunkinLua
 		// You ain't no epic coda i am :3
 		set("getObjectOrder", function(obj:String, ?group:String = null)
 		{
-			if (group != null)
-				luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
+			//if (group != null)
+				//luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
 	
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
