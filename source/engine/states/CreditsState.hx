@@ -75,7 +75,7 @@ class CreditsState extends MusicBeatState
 		[
 			"PhantomArcade",
 			"phantomarcade",
-			"Animator/Artist of Friday Night Funkin'",
+			"Artist and Animator of Friday Night Funkin'",
 			"https://x.com/PhantomArcade3K",
 			"FADC45"
 		],
