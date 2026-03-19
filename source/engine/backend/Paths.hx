@@ -220,7 +220,26 @@ class Paths
 
 			if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + modKey)) || FileSystem.exists(mods(modKey)))
 				return true;
+			
+			#if USING_GPU_TEXTURES
+			if (modKey.endsWith(IMAGE_EXT))
+			{
+				modKey = haxe.io.Path.withoutExtension(modKey) + '.$GPU_IMAGE_EXT';
+
+				for (mod in Mods.getGlobalMods())
+					if (FileSystem.exists(mods('$mod/$modKey')))
+						return true;
+
+				if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + modKey)) || FileSystem.exists(mods(modKey)))
+					return true;
+			}
+			#end
 		}
+		#end
+
+		#if USING_GPU_TEXTURES
+		if (path.endsWith(IMAGE_EXT) && FileSystem.exists(haxe.io.Path.withoutExtension(path) + '.$GPU_IMAGE_EXT'))
+			return true;
 		#end
 
 		return FileSystem.exists(path);
@@ -254,9 +273,9 @@ class Paths
 		else
 		#end
 		{
-			for (IMG_EXT in [#if USING_GPU_TEXTURES GPU_IMAGE_EXT, #end IMAGE_EXT])
+			for (ext in [#if USING_GPU_TEXTURES GPU_IMAGE_EXT, #end IMAGE_EXT])
 			{
-				file = getPath('images/$key.$IMG_EXT', getImageAssetType(IMG_EXT), library);
+				file = getPath('images/$key.$ext', getImageAssetType(ext), library);
 				if (currentTrackedAssets.exists(file))
 				{
 					localTrackedAssets.push(file);

@@ -219,8 +219,6 @@ class ChartingState extends MusicBeatState
 			PlayState.SONG = _song;
 		}
 
-		// Paths.clearMemory();
-
 		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));

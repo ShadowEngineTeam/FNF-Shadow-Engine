@@ -17,7 +17,7 @@ class CreditsState extends MusicBeatState
 
 	var offsetThing:Float = -75;
 
-	public var defaultList:Array<Array<String>> = [
+	public static var defaultList:Array<Array<String>> = [
 		/*
 			NAME
 			ICON NAME
@@ -29,7 +29,7 @@ class CreditsState extends MusicBeatState
 		[
 			"Homura",
 			"homura",
-			"Main Programmer and Head of Shadow Engine",
+			"Main Programmer and Author of Shadow Engine",
 			"https://www.youtube.com/@HomuHomu833",
 			"FFFFFF"
 		],
@@ -44,38 +44,38 @@ class CreditsState extends MusicBeatState
 		["Engine Contributors"],
 		[
 			"Chaos",
-			"",
-			"",
-			"",
-			""
+			"chaos",
+			"Assistant Programmer of Shadow Engine",
+			"https://www.youtube.com/@mr_chaosss",
+			"FFFFFF"
 		],
 		[
 			"Modeus",
-			"",
-			"",
-			"",
-			""
+			"modeus",
+			"Helper of Shadow Engine",
+			"https://github.com/moxie-coder",
+			"FFFFFF"
 		],
 		[
 			"Zanxt",
-			"",
-			"",
-			"",
-			""
+			"santidayo",
+			"Helper and Tester of Shadow Engine",
+			"https://www.youtube.com/@SantiYea",
+			"FFFFFF"
 		],
 		[""],
 		["Funkin' Crew"],
 		[
 			"ninjamuffin99",
 			"ninjamuffin99",
-			"Programmer of Friday Night Funkin'",
+			"Main Programmer of Friday Night Funkin'",
 			"https://x.com/ninja_muffin99",
 			"CF2D2D"
 		],
 		[
 			"PhantomArcade",
 			"phantomarcade",
-			"Artist/Animator of Friday Night Funkin'",
+			"Animator/Artist of Friday Night Funkin'",
 			"https://x.com/PhantomArcade3K",
 			"FADC45"
 		],
@@ -97,38 +97,38 @@ class CreditsState extends MusicBeatState
 		["Funkin' Crew Mobile Team"],
 		[
 			"MoonDroid",
-			"",
-			"",
-			"",
-			""
+			"moondroid",
+			"Main Programmer of Friday Night Funkin' Mobile",
+			"https://x.com/ZackDroidCoder",
+			"FFFFFF"
 		],
 		[
 			"MAJigsaw77",
-			"",
-			"",
-			"",
-			""
-		],
-		[
-			"Luckydog7",
-			"",
-			"",
-			"",
-			""
+			"jigsaw",
+			"Lead Programmer of Friday Night Funkin' Mobile",
+			"https://github.com/MAJigsaw77",
+			"5F5F5F"
 		],
 		[
 			"Karim Akra",
-			"",
-			"",
+			"karim",
+			"Assistant Programmer of Friday Night Funkin' Mobile",
 			"https://www.youtube.com/@Karim-Akra",
-			""
+			"FFFFFF"
+		],
+		[
+			"Luckydog7",
+			"lucky",
+			"Assistant Programmer of Friday Night Funkin' Mobile",
+			"https://github.com/luckydog7",
+			"FFFFFF"
 		],
 		[
 			"sector_5",
-			"",
-			"",
-			"",
-			""
+			"sector",
+			"Assistant Programmer of Friday Night Funkin' Mobile",
+			"https://github.com/sector-a",
+			"FFFFFF"
 		],
 		[""]
 	];
@@ -216,7 +216,7 @@ class CreditsState extends MusicBeatState
 		intendedColor = bg.color;
 		changeSelection();
 		#if FEATURE_MOBILE_CONTROLS
-		addVirtualPad("UP_DOWN", "A_B_C");
+		addTouchPad("UP_DOWN", "A_B_C");
 		#end
 		super.create();
 	}

@@ -15,13 +15,14 @@ class MainMenuState extends MusicBeatState
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
-	var optionShit:Array<String> = ['story_mode', 'freeplay', #if FEATURE_MODS 'mods', #end 'options'];
+	var optionShit:Array<String> = ['story_mode', 'freeplay', #if FEATURE_MODS 'mods', #end 'credits', 'options'];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
 	override function create()
 	{
+		Paths.clearStoredMemory();
 		#if FEATURE_MODS
 		Mods.pushGlobalMods();
 		#end
@@ -97,6 +98,8 @@ class MainMenuState extends MusicBeatState
 		super.create();
 
 		FlxG.camera.follow(camFollow, null, 9);
+
+		Paths.clearUnusedMemory();
 	}
 
 	var selectedSomethin:Bool = false;
@@ -146,6 +149,8 @@ class MainMenuState extends MusicBeatState
 						case 'mods':
 							MusicBeatState.switchState(new ModsMenuState());
 						#end
+						case 'credits':
+							MusicBeatState.switchState(new CreditsState());
 						case 'options':
 							MusicBeatState.switchState(new OptionsState());
 							OptionsState.onPlayState = false;
@@ -204,6 +209,6 @@ class MainMenuState extends MusicBeatState
 		menuItems.members[curSelected].screenCenter(X);
 
 		camFollow.setPosition(menuItems.members[curSelected].getGraphicMidpoint().x,
-			menuItems.members[curSelected].getGraphicMidpoint().y - (menuItems.length > 4 ? menuItems.length * 8 : 0));
+			menuItems.members[curSelected].getGraphicMidpoint().y - (menuItems.length > 3 ? menuItems.length * 8 : 0));
 	}
 }

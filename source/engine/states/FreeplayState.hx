@@ -51,8 +51,7 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
-		// Paths.clearStoredMemory();
-		// Paths.clearUnusedMemory();
+		Paths.clearStoredMemory();
 
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
@@ -189,6 +188,7 @@ class FreeplayState extends MusicBeatState
 		addTouchPad("LEFT_FULL", "A_B_C_X_Y_Z");
 		#end
 		super.create();
+		Paths.clearUnusedMemory();
 	}
 
 	override function closeSubState()
