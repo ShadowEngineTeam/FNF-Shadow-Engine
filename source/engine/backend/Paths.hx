@@ -110,6 +110,11 @@ class Paths
 
 	public static function getPath(file:String, ?type:AssetType = TEXT, ?library:Null<String> = null, ?modsAllowed:Bool = false):String
 	{
+		#if USING_GPU_TEXTURES
+		if (file.endsWith(IMAGE_EXT) && FileSystem.exists(haxe.io.Path.withoutExtension(file) + '.$GPU_IMAGE_EXT'))
+			file = haxe.io.Path.withoutExtension(file) + '.$GPU_IMAGE_EXT';
+		#end
+
 		#if FEATURE_MODS
 		if (modsAllowed)
 		{
