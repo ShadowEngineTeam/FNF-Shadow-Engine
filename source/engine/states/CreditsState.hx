@@ -71,6 +71,13 @@ class CreditsState extends MusicBeatState
 			"Main Programmer of Friday Night Funkin'",
 			"https://x.com/ninja_muffin99",
 			"CF2D2D"
+		],,
+		[
+			"EliteMasterEric",
+			"mastereric",
+			"Lead Programmer of Friday Night Funkin'",
+			"https://x.com/EliteMasterEric",
+			"FFBD40"
 		],
 		[
 			"PhantomArcade",
