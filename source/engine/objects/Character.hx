@@ -99,7 +99,6 @@ class Character extends FlxAnimate
 		animOffsets = new Map<String, Array<Dynamic>>();
 		curCharacter = character;
 		this.isPlayer = isPlayer;
-		useRenderTexture = true;
 		switch (curCharacter)
 		{
 			// case 'your character name in case you want to hardcode them instead':
