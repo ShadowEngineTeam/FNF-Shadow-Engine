@@ -53,6 +53,7 @@ class Main extends Sprite
 		#if android
 		StorageUtil.requestPermissions();
 		#end
+		mobile.backend.io.Assets.init();
 		#end
 		super();
 
