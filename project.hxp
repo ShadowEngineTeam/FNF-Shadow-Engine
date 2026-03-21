@@ -220,7 +220,7 @@ class Project extends HXProject
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
-		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
+		USE_OPENFL_FILESYSTEM.integrate(FEATURE_MODS.isDisabled() && !isMobile());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
