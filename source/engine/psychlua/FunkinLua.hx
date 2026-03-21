@@ -901,38 +901,27 @@ class FunkinLua
 		});
 
 		// shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
+		// You ain't no epic coda i am :3
 		set("getObjectOrder", function(obj:String, ?group:String = null)
 		{
+			//if (group != null)
+				//luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
+	
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
-				if (group != null)
-				{
-					var groupOrArray:Dynamic = Reflect.getProperty(LuaUtils.getTargetInstance(), group);
-					if (groupOrArray != null)
-					{
-						switch (Type.typeof(groupOrArray))
-						{
-							case TClass(Array): // Is Array
-								return groupOrArray.indexOf(leObj);
-							default: // Is Group
-								return Reflect.getProperty(groupOrArray, 'members').indexOf(leObj); // Has to use a Reflect here because of FlxTypedSpriteGroup
-						}
-					}
-					else
-					{
-						luaTrace('getObjectOrder: Group $group doesn\'t exist!', false, false, FlxColor.RED);
-						return -1;
-					}
-				}
-				var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
-				return groupOrArray.members.indexOf(leObj);
+				if (leObj.zIndex == -1)
+					luaTrace('getObjectOrder: Object $obj doesn\'t belong to any group!', false, false, FlxColor.RED);
+
+				return leObj.zIndex;
 			}
 			luaTrace('getObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 			return -1;
 		});
-		set("setObjectOrder", function(obj:String, position:Int, ?group:String = null)
+		set("setObjectOrder", function(obj:String, ?position:Int, ?group:String)
 		{
+			if (position != null && position < 0) position = 0;
+			if (position == null) position = -1;
 			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (leObj != null)
 			{
@@ -944,11 +933,16 @@ class FunkinLua
 						switch (Type.typeof(groupOrArray))
 						{
 							case TClass(Array): // Is Array
-								groupOrArray.remove(leObj);
-								groupOrArray.insert(position, leObj);
+								function sortZIndex(order:Int, a:FlxBasic, b:FlxBasic):Int
+								{
+									if (a == null || b == null) return 0;
+									return flixel.util.FlxSort.byValues(order, a.zIndex, b.zIndex);
+								}
+								leObj.zIndex = position;
+								groupOrArray.sort(sortZIndex.bind(flixel.util.FlxSort.ASCENDING));
 							default: // Is Group
-								groupOrArray.remove(leObj, true);
-								groupOrArray.insert(position, leObj);
+								leObj.zIndex = position;
+								groupOrArray.refresh();
 						}
 					}
 					else
@@ -957,8 +951,8 @@ class FunkinLua
 				else
 				{
 					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
-					groupOrArray.remove(leObj, true);
-					groupOrArray.insert(position, leObj);
+					leObj.zIndex = position;
+					groupOrArray.refresh();
 				}
 				return;
 			}
@@ -1136,12 +1130,12 @@ class FunkinLua
 		set("getMouseX", function(camera:String)
 		{
 			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
-			return FlxG.mouse.getScreenPosition(cam).x;
+			return FlxG.mouse.getViewPosition(cam).x;
 		});
 		set("getMouseY", function(camera:String)
 		{
 			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
-			return FlxG.mouse.getScreenPosition(cam).y;
+			return FlxG.mouse.getViewPosition(cam).y;
 		});
 
 		set("getMidpointX", function(variable:String)
@@ -1232,6 +1226,7 @@ class FunkinLua
 			{
 				leSprite.loadGraphic(Paths.image(image));
 			}
+
 			game.modchartSprites.set(tag, leSprite);
 			leSprite.active = true;
 		});
@@ -1940,7 +1935,9 @@ class FunkinLua
 			{
 				return;
 			}
+			#if (FEATURE_LUA || FEATURE_HSCRIPT)
 			FunkinLua.getCurrentMusicState().addTextToDebug(text, color);
+			#end
 		}
 	}
 

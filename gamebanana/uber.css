@@ -71,6 +71,63 @@ h1 {
   background: #0a0a0a;
 }
 
+stateLabel[data-_sUpdateType=Addition] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Removal] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Overhaul] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Adjustment] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Amendment] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Improvement] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Optimization] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Tweak] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Suggestion] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Feature] {
+   color: var(--DefaultRedColor)
+}
+
+stateLabel[data-_sUpdateType=Refactor] {
+   color: var(--DefaultRedColor);
+}
+
+stateLabel[data-_sUpdateType=BugFix] {
+   color: var(--DefaultRedColor)
+}
+
+.Content.Flow .BlueColor {
+    color: var(--DefaultRedColor); 
+}
+
+.ProgressInner {
+  background: var(--hue,var(--DefaultRedColor));
+  animation: 1s linear progress
+}
+
 .PageModule > .Content {
   background: #121212;
   border: 1px solid #cc000055;

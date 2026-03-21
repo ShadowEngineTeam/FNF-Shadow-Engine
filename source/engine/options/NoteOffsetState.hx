@@ -16,9 +16,9 @@ class NoteOffsetState extends MusicBeatState
 	var boyfriend:Character;
 	var gf:Character;
 
-	public var camHUD:FlxCamera;
-	public var camGame:FlxCamera;
-	public var camOther:FlxCamera;
+	public var camHUD:ShadowCamera;
+	public var camGame:ShadowCamera;
+	public var camOther:ShadowCamera;
 
 	var coolText:FlxText;
 	var rating:FlxSprite;
@@ -42,6 +42,7 @@ class NoteOffsetState extends MusicBeatState
 
 	override public function create()
 	{
+		Paths.clearStoredMemory();
 		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Delay/Combo Offset Menu", null);
 		#end
@@ -49,11 +50,11 @@ class NoteOffsetState extends MusicBeatState
 		// Cameras
 		camGame = initPsychCamera();
 
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
 
@@ -190,6 +191,7 @@ class NoteOffsetState extends MusicBeatState
 		#end
 
 		super.create();
+		Paths.clearUnusedMemory();
 	}
 
 	var holdTime:Float = 0;
@@ -224,7 +226,7 @@ class NoteOffsetState extends MusicBeatState
 			// changed to controller mid state
 			if (controls.controllerMode)
 			{
-				var mousePos = FlxG.mouse.getScreenPosition(camHUD);
+				var mousePos = FlxG.mouse.getViewPosition(camHUD);
 				controllerPointer.x = mousePos.x;
 				controllerPointer.y = mousePos.y;
 			}
@@ -324,7 +326,7 @@ class NoteOffsetState extends MusicBeatState
 			{
 				holdingObjectType = null;
 				if (!controls.controllerMode)
-					FlxG.mouse.getScreenPosition(camHUD, startMousePos);
+					FlxG.mouse.getViewPosition(camHUD, startMousePos);
 				else
 					controllerPointer.getScreenPosition(startMousePos, camHUD);
 
@@ -361,7 +363,7 @@ class NoteOffsetState extends MusicBeatState
 				{
 					var mousePos:FlxPoint = null;
 					if (!controls.controllerMode)
-						mousePos = FlxG.mouse.getScreenPosition(camHUD);
+						mousePos = FlxG.mouse.getViewPosition(camHUD);
 					else
 						mousePos = controllerPointer.getScreenPosition(camHUD);
 

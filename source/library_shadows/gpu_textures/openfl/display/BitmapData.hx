@@ -142,6 +142,7 @@ class BitmapData implements IBitmapDrawable
 	@:noCompletion private static var __textureInternalFormat:Int;
 	#if lime
 	@:noCompletion private static var __tempVector:Vector2 = new Vector2();
+	@:noCompletion private static var __fillRectRectangle:Rectangle = new Rectangle();
 	#end
 
 	/**
@@ -156,8 +157,6 @@ class BitmapData implements IBitmapDrawable
 	**/
 	@SuppressWarnings("checkstyle:Dynamic")
 	public var image(default, null):#if lime Image #else Dynamic #end;
-
-	// #if !flash_doc_gen
 
 	/**
 		Defines whether the bitmap image is readable. Hardware-only bitmap images
@@ -174,8 +173,6 @@ class BitmapData implements IBitmapDrawable
 		will need to be recreated if the current hardware rendering context is lost.
 	**/
 	@:beta public var readable(default, null):Bool;
-
-	// #end
 
 	/**
 		The rectangle that defines the size and location of the bitmap image. The
@@ -237,6 +234,7 @@ class BitmapData implements IBitmapDrawable
 	@:noCompletion private var __worldColorTransform:ColorTransform;
 	@:noCompletion private var __worldTransform:Matrix;
 	@:noCompletion private var __asset:Bool;
+	@:noCompletion private var __renderer:OpenGLRenderer;
 
 	/**
 		Creates a BitmapData object with a specified width and height. If you specify a value for
@@ -970,27 +968,35 @@ class BitmapData implements IBitmapDrawable
 				_colorTransform.__combine(colorTransform);
 			}
 
-			var renderer = new OpenGLRenderer(Lib.current.stage.context3D, this);
-			renderer.__allowSmoothing = smoothing;
-			renderer.__pixelRatio = #if openfl_disable_hdpi 1 #else Lib.current.stage.window.scale #end;
-			renderer.__overrideBlendMode = blendMode;
+			if (__renderer == null)
+			{
+				__renderer = new OpenGLRenderer(Lib.current.stage.context3D, this);
+			}
+			else
+			{
+				@:privateAccess __renderer.__cleanup();
+				__renderer.setShader(@:privateAccess __renderer.__defaultShader);
+			}
+			__renderer.__allowSmoothing = smoothing;
+			__renderer.__pixelRatio = #if openfl_disable_hdpi 1 #else Lib.current.stage.window.scale #end;
+			__renderer.__overrideBlendMode = blendMode;
 
-			renderer.__worldTransform = transform;
-			renderer.__worldAlpha = 1 / source.__worldAlpha;
-			renderer.__worldColorTransform = _colorTransform;
+			__renderer.__worldTransform = transform;
+			__renderer.__worldAlpha = 1 / source.__worldAlpha;
+			__renderer.__worldColorTransform = _colorTransform;
 
-			renderer.__resize(width, height);
+			__renderer.__resize(width, height);
 
 			if (clipRect != null)
 			{
-				renderer.__pushMaskRect(clipRect, clipMatrix);
+				__renderer.__pushMaskRect(clipRect, clipMatrix);
 			}
 
-			__drawGL(source, renderer);
+			__drawGL(source, __renderer);
 
 			if (clipRect != null)
 			{
-				renderer.__popMaskRect();
+				__renderer.__popMaskRect();
 				Matrix.__pool.release(clipMatrix);
 			}
 		}
@@ -1306,7 +1312,19 @@ class BitmapData implements IBitmapDrawable
 	public static function fromBytes(bytes:ByteArray, rawAlpha:ByteArray = null):BitmapData
 	{
 		#if (js && html5)
-		return null;
+		var bitmapData = new BitmapData(0, 0, true, 0);
+		loadFromBytes(bytes, rawAlpha).onComplete(function(decoded:BitmapData)
+		{
+			if (decoded != null)
+			{
+				bitmapData.__fromImage(decoded.image);
+				bitmapData.width = decoded.width;
+				bitmapData.height = decoded.height;
+				bitmapData.image = decoded.image;
+				bitmapData.readable = true;
+			}
+		});
+		return bitmapData;
 		#else
 		if (ASTCTexture.isBytesASTC(bytes) || BCTexture.isBytesBC(bytes))
 		{
@@ -2421,12 +2439,10 @@ class BitmapData implements IBitmapDrawable
 	{
 		if (!readable) return false;
 
-		// #if !openfljs
 		if ((secondObject is Bitmap))
 		{
 			secondObject = cast(secondObject, Bitmap).__bitmapData;
 		}
-		// #end
 
 		if ((secondObject is Point))
 		{
@@ -3250,10 +3266,24 @@ class BitmapData implements IBitmapDrawable
 
 			if (useScissor)
 			{
-				context.setScissorRectangle(rect);
+				var x = Math.floor(rect.x);
+				var y = Math.floor(rect.y);
+				var width = (rect.width > 0 ? Math.ceil(rect.right) - x : 0);
+				var height = (rect.height > 0 ? Math.ceil(rect.bottom) - y : 0);
+				#if !openfl_dpi_aware
+				if (context.__backBufferWantsBestResolution)
+				{
+					x = Math.floor(rect.x / context.__stage.window.scale);
+					y = Math.floor(rect.y / context.__stage.window.scale);
+					width = (rect.width > 0 ? Math.ceil(rect.right / context.__stage.window.scale) - x : 0);
+					height = (rect.height > 0 ? Math.ceil(rect.bottom / context.__stage.window.scale) - y : 0);
+				}
+				#end
+				__fillRectRectangle.setTo(x, y, width, height);
+				context.setScissorRectangle(__fillRectRectangle);
 			}
 
-			context.clear(color.r / 0xFF, color.g / 0xFF, color.b / 0xFF, transparent ? color.a / 0xFF : 1, 0, 0, Context3DClearMask.COLOR);
+			context.__clear(useScissor, color.r / 0xFF, color.g / 0xFF, color.b / 0xFF, transparent ? color.a / 0xFF : 1, 0, 0, Context3DClearMask.COLOR);
 
 			if (useScissor)
 			{
@@ -3284,7 +3314,7 @@ class BitmapData implements IBitmapDrawable
 		#end
 	}
 
-	@:noCompletion private function __fromBytes(bytes:ByteArray, rawAlpha:ByteArray = null):Void
+	@:noCompletion private inline function __fromBytes(bytes:ByteArray, rawAlpha:ByteArray = null):Void
 	{
 		#if lime
 		var image = Image.fromBytes(bytes);

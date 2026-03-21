@@ -25,7 +25,7 @@ class Project extends HXProject
 
 	static final PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
-	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "flixel_animate", "float_deltatime", "gpu_textures"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "compatibility", "flixel_animate", "gpu_textures"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -34,6 +34,7 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
 	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
@@ -182,7 +183,7 @@ class Project extends HXProject
 		for (shadowName in LIBRARY_SHADOWS_LIST)
 			SOURCE_FOLDERS.push('source/library_shadows/${shadowName}');
 
-		sources = SOURCE_FOLDERS;
+		sources = sources.concat(SOURCE_FOLDERS);
 		templatePaths.push("templates");
 
 		window.width = 1280;
@@ -218,7 +219,11 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
+		FEATURE_FUNKIN_CONTENT.integrate(true);
 		USE_OPENFL_FILESYSTEM.integrate(MODS_ALLOWED.isDisabled() && !isMobile());
+
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+			FEATURE_HSCRIPT.integrate(true);
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -228,10 +233,10 @@ class Project extends HXProject
 		setHaxedef("no-deprecation-warnings");
 		setHaxedef("lime_disable_assets_version");
 		setHaxedef("openfl_dpi_aware");
+		setHaxedef("openfl_pool_events");
 
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");
-		setHaxedef("HXCPP_STACK_IDS");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
 		if (FEATURE_DCE.isDisabled())
@@ -322,6 +327,12 @@ class Project extends HXProject
 		addAssetPath("assets/shared");
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		{
+			addAssetPath("assets/funkin_resources/embed", 'assets/embed', true);
+			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
+			addAssetPath("assets/funkin_resources/shared", 'assets/shared', false);
+		}
 
 		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
@@ -338,6 +349,8 @@ class Project extends HXProject
 				needsPNG = false;
 				if (FEATURE_MOBILE_CONTROLS.isEnabled())
 					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', false);
+				if (FEATURE_FUNKIN_CONTENT.isEnabled())
+					addAssetPath('assets/funkin_resources/images-${format.toLowerCase()}', 'assets/shared/images', false);
 				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
 			}
 		}
@@ -346,6 +359,8 @@ class Project extends HXProject
 		{
 			if (FEATURE_MOBILE_CONTROLS.isEnabled())
 				addAssetPath('assets/mobile-images/png', 'assets/shared/images', false);
+			if (FEATURE_FUNKIN_CONTENT.isEnabled())
+				addAssetPath('assets/funkin_resources/images-png', 'assets/shared/images', false);
 			addAssetPath('assets/images-png', 'assets/shared/images');
 		}
 
@@ -364,9 +379,17 @@ class Project extends HXProject
 		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
 		if (FEATURE_VIDEOS.isEnabled())
+		{
+			setHaxedef("HXVLC_EXPORT_DIR", '${app.path}');
 			includeHaxelib("hxvlc");
+		}
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		{
+			includeHaxelib("funkin.vis");
+			includeHaxelib("grig.audio");
+		}
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");

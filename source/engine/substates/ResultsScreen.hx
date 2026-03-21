@@ -34,7 +34,7 @@ class ResultsScreen extends MusicBeatSubstate
 	public var ranking:String;
 	public var accuracy:String;
 
-	public var fuckingCamera:FlxCamera;
+	public var fuckingCamera:ShadowCamera;
 
 	override function create()
 	{
@@ -159,7 +159,7 @@ class ResultsScreen extends MusicBeatSubstate
 				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
 			}
 		});
-		fuckingCamera = new FlxCamera();
+		fuckingCamera = new ShadowCamera();
 		fuckingCamera.bgColor.alpha = 0;
 		FlxG.cameras.add(fuckingCamera, false);
 		cameras = [fuckingCamera];
@@ -308,7 +308,7 @@ class HitGraph extends Sprite
 		tf.wordWrap = false;
 		tf.embedFonts = true;
 		tf.selectable = false;
-		tf.defaultTextFormat = new TextFormat("assets/fonts/vcr.ttf", Size, Color.to24Bit());
+		tf.defaultTextFormat = new TextFormat("assets/fonts/vcr.ttf", Size, Color.rgb);
 		tf.alpha = Color.alphaFloat;
 		tf.autoSize = TextFieldAutoSize.LEFT;
 		return tf;

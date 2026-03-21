@@ -3,7 +3,7 @@ package backend;
 import flixel.FlxBasic;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSave;
-import backend.PsychCamera;
+import backend.rendering.PsychCamera;
 
 interface IMusicState
 {
@@ -43,7 +43,7 @@ interface IMusicState
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	private var luaDebugCam:FlxCamera;
+	private var luaDebugCam:ShadowCamera;
 	private var currentClassName:String;
 	#end
 
@@ -55,11 +55,11 @@ interface IMusicState
 
 	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
-	public var touchPadCam:FlxCamera;
+	public var touchPadCam:ShadowCamera;
 	public var luaTouchPad:TouchPad;
-	public var luaTouchPadCam:FlxCamera;
+	public var luaTouchPadCam:ShadowCamera;
 	public var mobileControls:IMobileControls;
-	public var mobileControlsCam:FlxCamera;
+	public var mobileControlsCam:ShadowCamera;
 	#end
 
 	public function remove(basic:FlxBasic, splice:Bool = false):FlxBasic;

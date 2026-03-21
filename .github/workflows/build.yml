@@ -42,18 +42,9 @@ jobs:
           submodules: true
 
       - name: Setup Haxe
-        if: ${{ inputs.name != 'Linux ARM64' && inputs.name != 'Linux ARMV7' }}
-        uses: krdlab/setup-haxe@master
+        uses: ShadowEngineTeam/setup-haxe@main
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-
-      - name: Setup Haxe (Linux ARM)
-        if: ${{ inputs.name == 'Linux ARM64' || inputs.name == 'Linux ARMV7' }}
-        run: |
-          sudo add-apt-repository ppa:haxe/releases -y
-          sudo apt update
-          sudo apt-get install -y haxe neko
-          haxelib setup ~/haxelib
 
       - name: Install Dependencies for Linux
         if: ${{ startsWith(inputs.name, 'Linux') }}
@@ -81,13 +72,6 @@ jobs:
         run: |
           haxelib git hmm https://github.com/ShadowEngineTeam/hmm --skip-dependencies --quiet
           haxelib run hmm install --quiet
-          if [ "${{ inputs.name }}" == "Windows ARM64" ]; then
-            haxelib remove hxvlc
-            haxelib git hxvlc https://github.com/ShadowEngineTeam/hxvlc winarm64 --skip-dependencies --quiet
-          elif [ "${{ inputs.name }}" == "Windows i686" ]; then
-            haxelib remove hxvlc
-            haxelib git hxvlc https://github.com/ShadowEngineTeam/hxvlc win32 --skip-dependencies --quiet
-          fi
 
       - name: Configure Android
         if: ${{ inputs.name == 'Android' }}

@@ -53,6 +53,7 @@ import backend.BaseStage;
 import backend.Difficulty;
 import backend.io.*;
 import backend.Mods;
+import backend.rendering.ShadowCamera;
 import mobile.backend.StorageUtil;
 import objects.Alphabet;
 import objects.BGSprite;

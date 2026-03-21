@@ -4,7 +4,7 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileFilter;
@@ -16,8 +16,8 @@ class MenuCharacterEditorState extends MusicBeatState
 	var characterFile:MenuCharacterFile = null;
 	var defaultCharacters:Array<String> = ['dad', 'bf', 'gf'];
 
-	var camEditor:FlxCamera;
-	var camHUD:FlxCamera;
+	var camEditor:ShadowCamera;
+	var camHUD:ShadowCamera;
 
 	var UI_offsetPanel:ShadowPanel;
 	var UI_offsetLabel:ShadowLabel;
@@ -34,13 +34,13 @@ class MenuCharacterEditorState extends MusicBeatState
 		};
 
 		camEditor = initPsychCamera();
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 
 		FlxG.cameras.add(camHUD, false);
 
 		#if FEATURE_DISCORD_RPC
-		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
+		DiscordClient.changePresence("Menu Character Editor", "Editing: " + characterFile.image);
 		#end
 
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
@@ -282,7 +282,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image);
+		DiscordClient.changePresence("Menu Character Editor", "Editing: " + characterFile.image);
 		#end
 	}
 
@@ -359,37 +359,80 @@ class MenuCharacterEditorState extends MusicBeatState
 			UI_offsetLabel.text = '[' + characterFile.position[0] + ', ' + characterFile.position[1] + ']';
 	}
 
+	var _file:FileReference = null;
 
 	function loadCharacter()
 	{
-		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-		fileDialog.onOpen.add((file) -> onLoadComplete(file));
-		fileDialog.open('json');
+		var jsonFilter:FileFilter = new FileFilter('JSON', 'json');
+		_file = new FileReference();
+		_file.addEventListener(Event.COMPLETE, onLoadComplete);
+		_file.addEventListener(Event.CANCEL, onLoadCancel);
+		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file.browse([jsonFilter]);
 	}
 
-	function onLoadComplete(file:haxe.io.Bytes):Void
+	function onLoadComplete(_):Void
 	{
 		#if sys
-		if (file != null && file.length > 0)
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+
+		var fullPath:String = null;
+		@:privateAccess
+		if (_file.__path != null)
+			fullPath = _file.__path;
+
+		if (fullPath != null)
 		{
-			var jsonStr:String = file.getString(0, file.length);
-			var loadedChar:MenuCharacterFile = cast Json.parse(jsonStr);
-			if (loadedChar.idle_anim != null && loadedChar.confirm_anim != null) // Make sure it's really a character
+			var rawJson:String = File.getContent(fullPath);
+			if (rawJson != null)
 			{
-				trace("Successfully loaded file.");
-				characterFile = loadedChar;
-				reloadSelectedCharacter();
-				imageInputText.text = characterFile.image;
-				idleInputText.text = characterFile.idle_anim;
-				confirmInputText.text = characterFile.confirm_anim;
-				scaleStepper.value = characterFile.scale;
-				updateOffset();
-				return;
+				var loadedChar:MenuCharacterFile = cast Json.parse(rawJson, fullPath);
+				if (loadedChar.idle_anim != null && loadedChar.confirm_anim != null) // Make sure it's really a character
+				{
+					var cutName:String = _file.name.substr(0, _file.name.length - 5);
+					trace("Successfully loaded file: " + cutName);
+					characterFile = loadedChar;
+					reloadSelectedCharacter();
+					imageInputText.text = characterFile.image;
+					idleInputText.text = characterFile.idle_anim;
+					confirmInputText.text = characterFile.confirm_anim;
+					scaleStepper.value = characterFile.scale;
+					updateOffset();
+					_file = null;
+					return;
+				}
 			}
 		}
+		_file = null;
 		#else
-		trace("File couldn't be loaded! You aren't on Native, are you?");
+		trace("File couldn't be loaded! You aren't on Desktop, are you?");
 		#end
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onLoadCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Cancelled file loading.");
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onLoadError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Problem loading file");
 	}
 
 	function saveCharacter()
@@ -399,8 +442,44 @@ class MenuCharacterEditorState extends MusicBeatState
 		{
 			var splittedImage:Array<String> = imageInputText.text.trim().split('_');
 			var characterName:String = splittedImage[splittedImage.length - 1].toLowerCase().replace(' ', '');
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data, null, characterName + ".json", null, "application/json");
+
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, characterName + ".json");
 		}
+	}
+
+	function onSaveComplete(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved file.");
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onSaveCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onSaveError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving file");
 	}
 }

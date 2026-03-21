@@ -389,8 +389,7 @@ class LoadingState extends MusicBeatState
 				else
 				#end
 				{
-					#if USING_GPU_TEXTURES
-					file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
+					file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 					if (Paths.currentTrackedAssets.exists(file))
 					{
 						loaded++;
@@ -399,22 +398,10 @@ class LoadingState extends MusicBeatState
 					else if (FileSystem.exists(file))
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
-					#end
 					{
-						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-						if (Paths.currentTrackedAssets.exists(file))
-						{
-							loaded++;
-							continue;
-						}
-						else if (FileSystem.exists(file))
-							bitmap = BitmapData.fromBytes(File.getBytes(file));
-						else
-						{
-							trace('no such image $image exists');
-							loaded++;
-							continue;
-						}
+						trace('no such image $image exists');
+						loaded++;
+						continue;
 					}
 				}
 
@@ -469,8 +456,7 @@ class LoadingState extends MusicBeatState
 					else
 					#end
 					{
-						#if USING_GPU_TEXTURES
-						file = Paths.getPath('images/$image.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
+						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 						if (Paths.currentTrackedAssets.exists(file))
 						{
 							#if (target.threaded)
@@ -486,36 +472,17 @@ class LoadingState extends MusicBeatState
 						else if (FileSystem.exists(file))
 							bitmap = BitmapData.fromBytes(File.getBytes(file));
 						else
-						#end
 						{
-							file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-							if (Paths.currentTrackedAssets.exists(file))
-							{
-								#if (target.threaded)
-								mutex.release();
-								loadedMutex.acquire();
-								#end
-								loaded++;
-								#if (target.threaded)
-								loadedMutex.release();
-								#end
-								return;
-							}
-							else if (FileSystem.exists(file))
-								bitmap = BitmapData.fromBytes(File.getBytes(file));
-							else
-							{
-								trace('no such image $image exists');
-								#if (target.threaded)
-								mutex.release();
-								loadedMutex.acquire();
-								#end
-								loaded++;
-								#if (target.threaded)
-								loadedMutex.release();
-								#end
-								return;
-							}
+							trace('no such image $image exists');
+							#if (target.threaded)
+							mutex.release();
+							loadedMutex.acquire();
+							#end
+							loaded++;
+							#if (target.threaded)
+							loadedMutex.release();
+							#end
+							return;
 						}
 					}
 					#if (target.threaded)

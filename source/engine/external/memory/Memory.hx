@@ -10,7 +10,7 @@ package external.memory;
 extern #end class Memory
 {
 	#if cpp
-	@:native("getCurrentRSS")
+	@:native("getMemoryUsage")
 	#end
 	public static function getCurrentUsage():#if cpp cpp.SizeT; #else Float #end
 		#if !cpp

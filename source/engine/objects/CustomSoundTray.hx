@@ -103,12 +103,6 @@ class CustomSoundTray extends FlxSoundTray
 			return modPath;
 		#end
 
-		#if USING_GPU_TEXTURES
-		var gpuPath:String = Paths.getPath('images/$key.${Paths.GPU_IMAGE_EXT}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
-		if (FileSystem.exists(gpuPath))
-			return gpuPath;
-		#end
-
 		return Paths.getPath('images/$key.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 	}
 

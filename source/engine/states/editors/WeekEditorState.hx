@@ -1,7 +1,7 @@
 package states.editors;
 
 import backend.WeekData;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileFilter;
@@ -424,17 +424,6 @@ class WeekEditorState extends MusicBeatState
 					weekThing.loadGraphic(basePath);
 					isMissing = false;
 				}
-				else
-				{
-					#if USING_GPU_TEXTURES
-					var baseGpuPath:String = Paths.getPath('images/storymenu/' + assetName + Paths.GPU_IMAGE_EXT, Paths.getImageAssetType(Paths.GPU_IMAGE_EXT));
-					if (FileSystem.exists(baseGpuPath))
-					{
-						weekThing.loadGraphic(baseGpuPath);
-						isMissing = false;
-					}
-					#end
-				}
 			}
 		}
 
@@ -497,36 +486,74 @@ class WeekEditorState extends MusicBeatState
 		lock.x = weekThing.width + 10 + weekThing.x;
 	}
 
+	private static var _file:FileReference;
+
 	public static function loadWeek()
 	{
-		var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-		fileDialog.onOpen.add((file) -> onLoadComplete(file));
-		fileDialog.open('json');
+		var jsonFilter:FileFilter = new FileFilter('JSON', 'json');
+		_file = new FileReference();
+		_file.addEventListener(Event.COMPLETE, onLoadComplete);
+		_file.addEventListener(Event.CANCEL, onLoadCancel);
+		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file.browse([jsonFilter]);
 	}
 
 	public static var loadedWeek:WeekFile = null;
 	public static var loadError:Bool = false;
 
-	private static function onLoadComplete(file:haxe.io.Bytes):Void
+	private static function onLoadComplete(_):Void
 	{
 		#if sys
-		if (file != null && file.length > 0)
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+
+		var fullPath:String = null;
+		@:privateAccess
+		if (_file.__path != null)
+			fullPath = _file.__path;
+
+		if (fullPath != null)
 		{
-			var jsonStr:String = file.getString(0, file.length);
-			loadedWeek = cast Json.parse(jsonStr);
-			if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
+			var rawJson:String = File.getContent(fullPath);
+			if (rawJson != null)
 			{
-				trace("Successfully loaded file.");
-				loadError = false;
-				weekFileName = '';
-				return;
+				loadedWeek = cast Json.parse(rawJson, fullPath);
+				if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
+				{
+					var cutName:String = _file.name.substr(0, _file.name.length - 5);
+					trace("Successfully loaded file: " + cutName);
+					loadError = false;
+					weekFileName = cutName;
+					_file = null;
+					return;
+				}
 			}
 		}
-		else
-			loadError = true;
+		loadError = true;
+		loadedWeek = null;
+		_file = null;
 		#else
-		trace("File couldn't be loaded! You aren't on Native, are you?");
+		trace("File couldn't be loaded! You aren't on Desktop, are you?");
 		#end
+	}
+
+	private static function onLoadCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Cancelled file loading.");
+	}
+
+	private static function onLoadError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		trace("Problem loading file");
 	}
 
 	public static function saveWeek(weekFile:WeekFile)
@@ -534,9 +561,38 @@ class WeekEditorState extends MusicBeatState
 		var data:String = Json.stringify(weekFile, "\t");
 		if (data.length > 0)
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data, null, weekFileName + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, weekFileName + ".json");
 		}
+	}
+
+	private static function onSaveComplete(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved file.");
+	}
+
+	private static function onSaveCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	private static function onSaveError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving file");
 	}
 }
 

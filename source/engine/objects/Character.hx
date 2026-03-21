@@ -165,8 +165,7 @@ class Character extends FlxAnimate
 		}
 		else
 		{
-			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE)
-				#if USING_GPU_TEXTURES && !Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, Paths.GPU_IMAGE_EXT)}', Paths.getImageAssetType(Paths.GPU_IMAGE_EXT)) #end)
+			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
 			{
 				spriteType = TEXTURE_ATLAS;
 				isAnimateAtlas = true;

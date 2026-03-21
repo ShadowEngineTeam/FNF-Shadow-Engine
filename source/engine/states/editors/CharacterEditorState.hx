@@ -1,16 +1,13 @@
 package states.editors;
 
 import flixel.graphics.FlxGraphic;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import flixel.FlxCamera;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
-
-@:bitmap("assets/images/debugger/cursorCross.png")
-private class GraphicCursorCross extends openfl.display.BitmapData {}
 
 class CharacterEditorState extends MusicBeatState
 {
@@ -41,9 +38,9 @@ class CharacterEditorState extends MusicBeatState
 	var animsTxtGroup:FlxTypedGroup<FlxText>;
 	var curAnim:Int = 0;
 
-	private var camEditor:FlxCamera;
-	private var camHUD:FlxCamera;
-	private var camOther:FlxCamera;
+	private var camEditor:ShadowCamera;
+	private var camHUD:ShadowCamera;
+	private var camOther:ShadowCamera;
 
 	var UI_box:ShadowTabMenu;
 	var UI_characterbox:ShadowTabMenu;
@@ -71,11 +68,11 @@ class CharacterEditorState extends MusicBeatState
 		FlxG.sound.music.stop();
 		camEditor = initPsychCamera();
 
-		camHUD = new FlxCamera();
+		camHUD = new ShadowCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		camOther.visible = false;
 		FlxG.cameras.add(camOther, false);
@@ -107,8 +104,9 @@ class CharacterEditorState extends MusicBeatState
 
 		addCharacter();
 
-		cameraFollowPointer = new FlxSprite().loadGraphic(FlxGraphic.fromClass(GraphicCursorCross));
+		cameraFollowPointer = new FlxSprite().loadGraphic(Paths.image('ui/cursorCross'));
 		cameraFollowPointer.setGraphicSize(40, 40);
+		cameraFollowPointer.antialiasing = false;
 		cameraFollowPointer.updateHitbox();
 		add(cameraFollowPointer);
 
@@ -1232,10 +1230,10 @@ class CharacterEditorState extends MusicBeatState
 		else
 			holdingArrowsTime = 0;
 
-		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0))
+		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaViewX != 0 || FlxG.mouse.deltaViewY != 0))
 		{
-			character.offset.x -= FlxG.mouse.deltaScreenX;
-			character.offset.y -= FlxG.mouse.deltaScreenY;
+			character.offset.x -= FlxG.mouse.deltaViewX;
+			character.offset.y -= FlxG.mouse.deltaViewY;
 			changedOffset = true;
 		}
 
@@ -1625,8 +1623,51 @@ class CharacterEditorState extends MusicBeatState
 	}
 
 	// save
+	var _file:FileReference;
+
+	function onSaveComplete(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved file.");
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onSaveCancel(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onSaveError(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving file");
+	}
+
 	function saveCharacter()
 	{
+		if (_file != null)
+			return;
+
 		var json:Dynamic = {
 			"animations": character.animationsArray,
 			"image": character.imageFile,
@@ -1648,8 +1689,11 @@ class CharacterEditorState extends MusicBeatState
 
 		if (data.length > 0)
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data, null, '$_char' + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, '$_char.json');
 		}
 	}
 }

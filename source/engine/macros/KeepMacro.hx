@@ -43,10 +43,14 @@ class KeepMacro
 			"flixel.addons.weapon",
 			// OPENFL SYSTEM
 			"openfl.system",
-			// HXVLC
-			#if hxvlc
+			// HXVLC & HXCODEC WRAPPERS
+			#if FEATURE_VIDEOS
+			"hxcodec",
+			"hxcodec.flixel",
+			"hxcodec.openfl",
 			"hxvlc.flixel",
 			"hxvlc.openfl",
+			"vlc",
 			#end
 			// BASE HAXE
 			"DateTools",

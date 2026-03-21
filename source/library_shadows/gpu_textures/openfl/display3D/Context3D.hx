@@ -466,6 +466,12 @@ import lime.math.Vector2;
 	public function clear(red:Float = 0, green:Float = 0, blue:Float = 0, alpha:Float = 1, depth:Float = 1, stencil:UInt = 0,
 			mask:UInt = Context3DClearMask.ALL):Void
 	{
+		__clear(false, red, green, blue, alpha, depth, stencil, mask);
+	}
+
+	@:noCompletion private function __clear(useScissor:Bool, red:Float = 0, green:Float = 0, blue:Float = 0, alpha:Float = 1, depth:Float = 1,
+			stencil:UInt = 0, mask:UInt = Context3DClearMask.ALL)
+	{
 		__flushGLFramebuffer();
 		__flushGLViewport();
 
@@ -525,7 +531,15 @@ import lime.math.Vector2;
 
 		if (clearMask == 0) return;
 
-		__setGLScissorTest(false);
+		if (useScissor)
+		{
+			__flushGLScissor();
+		}
+		else
+		{
+			__setGLScissorTest(false);
+		}
+
 		gl.clear(clearMask);
 	}
 
@@ -625,38 +639,38 @@ import lime.math.Vector2;
 				var scaledWidth = wantsBestResolution ? width : Std.int(width * __stage.window.scale);
 				var scaledHeight = wantsBestResolution ? height : Std.int(height * __stage.window.scale);
 				#end
-				var vertexData = new Vector<Float>([
+				var vertexData:Array<Float> = [
 					scaledWidth,
 					scaledHeight,
-					0,
-					1,
-					1,
-					0,
+					0.0,
+					1.0,
+					1.0,
+					0.0,
 					scaledHeight,
-					0,
-					0,
-					1,
+					0.0,
+					0.0,
+					1.0,
 					scaledWidth,
-					0,
-					0,
-					1,
-					0,
-					0,
-					0,
-					0,
-					0,
+					0.0,
+					0.0,
+					1.0,
+					0.0,
+					0.0,
+					0.0,
+					0.0,
+					0.0,
 					0.0
-				]);
+				];
 
-				__stage3D.__vertexBuffer.uploadFromVector(vertexData, 0, 20);
+				__stage3D.__vertexBuffer.uploadFromArray(vertexData, 0, 20);
 
 				if (__stage3D.__indexBuffer == null)
 				{
 					__stage3D.__indexBuffer = createIndexBuffer(6);
 
-					var indexData = new Vector<UInt>([0, 1, 2, 2, 1, 3]);
+					var indexData:Array<UInt> = [0, 1, 2, 2, 1, 3];
 
-					__stage3D.__indexBuffer.uploadFromVector(indexData, 0, 6);
+					__stage3D.__indexBuffer.uploadFromArray(indexData, 0, 6);
 				}
 			}
 
@@ -1632,6 +1646,63 @@ import lime.math.Vector2;
 		than `numRegisters*4`
 	**/
 	public function setProgramConstantsFromVector(programType:Context3DProgramType, firstRegister:Int, data:Vector<Float>, numRegisters:Int = -1):Void
+	{
+		if (numRegisters == 0) return;
+
+		if (__state.program != null && __state.program.__format == GLSL) {}
+		else
+		{
+			if (numRegisters == -1)
+			{
+				numRegisters = (data.length >> 2);
+			}
+
+			var isVertex = (programType == VERTEX);
+			var dest = isVertex ? __vertexConstants : __fragmentConstants;
+			var source = data;
+
+			var sourceIndex = 0;
+			var destIndex = firstRegister * 4;
+
+			for (i in 0...numRegisters)
+			{
+				dest[destIndex++] = source[sourceIndex++];
+				dest[destIndex++] = source[sourceIndex++];
+				dest[destIndex++] = source[sourceIndex++];
+				dest[destIndex++] = source[sourceIndex++];
+			}
+
+			if (__state.program != null)
+			{
+				__state.program.__markDirty(isVertex, firstRegister, numRegisters);
+			}
+		}
+	}
+
+	/**
+		Sets the constant inputs for the shader programs.
+
+		Sets an array of constants to be accessed by a vertex or fragment shader
+		program. Constants set in Program3D are accessed within the shader programs as
+		constant registers. Each constant register is comprised of 4 floating point
+		values (x, y, z, w). Therefore every register requires 4 entries in the data
+		Vector. The number of registers that you can set for vertex program and
+		fragment program depends on the Context3DProfile.
+
+		@param	programType	The type of shader program, either
+		`Context3DProgramType.VERTEX` or `Context3DProgramType.FRAGMENT`.
+		@param	firstRegister	the index of the first constant register to set.
+		@param	data	the floating point constant values. There must be at least
+		`numRegisters` 4 elements in data.
+		@param	numRegisters	the number of constants to set. Specify -1, the default
+		value, to set enough registers to use all of the available data.
+		@throws	TypeError	Null Pointer Error: when data is `null`.
+		@throws	RangeError	Constant Register Out Of Bounds: when attempting to set more
+		than the maximum number of shader constant registers.
+		@throws	RangeError	Bad Input Size: When the number of elements in data is less
+		than `numRegisters*4`
+	**/
+	public function setProgramConstantsFromArray(programType:Context3DProgramType, firstRegister:Int, data:Array<Float>, numRegisters:Int = -1):Void
 	{
 		if (numRegisters == 0) return;
 

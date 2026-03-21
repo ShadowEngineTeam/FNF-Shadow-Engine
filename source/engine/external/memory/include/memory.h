@@ -12,10 +12,10 @@
 #include <stdio.h>
 
 #else
-#error "Cannot define getCurrentRSS() for an unknown OS."
+#error "Cannot define getMemoryUsage() for an unknown OS."
 #endif
 
-size_t getCurrentRSS(void)
+size_t getMemoryUsage(void)
 {
 #if defined(_WIN32)
     PROCESS_MEMORY_COUNTERS_EX info;

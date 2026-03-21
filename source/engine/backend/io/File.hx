@@ -115,7 +115,7 @@ class File
 		#end
 	}
 
-	public static function read(path:String, binary:Bool = true):Null<FileInput>
+	public static function read(path:String, binary:Bool = true):Null<#if sys FileInput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -134,7 +134,7 @@ class File
 		return null;
 	}
 
-	public static function write(path:String, binary:Bool = true):Null<FileOutput>
+	public static function write(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -151,7 +151,7 @@ class File
 		#end
 	}
 
-	public static function append(path:String, binary:Bool = true):Null<FileOutput>
+	public static function append(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -168,7 +168,7 @@ class File
 		#end
 	}
 
-	public static function update(path:String, binary:Bool = true):Null<FileOutput>
+	public static function update(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux

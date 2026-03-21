@@ -64,7 +64,7 @@ class Rating
 		var absTiming:Float = Math.abs(msTiming);
 		return switch (absTiming)
 		{
-			case(_ < PERFECT_THRESHOLD) => true:
+			case(_ <= PERFECT_THRESHOLD) => true:
 				MAX_SCORE;
 			default:
 				var factor:Float = 1.0 - (1.0 / (1.0 + Math.exp(-SCORING_SLOPE * (absTiming - SCORING_OFFSET))));
@@ -78,13 +78,13 @@ class Rating
 		var absTiming:Float = Math.abs(msTiming);
 		return switch (absTiming)
 		{
-			case(_ < SICK_THRESHOLD) => true:
+			case(_ <= SICK_THRESHOLD) => true:
 				'sick';
-			case(_ < GOOD_THRESHOLD) => true:
+			case(_ <= GOOD_THRESHOLD) => true:
 				'good';
-			case(_ < BAD_THRESHOLD) => true:
+			case(_ <= BAD_THRESHOLD) => true:
 				'bad';
-			case(_ < SHIT_THRESHOLD) => true:
+			case(_ <= SHIT_THRESHOLD) => true:
 				'shit';
 			default:
 				'miss';

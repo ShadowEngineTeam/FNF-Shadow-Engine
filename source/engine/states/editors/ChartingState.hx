@@ -14,7 +14,7 @@ import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.geom.Rectangle;
-import lime.ui.FileDialog;
+import openfl.net.FileReference;
 import backend.Song;
 import backend.Section;
 import backend.StageData;
@@ -87,16 +87,30 @@ class ChartingState extends MusicBeatState
 		[
 			'Play Sound',
 			"Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"
+		],
+		[
+			'Set Camera Bopping',
+			"Sets how camera should bop.\nValue 1: Frequency (in beats)\nValue 2: Intensity scale (1 for default)"
+		],
+		[
+			'Zoom Camera',
+			"An attempt to emulate V-slice camera zoom.\nNot really accurate, but oh well.\n\nValue 1: Zoom length (in steps) and zoom scale.\n[separated with ',']\n\nValue 2: Zooming ease"
+		],
+		[
+			'Focus Camera',
+			"Focus camera on the specific point.\nThis will also lock the camera (like Camera Follow Pos)\n\nValue1:character to focus\nValue2: separated with ',' x, y, duration, ease"
 		]
 	];
+
+	var _file:FileReference;
 
 	var UI_box:ShadowTabMenu;
 	var UI_help:ShadowPanel;
 	var UI_helpOverlay:FlxSprite;
 	var UI_infoPanel:ShadowPanel;
 
-	private var camMain:FlxCamera;
-	private var camOther:FlxCamera;
+	private var camMain:ShadowCamera;
+	private var camOther:ShadowCamera;
 
 	public static var goToPlayState:Bool = false;
 
@@ -216,8 +230,6 @@ class ChartingState extends MusicBeatState
 			addSection();
 			PlayState.SONG = _song;
 		}
-
-		// Paths.clearMemory();
 
 		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence
@@ -673,7 +685,7 @@ class ChartingState extends MusicBeatState
 
 		initPsychCamera().follow(camPos, LOCKON, 999);
 
-		camOther = new FlxCamera();
+		camOther = new ShadowCamera();
 		camOther.bgColor.alpha = 0;
 		camOther.visible = false;
 		FlxG.cameras.add(camOther, false);
@@ -3575,8 +3587,11 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data.trim(), null, Paths.formatToSongPath(_song.song) + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
 		}
 	}
 
@@ -3600,9 +3615,44 @@ class ChartingState extends MusicBeatState
 
 		if ((data != null) && (data.length > 0))
 		{
-			var fileDialog:lime.ui.FileDialog = new lime.ui.FileDialog();
-			fileDialog.save(data.trim(), null, "events" + (isDiffErect ? '-erect' : "") + ".json", null, "application/json");
+			_file = new FileReference();
+			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data.trim(), "events" + (isDiffErect ? '-erect' : "") + ".json");
 		}
+	}
+
+	function onSaveComplete(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.notice("Successfully saved LEVEL DATA.");
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onSaveCancel(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onSaveError(_):Void
+	{
+		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+		_file.removeEventListener(Event.CANCEL, onSaveCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+		_file = null;
+		FlxG.log.error("Problem saving Level data");
 	}
 
 	function getSectionBeats(?section:Null<Int> = null)

@@ -20,9 +20,6 @@ import lime.ui.WindowVSyncMode;
 #end
 import states.TitleState;
 import openfl.events.KeyboardEvent;
-#if (linux && !debug)
-import hxgamemode.GamemodeClient;
-#end
 
 class Main extends Sprite
 {
@@ -37,20 +34,6 @@ class Main extends Sprite
 	};
 
 	public static var fpsVar:Framerate;
-
-	@:noCompletion
-	private static function __init__():Void
-	{
-		#if (linux && !debug)
-		if (GamemodeClient.request_start() != 0)
-		{
-			Sys.println('Failed to request gamemode start: ${GamemodeClient.error_string()}...');
-			// Sys.exit(1);
-		}
-		else
-			Sys.println('Succesfully requested gamemode to start...');
-		#end
-	}
 
 	public static function main():Void
 	{
@@ -114,6 +97,8 @@ class Main extends Sprite
 		Controls.instance = new Controls();
 		ClientPrefs.loadDefaultKeys();
 
+		untyped FlxG.cameras = new backend.rendering.ShadowCameraFrontEnd();
+
 		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate,
 			game.framerate, game.skipSplash, game.startFullscreen);
 
@@ -159,7 +144,7 @@ class Main extends Sprite
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
 
-		FlxSprite.defaultAntialiasing = true;
+		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
