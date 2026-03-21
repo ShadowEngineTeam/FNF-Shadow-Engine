@@ -29,7 +29,7 @@ class CreditsState extends MusicBeatState
 		[
 			"Homura",
 			"homura",
-			"Main Programmer and Author of Shadow Engine",
+			"Main Programmer and Co-Owner of Shadow Engine",
 			"https://www.youtube.com/@HomuHomu833",
 			"FFFFFF"
 		],
