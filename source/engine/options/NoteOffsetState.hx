@@ -178,11 +178,11 @@ class NoteOffsetState extends MusicBeatState
 		Thread.create(function()
 		{
 			mutex.acquire();
-		#end
 			FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
-		#if (target.threaded)
-		mutex.release();
+			mutex.release();
 		});
+		#else
+		FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
 		#end
 
 		#if FEATURE_MOBILE_CONTROLS

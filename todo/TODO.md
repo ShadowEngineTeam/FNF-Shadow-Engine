@@ -1,4 +1,4 @@
-- Switch SScript to RuleScript or hscript-improved(?) [in a nutshell screw SScript]
+- Remove ProprietaryBase and File creation for defines in SScript
 - Switch Game Res from 720p to 1080p(?)
 - Add hxfmod
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)

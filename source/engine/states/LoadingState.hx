@@ -384,7 +384,7 @@ class LoadingState extends MusicBeatState
 					loaded++;
 					continue;
 				}
-				else if (FileSystem.exists(file))
+				else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
 					bitmap = BitmapData.fromBytes(File.getBytes(file));
 				else
 				#end
@@ -395,7 +395,7 @@ class LoadingState extends MusicBeatState
 						loaded++;
 						continue;
 					}
-					else if (FileSystem.exists(file))
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					{
@@ -451,7 +451,7 @@ class LoadingState extends MusicBeatState
 						#end
 						return;
 					}
-					else if (FileSystem.exists(file))
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					#end
@@ -469,7 +469,7 @@ class LoadingState extends MusicBeatState
 							#end
 							return;
 						}
-						else if (FileSystem.exists(file))
+						else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
 							bitmap = BitmapData.fromBytes(File.getBytes(file));
 						else
 						{
