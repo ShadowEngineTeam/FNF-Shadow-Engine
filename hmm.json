@@ -33,7 +33,7 @@
     {
       "name": "SScript",
       "type": "git",
-      "ref": "791c14d51aaf1411f38d7140058e2aeb3a763ca0",
+      "ref": "fa793b14c5af595a405dc2fe8cce5b8e047ee7f4",
       "url": "https://github.com/ShadowEngineTeam/SScript"
     },
     {
@@ -87,7 +87,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "605612ecfeeb47f27af34bceb9f841c28b936653",
+      "ref": "7ccda74ec7b6c5ba0b3ae4d3f8d64582331b4da1",
       "url": "https://github.com/MaybeMaru/flixel-animate"
     }
   ]
