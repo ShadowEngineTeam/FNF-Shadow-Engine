@@ -1,4 +1,4 @@
-- Remove ProprietaryBase and File creation for defines in SScript
+- Add preprocessor (#if) support to SScript
 - Switch Game Res from 720p to 1080p(?)
 - Add hxfmod
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
