@@ -33,8 +33,8 @@
     {
       "name": "SScript",
       "type": "git",
-      "ref": "4932ba01d46dd46068c6ce2d2d9adfa31cd5bb29",
-      "url": "https://github.com/ShadowEngineTeam/SScript-new"
+      "ref": "791c14d51aaf1411f38d7140058e2aeb3a763ca0",
+      "url": "https://github.com/ShadowEngineTeam/SScript"
     },
     {
       "name": "hxdiscord_rpc",
