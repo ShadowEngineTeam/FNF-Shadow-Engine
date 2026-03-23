@@ -93,9 +93,6 @@ class HScript extends SScript
 	{
 		super.preset();
 
-		// Always use regular imports
-		SScript.defaultPreset = PresetMode.REGULAR;
-
 		// Some very commonly used classes
 		set('FlxG', flixel.FlxG);
 		set('FlxMath', flixel.math.FlxMath);
