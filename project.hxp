@@ -298,8 +298,6 @@ class Project extends HXProject
 		if (isMobile())
 			setHaxedef("SHARE_MOBILE_FILES");
 		setHaxedef("loop_unroll_max_cost", "25");
-		if (isAndroid())
-			setHaxedef("DISABLED_MACRO_SUPERLATIVE");
 
 		if (FEATURE_DCE.isDisabled())
 		{
