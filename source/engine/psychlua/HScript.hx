@@ -8,9 +8,7 @@ import psychlua.CustomSubstate;
 import psychlua.FunkinLua;
 #end
 #if FEATURE_HSCRIPT
-import hscript.SScript;
-import hscript.SScript.FunctionCall;
-import hscript.backend.Preset;
+import tea.SScript;
 
 class HScript extends SScript
 {
@@ -369,7 +367,7 @@ class HScript extends SScript
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):TeaCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -405,7 +403,7 @@ class HScript extends SScript
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):FunctionCall
+	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):TeaCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -420,7 +418,7 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:FunctionCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)
