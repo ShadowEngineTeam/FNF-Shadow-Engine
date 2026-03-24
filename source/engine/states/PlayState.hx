@@ -1947,7 +1947,7 @@ class PlayState extends MusicBeatState
 		if (!ClientPrefs.data.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
 		{
 			health = 0;
-			trace("RESET = True");
+			trace("Pressed RESET key, go kaboom");
 		}
 		doDeathCheck();
 
