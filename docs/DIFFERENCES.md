@@ -6,6 +6,7 @@
 - Uses some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (R.I.P.)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine)
 - Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) with [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
 - Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) with [`hxvlc`](https://github.com/ShadowEngineTeam/hxvlc) for better customizability in video cutscenes
+- Replaced [`SScript`](https://github.com/ShadowEngineTeam/SScript) with [`ShadowScript`](https://github.com/ShadowEngineTeam/SScript) for better compatibility in HScripting
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
@@ -14,7 +15,7 @@
 - Uses PBOT1 scoring system instead of fixed scoring (like 300 for every sick)
 - Improved Controller Support
 - Removes 9999 combo limit
-- Some 0.6.3 and 1.0 compability
+- Some 0.6.3 and 1.0 compatibility
 - Little bit Null Safety
 - Linux ARM support (FNF on Raspberry Pi baby)
 - Kade Engine Results Screen

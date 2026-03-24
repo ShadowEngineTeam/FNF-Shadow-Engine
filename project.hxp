@@ -240,6 +240,14 @@ class Project extends HXProject
 		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
 
+		if (FEATURE_HSCRIPT.isEnabled())
+		{
+			setHaxedef("hscriptPos");
+			setHaxedef("HSCRIPT_ABSTRACT_SUPPORT");
+			// not adding as SE has own custom states support
+			//setHaxedef("CUSTOM_CLASSES");
+		}
+
 		if (isAndroid() && !isDebug())
 		{
 			final keystoreDir:String = Path.join([Sys.getCwd(), "keystore/android"]);
