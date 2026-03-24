@@ -7,31 +7,29 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.media.Sound;
 
+@:nullSafety
 class CustomSoundTray extends FlxSoundTray
 {
 	var graphicScale:Float = 0.3;
 	var lerpYPos:Float = 0;
 	var alphaTarget:Float = 0;
-	var volumeMaxSound:String;
+	var volumeMaxSound:String = "";
 	var _lastVolume:Int = -1;
 
-	var bg:Bitmap;
-	var backingBar:Bitmap;
-	var bgPath:String;
-	var backingPath:String;
+	var bg:Null<Bitmap> = null;
+	var backingBar:Null<Bitmap> = null;
+	var bgPath:String = "";
+	var backingPath:String = "";
 	var barPaths:Array<String> = [];
 
 	public function new()
 	{
 		super();
-		removeChildren();
-
+		
 		bg = new Bitmap();
 		backingBar = new Bitmap();
-		bgPath = "";
-		backingPath = "";
-		barPaths = [];
 		
+		removeChildren();
 		loadImages();
 		
 		y = -height;
@@ -48,24 +46,32 @@ class CustomSoundTray extends FlxSoundTray
 		bgPath = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
-			bg = new Bitmap(BitmapData.fromBytes(File.getBytes(bgPath)));
-			bg.scaleX = graphicScale;
-			bg.scaleY = graphicScale;
-			bg.smoothing = true;
-			addChild(bg);
+			var bgBytes:Null<haxe.io.Bytes> = File.getBytes(bgPath);
+			if (bgBytes != null)
+			{
+				bg = new Bitmap(BitmapData.fromBytes(bgBytes));
+				bg.scaleX = graphicScale;
+				bg.scaleY = graphicScale;
+				bg.smoothing = true;
+				addChild(bg);
+			}
 		}
 
 		backingPath = getImagePath('soundtray/bars_10');
 		if (FileSystem.exists(backingPath))
 		{
-			backingBar = new Bitmap(BitmapData.fromBytes(File.getBytes(backingPath)));
-			backingBar.x = 9;
-			backingBar.y = 5;
-			backingBar.scaleX = graphicScale;
-			backingBar.scaleY = graphicScale;
-			backingBar.smoothing = true;
-			addChild(backingBar);
-			backingBar.alpha = 0.4;
+			var backingBytes:Null<haxe.io.Bytes> = File.getBytes(backingPath);
+			if (backingBytes != null)
+			{
+				backingBar = new Bitmap(BitmapData.fromBytes(backingBytes));
+				backingBar.x = 9;
+				backingBar.y = 5;
+				backingBar.scaleX = graphicScale;
+				backingBar.scaleY = graphicScale;
+				backingBar.smoothing = true;
+				addChild(backingBar);
+				backingBar.alpha = 0.4;
+			}
 		}
 
 		_bars = [];
@@ -78,14 +84,23 @@ class CustomSoundTray extends FlxSoundTray
 			
 			if (FileSystem.exists(barPath))
 			{
-				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(File.getBytes(barPath)));
-				bar.x = 9;
-				bar.y = 5;
-				bar.scaleX = graphicScale;
-				bar.scaleY = graphicScale;
-				bar.smoothing = true;
-				addChild(bar);
-				_bars.push(bar);
+				var barBytes:Null<haxe.io.Bytes> = File.getBytes(barPath);
+				if (barBytes != null)
+				{
+					var bar:Bitmap = new Bitmap(BitmapData.fromBytes(barBytes));
+					bar.x = 9;
+					bar.y = 5;
+					bar.scaleX = graphicScale;
+					bar.scaleY = graphicScale;
+					bar.smoothing = true;
+					addChild(bar);
+					_bars.push(bar);
+				}
+				else
+				{
+					var emptyBar:Bitmap = new Bitmap();
+					_bars.push(emptyBar);
+				}
 			}
 			else
 			{
@@ -178,7 +193,11 @@ class CustomSoundTray extends FlxSoundTray
 				sound = volumeMaxSound;
 
 			if (sound != null)
-				FlxG.sound.play(Sound.fromBytes(File.getBytes(sound)));
+			{
+				var soundBytes:Null<haxe.io.Bytes> = File.getBytes(sound);
+				if (soundBytes != null)
+					FlxG.sound.play(Sound.fromBytes(soundBytes));
+			}
 		}
 
 		_lastVolume = globalVolume;

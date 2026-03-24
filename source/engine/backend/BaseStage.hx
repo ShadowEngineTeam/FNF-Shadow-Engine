@@ -14,6 +14,7 @@ enum Countdown
 	START;
 }
 
+@:nullSafety
 class BaseStage extends FlxBasic
 {
 	private var game(get, never):Dynamic;

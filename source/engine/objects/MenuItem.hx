@@ -1,5 +1,8 @@
 package objects;
 
+import flixel.graphics.FlxGraphic;
+
+@:nullSafety
 class MenuItem extends FlxSprite
 {
 	public var targetY:Float = 0;
@@ -7,7 +10,9 @@ class MenuItem extends FlxSprite
 	public function new(x:Float, y:Float, weekName:String = '')
 	{
 		super(x, y);
-		loadGraphic(Paths.image('storymenu/' + weekName));
+		var img:Null<FlxGraphic> = Paths.image('storymenu/' + weekName);
+		if (img != null)
+			loadGraphic(img);
 		antialiasing = ClientPrefs.data.antialiasing;
 	}
 

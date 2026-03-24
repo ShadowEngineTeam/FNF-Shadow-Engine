@@ -2,13 +2,14 @@ package shaders;
 
 import objects.Note;
 
+@:nullSafety
 class RGBPalette
 {
 	public var shader(default, null):RGBPaletteShader = new RGBPaletteShader();
-	public var r(default, set):FlxColor;
-	public var g(default, set):FlxColor;
-	public var b(default, set):FlxColor;
-	public var mult(default, set):Float;
+	public var r(default, set):FlxColor = FlxColor.WHITE;
+	public var g(default, set):FlxColor = FlxColor.WHITE;
+	public var b(default, set):FlxColor = FlxColor.WHITE;
+	public var mult(default, set):Float = 1.0;
 
 	private function set_r(color:FlxColor)
 	{

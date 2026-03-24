@@ -1,49 +1,57 @@
 package objects;
 
 import flixel.math.FlxRect;
+import flixel.graphics.FlxGraphic;
 
+@:nullSafety
 class Bar extends FlxSpriteGroup
 {
-	public var leftBar:FlxSprite;
-	public var rightBar:FlxSprite;
-	public var bg:FlxSprite;
-	public var valueFunction:Void->Float = null;
+	public var leftBar:Null<FlxSprite> = null;
+	public var rightBar:Null<FlxSprite> = null;
+	public var bg:Null<FlxSprite> = null;
+	public var valueFunction:Null<Void->Float> = null;
 	public var percent(default, set):Float = 0;
 	public var bounds:Dynamic = {min: 0, max: 1};
 	public var leftToRight(default, set):Bool = true;
 	public var barCenter(default, null):Float = 0;
 
-	// you might need to change this if you want to use a custom bar
 	public var barWidth(default, set):Int = 1;
 	public var barHeight(default, set):Int = 1;
 	public var barOffset:FlxPoint = FlxPoint.get(3, 3);
 
-	private var percentTween:FlxTween = null;
+	private var percentTween:Null<FlxTween> = null;
 
-	public function new(x:Float, y:Float, image:String = 'healthBar', valueFunction:Void->Float = null, boundX:Float = 0, boundY:Float = 1)
+	public function new(x:Float, y:Float, image:String = 'healthBar', ?valueFunction:Void->Float, boundX:Float = 0, boundY:Float = 1)
 	{
 		super(x, y);
 
 		this.valueFunction = valueFunction;
-		setBounds(boundX, boundY);
+		bounds.min = boundX;
+		bounds.max = boundY;
 
-		bg = new FlxSprite().loadGraphic(Paths.image(image));
-		bg.antialiasing = ClientPrefs.data.antialiasing;
-		barWidth = Std.int(bg.width - 6);
-		barHeight = Std.int(bg.height - 6);
+		var img:Null<FlxGraphic> = Paths.image(image);
+		if (img != null)
+		{
+			bg = new FlxSprite();
+			bg.loadGraphic(img);
+			bg.antialiasing = ClientPrefs.data.antialiasing;
+			barWidth = Std.int(bg.width - 6);
+			barHeight = Std.int(bg.height - 6);
 
-		leftBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
-		// leftBar.color = FlxColor.WHITE;
-		leftBar.antialiasing = antialiasing = ClientPrefs.data.antialiasing;
+			leftBar = new FlxSprite();
+			leftBar.makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
+			leftBar.antialiasing = ClientPrefs.data.antialiasing;
 
-		rightBar = new FlxSprite().makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
-		rightBar.color = FlxColor.BLACK;
-		rightBar.antialiasing = ClientPrefs.data.antialiasing;
+			rightBar = new FlxSprite();
+			rightBar.makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
+			rightBar.color = FlxColor.BLACK;
+			rightBar.antialiasing = ClientPrefs.data.antialiasing;
 
-		add(leftBar);
-		add(rightBar);
-		add(bg);
-		regenerateClips();
+			if (leftBar != null) add(leftBar);
+			if (rightBar != null) add(rightBar);
+			if (bg != null) add(bg);
+			regenerateClips();
+		}
 
 		moves = false;
 		immovable = true;
@@ -59,10 +67,12 @@ class Bar extends FlxSpriteGroup
 			return;
 		}
 
-		if (valueFunction != null)
+		var vf = valueFunction;
+		if (vf != null)
 		{
-			var value:Null<Float> = FlxMath.remapToRange(FlxMath.bound(valueFunction(), bounds.min, bounds.max), bounds.min, bounds.max, 0, 100);
-			percent = set_percent(value != null ? value : 0);
+			var rawValue:Float = vf();
+			var value:Float = FlxMath.remapToRange(FlxMath.bound(rawValue, bounds.min, bounds.max), bounds.min, bounds.max, 0, 100);
+			percent = set_percent(value);
 		}
 		else
 			percent = 0;
@@ -75,21 +85,26 @@ class Bar extends FlxSpriteGroup
 		bounds.max = max;
 	}
 
-	public function setColors(left:FlxColor = null, right:FlxColor = null)
+	public function setColors(?left:FlxColor, ?right:FlxColor)
 	{
-		if (left != null)
-			leftBar.color = left;
-		if (right != null)
-			rightBar.color = right;
+		var lb = leftBar;
+		var rb = rightBar;
+		if (left != null && lb != null)
+			lb.color = left;
+		if (right != null && rb != null)
+			rb.color = right;
 	}
 
 	public function updateBar()
 	{
-		if (leftBar == null || rightBar == null)
+		var lb = leftBar;
+		var rb = rightBar;
+		var bgSprite = bg;
+		if (lb == null || rb == null || bgSprite == null)
 			return;
 
-		leftBar.setPosition(bg.x, bg.y);
-		rightBar.setPosition(bg.x, bg.y);
+		lb.setPosition(bgSprite.x, bgSprite.y);
+		rb.setPosition(bgSprite.x, bgSprite.y);
 
 		var leftSize:Float = 0;
 		if (leftToRight)
@@ -97,36 +112,38 @@ class Bar extends FlxSpriteGroup
 		else
 			leftSize = FlxMath.lerp(0, barWidth, 1 - percent / 100);
 
-		leftBar.clipRect.width = leftSize;
-		leftBar.clipRect.height = barHeight;
-		leftBar.clipRect.x = barOffset.x;
-		leftBar.clipRect.y = barOffset.y;
+		lb.clipRect.width = leftSize;
+		lb.clipRect.height = barHeight;
+		lb.clipRect.x = barOffset.x;
+		lb.clipRect.y = barOffset.y;
 
-		rightBar.clipRect.width = barWidth - leftSize;
-		rightBar.clipRect.height = barHeight;
-		rightBar.clipRect.x = barOffset.x + leftSize;
-		rightBar.clipRect.y = barOffset.y;
+		rb.clipRect.width = barWidth - leftSize;
+		rb.clipRect.height = barHeight;
+		rb.clipRect.x = barOffset.x + leftSize;
+		rb.clipRect.y = barOffset.y;
 
-		barCenter = leftBar.x + leftSize + barOffset.x;
+		barCenter = lb.x + leftSize + barOffset.x;
 
-		// flixel is restarted
-		leftBar.clipRect = leftBar.clipRect;
-		rightBar.clipRect = rightBar.clipRect;
+		lb.clipRect = lb.clipRect;
+		rb.clipRect = rb.clipRect;
 	}
 
 	public function regenerateClips()
 	{
-		if (leftBar != null)
+		var lb = leftBar;
+		var rb = rightBar;
+		var bgSprite = bg;
+		if (lb != null && bgSprite != null)
 		{
-			leftBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
-			leftBar.updateHitbox();
-			leftBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+			lb.setGraphicSize(Std.int(bgSprite.width), Std.int(bgSprite.height));
+			lb.updateHitbox();
+			lb.clipRect = new FlxRect(0, 0, Std.int(bgSprite.width), Std.int(bgSprite.height));
 		}
-		if (rightBar != null)
+		if (rb != null && bgSprite != null)
 		{
-			rightBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
-			rightBar.updateHitbox();
-			rightBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+			rb.setGraphicSize(Std.int(bgSprite.width), Std.int(bgSprite.height));
+			rb.updateHitbox();
+			rb.clipRect = new FlxRect(0, 0, Std.int(bgSprite.width), Std.int(bgSprite.height));
 		}
 		updateBar();
 	}

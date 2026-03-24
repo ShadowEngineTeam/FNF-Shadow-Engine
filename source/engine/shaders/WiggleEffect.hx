@@ -10,6 +10,7 @@ enum WiggleEffectType
 	FLAG;
 }
 
+@:nullSafety
 class WiggleEffect
 {
 	public var shader(default, null):WiggleShader = new WiggleShader();

@@ -6,15 +6,15 @@ import openfl.display.BlendMode;
 class RuntimeCustomBlendShader extends RuntimePostEffectShader
 {
 	// only different name purely for hashlink fix
-	public var sourceSwag(default, set):BitmapData;
+	public var sourceSwag(default, set):Null<BitmapData> = null;
 
-	function set_sourceSwag(value:BitmapData):BitmapData
+	function set_sourceSwag(value:Null<BitmapData>):Null<BitmapData>
 	{
 		this.setBitmapData("sourceSwag", value);
 		return sourceSwag = value;
 	}
 
-	public var backgroundSwag(default, set):BitmapData;
+	public var backgroundSwag(default, set):Null<BitmapData> = null;
 
 	function set_backgroundSwag(value:BitmapData):BitmapData
 	{

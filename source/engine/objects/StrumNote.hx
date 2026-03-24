@@ -7,10 +7,11 @@ import shaders.RGBPalette.RGBShaderReference;
 
 using backend.CoolUtil;
 
+@:nullSafety
 class StrumNote extends FlxSkewedSprite
 {
-	public var colorSwap:ColorSwap = null;
-	public var rgbShader:RGBShaderReference;
+	public var colorSwap:Null<ColorSwap> = null;
+	public var rgbShader:Null<RGBShaderReference> = null;
 	public var resetAnim:Float = 0;
 
 	private var noteData:Int = 0;
@@ -19,11 +20,11 @@ class StrumNote extends FlxSkewedSprite
 	public var downScroll:Bool = false; // plan on doing scroll directions soon -bb
 	public var sustainReduce:Bool = true;
 
-	private var player:Int;
+	private var player:Int = 0;
 
-	public var texture(default, set):String = null;
+	public var texture(default, set):Null<String> = null;
 
-	private function set_texture(value:String):String
+	private function set_texture(value:Null<String>):Null<String>
 	{
 		if (texture != value)
 		{
@@ -102,16 +103,20 @@ class StrumNote extends FlxSkewedSprite
 
 	public function reloadNote()
 	{
-		var lastAnim:String = null;
+		var lastAnim:Null<String> = null;
 		if (animation.curAnim != null)
 			lastAnim = animation.curAnim.name;
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
-			loadGraphic(Paths.image('pixelUI/' + texture));
+			var pixelImg = Paths.image('pixelUI/' + (texture != null ? texture : ''));
+			if (pixelImg != null)
+				loadGraphic(pixelImg);
 			width = width / 4;
 			height = height / 5;
-			loadGraphic(Paths.image('pixelUI/' + texture), true, Math.floor(width), Math.floor(height));
+			pixelImg = Paths.image('pixelUI/' + (texture != null ? texture : ''));
+			if (pixelImg != null)
+				loadGraphic(pixelImg, true, Math.floor(width), Math.floor(height));
 
 			antialiasing = false;
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
@@ -142,7 +147,9 @@ class StrumNote extends FlxSkewedSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas(texture);
+			var sparrowFrames = Paths.getSparrowAtlas(texture != null ? texture : '');
+			if (sparrowFrames != null)
+				frames = sparrowFrames;
 			animation.addByPrefix('green', 'arrowUP');
 			animation.addByPrefix('blue', 'arrowDOWN');
 			animation.addByPrefix('purple', 'arrowLEFT');
@@ -214,17 +221,23 @@ class StrumNote extends FlxSkewedSprite
 		{
 			if (animation.curAnim == null || animation.curAnim.name == 'static')
 			{
-				colorSwap.hue = 0;
-				colorSwap.saturation = 0;
-				colorSwap.brightness = 0;
+				if (colorSwap != null)
+				{
+					colorSwap.hue = 0;
+					colorSwap.saturation = 0;
+					colorSwap.brightness = 0;
+				}
 			}
 			else
 			{
 				if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
 				{
-					colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
-					colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
-					colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+					if (colorSwap != null)
+					{
+						colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+						colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+						colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+					}
 				}
 
 				if (animation.curAnim != null)
@@ -234,7 +247,7 @@ class StrumNote extends FlxSkewedSprite
 				}
 			}
 		}
-		else if (useRGBShader)
+		else if (useRGBShader && rgbShader != null)
 			rgbShader.enabled = (animation.curAnim != null && animation.curAnim.name != 'static');
 	}
 

@@ -1,5 +1,6 @@
 package shaders;
 
+@:nullSafety
 class PixelSplashShaderRef
 {
 	public var shader:PixelSplashShader = new PixelSplashShader();

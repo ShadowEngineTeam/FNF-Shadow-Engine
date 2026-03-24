@@ -11,6 +11,7 @@ using flixel.util.FlxArrayUtil;
  * Crash Handler.
  * @author MAJigsaw77 and Homura Akemi (HomuHomu833)
  */
+@:nullSafety
 class CrashHandler
 {
 	public static function init():Void

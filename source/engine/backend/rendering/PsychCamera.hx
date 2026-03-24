@@ -2,6 +2,7 @@ package backend.rendering;
 
 // PsychCamera handles followLerp based on elapsed
 // and stops camera from snapping at higher framerates
+@:nullSafety
 class PsychCamera extends ShadowCamera
 {
 	override public function update(elapsed:Float):Void
@@ -16,7 +17,10 @@ class PsychCamera extends ShadowCamera
 		updateFlash(elapsed);
 		updateFade(elapsed);
 
-		flashSprite.filters = filtersEnabled ? filters : null;
+		if (filtersEnabled && filters != null)
+			flashSprite.filters = filters;
+		else
+			flashSprite.filters = [];
 
 		updateFlashSpritePosition();
 		updateShake(elapsed);
@@ -100,7 +104,7 @@ class PsychCamera extends ShadowCamera
 			}
 		}
 
-		var mult:Float = 1 - Math.exp(-elapsed * followLerp);
+		var mult:Float = 1 - Math.exp(-(elapsed ?? 0) * followLerp);
 		scroll.x += (_scrollTarget.x - scroll.x) * mult;
 		scroll.y += (_scrollTarget.y - scroll.y) * mult;
 		// trace('lerp on this frame: $mult');

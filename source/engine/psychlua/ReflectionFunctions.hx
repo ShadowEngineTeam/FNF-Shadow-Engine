@@ -6,6 +6,7 @@ import substates.GameOverSubstate;
 
 // Functions that use a high amount of Reflections, which are somewhat CPU intensive
 // These functions are held together by duct tape
+@:nullSafety
 class ReflectionFunctions
 {
 	static final instanceStr:Dynamic = "##PSYCHLUA_STRINGTOOBJ";
@@ -191,7 +192,7 @@ class ReflectionFunctions
 				return;
 			}
 
-			if (index < 0)
+			if (index == null || index < 0)
 			{
 				switch (Type.typeof(groupOrArray))
 				{
@@ -220,11 +221,11 @@ class ReflectionFunctions
 
 		funk.set("callMethod", function(funcToRun:String, ?args:Array<Dynamic> = null)
 		{
-			return callMethodFromObject(FunkinLua.getCurrentMusicState(), funcToRun, parseInstances(args));
+			return callMethodFromObject(FunkinLua.getCurrentMusicState(), funcToRun, parseInstances(args ?? []));
 		});
 		funk.set("callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic> = null)
 		{
-			return callMethodFromObject(Type.resolveClass(className), funcToRun, parseInstances(args));
+			return callMethodFromObject(Type.resolveClass(className), funcToRun, parseInstances(args ?? []));
 		});
 
 		funk.set("createInstance", function(variableToSave:String, className:String, ?args:Array<Dynamic> = null)
@@ -259,7 +260,8 @@ class ReflectionFunctions
 			if (FunkinLua.getCurrentMusicState().variables.exists(objectName))
 			{
 				var obj:Dynamic = FunkinLua.getCurrentMusicState().variables.get(objectName);
-				if (FunkinLua.getCurrentMusicState() is PlayState && !inFront)
+				var inFrontVal:Bool = inFront ?? false;
+				if (FunkinLua.getCurrentMusicState() is PlayState && !inFrontVal)
 				{
 					if (!PlayState.instance.isDead)
 						PlayState.instance.insert(PlayState.instance.members.indexOf(LuaUtils.getLowestCharacterGroup()), obj);
@@ -267,7 +269,10 @@ class ReflectionFunctions
 						GameOverSubstate.instance.insert(GameOverSubstate.instance.members.indexOf(GameOverSubstate.instance.boyfriend), obj);
 				}
 				else
-					LuaUtils.getTargetInstance().add(obj);
+				{
+					var target = LuaUtils.getTargetInstance();
+					if (target != null) target.add(obj);
+				}
 			}
 			else
 				FunkinLua.luaTrace('addInstance: Can\'t add what doesn\'t exist~ ($objectName)', false, false, FlxColor.RED);
@@ -315,7 +320,6 @@ class ReflectionFunctions
 			args = [];
 
 		var split:Array<String> = funcStr.split('.');
-		var funcToRun:Function = null;
 		var obj:Dynamic = classObj;
 		// trace('start: ' + obj);
 		if (obj == null)
@@ -329,7 +333,7 @@ class ReflectionFunctions
 			// trace(obj, split[i]);
 		}
 
-		funcToRun = cast obj;
+		var funcToRun:Null<Function> = cast obj;
 		// trace('end: $obj');
 		return funcToRun != null ? Reflect.callMethod(obj, funcToRun, args) : null;
 	}

@@ -1,9 +1,12 @@
 package objects;
 
+import flixel.graphics.frames.FlxAtlasFrames;
+
+@:nullSafety
 class CheckboxThingie extends FlxSprite
 {
-	public var sprTracker:FlxSprite;
-	public var daValue(default, set):Bool;
+	public var sprTracker:Null<FlxSprite> = null;
+	public var daValue(default, set):Bool = false;
 	public var copyAlpha:Bool = true;
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
@@ -12,11 +15,12 @@ class CheckboxThingie extends FlxSprite
 	{
 		super(x, y);
 
-		// why would we need velocity for this??
 		moves = false;
 		immovable = true;
 
-		frames = Paths.getSparrowAtlas('checkboxanim');
+		var atlas:Null<FlxAtlasFrames> = Paths.getSparrowAtlas('checkboxanim');
+		if (atlas != null)
+			frames = atlas;
 		animation.addByPrefix("unchecked", "checkbox0", 24, false);
 		animation.addByPrefix("unchecking", "checkbox anim reverse", 24, false);
 		animation.addByPrefix("checking", "checkbox anim0", 24, false);
@@ -26,19 +30,21 @@ class CheckboxThingie extends FlxSprite
 		setGraphicSize(Std.int(0.9 * width));
 		updateHitbox();
 
-		animationFinished(checked ? 'checking' : 'unchecking');
+		var c:Bool = checked != null ? checked : false;
+		animationFinished(c ? 'checking' : 'unchecking');
 		animation.onFinish.add(animationFinished);
-		daValue = checked;
+		daValue = c;
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (sprTracker != null)
+		var tracker = sprTracker;
+		if (tracker != null)
 		{
-			setPosition(sprTracker.x - 130 + offsetX, sprTracker.y + 30 + offsetY);
+			setPosition(tracker.x - 130 + offsetX, tracker.y + 30 + offsetY);
 			if (copyAlpha)
 			{
-				alpha = sprTracker.alpha;
+				alpha = tracker.alpha;
 			}
 		}
 		super.update(elapsed);

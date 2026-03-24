@@ -47,6 +47,7 @@ enum CharacterSpriteType
 	TEXTURE_ATLAS;
 }
 
+@:nullSafety
 class Character extends FlxAnimate
 {
 	/**
@@ -97,12 +98,10 @@ class Character extends FlxAnimate
 		super(x, y);
 
 		animOffsets = new Map<String, Array<Dynamic>>();
-		curCharacter = character;
-		this.isPlayer = isPlayer;
+		curCharacter = character != null ? character : DEFAULT_CHARACTER;
+		this.isPlayer = isPlayer != null ? isPlayer : false;
 		switch (curCharacter)
 		{
-			// case 'your character name in case you want to hardcode them instead':
-
 			default:
 				var characterPath:String = 'characters/$curCharacter.json';
 
@@ -110,14 +109,19 @@ class Character extends FlxAnimate
 				if (!FileSystem.exists(path))
 				{
 					path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER +
-						'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
+						'.json');
 					color = FlxColor.BLACK;
 					alpha = 0.6;
 				}
 
 				try
 				{
-					loadCharacterFile(Json.parse(File.getContent(path), path));
+					var jsonStr:Null<String> = File.getContent(path);
+					if (jsonStr != null)
+					{
+						var jsonContent:Dynamic = Json.parse(jsonStr, path);
+						loadCharacterFile(jsonContent);
+					}
 				}
 				catch (e:Dynamic)
 				{
@@ -152,8 +156,11 @@ class Character extends FlxAnimate
 			spriteType = MULTI_ATLAS;
 			isAnimateAtlas = false;
 			isMultiAtlas = true;
-			frames = Paths.getAtlas(json.image[0]);
-			final split:Array<String> = json.image;
+			var imgArray:Array<String> = json.image;
+			var atlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getAtlas(imgArray[0]);
+			if (atlas != null)
+				frames = atlas;
+			final split:Array<String> = imgArray;
 			if (frames != null)
 				for (imgFile in split)
 				{
@@ -161,24 +168,29 @@ class Character extends FlxAnimate
 					if (daAtlas != null)
 						cast(frames, flixel.graphics.frames.FlxAtlasFrames).addAtlas(daAtlas);
 				}
-			imageFile = json.image[0];
+			imageFile = imgArray[0];
 		}
 		else
 		{
-			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
+			var imgPath:String = json.image;
+			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(imgPath, 'png')}', IMAGE))
 			{
 				spriteType = TEXTURE_ATLAS;
 				isAnimateAtlas = true;
 				isMultiAtlas = false;
-				frames = Paths.getTextureAtlas(json.image);
+				var texAtlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getTextureAtlas(imgPath);
+				if (texAtlas != null)
+					frames = texAtlas;
 			}
 			else
 			{
 				spriteType = SPRITE;
 				isMultiAtlas = isAnimateAtlas = false;
-				frames = Paths.getAtlas(json.image);
+				var sprAtlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getAtlas(imgPath);
+				if (sprAtlas != null)
+					frames = sprAtlas;
 			}
-			imageFile = json.image;
+			imageFile = imgPath;
 		}
 
 		jsonScale = json.scale;
@@ -220,7 +232,8 @@ class Character extends FlxAnimate
 				switch (spriteType)
 				{
 					case TEXTURE_ATLAS:
-						if (anim.isFrameLabel)
+						var isFrameLabel:Bool = anim.isFrameLabel != null ? anim.isFrameLabel : false;
+						if (isFrameLabel)
 						{
 							if (animIndices != null && animIndices.length > 0)
 								this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop);
@@ -381,10 +394,10 @@ class Character extends FlxAnimate
 
 		if (animOffsets.exists(AnimName))
 		{
-			var daOffset = animOffsets.get(AnimName);
-			offset.set(daOffset[0], daOffset[1]);
+			var daOffset:Null<Array<Dynamic>> = animOffsets.get(AnimName);
+			if (daOffset != null)
+				offset.set(daOffset[0], daOffset[1]);
 		}
-		// else offset.set(0, 0);
 
 		if (curCharacter.startsWith('gf-') || curCharacter == 'gf')
 		{

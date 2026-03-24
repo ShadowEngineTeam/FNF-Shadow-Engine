@@ -8,6 +8,7 @@ import states.FreeplayState;
 /**
  * Music player used for Freeplay
  */
+@:nullSafety(Off)
 @:access(states.FreeplayState)
 class MusicPlayer extends FlxGroup
 {
@@ -17,7 +18,7 @@ class MusicPlayer extends FlxGroup
 	public var paused(get, never):Bool;
 
 	public var playingMusic:Bool = false;
-	public var curTime:Float;
+	public var curTime:Float = 0;
 
 	var songBG:FlxSprite;
 	var songTxt:FlxText;

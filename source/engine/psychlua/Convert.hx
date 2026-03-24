@@ -11,6 +11,7 @@ import hxluajit.Types;
  * 
  * We didn't use hxluajit-wrapper because we wanted to have our functions and methods as similar as possible to linc_luajit
  */
+@:nullSafety
 class Convert
 {
 	public static function addCallback(l:State, name:String, func:Dynamic)

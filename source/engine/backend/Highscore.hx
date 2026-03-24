@@ -1,5 +1,6 @@
 package backend;
 
+@:nullSafety
 class Highscore
 {
 	public static var weekScores:Map<String, Int> = new Map();
@@ -19,7 +20,7 @@ class Highscore
 		setWeekScore(daWeek, 0);
 	}
 
-	public static function saveScore(song:String, score:Int = 0, ?diff:Int = 0, ?rating:Float = -1):Void
+	public static function saveScore(song:String, score:Int = 0, diff:Int = 0, rating:Float = -1):Void
 	{
 		if (song == null)
 			return;
@@ -27,7 +28,8 @@ class Highscore
 
 		if (songScores.exists(daSong))
 		{
-			if (songScores.get(daSong) < score)
+			var existingScore = songScores.get(daSong);
+			if (existingScore != null && existingScore < score)
 			{
 				setScore(daSong, score);
 				if (rating >= 0)
@@ -42,13 +44,14 @@ class Highscore
 		}
 	}
 
-	public static function saveWeekScore(week:String, score:Int = 0, ?diff:Int = 0):Void
+	public static function saveWeekScore(week:String, score:Int = 0, diff:Int = 0):Void
 	{
 		var daWeek:String = formatSong(week, diff);
 
 		if (weekScores.exists(daWeek))
 		{
-			if (weekScores.get(daWeek) < score)
+			var existingScore = weekScores.get(daWeek);
+			if (existingScore != null && existingScore < score)
 				setWeekScore(daWeek, score);
 		}
 		else
@@ -93,7 +96,8 @@ class Highscore
 		if (!songScores.exists(daSong))
 			setScore(daSong, 0);
 
-		return songScores.get(daSong);
+		var result = songScores.get(daSong);
+		return result != null ? result : 0;
 	}
 
 	public static function getRating(song:String, diff:Int):Float
@@ -102,7 +106,8 @@ class Highscore
 		if (!songRating.exists(daSong))
 			setRating(daSong, 0);
 
-		return songRating.get(daSong);
+		var result = songRating.get(daSong);
+		return result != null ? result : 0;
 	}
 
 	public static function getWeekScore(week:String, diff:Int):Int
@@ -111,7 +116,8 @@ class Highscore
 		if (!weekScores.exists(daWeek))
 			setWeekScore(daWeek, 0);
 
-		return weekScores.get(daWeek);
+		var result = weekScores.get(daWeek);
+		return result != null ? result : 0;
 	}
 
 	public static function load():Void

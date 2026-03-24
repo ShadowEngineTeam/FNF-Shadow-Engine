@@ -6,6 +6,7 @@ import openfl.utils.Assets;
 import sys.io.Process;
 #end
 
+@:nullSafety
 class CoolUtil
 {
 	public static function quantize(f:Float, snap:Float)
@@ -21,7 +22,7 @@ class CoolUtil
 
 	public static function coolTextFile(path:String):Array<String>
 	{
-		var daList:String = null;
+		var daList:Null<String> = null;
 		var formatted:Array<String> = path.split(':'); // prevent "shared:", "preload:" and other library names on file path
 		path = formatted[formatted.length - 1];
 		if (FileSystem.exists(path))
@@ -80,21 +81,25 @@ class CoolUtil
 				if (colorOfThisPixel != 0)
 				{
 					if (countByColor.exists(colorOfThisPixel))
-						countByColor[colorOfThisPixel] = countByColor[colorOfThisPixel] + 1;
+					{
+						var currentCount:Null<Int> = countByColor[colorOfThisPixel];
+						countByColor[colorOfThisPixel] = (currentCount == null) ? 1 : currentCount + 1;
+					}
 					else if (countByColor[colorOfThisPixel] != 13520687 - (2 * 13520687))
 						countByColor[colorOfThisPixel] = 1;
 				}
 			}
 		}
 
-		var maxCount = 0;
+		var maxCount:Int = 0;
 		var maxKey:Int = 0; // after the loop this will store the max color
 		countByColor[FlxColor.BLACK] = 0;
 		for (key in countByColor.keys())
 		{
-			if (countByColor[key] >= maxCount)
+			var count = countByColor[key];
+			if (count != null && count >= maxCount)
 			{
-				maxCount = countByColor[key];
+				maxCount = count;
 				maxKey = key;
 			}
 		}
@@ -102,10 +107,11 @@ class CoolUtil
 		return maxKey;
 	}
 
-	public static function numberArray(max:Int, ?min = 0):Array<Int>
+	public static function numberArray(max:Int, ?min:Int = 0):Array<Int>
 	{
 		var dumbArray:Array<Int> = [];
-		for (i in min...max)
+		var minVal:Int = (min == null) ? 0 : min;
+		for (i in minVal...max)
 			dumbArray.push(i);
 
 		return dumbArray;
@@ -154,22 +160,22 @@ class CoolUtil
 	@:access(flixel.util.FlxSave.validate)
 	public static function getSavePath():String
 	{
-		final company:String = FlxG.stage.application.meta.get('company');
+		final company:Null<String> = FlxG.stage.application.meta.get('company');
+		final companyVal:String = (company != null) ? company : '';
 		// #if (flixel < "5.0.0") return company; #else
-		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
+		final fileVal:Null<String> = FlxG.stage.application.meta.get('file');
+		return '$companyVal/${flixel.util.FlxSave.validate((fileVal != null) ? fileVal : '')}';
 		// #end
 	}
 
 	public static function loadSong(?name:String = null, ?difficultyNum:Int = -1)
 	{
-		if (name == null || name.length < 1)
-			name = PlayState.SONG.song;
-		if (difficultyNum == -1)
-			difficultyNum = PlayState.storyDifficulty;
+		var finalName:String = (name == null || name.length < 1) ? PlayState.SONG.song : name;
+		var finalDiff:Int = (difficultyNum == null || difficultyNum == -1) ? PlayState.storyDifficulty : difficultyNum;
 
-		var poop:String = Highscore.formatSong(name, difficultyNum);
-		PlayState.SONG = Song.loadFromJson(poop, name);
-		PlayState.storyDifficulty = difficultyNum;
+		var poop:String = Highscore.formatSong(finalName, finalDiff);
+		PlayState.SONG = Song.loadFromJson(poop, finalName);
+		PlayState.storyDifficulty = finalDiff;
 		LoadingState.prepareToSong();
 		LoadingState.loadAndSwitchState(new PlayState());
 
@@ -258,7 +264,8 @@ class CoolUtil
 			return 0.0;
 		if (x >= 1.0)
 			return 1.0;
-		return (1 + c) * x * x * x - c * x * x;
+		var cVal:Float = (c == null) ? 1.70158 : c;
+		return (1 + cVal) * x * x * x - cVal * x * x;
 	}
 
 	public static function easeOutBack(x:Float, ?c:Float = 1.70158):Float
@@ -267,7 +274,8 @@ class CoolUtil
 			return 0.0;
 		if (x >= 1.0)
 			return 1.0;
-		return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2);
+		var cVal:Float = (c == null) ? 1.70158 : c;
+		return 1 + (cVal + 1) * Math.pow(x - 1, 3) + cVal * Math.pow(x - 1, 2);
 	}
 
 	public static function priorityBool(a:Bool, ?b:Null<Bool>):Bool

@@ -12,6 +12,7 @@ typedef BPMChangeEvent =
 	@:optional var stepCrochet:Float;
 }
 
+@:nullSafety
 class Conductor
 {
 	public static var bpm(default, set):Float = 100;
@@ -25,10 +26,12 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function getCrotchetAtTime(time:Float)
+	public static function getCrotchetAtTime(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		return lastChange.stepCrochet * 4;
+		var sc = lastChange.stepCrochet;
+		if (sc == null) sc = stepCrochet;
+		return sc * 4;
 	}
 
 	public static function getBPMFromSeconds(time:Float)
@@ -69,19 +72,25 @@ class Conductor
 	{
 		var step = beat * 4;
 		var lastChange = getBPMFromStep(step);
-		return lastChange.songTime + (step - lastChange.stepTime) * (lastChange.stepCrochet / 1000);
+		var sc = lastChange.stepCrochet;
+		if (sc == null) sc = stepCrochet;
+		return lastChange.songTime + (step - lastChange.stepTime) * (sc / 1000);
 	}
 
-	public static function getStep(time:Float)
+	public static function getStep(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		return lastChange.stepTime + (time - lastChange.songTime) / lastChange.stepCrochet;
+		var sc = lastChange.stepCrochet;
+		if (sc == null) sc = stepCrochet;
+		return lastChange.stepTime + (time - lastChange.songTime) / sc;
 	}
 
-	public static function getStepRounded(time:Float)
+	public static function getStepRounded(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		return lastChange.stepTime + Math.floor(time - lastChange.songTime) / lastChange.stepCrochet;
+		var sc = lastChange.stepCrochet;
+		if (sc == null) sc = stepCrochet;
+		return lastChange.stepTime + Math.floor(time - lastChange.songTime) / sc;
 	}
 
 	public static function getBeat(time:Float)
@@ -122,7 +131,7 @@ class Conductor
 		//trace("new BPM map BUDDY " + bpmChangeMap);
 	}
 
-	static function getSectionBeats(song:SwagSong, section:Int)
+	static function getSectionBeats(song:SwagSong, section:Int):Float
 	{
 		var val:Null<Float> = null;
 		if (song.notes[section] != null)

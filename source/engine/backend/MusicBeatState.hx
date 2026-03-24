@@ -5,9 +5,10 @@ import flixel.util.FlxSave;
 import backend.rendering.PsychCamera;
 import haxe.io.Path;
 
+@:nullSafety
 class MusicBeatState extends FlxTransitionableState implements IMusicState
 {
-	public var stateInstance:FlxState = null;
+	public var stateInstance:Null<FlxState> = null;
 
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -37,27 +38,27 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
-	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	private var luaDebugCam:ShadowCamera;
-	private var currentClassName:String;
+	private var luaDebugGroup:Null<FlxTypedGroup<psychlua.DebugLuaText>> = null;
+	private var luaDebugCam:Null<ShadowCamera> = null;
+	private var currentClassName:String = '';
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public var controls(get, never):Controls;
 
-	private function get_controls()
+	private function get_controls():Controls
 	{
-		return Controls.instance;
+		return Controls.instance != null ? Controls.instance : new Controls();
 	}
 
 	#if FEATURE_MOBILE_CONTROLS
-	public var touchPad:TouchPad;
-	public var touchPadCam:ShadowCamera;
-	public var luaTouchPad:TouchPad;
-	public var luaTouchPadCam:ShadowCamera;
-	public var mobileControls:IMobileControls;
-	public var mobileControlsCam:ShadowCamera;
+	public var touchPad:Null<TouchPad> = null;
+	public var touchPadCam:Null<ShadowCamera> = null;
+	public var luaTouchPad:Null<TouchPad> = null;
+	public var luaTouchPadCam:Null<ShadowCamera> = null;
+	public var mobileControls:Null<IMobileControls> = null;
+	public var mobileControlsCam:Null<ShadowCamera> = null;
 
 	public function addTouchPad(DPad:String, Action:String)
 	{
@@ -457,8 +458,10 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	private function updateCurStep():Void
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
+		var sc = lastChange.stepCrochet;
+		if (sc == null) sc = Conductor.stepCrochet;
 
-		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
+		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
 		curDecStep = lastChange.stepTime + shit;
 		curStep = lastChange.stepTime + Math.floor(shit);
 	}
@@ -559,7 +562,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 				func(stage);
 	}
 
-	public function getBeatsOnSection()
+	public function getBeatsOnSection():Float
 	{
 		var val:Null<Float> = 4;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
@@ -593,7 +596,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	}
 	#end
 
-	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
+	public function getLuaObject(tag:String, text:Bool = true):Null<FlxSprite>
 	{
 		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
@@ -720,9 +723,10 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			if (len <= 0)
 				len = e.message.length;
 			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
-			var newScript:HScript = cast(SScript.global.get(file), HScript);
-			if (newScript != null)
+			var scriptFromGlobal = SScript.global.get(file);
+			if (scriptFromGlobal != null)
 			{
+				var newScript:HScript = cast scriptFromGlobal;
 				newScript.destroy();
 				hscriptArray.remove(newScript);
 			}
@@ -794,7 +798,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return returnVal;
 	}
 
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;

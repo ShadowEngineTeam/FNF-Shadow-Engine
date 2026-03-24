@@ -5,6 +5,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.mappings.FlxGamepadMapping;
 import flixel.input.keyboard.FlxKey;
 
+@:nullSafety
 class Controls
 {
 	// Keeping same use cases on stuff for it to be easier to understand/use
@@ -143,36 +144,57 @@ class Controls
 
 	public function justPressed(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds[key]) == true);
-		if (result)
+		var keyboardResult:Bool = false;
+		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
+		if (kbBind != null)
+			keyboardResult = FlxG.keys.anyJustPressed(kbBind) == true;
+		if (keyboardResult)
 			controllerMode = false;
 
-		return result
-			|| _myGamepadJustPressed(gamepadBinds[key]) == true
+		var gpResult:Bool = false;
+		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
+		if (gpBind != null)
+			gpResult = _myGamepadJustPressed(gpBind) == true;
+
+		return keyboardResult || gpResult
 			#if FEATURE_MOBILE_CONTROLS || mobileCJustPressed(mobileBinds[key]) == true
 			|| touchPadJustPressed(mobileBinds[key]) == true #end;
 	}
 
 	public function pressed(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds[key]) == true);
-		if (result)
+		var keyboardResult:Bool = false;
+		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
+		if (kbBind != null)
+			keyboardResult = FlxG.keys.anyPressed(kbBind) == true;
+		if (keyboardResult)
 			controllerMode = false;
 
-		return result
-			|| _myGamepadPressed(gamepadBinds[key]) == true
+		var gpResult:Bool = false;
+		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
+		if (gpBind != null)
+			gpResult = _myGamepadPressed(gpBind) == true;
+
+		return keyboardResult || gpResult
 			#if FEATURE_MOBILE_CONTROLS || mobileCPressed(mobileBinds[key]) == true
 			|| touchPadPressed(mobileBinds[key]) == true #end;
 	}
 
 	public function justReleased(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds[key]) == true);
-		if (result)
+		var keyboardResult:Bool = false;
+		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
+		if (kbBind != null)
+			keyboardResult = FlxG.keys.anyJustReleased(kbBind) == true;
+		if (keyboardResult)
 			controllerMode = false;
 
-		return result
-			|| _myGamepadJustReleased(gamepadBinds[key]) == true
+		var gpResult:Bool = false;
+		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
+		if (gpBind != null)
+			gpResult = _myGamepadJustReleased(gpBind) == true;
+
+		return keyboardResult || gpResult
 			#if FEATURE_MOBILE_CONTROLS || mobileCJustReleased(mobileBinds[key]) == true
 			|| touchPadJustReleased(mobileBinds[key]) == true #end;
 	}
@@ -316,7 +338,7 @@ class Controls
 	#end
 
 	// IGNORE THESE
-	public static var instance:Controls;
+	public static var instance:Null<Controls> = null;
 
 	public function new()
 	{

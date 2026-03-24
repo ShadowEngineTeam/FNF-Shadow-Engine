@@ -21,6 +21,7 @@ import lime.ui.WindowVSyncMode;
 import states.TitleState;
 import openfl.events.KeyboardEvent;
 
+@:nullSafety
 class Main extends Sprite
 {
 	public static final game = {
@@ -33,7 +34,7 @@ class Main extends Sprite
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	public static var fpsVar:Framerate;
+	public static var fpsVar:Null<Framerate> = null;
 
 	public static function main():Void
 	{
@@ -164,7 +165,7 @@ class Main extends Sprite
 
 	static function resetSpriteCache(sprite:Sprite):Void
 	{
-		@:privateAccess
+		@:privateAccess @:nullSafety(Off)
 		{
 			sprite.__cacheBitmap = null;
 			sprite.__cacheBitmapData = null;
@@ -173,7 +174,7 @@ class Main extends Sprite
 
 	function toggleFullScreen(event:KeyboardEvent):Void
 	{
-		if (Controls.instance.justReleased('fullscreen'))
+		if (Controls.instance != null && Controls.instance.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;
 	}
 

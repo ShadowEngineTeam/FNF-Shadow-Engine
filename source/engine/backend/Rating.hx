@@ -1,5 +1,6 @@
 package backend;
 
+@:nullSafety
 class Rating
 {
 	public var name:String = '';

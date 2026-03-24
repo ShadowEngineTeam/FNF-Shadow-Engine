@@ -7,6 +7,7 @@ typedef ModsList =
 	all:Array<String>
 };
 
+@:nullSafety
 class Mods
 {
 	static public var currentModDirectory:String = '';
@@ -144,7 +145,7 @@ class Mods
 		{
 			try
 			{
-				var rawJson:String = File.getContent(path);
+				var rawJson:Null<String> = File.getContent(path);
 				if (rawJson != null && rawJson.length > 0)
 					return Json.parse(rawJson, path);
 			}

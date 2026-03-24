@@ -5,17 +5,18 @@ import openfl.display.Sprite;
 /**
  * Designed to draw a OpenFL Sprite as a FlxSprite (To allow layering and auto sizing for haxe flixel cameras)
  */
+@:nullSafety
 class OpenFLSprite extends FlxSprite
 {
-	public var flSprite:Sprite;
+	public var flSprite:Null<Sprite> = null;
 
-	public function new(x, y, width, height, Sprite:Sprite)
+	public function new(x:Float, y:Float, width:Int, height:Int, sprite:Sprite)
 	{
 		super(x, y);
 
 		makeGraphic(width, height, FlxColor.TRANSPARENT);
 
-		flSprite = Sprite;
+		flSprite = sprite;
 
 		pixels.draw(flSprite);
 	}
@@ -26,23 +27,25 @@ class OpenFLSprite extends FlxSprite
 	{
 		if (_frameCount != 2)
 		{
-			pixels.draw(flSprite);
+			var s = flSprite;
+			if (s != null)
+				pixels.draw(s);
 			_frameCount++;
 		}
 	}
 
 	public function updateDisplay()
 	{
-		if (flSprite != null && pixels != null)
+		var s = flSprite;
+		if (s != null && pixels != null)
 		{
 			try
 			{
-				pixels.draw(flSprite);
+				pixels.draw(s);
 			}
 			catch (e:Dynamic)
 			{
 				trace('Error drawing OpenFL Sprite: $e');
-				// Optionally, set a fallback graphic or skip
 			}
 		}
 	}

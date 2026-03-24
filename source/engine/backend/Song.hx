@@ -32,24 +32,25 @@ typedef SwagSong =
 	@:optional var format:String;
 }
 
+@:nullSafety
 class Song
 {
 	public var song:String;
 	public var notes:Array<SwagSection>;
-	public var events:Array<Dynamic>;
+	public var events:Array<Dynamic> = [];
 	public var bpm:Float;
 	public var needsVoices:Bool = true;
-	public var playerArrowSkin:String;
-	public var opponentArrowSkin:String;
-	public var splashSkin:String;
-	public var gameOverChar:String;
-	public var gameOverSound:String;
-	public var gameOverLoop:String;
-	public var gameOverEnd:String;
+	public var playerArrowSkin:String = '';
+	public var opponentArrowSkin:String = '';
+	public var splashSkin:String = '';
+	public var gameOverChar:String = '';
+	public var gameOverSound:String = '';
+	public var gameOverLoop:String = '';
+	public var gameOverEnd:String = '';
 	public var disableNoteRGB(get, set):Bool;
 	public var disableNoteCustomColor:Bool = false;
 	public var speed:Float = 1;
-	public var stage:String;
+	public var stage:String = '';
 	public var player1:String = 'bf';
 	public var player2:String = 'dad';
 	public var gfVersion:String = 'gf';
@@ -116,23 +117,23 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
 	{
-		var formattedFolder:String = Paths.formatToSongPath(folder);
+		var formattedFolder:String = Paths.formatToSongPath(folder ?? '');
 		var formattedSong:String = Paths.formatToSongPath(jsonInput);
 		var path:String = "";
-		var rawJson:String = null;
+		var rawJson:Null<String> = null;
 		#if FEATURE_MODS
 		var modPath:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
 		if (FileSystem.exists(modPath))
 		{
 			path = modPath;
-			rawJson = File.getContent(modPath).trim();
+			rawJson = File.getContent(modPath)?.trim();
 		}
 		#end
 
 		if (rawJson == null)
 		{
 			path = Paths.json(formattedFolder + '/' + formattedSong);
-			rawJson = File.getContent(path).trim();
+			rawJson = File.getContent(path)?.trim();
 		}
 
 		// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
@@ -140,7 +141,7 @@ class Song
 			while (!rawJson.endsWith("}"))
 				rawJson = rawJson.substr(0, rawJson.length - 1);
 
-		var songJson:Dynamic = parseJSONshit(rawJson, path);
+		var songJson:Dynamic = parseJSONshit(rawJson ?? '', path);
 
 		if (!jsonInput.startsWith("events"))
 			StageData.loadDirectory(songJson);
@@ -151,7 +152,7 @@ class Song
 
 	public static function parseJSONshit(rawJson:String, ?file:String):SwagSong
 	{
-		final parsed:Dynamic = Json.parse(rawJson, file);
+		final parsed:Dynamic = Json.parse(rawJson, file ?? null);
 
 		if (parsed.song != null)
 		{
