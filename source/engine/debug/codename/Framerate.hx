@@ -54,7 +54,7 @@ class Framerate extends Sprite
 	{
 		super();
 		if (instance != null)
-			return;
+			throw "Cannot create another instance";
 		instance = this;
 		textFormat = new TextFormat(fontName, 12, -1);
 

@@ -189,7 +189,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
@@ -211,7 +211,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
@@ -233,7 +233,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
@@ -255,7 +255,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
@@ -805,8 +805,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return returnVal;
 	}
 
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
-			excludeValues:Array<Dynamic> = null):Dynamic
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;
 
