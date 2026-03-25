@@ -118,9 +118,9 @@ class DeprecatedFunctions
 			FunkinLua.luaTrace("scaleLuaSprite is deprecated! Use scaleObject instead", false, true);
 			if (FunkinLua.getCurrentMusicState().modchartSprites.exists(tag))
 			{
-				var shit:ModchartSprite = FunkinLua.getCurrentMusicState().modchartSprites.get(tag);
-				shit.scale.set(x, y);
-				shit.updateHitbox();
+				var sprite:ModchartSprite = FunkinLua.getCurrentMusicState().modchartSprites.get(tag);
+				sprite.scale.set(x, y);
+				sprite.updateHitbox();
 				return true;
 			}
 			return false;

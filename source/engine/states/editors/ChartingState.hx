@@ -2179,13 +2179,13 @@ class ChartingState extends MusicBeatState
 						var increase:Float = 1 / snap;
 						if (FlxG.mouse.wheel > 0)
 						{
-							var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
-							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+							var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 						}
 						else
 						{
-							var fuck:Float = CoolUtil.quantize(beat, snap) + increase;
-							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+							var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 						}
 					}
 					pauseAndSetVocalsTime();
@@ -2224,13 +2224,13 @@ class ChartingState extends MusicBeatState
 					var increase:Float = 1 / snap;
 					if (FlxG.keys.pressed.UP)
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) - increase; // (Math.floor((beat+snap) / snap) * snap);
-						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase; // (Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 					}
 					else
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
-						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 					}
 				}
 			}
@@ -2283,7 +2283,7 @@ class ChartingState extends MusicBeatState
 					}
 				}
 
-				var feces:Float;
+				var targetTime:Float;
 				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
 				{
 					FlxG.sound.music.pause();
@@ -2298,15 +2298,15 @@ class ChartingState extends MusicBeatState
 					var increase:Float = 1 / snap;
 					if (FlxG.keys.pressed.UP)
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
-						feces = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase;
+						targetTime = Conductor.beatToSeconds(quantizedBeat);
 					}
 					else
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
-						feces = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
+						targetTime = Conductor.beatToSeconds(quantizedBeat);
 					}
-					FlxTween.tween(FlxG.sound.music, {time: feces}, 0.1, {ease: FlxEase.circOut});
+					FlxTween.tween(FlxG.sound.music, {time: targetTime}, 0.1, {ease: FlxEase.circOut});
 					pauseAndSetVocalsTime();
 
 					var dastrum = 0;
@@ -2317,7 +2317,7 @@ class ChartingState extends MusicBeatState
 					}
 
 					var secStart:Float = sectionStartTime();
-					var datime:Float = (feces - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
+					var datime:Float = (targetTime - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
 					if (curSelectedNote != null)
 					{
 						var controlArray:Array<Bool> = [

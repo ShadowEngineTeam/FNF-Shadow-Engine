@@ -187,14 +187,12 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 				return luaTouchPad.buttonPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
+				var buttonIds:Array<String> = button;
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyPressed(idArray);
 			}
-			else
-				return false;
 		}
 		return false;
 	}
@@ -431,10 +429,7 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 	private function updateCurStep():Void
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
-		var sc = lastChange.stepCrochet;
-		if (sc == null) sc = Conductor.stepCrochet;
-
-		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / Conductor.getStepCrochet(lastChange);
 		curDecStep = lastChange.stepTime + stepOffset;
 		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}

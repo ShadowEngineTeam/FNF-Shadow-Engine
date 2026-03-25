@@ -192,9 +192,9 @@ class TextFunctions
 		{
 			if (game.modchartTexts.exists(tag))
 			{
-				var shit:FlxText = game.modchartTexts.get(tag);
+				var textElement:FlxText = game.modchartTexts.get(tag);
 				var target = LuaUtils.getTargetInstance();
-				if (target != null) target.add(shit);
+				if (target != null) target.add(textElement);
 			}
 		});
 		funk.set("removeLuaText", function(tag:String, destroy:Bool = true)
@@ -204,13 +204,13 @@ class TextFunctions
 				return;
 			}
 
-			var pee:FlxText = game.modchartTexts.get(tag);
+			var textElement:FlxText = game.modchartTexts.get(tag);
 			var target = LuaUtils.getTargetInstance();
-			if (target != null) target.remove(pee, true);
+			if (target != null) target.remove(textElement, true);
 			if (destroy)
 			{
-				pee.kill();
-				pee.destroy();
+				textElement.kill();
+				textElement.destroy();
 				game.modchartTexts.remove(tag);
 			}
 		});

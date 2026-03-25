@@ -107,11 +107,10 @@ class CoolUtil
 		return maxKey;
 	}
 
-	public static function numberArray(max:Int, ?min:Int = 0):Array<Int>
+	public static function numberArray(max:Int, min:Int = 0):Array<Int>
 	{
 		var dumbArray:Array<Int> = [];
-		var minVal:Int = (min == null) ? 0 : min;
-		for (i in minVal...max)
+		for (i in min...max)
 			dumbArray.push(i);
 
 		return dumbArray;
@@ -258,24 +257,22 @@ class CoolUtil
 		return (result == Math.NaN) ? 1.0 : result;
 	}
 
-	public static function easeInBack(x:Float, ?c:Float = 1.70158):Float
+	public static function easeInBack(x:Float, c:Float = 1.70158):Float
 	{
 		if (x <= 0.0)
 			return 0.0;
 		if (x >= 1.0)
 			return 1.0;
-		var cVal:Float = (c == null) ? 1.70158 : c;
-		return (1 + cVal) * x * x * x - cVal * x * x;
+		return (1 + c) * x * x * x - c * x * x;
 	}
 
-	public static function easeOutBack(x:Float, ?c:Float = 1.70158):Float
+	public static function easeOutBack(x:Float, c:Float = 1.70158):Float
 	{
 		if (x <= 0.0)
 			return 0.0;
 		if (x >= 1.0)
 			return 1.0;
-		var cVal:Float = (c == null) ? 1.70158 : c;
-		return 1 + (cVal + 1) * Math.pow(x - 1, 3) + cVal * Math.pow(x - 1, 2);
+		return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2);
 	}
 
 	public static function priorityBool(a:Bool, ?b:Null<Bool>):Bool

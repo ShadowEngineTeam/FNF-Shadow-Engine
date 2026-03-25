@@ -34,7 +34,7 @@ class ResultsScreen extends MusicBeatSubstate
 	public var ranking:String;
 	public var accuracy:String;
 
-	public var fuckingCamera:ShadowCamera;
+	public var resultsCamera:ShadowCamera;
 
 	override function create()
 	{
@@ -159,13 +159,13 @@ class ResultsScreen extends MusicBeatSubstate
 				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
 			}
 		});
-		fuckingCamera = new ShadowCamera();
-		fuckingCamera.bgColor.alpha = 0;
-		FlxG.cameras.add(fuckingCamera, false);
-		cameras = [fuckingCamera];
+		resultsCamera = new ShadowCamera();
+		resultsCamera.bgColor.alpha = 0;
+		FlxG.cameras.add(resultsCamera, false);
+		cameras = [resultsCamera];
 		forEachAlive(function(obj:FlxBasic)
 		{
-			obj.cameras = [fuckingCamera];
+			obj.cameras = [resultsCamera];
 		});
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");

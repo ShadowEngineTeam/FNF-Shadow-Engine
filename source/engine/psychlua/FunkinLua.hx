@@ -485,10 +485,10 @@ class FunkinLua
 
 				if (FileSystem.exists(path))
 				{
-					var shit:DialogueFile = DialogueBoxPsych.parseDialogue(path);
-					if (shit.dialogue.length > 0)
+					var dialogueData:DialogueFile = DialogueBoxPsych.parseDialogue(path);
+					if (dialogueData.dialogue.length > 0)
 					{
-						cast(game, PlayState).startDialogue(shit, music);
+						cast(game, PlayState).startDialogue(dialogueData, music);
 						luaTrace('startDialogue: Successfully loaded dialogue', false, false, FlxColor.GREEN);
 						return true;
 					}
@@ -1362,25 +1362,25 @@ class FunkinLua
 		{
 			if (game.getLuaObject(obj) != null)
 			{
-				var shit:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
-				shit.setGraphicSize(x, y);
+				var sprite:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
+				sprite.setGraphicSize(x, y);
 				if (updateHitbox)
-					shit.updateHitbox();
+					sprite.updateHitbox();
 				return;
 			}
 
 			var split:Array<String> = obj.split('.');
-			var poop:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
+			var targetSprite:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
 			if (split.length > 1)
 			{
-				poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+				targetSprite = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 			}
 
-			if (poop != null)
+			if (targetSprite != null)
 			{
-				poop.setGraphicSize(x, y);
+				targetSprite.setGraphicSize(x, y);
 				if (updateHitbox)
-					poop.updateHitbox();
+					targetSprite.updateHitbox();
 				return;
 			}
 			luaTrace('setGraphicSize: Couldnt find object: ' + obj, false, false, FlxColor.RED);
@@ -1389,25 +1389,25 @@ class FunkinLua
 		{
 			if (game.getLuaObject(obj) != null)
 			{
-				var shit:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
-				shit.scale.set(x, y);
+				var sprite:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
+				sprite.scale.set(x, y);
 				if (updateHitbox)
-					shit.updateHitbox();
+					sprite.updateHitbox();
 				return;
 			}
 
 			var split:Array<String> = obj.split('.');
-			var poop:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
+			var targetSprite:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
 			if (split.length > 1)
 			{
-				poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+				targetSprite = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 			}
 
-			if (poop != null)
+			if (targetSprite != null)
 			{
-				poop.scale.set(x, y);
+				targetSprite.scale.set(x, y);
 				if (updateHitbox)
-					poop.updateHitbox();
+					targetSprite.updateHitbox();
 				return;
 			}
 			luaTrace('scaleObject: Couldnt find object: ' + obj, false, false, FlxColor.RED);
@@ -1416,15 +1416,15 @@ class FunkinLua
 		{
 			if (game.getLuaObject(obj) != null)
 			{
-				var shit:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
-				shit.updateHitbox();
+				var sprite:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
+				sprite.updateHitbox();
 				return;
 			}
 
-			var poop:FlxSprite = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
-			if (poop != null)
+			var targetSprite:FlxSprite = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+			if (targetSprite != null)
 			{
-				poop.updateHitbox();
+				targetSprite.updateHitbox();
 				return;
 			}
 			luaTrace('updateHitbox: Couldnt find object: ' + obj, false, false, FlxColor.RED);

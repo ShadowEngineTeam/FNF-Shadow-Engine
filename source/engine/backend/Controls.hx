@@ -142,88 +142,67 @@ class Controls
 	public var mobileBinds:Map<String, Array<MobileInputID>>;
 	#end
 
-	public function justPressed(key:String)
+	public function justPressed(key:String):Bool
 	{
-		var keyboardResult:Bool = false;
-		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
-		if (kbBind != null)
-			keyboardResult = FlxG.keys.anyJustPressed(kbBind) == true;
-		if (keyboardResult)
+		var kbBind = keyboardBinds[key];
+		if (kbBind != null && FlxG.keys.anyJustPressed(kbBind))
+		{
 			controllerMode = false;
+			return true;
+		}
 
-		var gpResult:Bool = false;
-		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
-		if (gpBind != null)
-			gpResult = _myGamepadJustPressed(gpBind) == true;
+		var gpBind = gamepadBinds[key];
+		if (gpBind != null && _myGamepadJustPressed(gpBind))
+			return true;
 
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
-		var mobileResult = false;
-		if (mobileBind != null)
-		{
-			var keys = mobileBind;
-			mobileResult = mobileCJustPressed(keys) == true || touchPadJustPressed(keys) == true;
-		}
-		#else
-		var mobileResult = false;
+		var mbBind = mobileBinds[key];
+		if (mbBind != null && (mobileCJustPressed(mbBind) || touchPadJustPressed(mbBind)))
+			return true;
 		#end
-		return keyboardResult || gpResult || mobileResult;
+		return false;
 	}
 
-	public function pressed(key:String)
+	public function pressed(key:String):Bool
 	{
-		var keyboardResult:Bool = false;
-		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
-		if (kbBind != null)
-			keyboardResult = FlxG.keys.anyPressed(kbBind) == true;
-		if (keyboardResult)
+		var kbBind = keyboardBinds[key];
+		if (kbBind != null && FlxG.keys.anyPressed(kbBind))
+		{
 			controllerMode = false;
+			return true;
+		}
 
-		var gpResult:Bool = false;
-		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
-		if (gpBind != null)
-			gpResult = _myGamepadPressed(gpBind) == true;
+		var gpBind = gamepadBinds[key];
+		if (gpBind != null && _myGamepadPressed(gpBind))
+			return true;
 
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
-		var mobileResult = false;
-		if (mobileBind != null)
-		{
-			var keys = mobileBind;
-			mobileResult = mobileCPressed(keys) == true || touchPadPressed(keys) == true;
-		}
-		#else
-		var mobileResult = false;
+		var mbBind = mobileBinds[key];
+		if (mbBind != null && (mobileCPressed(mbBind) || touchPadPressed(mbBind)))
+			return true;
 		#end
-		return keyboardResult || gpResult || mobileResult;
+		return false;
 	}
 
-	public function justReleased(key:String)
+	public function justReleased(key:String):Bool
 	{
-		var keyboardResult:Bool = false;
-		var kbBind:Null<Array<FlxKey>> = keyboardBinds[key];
-		if (kbBind != null)
-			keyboardResult = FlxG.keys.anyJustReleased(kbBind) == true;
-		if (keyboardResult)
+		var kbBind = keyboardBinds[key];
+		if (kbBind != null && FlxG.keys.anyJustReleased(kbBind))
+		{
 			controllerMode = false;
+			return true;
+		}
 
-		var gpResult:Bool = false;
-		var gpBind:Null<Array<FlxGamepadInputID>> = gamepadBinds[key];
-		if (gpBind != null)
-			gpResult = _myGamepadJustReleased(gpBind) == true;
+		var gpBind = gamepadBinds[key];
+		if (gpBind != null && _myGamepadJustReleased(gpBind))
+			return true;
 
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
-		var mobileResult = false;
-		if (mobileBind != null)
-		{
-			var keys = mobileBind;
-			mobileResult = mobileCJustReleased(keys) == true || touchPadJustReleased(keys) == true;
-		}
-		#else
-		var mobileResult = false;
+		var mbBind = mobileBinds[key];
+		if (mbBind != null && (mobileCJustReleased(mbBind) || touchPadJustReleased(mbBind)))
+			return true;
 		#end
-		return keyboardResult || gpResult || mobileResult;
+		return false;
 	}
 
 	public var controllerMode:Bool = false;

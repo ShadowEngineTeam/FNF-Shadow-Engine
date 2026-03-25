@@ -26,15 +26,16 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
+	inline static function getStepCrochet(event:BPMChangeEvent):Float
+		return event.stepCrochet != null ? event.stepCrochet : stepCrochet;
+
 	public static function getCrotchetAtTime(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		var sc = lastChange.stepCrochet;
-		if (sc == null) sc = stepCrochet;
-		return sc * 4;
+		return getStepCrochet(lastChange) * 4;
 	}
 
-	public static function getBPMFromSeconds(time:Float)
+	public static function getBPMFromSeconds(time:Float):BPMChangeEvent
 	{
 		var lastChange:BPMChangeEvent = {
 			stepTime: 0,
@@ -51,7 +52,7 @@ class Conductor
 		return lastChange;
 	}
 
-	public static function getBPMFromStep(step:Float)
+	public static function getBPMFromStep(step:Float):BPMChangeEvent
 	{
 		var lastChange:BPMChangeEvent = {
 			stepTime: 0,
@@ -72,25 +73,19 @@ class Conductor
 	{
 		var step = beat * 4;
 		var lastChange = getBPMFromStep(step);
-		var sc = lastChange.stepCrochet;
-		if (sc == null) sc = stepCrochet;
-		return lastChange.songTime + (step - lastChange.stepTime) * (sc / 1000);
+		return lastChange.songTime + (step - lastChange.stepTime) * (getStepCrochet(lastChange) / 1000);
 	}
 
 	public static function getStep(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		var sc = lastChange.stepCrochet;
-		if (sc == null) sc = stepCrochet;
-		return lastChange.stepTime + (time - lastChange.songTime) / sc;
+		return lastChange.stepTime + (time - lastChange.songTime) / getStepCrochet(lastChange);
 	}
 
 	public static function getStepRounded(time:Float):Float
 	{
 		var lastChange = getBPMFromSeconds(time);
-		var sc = lastChange.stepCrochet;
-		if (sc == null) sc = stepCrochet;
-		return lastChange.stepTime + Math.floor(time - lastChange.songTime) / sc;
+		return lastChange.stepTime + Math.floor(time - lastChange.songTime) / getStepCrochet(lastChange);
 	}
 
 	public static function getBeat(time:Float)
