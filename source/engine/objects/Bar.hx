@@ -15,6 +15,7 @@ class Bar extends FlxSpriteGroup
 	public var leftToRight(default, set):Bool = true;
 	public var barCenter(default, null):Float = 0;
 
+	// you might need to change this if you want to use a custom bar
 	public var barWidth(default, set):Int = 1;
 	public var barHeight(default, set):Int = 1;
 	public var barOffset:FlxPoint = FlxPoint.get(3, 3);

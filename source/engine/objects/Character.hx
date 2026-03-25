@@ -109,7 +109,7 @@ class Character extends FlxAnimate
 				if (!FileSystem.exists(path))
 				{
 					path = Paths.getSharedPath('characters/' + DEFAULT_CHARACTER +
-						'.json');
+						'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 					color = FlxColor.BLACK;
 					alpha = 0.6;
 				}

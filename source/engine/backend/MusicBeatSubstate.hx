@@ -187,9 +187,9 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 				return luaTouchPad.buttonPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyPressed(idArray);
 			}
@@ -207,9 +207,9 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 				return luaTouchPad.buttonJustPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustPressed(idArray);
 			}
@@ -229,9 +229,9 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustReleased(idArray);
 			}
@@ -251,9 +251,9 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyReleased(idArray);
 			}
@@ -434,9 +434,9 @@ public function luaTouchPadPressed(button:Dynamic):Bool
 		var sc = lastChange.stepCrochet;
 		if (sc == null) sc = Conductor.stepCrochet;
 
-		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
-		curDecStep = lastChange.stepTime + shit;
-		curStep = lastChange.stepTime + Math.floor(shit);
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
+		curDecStep = lastChange.stepTime + stepOffset;
+		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}
 
 	public function stepHit():Void

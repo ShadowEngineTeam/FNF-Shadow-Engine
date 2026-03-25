@@ -189,9 +189,9 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyPressed(idArray);
 			}
@@ -211,9 +211,9 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustPressed(idArray);
 			}
@@ -233,9 +233,9 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustReleased(idArray);
 			}
@@ -255,9 +255,9 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			}
 			else if (Std.isOfType(button, Array))
 			{
-				var fuck:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dynamic Value Please Specify Iterator or Iterable" so this is the workaround
 				var idArray:Array<MobileInputID> = [];
-				for (strId in fuck)
+				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyReleased(idArray);
 			}
@@ -471,9 +471,9 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		var sc = lastChange.stepCrochet;
 		if (sc == null) sc = Conductor.stepCrochet;
 
-		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
-		curDecStep = lastChange.stepTime + shit;
-		curStep = lastChange.stepTime + Math.floor(shit);
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / sc;
+		curDecStep = lastChange.stepTime + stepOffset;
+		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}
 
 	public static function switchState(nextState:FlxState = null)

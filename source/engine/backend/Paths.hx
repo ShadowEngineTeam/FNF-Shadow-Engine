@@ -309,8 +309,6 @@ class Paths
 				return retVal;
 		}
 
-		trace('Failed to load image: $file');
-		
 		if (currentTrackedAssets.exists('__flixel_logo'))
 		{
 			localTrackedAssets.push('__flixel_logo');
@@ -320,8 +318,6 @@ class Paths
 
 		var fallback = cacheBitmap('__flixel_logo', FlxAssets.getBitmapFromClass(GraphicLogo));
 		if (fallback != null) return fallback;
-		
-		trace("Failed to load fallback image");
 		return null;
 	}
 
@@ -444,7 +440,6 @@ class Paths
 		localTrackedAssets.push(gottenPath);
 		var result = currentTrackedSounds.get(gottenPath);
 		if (result != null) return result;
-		trace("Failed to load sound: " + gottenPath);
 		return null;
 	}
 
@@ -452,10 +447,7 @@ class Paths
 	{
 		var imageLoaded = image(key, library);
 		if (imageLoaded == null)
-		{
-			trace("Failed to load image for atlas: " + key);
 			return null;
-		}
 
 		var xmlPath:String = getPath('images/$key.xml', TEXT, library, true);
 		#if FEATURE_MODS
@@ -496,10 +488,7 @@ class Paths
 	{
 		var imageLoaded = image(key, library);
 		if (imageLoaded == null)
-		{
-			trace("Failed to load image for sparrow atlas: " + key);
 			return null;
-		}
 
 		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
@@ -513,7 +502,6 @@ class Paths
 		var xmlPath:String = getPath('images/$key.xml', library);
 		var content = File.getContent(xmlPath);
 		if (content != null) return FlxAtlasFrames.fromSparrow(imageLoaded, content);
-		trace("Failed to load sparrow atlas: " + key);
 		return null;
 	}
 
@@ -521,10 +509,7 @@ class Paths
 	{
 		var imageLoaded = image(key, library);
 		if (imageLoaded == null)
-		{
-			trace("Failed to load image for packer atlas: " + key);
 			return null;
-		}
 
 		#if FEATURE_MODS
 		var modTxt:String = modsTxt(key);
@@ -538,7 +523,6 @@ class Paths
 		var txtPath:String = getPath('images/$key.txt', library);
 		var content = File.getContent(txtPath);
 		if (content != null) return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, content);
-		trace("Failed to load packer atlas: " + key);
 		return null;
 	}
 
@@ -546,10 +530,7 @@ class Paths
 	{
 		var imageLoaded = image(key, library);
 		if (imageLoaded == null)
-		{
-			trace("Failed to load image for aseprite atlas: " + key);
 			return null;
-		}
 
 		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
@@ -563,7 +544,6 @@ class Paths
 		var jsonPath:String = getPath('images/$key.json', library);
 		var content = File.getContent(jsonPath);
 		if (content != null) return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
-		trace("Failed to load aseprite atlas: " + key);
 		return null;
 	}
 

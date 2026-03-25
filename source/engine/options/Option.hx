@@ -12,29 +12,31 @@ class Option
 	public var child:Null<Alphabet> = null;
 	public var text(get, set):String;
 	private var _text:String = '';
-	public var onChange:Null<Void->Void> = null;
+	public var onChange:Null<Void->Void> = null; // Pressed enter (on Bool type options) or pressed/held left/right (on other types)
 
-	public var type(get, default):String = 'bool';
+	public var type(get, default):String = 'bool'; // bool, int (or integer), float (or fl), percent, string (or str), keybind (or key)
 
-	public var scrollSpeed:Float = 50;
+	// Bool will use checkboxes
+	// Everything else will use a text
+	public var scrollSpeed:Float = 50; // Only works on int/float, defines how fast it scrolls per second while holding left/right
 
-	private var variable:Null<String> = null;
+	private var variable:Null<String> = null; // Variable from ClientPrefs.hx
 
 	public var defaultValue:Dynamic = null;
 
-	public var curOption:Int = 0;
-	public var options:Null<Array<String>> = null;
-	public var changeValue:Dynamic = 1;
-	public var minValue:Dynamic = null;
-	public var maxValue:Dynamic = null;
-	public var decimals:Int = 1;
+	public var curOption:Int = 0; // Don't change this
+	public var options:Null<Array<String>> = null; // Only used in string type
+	public var changeValue:Dynamic = 1; // Only used in int/float/percent type, how much is changed when you PRESS
+	public var minValue:Dynamic = null; // Only used in int/float/percent type
+	public var maxValue:Dynamic = null; // Only used in int/float/percent type
+	public var decimals:Int = 1; // Only used in float/percent type
 
-	public var displayFormat:String = '%v';
+	public var displayFormat:String = '%v'; // How String/Float/Percent/Int values are shown, %v = Current value, %d = Default value
 	public var description:String = '';
 	public var name:String = 'Unknown';
 
-	public var defaultKeys:Null<Keybind> = null;
-	public var keys:Null<Keybind> = null;
+	public var defaultKeys:Null<Keybind> = null; // Only used in keybind type
+	public var keys:Null<Keybind> = null; // Only used in keybind type
 
 	public function new(name:String, description:String = '', variable:String, type:String = 'bool', ?options:Array<String> = null)
 	{

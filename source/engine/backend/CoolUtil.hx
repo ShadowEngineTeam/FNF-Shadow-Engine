@@ -173,8 +173,8 @@ class CoolUtil
 		var finalName:String = (name == null || name.length < 1) ? PlayState.SONG.song : name;
 		var finalDiff:Int = (difficultyNum == null || difficultyNum == -1) ? PlayState.storyDifficulty : difficultyNum;
 
-		var poop:String = Highscore.formatSong(finalName, finalDiff);
-		PlayState.SONG = Song.loadFromJson(poop, finalName);
+		var formattedSongName:String = Highscore.formatSong(finalName, finalDiff);
+		PlayState.SONG = Song.loadFromJson(formattedSongName, finalName);
 		PlayState.storyDifficulty = finalDiff;
 		LoadingState.prepareToSong();
 		LoadingState.loadAndSwitchState(new PlayState());
