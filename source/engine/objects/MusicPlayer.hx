@@ -8,7 +8,7 @@ import states.FreeplayState;
 /**
  * Music player used for Freeplay
  */
-@:nullSafety(Off)
+@:nullSafety
 @:access(states.FreeplayState)
 class MusicPlayer extends FlxGroup
 {
@@ -20,15 +20,15 @@ class MusicPlayer extends FlxGroup
 	public var playingMusic:Bool = false;
 	public var curTime:Float = 0;
 
-	var songBG:FlxSprite;
-	var songTxt:FlxText;
-	var timeTxt:FlxText;
-	var progressBar:FlxBar;
-	var playbackBG:FlxSprite;
+	var songBG:Null<FlxSprite> = null;
+	var songTxt:Null<FlxText> = null;
+	var timeTxt:Null<FlxText> = null;
+	var progressBar:Null<FlxBar> = null;
+	var playbackBG:Null<FlxSprite> = null;
 	var playbackSymbols:Array<FlxText> = [];
-	var playbackTxt:FlxText;
+	var playbackTxt:Null<FlxText> = null;
 
-	var wasPlaying:Bool;
+	var wasPlaying:Bool = false;
 
 	var holdPitchTime:Float = 0;
 	var playbackRate(default, set):Float = 1;
@@ -90,9 +90,15 @@ class MusicPlayer extends FlxGroup
 		}
 
 		if (paused && !wasPlaying)
-			songTxt.text = 'PLAYING: ' + instance.songs[FreeplayState.curSelected].songName + ' (PAUSED)';
+		{
+			if (songTxt != null)
+				songTxt.text = 'PLAYING: ' + instance.songs[FreeplayState.curSelected].songName + ' (PAUSED)';
+		}
 		else
-			songTxt.text = 'PLAYING: ' + instance.songs[FreeplayState.curSelected].songName;
+		{
+			if (songTxt != null)
+				songTxt.text = 'PLAYING: ' + instance.songs[FreeplayState.curSelected].songName;
+		}
 
 		positionSong();
 
@@ -238,8 +244,13 @@ class MusicPlayer extends FlxGroup
 		FlxG.autoPause = (!playingMusic && ClientPrefs.data.autoPause);
 		active = visible = playingMusic;
 
-		instance.scoreBG.visible = instance.diffText.visible = instance.scoreText.visible = !playingMusic; // Hide Freeplay texts and boxes if playingMusic is true
-		songTxt.visible = timeTxt.visible = songBG.visible = playbackTxt.visible = playbackBG.visible = progressBar.visible = playingMusic; // Show Music Player texts and boxes if playingMusic is true
+		instance.scoreBG.visible = instance.diffText.visible = instance.scoreText.visible = !playingMusic;
+		if (songTxt != null) songTxt.visible = playingMusic;
+		if (timeTxt != null) timeTxt.visible = playingMusic;
+		if (songBG != null) songBG.visible = playingMusic;
+		if (playbackTxt != null) playbackTxt.visible = playingMusic;
+		if (playbackBG != null) playbackBG.visible = playingMusic;
+		if (progressBar != null) progressBar.visible = playingMusic;
 
 		for (i in playbackSymbols)
 			i.visible = playingMusic;
@@ -257,22 +268,29 @@ class MusicPlayer extends FlxGroup
 				instance.bottomText.text = 'Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to Pause / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(A).toUpperCase() : 'ESC'} to Exit / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset the Song';
 			positionSong();
 
-			progressBar.setRange(0, FlxG.sound.music.length);
-			progressBar.setParent(FlxG.sound.music, "time");
-			progressBar.numDivisions = 1600;
+			if (progressBar != null)
+			{
+				progressBar.setRange(0, FlxG.sound.music.length);
+				progressBar.setParent(FlxG.sound.music, "time");
+				progressBar.numDivisions = 1600;
+			}
 
 			updateTimeTxt();
 		}
 		else
 		{
-			progressBar.setRange(0, Math.POSITIVE_INFINITY);
-			progressBar.setParent(null, "");
-			progressBar.numDivisions = 0;
+			if (progressBar != null)
+			{
+				progressBar.setRange(0, Math.POSITIVE_INFINITY);
+				progressBar.setParent(null, "");
+				progressBar.numDivisions = 0;
+			}
 
 			instance.bottomText.text = instance.bottomString;
 			instance.positionHighscore();
 		}
-		progressBar.updateBar();
+		if (progressBar != null)
+			progressBar.updateBar();
 	}
 
 	function updatePlaybackTxt()
@@ -288,58 +306,78 @@ class MusicPlayer extends FlxGroup
 
 			text = playbackRate;
 		}
-		playbackTxt.text = text + 'x';
+		if (playbackTxt != null)
+			playbackTxt.text = text + 'x';
 	}
 
 	function positionSong()
 	{
 		var length:Int = instance.songs[FreeplayState.curSelected].songName.length;
 		var shortName:Bool = length < 5; // Fix for song names like Ugh, Guns
-		songTxt.x = FlxG.width - songTxt.width - 6;
-		if (shortName)
-			songTxt.x -= 10 * length - length;
-		songBG.scale.x = FlxG.width - songTxt.x + 12;
-		if (shortName)
-			songBG.scale.x += 6 * length;
-		songBG.x = FlxG.width - (songBG.scale.x / 2);
-		timeTxt.x = Std.int(songBG.x + (songBG.width / 2));
-		timeTxt.x -= timeTxt.width / 2;
-		if (shortName)
-			timeTxt.x -= length - 5;
-
-		playbackBG.scale.x = playbackTxt.width + 30;
-		playbackBG.x = songBG.x - (songBG.scale.x / 2);
-		playbackBG.x -= playbackBG.scale.x;
-
-		playbackTxt.x = playbackBG.x - playbackTxt.width / 2;
-		playbackTxt.y = playbackTxt.height;
-
-		progressBar.setGraphicSize(Std.int(songTxt.width), 5);
-		progressBar.y = songTxt.y + songTxt.height + 10;
-		progressBar.x = songTxt.x + songTxt.width / 2 - 15;
-		if (shortName)
+		if (songTxt != null)
 		{
-			progressBar.scale.x += length / 2;
-			progressBar.x -= length - 10;
+			songTxt.x = FlxG.width - songTxt.width - 6;
+			if (shortName)
+				songTxt.x -= 10 * length - length;
+		}
+		if (songBG != null)
+		{
+			songBG.scale.x = songTxt != null ? FlxG.width - songTxt.x + 12 : 0;
+			if (shortName)
+				songBG.scale.x += 6 * length;
+			songBG.x = FlxG.width - (songBG.scale.x / 2);
+		}
+		if (timeTxt != null && songBG != null)
+		{
+			timeTxt.x = Std.int(songBG.x + (songBG.width / 2));
+			timeTxt.x -= timeTxt.width / 2;
+			if (shortName)
+				timeTxt.x -= length - 5;
+		}
+		if (playbackBG != null && playbackTxt != null)
+		{
+			playbackBG.scale.x = playbackTxt.width + 30;
+			playbackBG.x = songBG != null ? songBG.x - (songBG.scale.x / 2) : 0;
+			playbackBG.x -= playbackBG.scale.x;
+		}
+		if (playbackTxt != null)
+		{
+			playbackTxt.x = playbackBG != null ? playbackBG.x - playbackTxt.width / 2 : 0;
+			playbackTxt.y = playbackTxt.height;
+		}
+		if (progressBar != null && songTxt != null)
+		{
+			progressBar.setGraphicSize(Std.int(songTxt.width), 5);
+			progressBar.y = songTxt.y + songTxt.height + 10;
+			progressBar.x = songTxt.x + songTxt.width / 2 - 15;
+			if (shortName)
+			{
+				progressBar.scale.x += length / 2;
+				progressBar.x -= length - 10;
+			}
 		}
 
 		for (i in 0...2)
 		{
 			var text = playbackSymbols[i];
-			text.x = playbackTxt.x + playbackTxt.width / 2 - 10;
-			text.y = playbackTxt.y;
+			if (text != null && playbackTxt != null)
+			{
+				text.x = playbackTxt.x + playbackTxt.width / 2 - 10;
+				text.y = playbackTxt.y;
 
-			if (i == 0)
-				text.y -= playbackTxt.height;
-			else
-				text.y += playbackTxt.height;
+				if (i == 0)
+					text.y -= playbackTxt.height;
+				else
+					text.y += playbackTxt.height;
+			}
 		}
 	}
 
 	function updateTimeTxt()
 	{
 		var text = FlxStringUtil.formatTime(FlxG.sound.music.time / 1000, false) + ' / ' + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000, false);
-		timeTxt.text = '< ' + text + ' >';
+		if (timeTxt != null)
+			timeTxt.text = '< ' + text + ' >';
 	}
 
 	function setPlaybackRate()

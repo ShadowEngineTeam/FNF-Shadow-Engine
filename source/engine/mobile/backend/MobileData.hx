@@ -10,6 +10,7 @@ import flixel.util.FlxSave;
  * ...
  * @author: Karim Akra
  */
+@:nullSafety(Off)
 class MobileData
 {
 	public static var actionModes:Map<String, TouchButtonsData> = new Map();

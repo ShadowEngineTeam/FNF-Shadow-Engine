@@ -7,6 +7,7 @@ import flixel.input.touch.FlxTouch;
  * ...
  * @author: Karim Akra
  */
+@:nullSafety(Off)
 class TouchUtil
 {
 	public static var pressed(get, never):Bool;

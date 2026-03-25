@@ -4,6 +4,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
+@:nullSafety
 class FramerateCounter extends Sprite
 {
 	public var fpsNum:TextField;

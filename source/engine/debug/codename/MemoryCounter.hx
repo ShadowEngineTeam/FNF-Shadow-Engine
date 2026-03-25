@@ -4,6 +4,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
+@:nullSafety
 class MemoryCounter extends Sprite
 {
 	public var memoryText:TextField;

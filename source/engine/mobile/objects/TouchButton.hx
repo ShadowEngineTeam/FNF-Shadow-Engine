@@ -13,6 +13,7 @@ import flixel.input.mouse.FlxMouseButton;
  * A simple button class that calls a function when clicked by the touch.
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
+@:nullSafety(Off)
 class TouchButton extends TypedTouchButton<FlxSprite>
 {
 	/**
@@ -77,6 +78,7 @@ class TouchButton extends TypedTouchButton<FlxSprite>
 #if !display
 @:generic
 #end
+@:nullSafety(Off)
 class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 {
 	/**
@@ -577,6 +579,7 @@ class TypedTouchButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 /** 
  * Helper function for `TouchButton` which handles its events.
  */
+@:nullSafety(Off)
 private class TouchButtonEvent implements IFlxDestroyable
 {
 	/**
@@ -631,6 +634,7 @@ private class TouchButtonEvent implements IFlxDestroyable
 	}
 }
 
+@:nullSafety(Off)
 class ButtonBrightnessShader extends FlxShader
 {
 	public var color(default, set):Null<FlxColor> = FlxColor.WHITE;
@@ -667,6 +671,7 @@ class ButtonBrightnessShader extends FlxShader
 	}
 }
 
+@:nullSafety(Off)
 enum StatusIndicators
 {
 	// isn't very good looking

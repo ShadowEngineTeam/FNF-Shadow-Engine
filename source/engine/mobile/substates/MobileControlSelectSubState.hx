@@ -9,6 +9,7 @@ import mobile.backend.TouchUtil;
 import flixel.input.touch.FlxTouch;
 import flixel.ui.FlxButton as UIButton;
 
+@:nullSafety(Off)
 class MobileControlSelectSubState extends MusicBeatSubstate
 {
 	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox'];

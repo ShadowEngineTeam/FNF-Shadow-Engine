@@ -7,6 +7,7 @@ import flixel.util.FlxSignal.FlxTypedSignal;
  * ...
  * @author: Karim Akra
  */
+@:nullSafety(Off)
 interface IMobileControls
 {
 	public var buttonLeft:TouchButton;

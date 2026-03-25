@@ -7,6 +7,7 @@ package mobile.objects;
  * ...
  * @author: Karim Akra
  */
+@:nullSafety(Off)
 class MobileControls extends FlxTypedSpriteGroup<MobileInputManager>
 {
 	public var touchPad:TouchPad = new TouchPad('NONE', 'NONE', NONE);

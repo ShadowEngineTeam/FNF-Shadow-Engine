@@ -156,9 +156,18 @@ class Controls
 		if (gpBind != null)
 			gpResult = _myGamepadJustPressed(gpBind) == true;
 
-		return keyboardResult || gpResult
-			#if FEATURE_MOBILE_CONTROLS || mobileCJustPressed(mobileBinds[key]) == true
-			|| touchPadJustPressed(mobileBinds[key]) == true #end;
+		#if FEATURE_MOBILE_CONTROLS
+		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
+		var mobileResult = false;
+		if (mobileBind != null)
+		{
+			var keys = mobileBind;
+			mobileResult = mobileCJustPressed(keys) == true || touchPadJustPressed(keys) == true;
+		}
+		#else
+		var mobileResult = false;
+		#end
+		return keyboardResult || gpResult || mobileResult;
 	}
 
 	public function pressed(key:String)
@@ -175,9 +184,18 @@ class Controls
 		if (gpBind != null)
 			gpResult = _myGamepadPressed(gpBind) == true;
 
-		return keyboardResult || gpResult
-			#if FEATURE_MOBILE_CONTROLS || mobileCPressed(mobileBinds[key]) == true
-			|| touchPadPressed(mobileBinds[key]) == true #end;
+		#if FEATURE_MOBILE_CONTROLS
+		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
+		var mobileResult = false;
+		if (mobileBind != null)
+		{
+			var keys = mobileBind;
+			mobileResult = mobileCPressed(keys) == true || touchPadPressed(keys) == true;
+		}
+		#else
+		var mobileResult = false;
+		#end
+		return keyboardResult || gpResult || mobileResult;
 	}
 
 	public function justReleased(key:String)
@@ -194,9 +212,18 @@ class Controls
 		if (gpBind != null)
 			gpResult = _myGamepadJustReleased(gpBind) == true;
 
-		return keyboardResult || gpResult
-			#if FEATURE_MOBILE_CONTROLS || mobileCJustReleased(mobileBinds[key]) == true
-			|| touchPadJustReleased(mobileBinds[key]) == true #end;
+		#if FEATURE_MOBILE_CONTROLS
+		var mobileBind:Null<Array<MobileInputID>> = mobileBinds[key];
+		var mobileResult = false;
+		if (mobileBind != null)
+		{
+			var keys = mobileBind;
+			mobileResult = mobileCJustReleased(keys) == true || touchPadJustReleased(keys) == true;
+		}
+		#else
+		var mobileResult = false;
+		#end
+		return keyboardResult || gpResult || mobileResult;
 	}
 
 	public var controllerMode:Bool = false;
@@ -251,8 +278,8 @@ class Controls
 
 	#if FEATURE_MOBILE_CONTROLS
 	public var isInSubstate:Bool = false; // don't worry about this it becomes true and false on it's own in MusicBeatSubstate
-	public var requestedInstance(get, default):Dynamic; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
-	public var requestedMobileC(get, default):IMobileControls; // for PlayState and EditorPlayState (hitbox and touchPad)
+	public var requestedInstance(get, default):Null<Dynamic> = null; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
+	public var requestedMobileC(get, default):Null<IMobileControls> = null; // for PlayState and EditorPlayState (hitbox and touchPad)
 	public var mobileC(get, never):Bool;
 
 	private function touchPadPressed(keys:Array<MobileInputID>):Bool

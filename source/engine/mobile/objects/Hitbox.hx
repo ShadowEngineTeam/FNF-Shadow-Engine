@@ -13,6 +13,7 @@ import openfl.geom.Matrix;
  *
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
+@:nullSafety(Off)
 class Hitbox extends MobileInputManager implements IMobileControls
 {
 	final offsetFir:Int = (ClientPrefs.data.hitboxPos ? Std.int(FlxG.height / 4) * 3 : 0);

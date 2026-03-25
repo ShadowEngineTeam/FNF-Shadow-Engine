@@ -136,7 +136,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public function makeLuaTouchPad(DPadMode:String, ActionMode:String)
 	{
-		if (members.contains(luaTouchPad))
+		if (luaTouchPad != null && members.contains(luaTouchPad))
 			return;
 
 		if (!variables.exists("luaTouchPad"))
@@ -152,6 +152,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			return;
 
 		var target = LuaUtils.getTargetInstance();
+		if (target == null)
+			return;
 		target.insert(target.members.length + 1, luaTouchPad);
 	}
 
@@ -177,18 +179,18 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		}
 	}
 
-	public function luaTouchPadPressed(button:Dynamic):Bool
+public function luaTouchPadPressed(button:Dynamic):Bool
 	{
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonPressed(MobileInputID.fromString(button));
+				return luaTouchPad.buttonPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
+				var fuck:Array<String> = button;
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in fuck)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyPressed(idArray);
 			}
 			else
@@ -202,13 +204,13 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustPressed(MobileInputID.fromString(button));
+				return luaTouchPad.buttonJustPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var fuck:Array<String> = button;
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in fuck)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustPressed(idArray);
 			}
 			else
@@ -222,13 +224,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			{
+				return luaTouchPad.buttonJustReleased(cast MobileInputID.fromString(button));
+			}
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var fuck:Array<String> = button;
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in fuck)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustReleased(idArray);
 			}
 			else
@@ -242,13 +246,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			{
+				return luaTouchPad.buttonReleased(cast MobileInputID.fromString(button));
+			}
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var fuck:Array<String> = button;
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in fuck)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyReleased(idArray);
 			}
 			else

@@ -2,6 +2,7 @@ package cutscenes;
 
 import flixel.addons.text.FlxTypeText;
 
+@:nullSafety
 class DialogueBox extends FlxSpriteGroup
 {
 	var box:FlxSprite;

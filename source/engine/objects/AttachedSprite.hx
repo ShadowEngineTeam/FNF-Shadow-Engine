@@ -3,7 +3,7 @@ package objects;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
 
-@:nullSafety(Strict)
+@:nullSafety
 class AttachedSprite extends FlxSprite
 {
 	public var sprTracker:Null<FlxSprite> = null;
