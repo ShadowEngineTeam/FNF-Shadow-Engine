@@ -130,14 +130,14 @@ class ReflectionFunctions
 				return result;
 			}
 
-			var leArray:Dynamic = realObject[index];
-			if (leArray != null)
+			var arrayItem:Dynamic = realObject[index];
+			if (arrayItem != null)
 			{
 				var result:Dynamic = null;
 				if (Type.typeof(variable) == ValueType.TInt)
-					result = leArray[variable];
+					result = arrayItem[variable];
 				else
-					result = LuaUtils.getGroupStuff(leArray, variable, allowMaps);
+					result = LuaUtils.getGroupStuff(arrayItem, variable, allowMaps);
 				return result;
 			}
 			FunkinLua.luaTrace("getPropertyFromGroup: Object #" + index + " from group: " + obj + " doesn't exist!", false, false, FlxColor.RED);
@@ -158,15 +158,15 @@ class ReflectionFunctions
 				return value;
 			}
 
-			var leArray:Dynamic = realObject[index];
-			if (leArray != null)
+			var arrayItem:Dynamic = realObject[index];
+			if (arrayItem != null)
 			{
 				if (Type.typeof(variable) == ValueType.TInt)
 				{
-					leArray[variable] = value;
+					arrayItem[variable] = value;
 					return value;
 				}
-				LuaUtils.setGroupStuff(leArray, variable, value, allowMaps);
+				LuaUtils.setGroupStuff(arrayItem, variable, value, allowMaps);
 			}
 			return value;
 		});

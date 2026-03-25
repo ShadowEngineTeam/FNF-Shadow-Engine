@@ -397,7 +397,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	{
 		for (checkbox in checkboxGroup)
 		{
-			checkbox.daValue = (optionsArray[checkbox.ID].getValue() == true);
+			checkbox.isChecked = (optionsArray[checkbox.ID].getValue() == true);
 		}
 	}
 }

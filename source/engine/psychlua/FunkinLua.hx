@@ -907,13 +907,13 @@ class FunkinLua
 			//if (group != null)
 				//luaTrace('getObjectOrder: Second optional argument "group" argument is deprecated.', false, true, FlxColor.YELLOW);
 	
-			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
-			if (leObj != null)
+			var targetObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
+			if (targetObj != null)
 			{
-				if (leObj.zIndex == -1)
+				if (targetObj.zIndex == -1)
 					luaTrace('getObjectOrder: Object $obj doesn\'t belong to any group!', false, false, FlxColor.RED);
 
-				return leObj.zIndex;
+				return targetObj.zIndex;
 			}
 			luaTrace('getObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 			return -1;
@@ -922,8 +922,8 @@ class FunkinLua
 		{
 			if (position != null && position < 0) position = 0;
 			if (position == null) position = -1;
-			var leObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
-			if (leObj != null)
+			var targetObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
+			if (targetObj != null)
 			{
 				if (group != null)
 				{
@@ -938,10 +938,10 @@ class FunkinLua
 									if (a == null || b == null) return 0;
 									return flixel.util.FlxSort.byValues(order, a.zIndex, b.zIndex);
 								}
-								leObj.zIndex = position;
+								targetObj.zIndex = position;
 								groupOrArray.sort(sortZIndex.bind(flixel.util.FlxSort.ASCENDING));
 							default: // Is Group
-								leObj.zIndex = position;
+								targetObj.zIndex = position;
 								groupOrArray.refresh();
 						}
 					}
@@ -951,7 +951,7 @@ class FunkinLua
 				else
 				{
 					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
-					leObj.zIndex = position;
+					targetObj.zIndex = position;
 					groupOrArray.refresh();
 				}
 				return;
@@ -959,16 +959,16 @@ class FunkinLua
 			luaTrace('setObjectOrder: Object $obj doesn\'t exist!', false, false, FlxColor.RED);
 		});
 
-		// gay ass tweens
+		// Tweens
 		set("startTween", function(tag:String, vars:String, values:Any = null, duration:Float, options:Any = null)
 		{
-			var penisExam:Dynamic = LuaUtils.tweenPrepare(tag, vars);
-			if (penisExam != null)
+			var tweenTarget:Dynamic = LuaUtils.tweenPrepare(tag, vars);
+			if (tweenTarget != null)
 			{
 				if (values != null)
 				{
 					var myOptions:LuaTweenOptions = LuaUtils.getLuaTween(options);
-					game.modchartTweens.set(tag, FlxTween.tween(penisExam, values, duration, {
+					game.modchartTweens.set(tag, FlxTween.tween(tweenTarget, values, duration, {
 						type: myOptions.type,
 						ease: myOptions.ease,
 						startDelay: myOptions.startDelay,
@@ -1026,12 +1026,12 @@ class FunkinLua
 		});
 		set("doTweenColor", function(tag:String, vars:String, targetColor:String, duration:Float, ease:String)
 		{
-			var penisExam:Dynamic = LuaUtils.tweenPrepare(tag, vars);
-			if (penisExam != null)
+			var tweenTarget:Dynamic = LuaUtils.tweenPrepare(tag, vars);
+			if (tweenTarget != null)
 			{
-				var curColor:FlxColor = penisExam.color;
-				curColor.alphaFloat = penisExam.alpha;
-				game.modchartTweens.set(tag, FlxTween.color(penisExam, duration, curColor, CoolUtil.colorFromString(targetColor), {
+				var curColor:FlxColor = tweenTarget.color;
+				curColor.alphaFloat = tweenTarget.alpha;
+				game.modchartTweens.set(tag, FlxTween.color(tweenTarget, duration, curColor, CoolUtil.colorFromString(targetColor), {
 					ease: LuaUtils.getTweenEaseByString(ease),
 					onComplete: function(twn:FlxTween)
 					{
@@ -1221,24 +1221,24 @@ class FunkinLua
 		{
 			tag = tag.replace('.', '');
 			LuaUtils.resetSpriteTag(tag);
-			var leSprite:ModchartSprite = new ModchartSprite(x, y);
+			var newSprite:ModchartSprite = new ModchartSprite(x, y);
 			if (image != null && image.length > 0)
 			{
-				leSprite.loadGraphic(Paths.image(image));
+				newSprite.loadGraphic(Paths.image(image));
 			}
 
-			game.modchartSprites.set(tag, leSprite);
-			leSprite.active = true;
+			game.modchartSprites.set(tag, newSprite);
+			newSprite.active = true;
 		});
 
 		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = "sparrow", swfMode:Bool = false, cacheOnLoad:Bool = false)
 		{
 			tag = tag.replace('.', '');
 			LuaUtils.resetSpriteTag(tag);
-			var leSprite:ModchartSprite = new ModchartSprite(x, y);
+			var newSprite:ModchartSprite = new ModchartSprite(x, y);
 
-			LuaUtils.loadFrames(leSprite, image, spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});
-			game.modchartSprites.set(tag, leSprite);
+			LuaUtils.loadFrames(newSprite, image, spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});
+			game.modchartSprites.set(tag, newSprite);
 		});
 
 		set("makeGraphic", function(obj:String, width:Int = 256, height:Int = 256, color:String = 'FFFFFF')

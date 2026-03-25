@@ -96,7 +96,7 @@ class DialogueCharacter extends FlxSprite
 
 	public function playAnim(animName:Null<String> = null, playIdle:Bool = false)
 	{
-		var leAnim:Null<String> = animName;
+		var targetAnim:Null<String> = animName;
 		if (animName == null || !dialogueAnimations.exists(animName)) // Anim is null, get a random animation
 		{
 			var arrayAnims:Array<String> = [];
@@ -106,13 +106,13 @@ class DialogueCharacter extends FlxSprite
 			}
 			if (arrayAnims.length > 0)
 			{
-				leAnim = arrayAnims[FlxG.random.int(0, arrayAnims.length - 1)];
+				targetAnim = arrayAnims[FlxG.random.int(0, arrayAnims.length - 1)];
 			}
 		}
 
-		if (leAnim != null && dialogueAnimations.exists(leAnim))
+		if (targetAnim != null && dialogueAnimations.exists(targetAnim))
 		{
-			var animData:Null<DialogueAnimArray> = dialogueAnimations.get(leAnim);
+			var animData:Null<DialogueAnimArray> = dialogueAnimations.get(targetAnim);
 			if (animData != null && (animData.loop_name == null
 				|| animData.loop_name.length < 1
 				|| animData.loop_name == animData.idle_name))
@@ -120,12 +120,12 @@ class DialogueCharacter extends FlxSprite
 				playIdle = true;
 			}
 		}
-		if (leAnim != null)
-			animation.play(playIdle ? leAnim + IDLE_SUFFIX : leAnim, false);
+		if (targetAnim != null)
+			animation.play(playIdle ? targetAnim + IDLE_SUFFIX : targetAnim, false);
 
-		if (leAnim != null && dialogueAnimations.exists(leAnim))
+		if (targetAnim != null && dialogueAnimations.exists(targetAnim))
 		{
-			var anim:Null<DialogueAnimArray> = dialogueAnimations.get(leAnim);
+			var anim:Null<DialogueAnimArray> = dialogueAnimations.get(targetAnim);
 			if (anim != null)
 			{
 				if (playIdle)
@@ -142,7 +142,7 @@ class DialogueCharacter extends FlxSprite
 		{
 			offset.set(0, 0);
 			trace('Offsets not found! Dialogue character is badly formatted, anim: '
-				+ leAnim
+				+ targetAnim
 				+ ', '
 				+ (playIdle ? 'idle anim' : 'loop anim'));
 		}

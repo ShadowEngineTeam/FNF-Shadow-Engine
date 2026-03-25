@@ -22,12 +22,12 @@ class CoolUtil
 
 	public static function coolTextFile(path:String):Array<String>
 	{
-		var daList:Null<String> = null;
+		var fileContent:Null<String> = null;
 		var formatted:Array<String> = path.split(':'); // prevent "shared:", "preload:" and other library names on file path
 		path = formatted[formatted.length - 1];
 		if (FileSystem.exists(path))
-			daList = File.getContent(path);
-		return daList != null ? listFromString(daList) : [];
+			fileContent = File.getContent(path);
+		return fileContent != null ? listFromString(fileContent) : [];
 	}
 
 	public static function colorFromString(color:String):FlxColor
@@ -48,13 +48,13 @@ class CoolUtil
 		if (string == null)
 			return [""];
 
-		var daList:Array<String> = [];
-		daList = string.trim().split('\n');
+		var lines:Array<String> = [];
+		lines = string.trim().split('\n');
 
-		for (i in 0...daList.length)
-			daList[i] = daList[i].trim();
+		for (i in 0...lines.length)
+			lines[i] = lines[i].trim();
 
-		return daList;
+		return lines;
 	}
 
 	public static function floorDecimal(value:Float, decimals:Int):Float
@@ -109,11 +109,11 @@ class CoolUtil
 
 	public static function numberArray(max:Int, min:Int = 0):Array<Int>
 	{
-		var dumbArray:Array<Int> = [];
+		var result:Array<Int> = [];
 		for (i in min...max)
-			dumbArray.push(i);
+			result.push(i);
 
-		return dumbArray;
+		return result;
 	}
 
 	public static function browserLoad(site:String)

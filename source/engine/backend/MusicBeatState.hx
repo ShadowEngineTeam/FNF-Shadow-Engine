@@ -468,7 +468,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	private function updateCurStep():Void
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
-		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / Conductor.getStepCrochet(lastChange);
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / (lastChange.stepCrochet != null ? lastChange.stepCrochet : Conductor.stepCrochet);
 		curDecStep = lastChange.stepTime + stepOffset;
 		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}

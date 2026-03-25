@@ -104,17 +104,17 @@ class ShaderFunctions
 			}
 
 			var split:Array<String> = obj.split('.');
-			var leObj:Null<FlxSprite> = LuaUtils.getObjectDirectly(split[0]);
+			var targetObj:Null<FlxSprite> = LuaUtils.getObjectDirectly(split[0]);
 			if (split.length > 1)
 			{
-				leObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+				targetObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 			}
 
-			if (leObj != null)
+			if (targetObj != null)
 			{
 				var arr:Null<Array<String>> = funk.runtimeShaders.get(shader);
 				if (arr != null)
-					leObj.shader = new FlxRuntimeShader(arr[0], arr[1]);
+					targetObj.shader = new FlxRuntimeShader(arr[0], arr[1]);
 				return true;
 			}
 			#else
@@ -126,15 +126,15 @@ class ShaderFunctions
 		funk.set("removeSpriteShader", function(obj:String)
 		{
 			var split:Array<String> = obj.split('.');
-			var leObj:Null<FlxSprite> = LuaUtils.getObjectDirectly(split[0]);
+			var targetObj:Null<FlxSprite> = LuaUtils.getObjectDirectly(split[0]);
 			if (split.length > 1)
 			{
-				leObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+				targetObj = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 			}
 
-			if (leObj != null)
+			if (targetObj != null)
 			{
-				var sprite:FlxSprite = leObj;
+				var sprite:FlxSprite = targetObj;
 				Reflect.setProperty(sprite, 'shader', null);
 				return true;
 			}

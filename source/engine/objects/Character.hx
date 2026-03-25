@@ -394,9 +394,9 @@ class Character extends FlxAnimate
 
 		if (animOffsets.exists(AnimName))
 		{
-			var daOffset:Null<Array<Dynamic>> = animOffsets.get(AnimName);
-			if (daOffset != null)
-				offset.set(daOffset[0], daOffset[1]);
+			var animOffset:Null<Array<Dynamic>> = animOffsets.get(AnimName);
+			if (animOffset != null)
+				offset.set(animOffset[0], animOffset[1]);
 		}
 
 		if (curCharacter.startsWith('gf-') || curCharacter == 'gf')

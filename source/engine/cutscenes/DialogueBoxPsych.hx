@@ -106,11 +106,11 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			add(box);
 		}
 
-		daText = new TypedAlphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, '');
-		if (daText != null)
+		alphabetText = new TypedAlphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, '');
+		if (alphabetText != null)
 		{
-			daText.setScale(0.7);
-			add(daText);
+			alphabetText.setScale(0.7);
+			add(alphabetText);
 		}
 
 		startNextDialog();
@@ -179,7 +179,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 	}
 
-	var daText:Null<TypedAlphabet> = null;
+	var alphabetText:Null<TypedAlphabet> = null;
 	var ignoreThisFrame:Bool = true; // First frame is reserved for loading dialogue images
 
 	public var closeSound:String = 'dialogueClose';
@@ -215,9 +215,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 			if (acceptPressed || justTouched)
 			{
-				if (daText != null && !daText.finishedText)
+				if (alphabetText != null && !alphabetText.finishedText)
 				{
-					daText.finishText();
+					alphabetText.finishText();
 					if (skipDialogueThing != null)
 					{
 						skipDialogueThing();
@@ -247,11 +247,11 @@ class DialogueBoxPsych extends FlxSpriteGroup
 						box.animation.curAnim.curFrame = box.animation.curAnim.frames.length - 1;
 						box.animation.curAnim.reverse();
 					}
-					if (daText != null)
+					if (alphabetText != null)
 					{
-						remove(daText);
-						daText.kill();
-						daText.destroy();
+						remove(alphabetText);
+						alphabetText.kill();
+						alphabetText.destroy();
 					}
 					if (box != null)
 						updateBoxOffsets(box);
@@ -265,7 +265,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			if (soundPath != null)
 				FlxG.sound.play(soundPath, closeVolume);
 			}
-			else if (daText != null && daText.finishedText)
+			else if (alphabetText != null && alphabetText.finishedText)
 			{
 				var char:Null<DialogueCharacter> = arrayCharacters[lastCharacter];
 				if (char != null && char.animation != null && char.animation.curAnim != null && char.animationIsLoop() && char.animation.finished)
@@ -275,7 +275,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 						char.playAnim(animName, true);
 				}
 			}
-			else if (daText != null)
+			else if (alphabetText != null)
 			{
 				var char:Null<DialogueCharacter> = arrayCharacters[lastCharacter];
 				if (char != null && char.animation != null && char.animation.curAnim != null && char.animation.finished)
@@ -379,21 +379,21 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 			for (i in 0...arrayCharacters.length)
 			{
-				var leChar:Null<DialogueCharacter> = arrayCharacters[i];
-				if (leChar != null)
+				var char:Null<DialogueCharacter> = arrayCharacters[i];
+				if (char != null)
 				{
-					var jsonFile = leChar.jsonFile;
+					var jsonFile = char.jsonFile;
 					var pos:String = (jsonFile != null) ? jsonFile.dialogue_pos : 'left';
 					switch (pos)
 					{
 						case 'left':
-							leChar.x -= scrollSpeed * elapsed;
+							char.x -= scrollSpeed * elapsed;
 						case 'center':
-							leChar.y += scrollSpeed * elapsed;
+							char.y += scrollSpeed * elapsed;
 						case 'right':
-							leChar.x += scrollSpeed * elapsed;
+							char.x += scrollSpeed * elapsed;
 					}
-					leChar.alpha -= elapsed * 10;
+					char.alpha -= elapsed * 10;
 				}
 			}
 
@@ -401,12 +401,12 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			{
 				for (i in 0...arrayCharacters.length)
 				{
-					var leChar:Null<DialogueCharacter> = arrayCharacters[0];
-					if (leChar != null)
+					var char:Null<DialogueCharacter> = arrayCharacters[0];
+					if (char != null)
 					{
-						arrayCharacters.remove(leChar);
-						remove(leChar);
-						leChar.destroy();
+						arrayCharacters.remove(char);
+						remove(char);
+						char.destroy();
 					}
 				}
 				if (finishThing != null)
@@ -491,27 +491,27 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		lastCharacter = character;
 		lastBoxType = boxType;
 
-		if (daText != null && curDialogue.text != null)
-			daText.text = curDialogue.text;
-		if (daText != null && curDialogue.speed != null)
-			daText.delay = curDialogue.speed;
-		if (daText != null)
+		if (alphabetText != null && curDialogue.text != null)
+			alphabetText.text = curDialogue.text;
+		if (alphabetText != null && curDialogue.speed != null)
+			alphabetText.delay = curDialogue.speed;
+		if (alphabetText != null)
 		{
-			daText.sound = (curDialogue.sound != null) ? curDialogue.sound : 'dialogue';
-			var soundTrimmed = daText.sound.trim();
+			alphabetText.sound = (curDialogue.sound != null) ? curDialogue.sound : 'dialogue';
+			var soundTrimmed = alphabetText.sound.trim();
 			if (soundTrimmed == null || soundTrimmed == '')
-				daText.sound = 'dialogue';
+				alphabetText.sound = 'dialogue';
 
-			daText.y = DEFAULT_TEXT_Y;
-			if (daText.rows > 2)
-				daText.y -= LONG_TEXT_ADD;
+			alphabetText.y = DEFAULT_TEXT_Y;
+			if (alphabetText.rows > 2)
+				alphabetText.y -= LONG_TEXT_ADD;
 		}
 
 		var char:Null<DialogueCharacter> = arrayCharacters[character];
 		if (char != null)
 		{
 			var expression = curDialogue.expression;
-			var finished = (daText != null) ? daText.finishedText : false;
+			var finished = (alphabetText != null) ? alphabetText.finishedText : false;
 			char.playAnim(expression, finished);
 			if (char.animation != null && char.animation.curAnim != null)
 			{
