@@ -211,9 +211,9 @@ class Controls
 	}
 
 	#if FEATURE_MOBILE_CONTROLS
-	public var isInSubstate:Bool = false;
-	public var requestedInstance(get, default):Null<Dynamic> = null;
-	public var requestedMobileC(get, default):Null<IMobileControls> = null;
+	public var isInSubstate:Bool = false; // don't worry about this it becomes true and false on it's own in MusicBeatSubstate
+	public var requestedInstance(get, default):Null<Dynamic> = null; // is set to MusicBeatState or MusicBeatSubstate when the constructor is called
+	public var requestedMobileC(get, default):Null<IMobileControls> = null; // for PlayState and EditorPlayState (hitbox and touchPad)
 	public var mobileC(get, never):Bool;
 
 	private function touchPadPressed(keys:Array<MobileInputID>):Bool
