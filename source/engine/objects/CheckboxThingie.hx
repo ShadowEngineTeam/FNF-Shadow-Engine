@@ -31,7 +31,7 @@ class CheckboxThingie extends FlxSprite
 		setGraphicSize(Std.int(0.9 * width));
 		updateHitbox();
 
-		var c:Bool = checked != null ? checked : false;
+		var c:Bool = checked ?? false;
 		animationFinished(c ? 'checking' : 'unchecking');
 		animation.onFinish.add(animationFinished);
 		isChecked = c;

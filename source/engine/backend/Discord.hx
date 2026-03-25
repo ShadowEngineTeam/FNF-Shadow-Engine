@@ -97,17 +97,17 @@ class DiscordClient
 	{
 		var startTimestamp:Float = 0;
 		var hasTimestamp:Bool = (hasStartTimestamp == true);
-		var endTime:Float = (endTimestamp == null) ? 0 : endTimestamp;
+		var endTime:Float = endTimestamp ?? 0;
 		if (hasTimestamp)
 			startTimestamp = Date.now().getTime();
 		if (endTime > 0)
 			endTime = startTimestamp + endTime;
 
-		presence.details = (details != null) ? details : 'In the Menus';
-		presence.state = (state != null) ? state : '';
+		presence.details = details ?? 'In the Menus';
+		presence.state = state ?? '';
 		presence.largeImageKey = 'icon';
 		presence.largeImageText = "Version: " + states.MainMenuState.shadowEngineVersion;
-		presence.smallImageKey = (smallImageKey != null) ? smallImageKey : '';
+		presence.smallImageKey = smallImageKey ?? '';
 		// Obtained times are in milliseconds so they are divided so Discord can use it
 		presence.startTimestamp = Std.int(startTimestamp / 1000);
 		presence.endTimestamp = Std.int(endTime / 1000);

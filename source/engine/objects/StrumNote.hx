@@ -109,12 +109,12 @@ class StrumNote extends FlxSkewedSprite
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
-			var pixelImg = Paths.image('pixelUI/' + (texture != null ? texture : ''));
+			var pixelImg = Paths.image('pixelUI/' + (texture ?? ''));
 			if (pixelImg != null)
 				loadGraphic(pixelImg);
 			width = width / 4;
 			height = height / 5;
-			pixelImg = Paths.image('pixelUI/' + (texture != null ? texture : ''));
+			pixelImg = Paths.image('pixelUI/' + (texture ?? ''));
 			if (pixelImg != null)
 				loadGraphic(pixelImg, true, Math.floor(width), Math.floor(height));
 
@@ -147,7 +147,7 @@ class StrumNote extends FlxSkewedSprite
 		}
 		else
 		{
-			var sparrowFrames = Paths.getSparrowAtlas(texture != null ? texture : '');
+			var sparrowFrames = Paths.getSparrowAtlas(texture ?? '');
 			if (sparrowFrames != null)
 				frames = sparrowFrames;
 			animation.addByPrefix('green', 'arrowUP');

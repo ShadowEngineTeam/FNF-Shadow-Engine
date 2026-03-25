@@ -47,9 +47,15 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public var controls(get, never):Controls;
 
+	private static var _fallbackControls:Null<Controls> = null;
+
 	private function get_controls():Controls
 	{
-		return Controls.instance != null ? Controls.instance : new Controls();
+		if (Controls.instance != null)
+			return Controls.instance;
+		if (_fallbackControls == null)
+			_fallbackControls = new Controls();
+		return _fallbackControls;
 	}
 
 	#if FEATURE_MOBILE_CONTROLS
@@ -468,7 +474,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	private function updateCurStep():Void
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
-		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / (lastChange.stepCrochet != null ? lastChange.stepCrochet : Conductor.stepCrochet);
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / (lastChange.stepCrochet ?? Conductor.stepCrochet);
 		curDecStep = lastChange.stepTime + stepOffset;
 		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}
@@ -571,10 +577,10 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public function getBeatsOnSection():Float
 	{
-		var val:Null<Float> = 4;
+		var val:Null<Float> = null;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
 			val = PlayState.SONG.notes[curSection].sectionBeats;
-		return val == null ? 4 : val;
+		return val ?? 4;
 	}
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)

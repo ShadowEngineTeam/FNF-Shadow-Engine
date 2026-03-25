@@ -769,7 +769,7 @@ class CharacterEditorState extends MusicBeatState
 				updatePresence();
 		});
 
-		vocalsInputText = new ShadowTextInput(leftX, controlY2, leftW, character.vocalsFile != null ? character.vocalsFile : '', function(text:String)
+		vocalsInputText = new ShadowTextInput(leftX, controlY2, leftW, character.vocalsFile ?? '', function(text:String)
 		{
 			character.vocalsFile = text;
 		});
@@ -1045,7 +1045,7 @@ class CharacterEditorState extends MusicBeatState
 		check_player.checked = character.isPlayer;
 		imageInputText.text = character.imageFile;
 		healthIconInputText.text = character.healthIcon;
-		vocalsInputText.text = character.vocalsFile != null ? character.vocalsFile : '';
+		vocalsInputText.text = character.vocalsFile ?? '';
 		singDurationStepper.value = character.singDuration;
 		scaleStepper.value = character.jsonScale;
 		flipXCheckBox.checked = character.originalFlipX;

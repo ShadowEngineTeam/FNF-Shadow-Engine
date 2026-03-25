@@ -2108,7 +2108,7 @@ class PlayState extends MusicBeatState
 		health = value;
 		var newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max),
 			healthBar.bounds.min, healthBar.bounds.max, 0, 100);
-		healthBar.percent = (newPercent != null ? newPercent : 0);
+		healthBar.percent = newPercent ?? 0;
 
 		final iconP1HasLoseIcon:Bool = (iconP1.animation.curAnim.frames.length >= 2);
 		final iconP1HasWinIcon:Bool = (iconP1.animation.curAnim.frames.length >= 3);
@@ -3438,7 +3438,7 @@ class PlayState extends MusicBeatState
 				invalidateNote(note);
 		});
 		songSaveNotes.push([
-			daNote != null ? daNote.strumTime : Conductor.songPosition,
+			daNote?.strumTime ?? Conductor.songPosition,
 			0,
 			daNote.noteData,
 			-(166 * Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) / 166)

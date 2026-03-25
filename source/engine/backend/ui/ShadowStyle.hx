@@ -178,7 +178,7 @@ class ShadowStyle
 
 	public static function applySavedTheme():Void
 	{
-		var theme:String = ClientPrefs.data.uiTheme != null ? ClientPrefs.data.uiTheme : ShadowTHEME_DARK;
+		var theme:String = ClientPrefs.data.uiTheme ?? ShadowTHEME_DARK;
 		setShadowThemeByName(theme);
 	}
 

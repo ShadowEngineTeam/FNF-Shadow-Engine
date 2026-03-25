@@ -212,7 +212,7 @@ class NoteSplash extends FlxSprite
 		_configLoaded = skin;
 
 		if (animName == null)
-			animName = config != null ? config.anim : 'note splash';
+			animName = config?.anim ?? 'note splash';
 
 		while (true)
 		{
@@ -222,7 +222,7 @@ class NoteSplash extends FlxSprite
 				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', 24, false))
 				{
 					// trace('maxAnims: $maxAnims');
-					return config != null ? config : defaultConfig();
+					return config ?? defaultConfig();
 				}
 			}
 			maxAnims++;

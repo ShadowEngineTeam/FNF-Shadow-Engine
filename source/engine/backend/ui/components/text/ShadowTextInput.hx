@@ -32,7 +32,7 @@ class ShadowTextInput extends FlxSpriteGroup
 		drawBorder(ShadowStyle.BORDER_DARK);
 		add(bg);
 
-		var startText:String = defaultText != null ? defaultText : "";
+		var startText:String = defaultText ?? "";
 		input = new ShadowInputText(2, 0, _width - 4, "", ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, FlxColor.TRANSPARENT, true);
 		input.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		input.antialiasing = ShadowStyle.antialiasing;
@@ -96,7 +96,7 @@ class ShadowTextInput extends FlxSpriteGroup
 			input.hasFocus = value;
 
 	function get_text():String
-		return input != null ? input.text : "";
+		return input?.text ?? "";
 
 	function set_text(value:String):String
 	{

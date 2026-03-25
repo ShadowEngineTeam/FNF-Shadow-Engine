@@ -27,7 +27,7 @@ class Conductor
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
 	inline static function getStepCrochet(event:BPMChangeEvent):Float
-		return event.stepCrochet != null ? event.stepCrochet : stepCrochet;
+		return event.stepCrochet ?? stepCrochet;
 
 	public static function getCrotchetAtTime(time:Float):Float
 	{
@@ -131,7 +131,7 @@ class Conductor
 		var val:Null<Float> = null;
 		if (song.notes[section] != null)
 			val = song.notes[section].sectionBeats;
-		return val != null ? val : 4;
+		return val ?? 4;
 	}
 
 	inline public static function calculateCrochet(bpm:Float)

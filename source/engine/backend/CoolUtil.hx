@@ -40,7 +40,7 @@ class CoolUtil
 		var colorNum:Null<FlxColor> = FlxColor.fromString(color);
 		if (colorNum == null)
 			colorNum = FlxColor.fromString('#$color');
-		return colorNum != null ? colorNum : FlxColor.WHITE;
+		return colorNum ?? FlxColor.WHITE;
 	}
 
 	public static function listFromString(string:String):Array<String>
@@ -82,8 +82,7 @@ class CoolUtil
 				{
 					if (countByColor.exists(colorOfThisPixel))
 					{
-						var currentCount:Null<Int> = countByColor[colorOfThisPixel];
-						countByColor[colorOfThisPixel] = (currentCount == null) ? 1 : currentCount + 1;
+						countByColor[colorOfThisPixel] = (countByColor[colorOfThisPixel] ?? 0) + 1;
 					}
 					else if (countByColor[colorOfThisPixel] != 13520687 - (2 * 13520687))
 						countByColor[colorOfThisPixel] = 1;

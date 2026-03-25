@@ -97,7 +97,7 @@ class Highscore
 			setScore(key, 0);
 
 		var result = songScores.get(key);
-		return result != null ? result : 0;
+		return result ?? 0;
 	}
 
 	public static function getRating(song:String, diff:Int):Float
@@ -107,7 +107,7 @@ class Highscore
 			setRating(key, 0);
 
 		var result = songRating.get(key);
-		return result != null ? result : 0;
+		return result ?? 0;
 	}
 
 	public static function getWeekScore(week:String, diff:Int):Int
@@ -117,7 +117,7 @@ class Highscore
 			setWeekScore(key, 0);
 
 		var result = weekScores.get(key);
-		return result != null ? result : 0;
+		return result ?? 0;
 	}
 
 	public static function load():Void

@@ -363,7 +363,7 @@ class EditorPlayState extends MusicBeatSubstate
 			if (songData.needsVoices)
 			{
 				var playerVocals = Paths.voices(songData.song, (boyfriendVocals == null || boyfriendVocals.length < 1) ? 'Player' : boyfriendVocals + Difficulty.getSongPrefix());
-				vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song, Difficulty.getSongPrefix(null, false)));
+				vocals.loadEmbedded(playerVocals ?? Paths.voices(songData.song, Difficulty.getSongPrefix(null, false)));
 
 				var oppVocals = Paths.voices(songData.song, (dadVocals == null || dadVocals.length < 1) ? 'Opponent' : dadVocals + Difficulty.getSongPrefix());
 				if (oppVocals != null)

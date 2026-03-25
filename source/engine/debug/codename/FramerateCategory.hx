@@ -51,7 +51,7 @@ class FramerateCategory extends Sprite
 			return;
 		super.__enterFrame(t);
 
-		var instanceX = Framerate.instance != null ? Framerate.instance.x : 10;
+		var instanceX = Framerate.instance?.x ?? 10;
 		var width = Math.max(this.title.width, this.text.width) + (instanceX * 2);
 		var height = this.text.height + this.text.y;
 		bgSprite.x = -instanceX;

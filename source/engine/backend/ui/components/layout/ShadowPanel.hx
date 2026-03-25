@@ -44,14 +44,14 @@ class ShadowPanel extends FlxSpriteGroup
 		_contentHeight = height - ShadowStyle.HEIGHT_HEADER;
 		this.title = title;
 
-		var fill = bgColor != null ? bgColor : ShadowStyle.BG_DARK;
-		var border = borderColor != null ? borderColor : ShadowStyle.BORDER_DARK;
+		var fill = bgColor ?? ShadowStyle.BG_DARK;
+		var border = borderColor ?? ShadowStyle.BORDER_DARK;
 
 		headerBar = new FlxSprite();
 		drawHeaderBar();
 		add(headerBar);
 
-		titleText = new FlxText(ShadowStyle.SPACING_SM, 0, _width, title != null ? title : "");
+		titleText = new FlxText(ShadowStyle.SPACING_SM, 0, _width, title ?? "");
 		titleText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, LEFT);
 		titleText.antialiasing = ShadowStyle.antialiasing;
 		titleText.y = (ShadowStyle.HEIGHT_HEADER - titleText.height) / 2;
@@ -162,7 +162,7 @@ class ShadowPanel extends FlxSpriteGroup
 	{
 		title = value;
 		if (titleText != null)
-			titleText.text = value != null ? value : "";
+			titleText.text = value ?? "";
 		return value;
 	}
 
@@ -192,8 +192,8 @@ class ShadowPanel extends FlxSpriteGroup
 		_height = height;
 		_contentHeight = height - ShadowStyle.HEIGHT_HEADER;
 
-		var fill = bgColor != null ? bgColor : ShadowStyle.BG_DARK;
-		var border = borderColor != null ? borderColor : ShadowStyle.BORDER_DARK;
+		var fill = bgColor ?? ShadowStyle.BG_DARK;
+		var border = borderColor ?? ShadowStyle.BORDER_DARK;
 
 		drawHeaderBar();
 		drawBackground(fill, border);

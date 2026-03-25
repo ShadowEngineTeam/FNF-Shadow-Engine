@@ -155,7 +155,7 @@ class LuaUtils
 							{
 								// FunkinLua.luaTrace('getModSetting: Found unsaved keybind "${sub.save}" in Mod: "$modName"');
 								settings.set(sub.save,
-									{keyboard: (sub.keyboard != null ? sub.keyboard : 'NONE'), gamepad: (sub.gamepad != null ? sub.gamepad : 'NONE')});
+									{keyboard: sub.keyboard ?? 'NONE', gamepad: sub.gamepad ?? 'NONE'});
 							}
 						}
 					}

@@ -152,7 +152,7 @@ class Song
 
 	public static function parseJSONshit(rawJson:String, ?file:String):SwagSong
 	{
-		final parsed:Dynamic = Json.parse(rawJson, file ?? null);
+		final parsed:Dynamic = Json.parse(rawJson, file);
 
 		if (parsed.song != null)
 		{

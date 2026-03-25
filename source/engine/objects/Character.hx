@@ -98,8 +98,8 @@ class Character extends FlxAnimate
 		super(x, y);
 
 		animOffsets = new Map<String, Array<Dynamic>>();
-		curCharacter = character != null ? character : DEFAULT_CHARACTER;
-		this.isPlayer = isPlayer != null ? isPlayer : false;
+		curCharacter = character ?? DEFAULT_CHARACTER;
+		this.isPlayer = isPlayer ?? false;
 		switch (curCharacter)
 		{
 			default:
@@ -209,7 +209,7 @@ class Character extends FlxAnimate
 		singDuration = json.sing_duration;
 		flipX = (json.flip_x != isPlayer);
 		healthColorArray = (json.healthbar_colors != null && json.healthbar_colors.length > 2) ? json.healthbar_colors : [161, 161, 161];
-		vocalsFile = json.vocals_file != null ? json.vocals_file : '';
+		vocalsFile = json.vocals_file ?? '';
 		originalFlipX = (json.flip_x == true);
 		editorIsPlayer = json._editor_isPlayer;
 
@@ -232,7 +232,7 @@ class Character extends FlxAnimate
 				switch (spriteType)
 				{
 					case TEXTURE_ATLAS:
-						var isFrameLabel:Bool = anim.isFrameLabel != null ? anim.isFrameLabel : false;
+						var isFrameLabel:Bool = anim.isFrameLabel ?? false;
 						if (isFrameLabel)
 						{
 							if (animIndices != null && animIndices.length > 0)
@@ -273,7 +273,7 @@ class Character extends FlxAnimate
 
 		if (heyTimer > 0)
 		{
-			var rate:Float = (PlayState.instance != null ? PlayState.instance.playbackRate : 1.0);
+			var rate:Float = PlayState.instance?.playbackRate ?? 1.0;
 			heyTimer -= elapsed * rate;
 			if (heyTimer <= 0)
 			{

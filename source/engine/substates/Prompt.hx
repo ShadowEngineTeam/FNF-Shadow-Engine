@@ -31,8 +31,8 @@ class Prompt extends MusicBeatSubstate
 		theText = promptText;
 		goAnyway = acceptOnDefault;
 
-		acceptLabel = option1 != null ? option1 : 'OK';
-		cancelLabel = option2 != null ? option2 : 'Cancel';
+		acceptLabel = option1 ?? 'OK';
+		cancelLabel = option2 ?? 'Cancel';
 		super();
 	}
 

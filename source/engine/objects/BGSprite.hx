@@ -12,8 +12,8 @@ class BGSprite extends FlxSprite
 	{
 		super(x, y);
 
-		var sx:Float = scrollX != null ? scrollX : 1;
-		var sy:Float = scrollY != null ? scrollY : 1;
+		var sx:Float = scrollX ?? 1;
+		var sy:Float = scrollY ?? 1;
 
 		if (animArray != null && image != null)
 		{
@@ -51,7 +51,7 @@ class BGSprite extends FlxSprite
 	{
 		if (idleAnim != null)
 		{
-			var fp:Bool = forceplay != null ? forceplay : false;
+			var fp:Bool = forceplay ?? false;
 			animation.play(idleAnim, fp);
 		}
 	}

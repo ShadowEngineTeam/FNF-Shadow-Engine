@@ -1083,7 +1083,7 @@ class ChartingState extends MusicBeatState
 
 		var row4:Int = row3 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
 		tab_group.add(new ShadowLabel(pad, row4, "Note Texture (Player):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSkinInputText = new ShadowTextInput(pad, row4 + labelOffset, 250, editorPlayerArrowSkin != null ? editorPlayerArrowSkin : '', function(text:String)
+		noteSkinInputText = new ShadowTextInput(pad, row4 + labelOffset, 250, editorPlayerArrowSkin ?? '', function(text:String)
 		{
 			editorPlayerArrowSkin = text;
 		});
@@ -1092,7 +1092,7 @@ class ChartingState extends MusicBeatState
 
 		var row5:Int = row4 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row5, "Note Texture (Opponent):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin != null ? editorOpponentArrowSkin : '',
+		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin ?? '',
 			function(text:String)
 			{
 				editorOpponentArrowSkin = text;
@@ -1102,7 +1102,7 @@ class ChartingState extends MusicBeatState
 
 		var row6:Int = row5 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row6, "Note Splashes Texture:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSplashesInputText = new ShadowTextInput(pad, row6 + labelOffset, 150, _song.splashSkin != null ? _song.splashSkin : '', function(text:String)
+		noteSplashesInputText = new ShadowTextInput(pad, row6 + labelOffset, 150, _song.splashSkin ?? '', function(text:String)
 		{
 			_song.splashSkin = text;
 		});
@@ -1554,7 +1554,7 @@ class ChartingState extends MusicBeatState
 
 		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Game Over Character:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar != null ? _song.gameOverChar : '',
+		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar ?? '',
 			function(text:String)
 			{
 				_song.gameOverChar = text;
@@ -1564,7 +1564,7 @@ class ChartingState extends MusicBeatState
 
 		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "Death Sound (sounds/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound != null ? _song.gameOverSound : '',
+		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound ?? '',
 			function(text:String)
 			{
 				_song.gameOverSound = text;
@@ -1574,7 +1574,7 @@ class ChartingState extends MusicBeatState
 
 		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Loop Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop != null ? _song.gameOverLoop : '',
+		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop ?? '',
 			function(text:String)
 			{
 				_song.gameOverLoop = text;
@@ -1584,7 +1584,7 @@ class ChartingState extends MusicBeatState
 
 		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Retry Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd != null ? _song.gameOverEnd : '',
+		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd ?? '',
 			function(text:String)
 			{
 				_song.gameOverEnd = text;
@@ -1668,7 +1668,7 @@ class ChartingState extends MusicBeatState
 		{
 			var playerVocals = Paths.voices(currentSongName,
 				(characterData.vocalsP1 == null || characterData.vocalsP1.length < 1) ? 'Player' : characterData.vocalsP1 + Difficulty.getSongPrefix());
-			vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
+			vocals.loadEmbedded(playerVocals ?? Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
 		}
 		vocals.autoDestroy = false;
 		FlxG.sound.list.add(vocals);
@@ -3663,7 +3663,7 @@ class ChartingState extends MusicBeatState
 
 		if (_song.notes[section] != null)
 			val = _song.notes[section].sectionBeats;
-		return val != null ? val : 4;
+		return val ?? 4;
 	}
 }
 

@@ -29,7 +29,7 @@ class Difficulty
 		if (week == null)
 			week = WeekData.getCurrentWeek();
 
-		var diffStr:Null<String> = (week != null) ? week.difficulties : null;
+		var diffStr:Null<String> = week?.difficulties;
 		if (diffStr != null && diffStr.length > 0)
 		{
 			var diffs:Array<String> = diffStr.trim().split(',');
@@ -71,7 +71,7 @@ class Difficulty
 	{
 		final idx:Int = num ?? PlayState.storyDifficulty;
 		final raw:String = list[idx];
-		final includeVal:Bool = (includeDash == null) ? true : includeDash;
+		final includeVal:Bool = includeDash ?? true;
 		final dash:String = includeVal ? "-" : "";
 
 		if (raw.toLowerCase() == "erect" || raw.toLowerCase() == "nightmare")

@@ -11,9 +11,9 @@ class AttachedText extends Alphabet
 
 	public function new(text:String = "", ?offsetX:Float = 0, ?offsetY:Float = 0, ?bold = false, ?scale:Float = 1)
 	{
-		var ox:Float = offsetX != null ? offsetX : 0;
-		var oy:Float = offsetY != null ? offsetY : 0;
-		var s:Float = scale != null ? scale : 1;
+		var ox:Float = offsetX ?? 0;
+		var oy:Float = offsetY ?? 0;
+		var s:Float = scale ?? 1;
 
 		super(0, 0, text, bold);
 
