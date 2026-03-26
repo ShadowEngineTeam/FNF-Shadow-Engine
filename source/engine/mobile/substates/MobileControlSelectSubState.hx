@@ -117,8 +117,9 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			MobileData.mode = curOption;
 			if (options[curOption] == 'Pad-Custom')
 			{
-				if (control?.touchPad != null)
-					MobileData.setTouchPadCustom(control?.touchPad);
+				var touchPadLocal = control?.touchPad;
+				if (touchPadLocal != null)
+					MobileData.setTouchPadCustom(touchPadLocal);
 			}
 			controls.isInSubstate = FlxG.mouse.visible = false;
 			var cancelSound = Paths.sound('cancelMenu');
@@ -241,7 +242,8 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			remove(control);
 		control = new MobileControls(type, extraMode);
 		add(control);
-		control.cameras = [ui];
+		if (ui != null)
+			control.cameras = [ui];
 	}
 
 	function changeOption(change:Int)
