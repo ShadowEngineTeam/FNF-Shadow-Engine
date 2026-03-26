@@ -9,24 +9,25 @@ import mobile.backend.TouchUtil;
 import flixel.input.touch.FlxTouch;
 import flixel.ui.FlxButton as UIButton;
 
-@:nullSafety(Off)
+@:nullSafety
 class MobileControlSelectSubState extends MusicBeatSubstate
 {
 	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox'];
-	var control:MobileControls;
-	var leftArrow:FlxSprite;
-	var rightArrow:FlxSprite;
-	var itemText:Alphabet;
-	var positionText:FlxText;
-	var positionTextBg:FlxSprite;
-	var bg:FlxBackdrop;
-	var ui:ShadowCamera;
+	var control:Null<MobileControls> = null;
+	var leftArrow:Null<FlxSprite> = null;
+	var rightArrow:Null<FlxSprite> = null;
+	var itemText:Null<Alphabet> = null;
+	var positionText:Null<FlxText> = null;
+	var positionTextBg:Null<FlxSprite> = null;
+	var bg:Null<FlxBackdrop> = null;
+	var ui:Null<ShadowCamera> = null;
 	var curOption:Int = MobileData.mode;
 	var buttonBinded:Bool = false;
-	var bindButton:TouchButton;
-	var reset:UIButton;
+	var bindButton:Null<TouchButton> = null;
+	var reset:Null<UIButton> = null;
 	var tweenieShit:Float = 0;
 
+	@:nullSafety(Off)
 	public function new()
 	{
 		super();
@@ -147,6 +148,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		changeOption(0);
 	}
 
+	@:nullSafety(Off)
 	override function update(elapsed:Float)
 	{
 		checkArrowButton(leftArrow, () ->
@@ -218,6 +220,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		super.update(elapsed);
 	}
 
+	@:nullSafety(Off)
 	function changeControls(?type:Int, ?extraMode:Bool = false)
 	{
 		if (type == null)
@@ -231,6 +234,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		control.cameras = [ui];
 	}
 
+	@:nullSafety(Off)
 	function changeOption(change:Int)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -263,6 +267,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		setOptionText();
 	}
 
+	@:nullSafety(Off)
 	function setOptionText()
 	{
 		itemText.text = options[curOption].replace('-', ' ');
@@ -271,6 +276,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		FlxTween.tween(rightArrow, {x: itemText.x + itemText.width + 10}, 0.1, {ease: FlxEase.quintOut});
 	}
 
+	@:nullSafety(Off)
 	function updatePosText()
 	{
 		var optionName = options[curOption];
@@ -291,6 +297,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			positionText.visible = positionTextBg.visible = false;
 	}
 
+	@:nullSafety(Off)
 	function checkArrowButton(button:FlxSprite, func:Void->Void)
 	{
 		if (TouchUtil.overlaps(button))
@@ -310,6 +317,7 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			func();
 	}
 
+	@:nullSafety(Off)
 	function moveButton(touch:FlxTouch, button:TouchButton):Void
 	{
 		bindButton = button;

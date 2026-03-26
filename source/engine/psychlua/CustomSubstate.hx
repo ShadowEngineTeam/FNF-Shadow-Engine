@@ -86,10 +86,11 @@ class CustomSubstate extends MusicBeatSubstate
 
 			if (tagObject != null)
 			{
-				if (pos < 0)
+				final insertPos = pos != null ? pos : -1;
+				if (insertPos < 0)
 					instance.add(tagObject);
 				else
-					instance.insert(pos, tagObject);
+					instance.insert(insertPos, tagObject);
 				return true;
 			}
 		}

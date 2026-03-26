@@ -27,7 +27,7 @@ class MobileFunctions
 			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
 			var mobileControlsLocal = MusicBeatState.getState()?.mobileControls;
-			if (mobileControls != null)
+			if (mobileControlsLocal != null)
 			{
 				switch (button)
 				{
