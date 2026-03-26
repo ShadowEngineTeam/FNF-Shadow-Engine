@@ -1480,7 +1480,6 @@ class FunkinLua
 		set("luaSpriteExists", game.modchartSprites.exists);
 		set("luaTextExists", game.modchartTexts.exists);
 		set("luaSoundExists", game.modchartSounds.exists);
-		set("luaSoundExists", game.modchartSounds.exists);
 
 		set("setObjectCamera", function(obj:String, camera:String = '')
 		{
