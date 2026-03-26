@@ -13,7 +13,7 @@ import flixel.input.mouse.FlxMouseButton;
  * A simple button class that calls a function when clicked by the touch.
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
-@:nullSafety(Off)
+@:nullSafety
 class TouchButton extends TypedTouchButton<FlxSprite>
 {
 	/**
@@ -34,7 +34,7 @@ class TouchButton extends TypedTouchButton<FlxSprite>
 	/**
 	 * A simple tag that returns the button's graphic name in upper case.
 	**/
-	public var tag:String;
+	public var tag:String = '';
 
 	/**
 	 * The `MobileInputID` that are assigned to this button.
@@ -671,7 +671,7 @@ class ButtonBrightnessShader extends FlxShader
 	}
 }
 
-@:nullSafety(Off)
+@:nullSafety
 enum StatusIndicators
 {
 	// isn't very good looking

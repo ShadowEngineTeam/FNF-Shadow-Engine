@@ -13,7 +13,7 @@ import openfl.geom.Matrix;
  *
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
-@:nullSafety(Off)
+@:nullSafety
 class Hitbox extends MobileInputManager implements IMobileControls
 {
 	final offsetFir:Int = (ClientPrefs.data.hitboxPos ? Std.int(FlxG.height / 4) * 3 : 0);
@@ -26,7 +26,7 @@ class Hitbox extends MobileInputManager implements IMobileControls
 	public var buttonExtra:TouchButton = new TouchButton(0, 0, [MobileInputID.EXTRA_1]);
 	public var buttonExtra2:TouchButton = new TouchButton(0, 0, [MobileInputID.EXTRA_2]);
 
-	public var instance:MobileInputManager;
+	public var instance:Null<MobileInputManager>;
 	public var onButtonDown:FlxTypedSignal<TouchButton->Void> = new FlxTypedSignal<TouchButton->Void>();
 	public var onButtonUp:FlxTypedSignal<TouchButton->Void> = new FlxTypedSignal<TouchButton->Void>();
 
@@ -35,6 +35,7 @@ class Hitbox extends MobileInputManager implements IMobileControls
 	/**
 	 * Create the zone.
 	 */
+	@:nullSafety(Off)
 	public function new(?extraMode:ExtraActions = NONE)
 	{
 		super();
@@ -100,6 +101,7 @@ class Hitbox extends MobileInputManager implements IMobileControls
 		}
 	}
 
+	@:nullSafety(Off)
 	private function createHint(X:Float, Y:Float, Width:Int, Height:Int, Color:Int = 0xFFFFFF):TouchButton
 	{
 		var hint = new TouchButton(X, Y);

@@ -7,13 +7,13 @@ package mobile.objects;
  * ...
  * @author: Karim Akra
  */
-@:nullSafety(Off)
+@:nullSafety
 class MobileControls extends FlxTypedSpriteGroup<MobileInputManager>
 {
-	public var touchPad:TouchPad = new TouchPad('NONE', 'NONE', NONE);
-	public var hitbox:Hitbox = new Hitbox(NONE);
+	public var touchPad:Null<TouchPad> = new TouchPad('NONE', 'NONE', NONE);
+	public var hitbox:Null<Hitbox> = new Hitbox(NONE);
 
-	public function new(?forceType:Int, ?extra:Bool = true)
+	public function new(?forceType:Null<Int>, ?extra:Bool = true)
 	{
 		super();
 		MobileData.forcedMode = forceType;
@@ -31,7 +31,7 @@ class MobileControls extends FlxTypedSpriteGroup<MobileInputManager>
 		alpha = ClientPrefs.data.controlsAlpha;
 	}
 
-	private function initControler(controlMode:Int = 0, ?extra:Bool = true):Void
+	private function initControler(controlMode:Int = 0, extra:Bool = true):Void
 	{
 		var extraAction = MobileData.extraActions.get(ClientPrefs.data.extraButtons);
 		if (!extra)

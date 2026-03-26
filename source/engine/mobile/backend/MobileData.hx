@@ -10,7 +10,7 @@ import flixel.util.FlxSave;
  * ...
  * @author: Karim Akra
  */
-@:nullSafety(Off)
+@:nullSafety
 class MobileData
 {
 	public static var actionModes:Map<String, TouchButtonsData> = new Map();
@@ -19,7 +19,7 @@ class MobileData
 
 	public static var mode(get, set):Int;
 	public static var forcedMode:Null<Int>;
-	public static var save:FlxSave;
+	public static var save:Null<FlxSave>;
 
 	public static function init()
 	{
@@ -42,18 +42,23 @@ class MobileData
 
 	public static function setTouchPadCustom(touchPad:TouchPad):Void
 	{
+		if (save == null || save.data == null)
+			return;
+
 		if (save.data.buttons == null)
 		{
 			save.data.buttons = new Array();
-			for (buttons in touchPad)
-				save.data.buttons.push(FlxPoint.get(buttons.x, buttons.y));
+			for (button in touchPad)
+				if (button != null)
+					save.data.buttons.push(FlxPoint.get(button.x, button.y));
 		}
 		else
 		{
 			var tempCount:Int = 0;
-			for (buttons in touchPad)
+			for (button in touchPad)
 			{
-				save.data.buttons[tempCount] = FlxPoint.get(buttons.x, buttons.y);
+				if (button != null)
+					save.data.buttons[tempCount] = FlxPoint.get(button.x, button.y);
 				tempCount++;
 			}
 		}
@@ -65,15 +70,19 @@ class MobileData
 	{
 		var tempCount:Int = 0;
 
-		if (save.data.buttons == null)
+		if (save == null || save.data == null || save.data.buttons == null)
 			return touchPad;
 
-		for (buttons in touchPad)
+		for (button in touchPad)
 		{
-			if (save.data.buttons[tempCount] != null)
+			if (button != null)
 			{
-				buttons.x = save.data.buttons[tempCount].x;
-				buttons.y = save.data.buttons[tempCount].y;
+				final btnData = save.data.buttons[tempCount];
+				if (btnData != null)
+				{
+					button.x = btnData.x;
+					button.y = btnData.y;
+				}
 			}
 			tempCount++;
 		}
@@ -108,18 +117,24 @@ class MobileData
 				if (Path.extension(file) == 'json')
 				{
 					file = Path.join([folder, Path.withoutDirectory(file)]);
-					var str = File.getContent(file);
-					var json:TouchButtonsData = cast Json.parse(str, file);
-					var mapKey:String = Path.withoutDirectory(Path.withoutExtension(file));
-					map.set(mapKey, json);
+					final str = File.getContent(file);
+					if (str != null)
+					{
+						var json:TouchButtonsData = cast Json.parse(str);
+						var mapKey:String = Path.withoutDirectory(Path.withoutExtension(file));
+						map.set(mapKey, json);
+					}
 				}
 			}
 	}
 
-	static function set_mode(mode:Int = 3)
+	static function set_mode(mode:Int = 3):Int
 	{
-		save.data.mobileControlsMode = mode;
-		save.flush();
+		if (save != null)
+		{
+			save.data.mobileControlsMode = mode;
+			save.flush();
+		}
 		return mode;
 	}
 
@@ -128,13 +143,16 @@ class MobileData
 		if (forcedMode != null)
 			return forcedMode;
 
-		if (save.data.mobileControlsMode == null)
+		if (save != null)
 		{
-			save.data.mobileControlsMode = 3;
-			save.flush();
+			if (save.data.mobileControlsMode == null)
+			{
+				save.data.mobileControlsMode = 3;
+				save.flush();
+			}
+			return save.data.mobileControlsMode;
 		}
-
-		return save.data.mobileControlsMode;
+		return 3;
 	}
 }
 
