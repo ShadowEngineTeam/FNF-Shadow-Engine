@@ -26,15 +26,15 @@ class MobileFunctions
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
-			var mControls = MusicBeatState.getState()?.mobileControls;
-			if (mControls != null)
+			var mobileControlsLocal = MusicBeatState.getState()?.mobileControls;
+			if (mobileControls != null)
 			{
 				switch (button)
 				{
 					case 'second':
-						return mControls.buttonExtra2.pressed;
+						return mobileControlsLocal.buttonExtra2.pressed;
 					default:
-						return mControls.buttonExtra.pressed;
+						return mobileControlsLocal.buttonExtra.pressed;
 				}
 			}
 			#end
@@ -45,15 +45,15 @@ class MobileFunctions
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
-			var mcs = MusicBeatState.getState()?.mobileControls;
-			if (mcs != null)
+			var mobileControlsLocal = MusicBeatState.getState()?.mobileControls;
+			if (mobileControlsLocal != null)
 			{
 				switch (button)
 				{
 					case 'second':
-						return mcs.buttonExtra2.justPressed;
+						return mobileControlsLocal.buttonExtra2.justPressed;
 					default:
-						return mcs.buttonExtra.justPressed;
+						return mobileControlsLocal.buttonExtra.justPressed;
 				}
 			}
 			#end
@@ -64,15 +64,15 @@ class MobileFunctions
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
-			var mcs = MusicBeatState.getState()?.mobileControls;
-			if (mcs != null)
+			var mobileControlsLocal = MusicBeatState.getState()?.mobileControls;
+			if (mobileControlsLocal != null)
 			{
 				switch (button)
 				{
 					case 'second':
-						return mcs.buttonExtra2.justReleased;
+						return mobileControlsLocal.buttonExtra2.justReleased;
 					default:
-						return mcs.buttonExtra.justReleased;
+						return mobileControlsLocal.buttonExtra.justReleased;
 				}
 			}
 			#end
@@ -83,15 +83,15 @@ class MobileFunctions
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			button = button.toLowerCase();
-			var mcs = MusicBeatState.getState()?.mobileControls;
-			if (mcs != null)
+			var mobileControlsLocal = MusicBeatState.getState()?.mobileControls;
+			if (mobileControlsLocal != null)
 			{
 				switch (button)
 				{
 					case 'second':
-						return mcs.buttonExtra2.released;
+						return mobileControlsLocal.buttonExtra2.released;
 					default:
-						return mcs.buttonExtra.released;
+						return mobileControlsLocal.buttonExtra.released;
 				}
 			}
 			#end

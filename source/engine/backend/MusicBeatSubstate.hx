@@ -195,7 +195,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 				return luaTouchPad.buttonPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var buttonIds:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
 				for (strId in buttonIds)
 					idArray.push(cast MobileInputID.fromString(strId));

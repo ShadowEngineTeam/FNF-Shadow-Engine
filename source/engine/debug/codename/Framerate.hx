@@ -186,7 +186,7 @@ class Framerate extends Sprite
 			bgSprite.scaleY = height;
 		}
 
-		var selectable = debugMode == 2;
+		var selectable = debugMode == 2; // idk i tried to make it more readable:sob: - Nex
 		if (memoryCounter != null && fpsCounter != null)
 		{
 			memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;

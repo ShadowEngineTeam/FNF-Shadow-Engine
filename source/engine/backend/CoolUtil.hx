@@ -156,13 +156,12 @@ class CoolUtil
 		@crowplexus
 	**/
 	@:access(flixel.util.FlxSave.validate)
+	@:nullSafety(Off)
 	public static function getSavePath():String
 	{
-		final company:Null<String> = FlxG.stage.application.meta.get('company');
-		final companyVal:String = (company != null) ? company : '';
+		final company:String = FlxG.stage.application.meta.get('company');
 		// #if (flixel < "5.0.0") return company; #else
-		final fileVal:Null<String> = FlxG.stage.application.meta.get('file');
-		return '$companyVal/${flixel.util.FlxSave.validate((fileVal != null) ? fileVal : '')}';
+		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
 		// #end
 	}
 
