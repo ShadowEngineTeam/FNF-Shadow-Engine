@@ -1,5 +1,6 @@
 package backend;
 
+import flixel.util.FlxColor;
 import flixel.util.FlxGradient;
 
 @:nullSafety
@@ -8,23 +9,23 @@ class CustomFadeTransition extends MusicBeatSubstate
 	public static var finishCallback:Null<Void->Void> = null;
 
 	var isTransIn:Bool = false;
-	var transBlack:FlxSprite = new FlxSprite();
-	var transGradient:FlxSprite = new FlxSprite();
+	var transBlack:FlxSprite;
+	var transGradient:FlxSprite;
 
 	var duration:Float;
 
 	public function new(duration:Float, isTransIn:Bool)
 	{
+		transGradient = new FlxSprite();
+		transBlack = new FlxSprite();
 		this.duration = duration;
 		this.isTransIn = isTransIn;
 		super();
-	}
 
-	override function create()
-	{
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 		var width:Int = Std.int(FlxG.width / Math.max(camera.zoom, 0.001));
 		var height:Int = Std.int(FlxG.height / Math.max(camera.zoom, 0.001));
+
 		transGradient = FlxGradient.createGradientFlxSprite(1, height, (isTransIn ? [0x0, FlxColor.BLACK] : [FlxColor.BLACK, 0x0]));
 		transGradient.scale.x = width;
 		transGradient.updateHitbox();
@@ -32,7 +33,7 @@ class CustomFadeTransition extends MusicBeatSubstate
 		transGradient.screenCenter(X);
 		add(transGradient);
 
-		transBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+		transBlack.makeGraphic(1, 1, FlxColor.BLACK);
 		transBlack.scale.set(width, height + 400);
 		transBlack.updateHitbox();
 		transBlack.scrollFactor.set();
@@ -43,8 +44,6 @@ class CustomFadeTransition extends MusicBeatSubstate
 			transGradient.y = transBlack.y - transBlack.height;
 		else
 			transGradient.y = -transGradient.height;
-
-		super.create();
 	}
 
 	override function update(elapsed:Float)

@@ -27,7 +27,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 	var reset:Null<UIButton> = null;
 	var tweenieShit:Float = 0;
 
-	@:nullSafety(Off)
 	public function new()
 	{
 		super();
@@ -40,6 +39,12 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		bg.velocity.set(40, 40);
 		bg.alpha = 0;
 		bg.antialiasing = ClientPrefs.data.antialiasing;
+		
+		ui = new ShadowCamera();
+		ui.bgColor.alpha = 0;
+		ui.alpha = 0;
+		FlxG.cameras.add(ui, false);
+		
 		FlxTween.tween(bg, {alpha: 0.45}, 0.3, {
 			ease: FlxEase.quadOut,
 			onComplete: (twn:FlxTween) ->
@@ -51,18 +56,15 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 
 		FlxG.mouse.visible = !FlxG.onMobile;
 
-		ui = new ShadowCamera();
-		ui.bgColor.alpha = 0;
-		ui.alpha = 0;
-		FlxG.cameras.add(ui, false);
-
 		itemText = new Alphabet(0, 60, '');
 		itemText.alignment = LEFT;
 		itemText.cameras = [ui];
 		add(itemText);
 
 		leftArrow = new FlxSprite(0, itemText.y - 25);
-		leftArrow.frames = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		var leftArrowFrames = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		if (leftArrowFrames != null)
+			leftArrow.frames = leftArrowFrames;
 		leftArrow.animation.addByPrefix('idle', 'arrow left');
 		leftArrow.animation.addByPrefix('press', "arrow push left");
 		leftArrow.animation.play('idle');
@@ -93,13 +95,14 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		var exit = new UIButton(0, itemText.y - 25, "Exit & Save", () ->
 		{
 			if (options[curOption].toLowerCase().contains('pad'))
-				control.touchPad.setExtrasDefaultPos();
+				control?.touchPad?.setExtrasDefaultPos();
 			if (options[curOption] == 'Pad-Extra')
 			{
 				var nuhuh = new FlxText(0, 0, FlxG.width / 2, 'Pad-Extra Is Just A Binding Option\nPlease Select A Different Option To Exit.');
 				nuhuh.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, FlxTextAlign.CENTER);
 				nuhuh.screenCenter();
-				nuhuh.cameras = [ui];
+				if (ui != null)
+					nuhuh.cameras = [ui];
 				add(nuhuh);
 				FlxTween.tween(nuhuh, {alpha: 0}, 3.4, {
 					ease: FlxEase.circOut,
@@ -113,9 +116,14 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			}
 			MobileData.mode = curOption;
 			if (options[curOption] == 'Pad-Custom')
-				MobileData.setTouchPadCustom(control.touchPad);
+			{
+				if (control?.touchPad != null)
+					MobileData.setTouchPadCustom(control?.touchPad);
+			}
 			controls.isInSubstate = FlxG.mouse.visible = false;
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			var cancelSound = Paths.sound('cancelMenu');
+			if (cancelSound != null)
+				FlxG.sound.play(cancelSound);
 			MobileData.forcedMode = null;
 			close();
 		});
@@ -126,14 +134,16 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		exit.label.setFormat(Paths.font('vcr.ttf'), 28, FlxColor.WHITE, FlxTextAlign.CENTER);
 		exit.label.fieldWidth = exit.width;
 		exit.label.x = ((exit.width - exit.label.width) / 2) + exit.x;
-		exit.label.offset.y = -10; // WHY THE FUCK I CAN'T CHANGE THE LABEL Y
+		exit.label.offset.y = -10;
 		exit.cameras = [ui];
 		add(exit);
 
 		reset = new UIButton(exit.x, exit.height + exit.y + 20, "Reset", () ->
 		{
-			changeOption(0); // realods the current control mode ig?
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			changeOption(0);
+			var resetSound = Paths.sound('cancelMenu');
+			if (resetSound != null)
+				FlxG.sound.play(resetSound);
 		});
 		reset.color = FlxColor.RED;
 		reset.setGraphicSize(Std.int(reset.width) * 3);
@@ -148,18 +158,13 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		changeOption(0);
 	}
 
-	@:nullSafety(Off)
 	override function update(elapsed:Float)
 	{
-		checkArrowButton(leftArrow, () ->
-		{
-			changeOption(-1);
-		});
+		if (leftArrow != null)
+			checkArrowButton(leftArrow, () -> changeOption(-1));
 
-		checkArrowButton(rightArrow, () ->
-		{
-			changeOption(1);
-		});
+		if (rightArrow != null)
+			checkArrowButton(rightArrow, () -> changeOption(1));
 
 		if (options[curOption] == 'Pad-Custom' || options[curOption] == 'Pad-Extra')
 		{
@@ -171,33 +176,39 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 					buttonBinded = false;
 				}
 				else
-					moveButton(TouchUtil.touch, bindButton);
+				{
+					var touch = TouchUtil.touch;
+					if (touch != null && bindButton != null)
+						moveButton(touch, bindButton);
+				}
 			}
 			else
 			{
-				control.touchPad.forEachAlive((button:TouchButton) ->
+				control?.touchPad?.forEachAlive((button:TouchButton) ->
 				{
-					if (button.justPressed)
-						moveButton(TouchUtil.touch, button);
+					var touch = TouchUtil.touch;
+					if (button.justPressed && touch != null)
+						moveButton(touch, button);
 				});
 			}
-			control.touchPad.forEachAlive((button:TouchButton) ->
+			control?.touchPad?.forEachAlive((button:TouchButton) ->
 			{
-				if (button != bindButton && buttonBinded)
+				if (button != bindButton && buttonBinded && bindButton != null && bindButton.bounds != null)
 				{
 					bindButton.centerBounds();
 					button.bounds.immovable = true;
 					bindButton.bounds.immovable = false;
 					button.centerBounds();
-					FlxG.overlap(bindButton.bounds, button.bounds, function(a:Dynamic, b:Dynamic) // these args dosen't work fuck them :/
+					FlxG.overlap(bindButton.bounds, button.bounds, function(a:Dynamic, b:Dynamic)
 					{
-						bindButton.centerInBounds();
+						bindButton?.centerInBounds();
 						button.centerBounds();
-						bindButton.bounds.immovable = true;
+						if (bindButton?.bounds != null)
+							bindButton.bounds.immovable = true;
 						button.bounds.immovable = false;
 					}, function(a:Dynamic, b:Dynamic)
 					{
-						if (!bindButton.bounds.immovable)
+						if (bindButton?.bounds == null || !bindButton.bounds.immovable)
 						{
 							if (bindButton.bounds.x > button.bounds.x)
 								bindButton.bounds.x = button.bounds.x + button.bounds.width;
@@ -220,24 +231,24 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		super.update(elapsed);
 	}
 
-	@:nullSafety(Off)
 	function changeControls(?type:Int, ?extraMode:Bool = false)
 	{
 		if (type == null)
 			type = curOption;
 		if (control != null)
 			control.destroy();
-		if (members.contains(control))
+		if (control != null && members.contains(control))
 			remove(control);
 		control = new MobileControls(type, extraMode);
 		add(control);
 		control.cameras = [ui];
 	}
 
-	@:nullSafety(Off)
 	function changeOption(change:Int)
 	{
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		var scrollSound = Paths.sound('scrollMenu');
+		if (scrollSound != null)
+			FlxG.sound.play(scrollSound);
 		curOption += change;
 
 		if (curOption < 0)
@@ -248,15 +259,18 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		switch (curOption)
 		{
 			case 0 | 1 | 3:
-				reset.visible = false;
+				if (reset != null)
+					reset.visible = false;
 				changeControls();
 			case 2:
-				reset.visible = true;
+				if (reset != null)
+					reset.visible = true;
 				changeControls();
 			case 5:
-				reset.visible = true;
+				if (reset != null)
+					reset.visible = true;
 				changeControls(0, true);
-				control.touchPad.forEachAlive((button:TouchButton) ->
+				control?.touchPad?.forEachAlive((button:TouchButton) ->
 				{
 					var ignore = ['G', 'S'];
 					if (!ignore.contains(button.tag.toUpperCase()))
@@ -267,29 +281,33 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 		setOptionText();
 	}
 
-	@:nullSafety(Off)
 	function setOptionText()
 	{
+		if (itemText == null || rightArrow == null) return;
 		itemText.text = options[curOption].replace('-', ' ');
 		itemText.updateHitbox();
 		itemText.offset.set(0, 15);
 		FlxTween.tween(rightArrow, {x: itemText.x + itemText.width + 10}, 0.1, {ease: FlxEase.quintOut});
 	}
 
-	@:nullSafety(Off)
 	function updatePosText()
 	{
+		if (positionText == null || positionTextBg == null) return;
 		var optionName = options[curOption];
 		if (optionName == 'Pad-Custom' || optionName == 'Pad-Extra')
 		{
 			positionText.visible = positionTextBg.visible = true;
-			if (optionName == 'Pad-Custom')
+			var touchPadLocal = control?.touchPad;
+			if (touchPadLocal != null)
 			{
-				positionText.text = 'LEFT X: ${control.touchPad.buttonLeft.x} - Y: ${control.touchPad.buttonLeft.y}\nDOWN X: ${control.touchPad.buttonDown.x} - Y: ${control.touchPad.buttonDown.y}\n\nUP X: ${control.touchPad.buttonUp.x} - Y: ${control.touchPad.buttonUp.y}\nRIGHT X: ${control.touchPad.buttonRight.x} - Y: ${control.touchPad.buttonRight.y}';
-			}
-			else
-			{
-				positionText.text = 'S X: ${control.touchPad.buttonExtra.x} - Y: ${control.touchPad.buttonExtra.y}\n\n\n\nG X: ${control.touchPad.buttonExtra2.x} - Y: ${control.touchPad.buttonExtra2.y}';
+				if (optionName == 'Pad-Custom')
+				{
+					positionText.text = 'LEFT X: ${touchPadLocal.buttonLeft.x} - Y: ${touchPadLocal.buttonLeft.y}\nDOWN X: ${touchPadLocal.buttonDown.x} - Y: ${touchPadLocal.buttonDown.y}\n\nUP X: ${touchPadLocal.buttonUp.x} - Y: ${touchPadLocal.buttonUp.y}\nRIGHT X: ${touchPadLocal.buttonRight.x} - Y: ${touchPadLocal.buttonRight.y}';
+				}
+				else
+				{
+					positionText.text = 'S X: ${touchPadLocal.buttonExtra.x} - Y: ${touchPadLocal.buttonExtra.y}\n\n\n\nG X: ${touchPadLocal.buttonExtra2.x} - Y: ${touchPadLocal.buttonExtra2.y}';
+				}
 			}
 			positionText.setPosition(0, (((positionTextBg.height - positionText.height) / 2) + positionTextBg.y));
 		}
@@ -297,7 +315,6 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 			positionText.visible = positionTextBg.visible = false;
 	}
 
-	@:nullSafety(Off)
 	function checkArrowButton(button:FlxSprite, func:Void->Void)
 	{
 		if (TouchUtil.overlaps(button))
@@ -306,24 +323,28 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				button.animation.play('press');
 			if (TouchUtil.justPressed)
 			{
-				if (options[curOption] == "Pad-Extra" && control.touchPad != null)
-					control.touchPad.setExtrasDefaultPos();
+				var touchPadLocal = control?.touchPad;
+				if (options[curOption] == "Pad-Extra" && touchPadLocal != null)
+					touchPadLocal.setExtrasDefaultPos();
 				func();
 			}
 		}
-		if (TouchUtil.justReleased && button.animation.curAnim.name == 'press')
+		var curAnim = button.animation.curAnim;
+		if (TouchUtil.justReleased && curAnim != null && curAnim.name == 'press')
 			button.animation.play('idle');
 		if (FlxG.keys.justPressed.LEFT && button == leftArrow || FlxG.keys.justPressed.RIGHT && button == rightArrow)
 			func();
 	}
 
-	@:nullSafety(Off)
 	function moveButton(touch:FlxTouch, button:TouchButton):Void
 	{
 		bindButton = button;
 		buttonBinded = bindButton == null ? false : true;
-		bindButton.x = touch.x - Std.int(bindButton.width / 2);
-		bindButton.y = touch.y - Std.int(bindButton.height / 2);
+		if (bindButton != null)
+		{
+			bindButton.x = touch.x - Std.int(bindButton.width / 2);
+			bindButton.y = touch.y - Std.int(bindButton.height / 2);
+		}
 		updatePosText();
 	}
 }
