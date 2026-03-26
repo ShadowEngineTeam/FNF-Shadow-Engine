@@ -113,9 +113,7 @@ class DialogueCharacter extends FlxSprite
 		if (targetAnim != null && dialogueAnimations.exists(targetAnim))
 		{
 			var animData:Null<DialogueAnimArray> = dialogueAnimations.get(targetAnim);
-			if (animData != null && (animData.loop_name == null
-				|| animData.loop_name.length < 1
-				|| animData.loop_name == animData.idle_name))
+			if (animData != null && (animData.loop_name == null || animData.loop_name.length < 1 || animData.loop_name == animData.idle_name))
 			{
 				playIdle = true;
 			}

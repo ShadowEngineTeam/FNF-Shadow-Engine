@@ -226,7 +226,7 @@ class Paths
 
 			if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + modKey)) || FileSystem.exists(mods(modKey)))
 				return true;
-			
+
 			#if USING_GPU_TEXTURES
 			if (modKey.endsWith(IMAGE_EXT))
 			{
@@ -271,7 +271,8 @@ class Paths
 		{
 			localTrackedAssets.push(file);
 			var asset = currentTrackedAssets.get(file);
-			if (asset != null) return asset;
+			if (asset != null)
+				return asset;
 		}
 		else if (FileSystem.exists(file))
 		{
@@ -289,7 +290,8 @@ class Paths
 				{
 					localTrackedAssets.push(file);
 					var asset = currentTrackedAssets.get(file);
-					if (asset != null) return asset;
+					if (asset != null)
+						return asset;
 				}
 				else if (FileSystem.exists(file))
 				{
@@ -298,7 +300,8 @@ class Paths
 						bitmap = BitmapData.fromBytes(bytes);
 				}
 
-				if (bitmap != null) break;
+				if (bitmap != null)
+					break;
 			}
 		}
 
@@ -310,17 +313,19 @@ class Paths
 		}
 
 		trace('Failed to load image: $file');
-		
+
 		if (currentTrackedAssets.exists('__flixel_logo'))
 		{
 			localTrackedAssets.push('__flixel_logo');
 			var logo = currentTrackedAssets.get('__flixel_logo');
-			if (logo != null) return logo;
+			if (logo != null)
+				return logo;
 		}
 
 		var fallback = cacheBitmap('__flixel_logo', FlxAssets.getBitmapFromClass(GraphicLogo));
-		if (fallback != null) return fallback;
-		
+		if (fallback != null)
+			return fallback;
+
 		trace("Failed to load fallback image");
 		return null;
 	}
@@ -418,7 +423,8 @@ class Paths
 				currentTrackedSounds.set(file, Sound.fromFile(file));
 			localTrackedAssets.push(file);
 			var snd = currentTrackedSounds.get(file);
-			if (snd != null) return snd;
+			if (snd != null)
+				return snd;
 		}
 		#end
 
@@ -443,7 +449,8 @@ class Paths
 
 		localTrackedAssets.push(gottenPath);
 		var result = currentTrackedSounds.get(gottenPath);
-		if (result != null) return result;
+		if (result != null)
+			return result;
 		trace("Failed to load sound: " + gottenPath);
 		return null;
 	}
@@ -463,14 +470,16 @@ class Paths
 		if (FileSystem.exists(modXml))
 		{
 			var content = File.getContent(modXml);
-			if (content != null) return FlxAtlasFrames.fromSparrow(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromSparrow(imageLoaded, content);
 		}
 		#end
 
 		if (FileSystem.exists(xmlPath))
 		{
 			var content = File.getContent(xmlPath);
-			if (content != null) return FlxAtlasFrames.fromSparrow(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromSparrow(imageLoaded, content);
 		}
 
 		var jsonPath:String = getPath('images/$key.json', TEXT, library, true);
@@ -479,14 +488,16 @@ class Paths
 		if (FileSystem.exists(modJson))
 		{
 			var content = File.getContent(modJson);
-			if (content != null) return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
 		}
 		#end
 
 		if (FileSystem.exists(jsonPath))
 		{
 			var content = File.getContent(jsonPath);
-			if (content != null) return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
 		}
 
 		return getPackerAtlas(key, library);
@@ -506,13 +517,15 @@ class Paths
 		if (FileSystem.exists(modXml))
 		{
 			var content = File.getContent(modXml);
-			if (content != null) return FlxAtlasFrames.fromSparrow(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromSparrow(imageLoaded, content);
 		}
 		#end
 
 		var xmlPath:String = getPath('images/$key.xml', library);
 		var content = File.getContent(xmlPath);
-		if (content != null) return FlxAtlasFrames.fromSparrow(imageLoaded, content);
+		if (content != null)
+			return FlxAtlasFrames.fromSparrow(imageLoaded, content);
 		trace("Failed to load sparrow atlas: " + key);
 		return null;
 	}
@@ -531,13 +544,15 @@ class Paths
 		if (FileSystem.exists(modTxt))
 		{
 			var content = File.getContent(modTxt);
-			if (content != null) return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, content);
 		}
 		#end
 
 		var txtPath:String = getPath('images/$key.txt', library);
 		var content = File.getContent(txtPath);
-		if (content != null) return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, content);
+		if (content != null)
+			return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, content);
 		trace("Failed to load packer atlas: " + key);
 		return null;
 	}
@@ -556,13 +571,15 @@ class Paths
 		if (FileSystem.exists(modJson))
 		{
 			var content = File.getContent(modJson);
-			if (content != null) return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
+			if (content != null)
+				return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
 		}
 		#end
 
 		var jsonPath:String = getPath('images/$key.json', library);
 		var content = File.getContent(jsonPath);
-		if (content != null) return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
+		if (content != null)
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, content);
 		trace("Failed to load aseprite atlas: " + key);
 		return null;
 	}

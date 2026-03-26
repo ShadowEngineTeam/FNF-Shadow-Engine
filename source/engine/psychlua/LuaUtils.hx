@@ -136,39 +136,38 @@ class LuaUtils
 					settings = new Map<String, Dynamic>();
 				var data:Null<String> = File.getContent(path);
 				if (data != null)
-				try
-				{
-					// FunkinLua.luaTrace('getModSetting: Trying to find default value for "$saveTag" in Mod: "$modName"');
-					var parsedJson:Dynamic = Json.parse(data, path);
-					for (i in 0...parsedJson.length)
+					try
 					{
-						var sub:Dynamic = parsedJson[i];
-						if (sub != null && sub.save != null && (!settings.exists(sub.save) || settings.get(sub.save) != sub.value))
+						// FunkinLua.luaTrace('getModSetting: Trying to find default value for "$saveTag" in Mod: "$modName"');
+						var parsedJson:Dynamic = Json.parse(data, path);
+						for (i in 0...parsedJson.length)
 						{
-							if (sub.type != 'keybind' && sub.type != 'key')
+							var sub:Dynamic = parsedJson[i];
+							if (sub != null && sub.save != null && (!settings.exists(sub.save) || settings.get(sub.save) != sub.value))
 							{
-								if (sub.value != null)
+								if (sub.type != 'keybind' && sub.type != 'key')
 								{
-									// FunkinLua.luaTrace('getModSetting: Found unsaved value "${sub.save}" in Mod: "$modName"');
-									settings.set(sub.save, sub.value);
+									if (sub.value != null)
+									{
+										// FunkinLua.luaTrace('getModSetting: Found unsaved value "${sub.save}" in Mod: "$modName"');
+										settings.set(sub.save, sub.value);
+									}
+								}
+								else
+								{
+									// FunkinLua.luaTrace('getModSetting: Found unsaved keybind "${sub.save}" in Mod: "$modName"');
+									settings.set(sub.save, {keyboard: sub.keyboard ?? 'NONE', gamepad: sub.gamepad ?? 'NONE'});
 								}
 							}
-							else
-							{
-								// FunkinLua.luaTrace('getModSetting: Found unsaved keybind "${sub.save}" in Mod: "$modName"');
-								settings.set(sub.save,
-									{keyboard: sub.keyboard ?? 'NONE', gamepad: sub.gamepad ?? 'NONE'});
-							}
 						}
+						FlxG.save.data.modSettings.set(modName, settings);
 					}
-					FlxG.save.data.modSettings.set(modName, settings);
-				}
-				catch (e:Dynamic)
-				{
-					var errorTitle = 'Mod name: ' + Mods.currentModDirectory;
-					var errorMsg = 'An error occurred: $e';
-					CoolUtil.showPopUp(errorMsg, errorTitle);
-				}
+					catch (e:Dynamic)
+					{
+						var errorTitle = 'Mod name: ' + Mods.currentModDirectory;
+						var errorMsg = 'An error occurred: $e';
+						CoolUtil.showPopUp(errorMsg, errorTitle);
+					}
 			}
 		}
 		else

@@ -171,7 +171,6 @@ class StoryMenuState extends MusicBeatState
 		#end
 
 		super.create();
-		
 		Paths.clearUnusedMemory();
 	}
 

@@ -366,7 +366,8 @@ class ControlsSubState extends MusicBeatSubstate
 					closeBinding();
 				}
 			}
-			else if ((FlxG.keys.pressed.BACKSPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.pressed #end) || FlxG.gamepads.anyPressed(BACK))
+			else if ((FlxG.keys.pressed.BACKSPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.pressed #end)
+				|| FlxG.gamepads.anyPressed(BACK))
 			{
 				holdingEsc += elapsed;
 				if (holdingEsc > 0.5)

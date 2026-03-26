@@ -59,36 +59,36 @@ class MenuCharacter extends FlxSprite
 					path = modPath;
 				#end
 
-			if (!FileSystem.exists(path))
-				path = Paths.getSharedPath(defaultPath);
+				if (!FileSystem.exists(path))
+					path = Paths.getSharedPath(defaultPath);
 
-			var rawJson:Null<String> = File.getContent(path);
-			if (rawJson == null)
-				return;
+				var rawJson:Null<String> = File.getContent(path);
+				if (rawJson == null)
+					return;
 
-			var charFile:MenuCharacterFile = cast Json.parse(rawJson, path);
-			var atlas:Null<FlxAtlasFrames> = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
-			if (atlas != null)
-				frames = atlas;
-			animation.addByPrefix('idle', charFile.idle_anim, 24);
+				var charFile:MenuCharacterFile = cast Json.parse(rawJson, path);
+				var atlas:Null<FlxAtlasFrames> = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+				if (atlas != null)
+					frames = atlas;
+				animation.addByPrefix('idle', charFile.idle_anim, 24);
 
-			var confirmAnim:String = charFile.confirm_anim;
-			if (confirmAnim != null && confirmAnim.length > 0 && confirmAnim != charFile.idle_anim)
-			{
-				animation.addByPrefix('confirm', confirmAnim, 24, false);
-				if (animation.getByName('confirm') != null)
-					hasConfirmAnimation = true;
-			}
+				var confirmAnim:String = charFile.confirm_anim;
+				if (confirmAnim != null && confirmAnim.length > 0 && confirmAnim != charFile.idle_anim)
+				{
+					animation.addByPrefix('confirm', confirmAnim, 24, false);
+					if (animation.getByName('confirm') != null)
+						hasConfirmAnimation = true;
+				}
 
-			flipX = (charFile.flipX == true);
+				flipX = (charFile.flipX == true);
 
-			if (charFile.scale != 1)
-			{
-				scale.set(charFile.scale, charFile.scale);
-				updateHitbox();
-			}
-			offset.set(charFile.position[0], charFile.position[1]);
-			animation.play('idle');
+				if (charFile.scale != 1)
+				{
+					scale.set(charFile.scale, charFile.scale);
+					updateHitbox();
+				}
+				offset.set(charFile.position[0], charFile.position[1]);
+				animation.play('idle');
 		}
 	}
 }

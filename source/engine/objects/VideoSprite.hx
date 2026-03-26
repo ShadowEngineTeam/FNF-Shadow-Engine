@@ -133,7 +133,7 @@ class VideoSprite extends FlxSpriteGroup
 			}
 			if (mobile.backend.TouchUtil.pressed)
 				controlsPressed = true;
-				
+
 			if (controlsPressed)
 			{
 				holdingTime = Math.max(0, Math.min(_timeToSkip, holdingTime + elapsed));

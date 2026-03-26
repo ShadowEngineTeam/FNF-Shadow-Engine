@@ -35,7 +35,8 @@ class ShadowStepper extends FlxSpriteGroup
 	var _scrollSpeed:Float = 40;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0, ?onChange:Float->Void, width:Int = 64)
+	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0,
+			?onChange:Float->Void, width:Int = 64)
 	{
 		super(x, y);
 

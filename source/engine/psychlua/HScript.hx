@@ -170,15 +170,18 @@ class HScript extends SScript
 		set('keyboardReleased', function(name:String) return Reflect.getProperty(FlxG.keys.justReleased, name));
 
 		@:nullSafety(Off)
-		set('anyGamepadJustPressed', function(name:String):Bool {
+		set('anyGamepadJustPressed', function(name:String):Bool
+		{
 			return FlxG.gamepads.anyJustPressed(name) == true;
 		});
 		@:nullSafety(Off)
-		set('anyGamepadPressed', function(name:String):Bool {
+		set('anyGamepadPressed', function(name:String):Bool
+		{
 			return FlxG.gamepads.anyPressed(name) == true;
 		});
 		@:nullSafety(Off)
-		set('anyGamepadReleased', function(name:String):Bool {
+		set('anyGamepadReleased', function(name:String):Bool
+		{
 			return FlxG.gamepads.anyJustReleased(name) == true;
 		});
 
@@ -468,8 +471,7 @@ class HScript extends SScript
 				{
 					var e = callValue.exceptions[0];
 					if (e != null && funk.hscript != null)
-						FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
-							false, FlxColor.RED);
+						FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false, false, FlxColor.RED);
 				}
 				return null;
 			}

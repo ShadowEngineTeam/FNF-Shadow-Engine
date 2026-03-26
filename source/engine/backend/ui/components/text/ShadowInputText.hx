@@ -178,7 +178,7 @@ class ShadowInputText extends FlxText
 		if (dirty)
 			calcFrame(useFramePixels);
 
-drawSprite(fieldBorderSprite);
+		drawSprite(fieldBorderSprite);
 		drawSprite(backgroundSprite);
 		drawSprite(selectionSprite);
 

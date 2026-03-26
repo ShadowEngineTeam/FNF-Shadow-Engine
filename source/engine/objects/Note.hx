@@ -145,7 +145,7 @@ class Note extends FlxSkewedSprite
 			for (note in _activeNotes)
 				note.reloadNote(note.texture);
 		}
-		
+
 		return value;
 	}
 
@@ -548,7 +548,6 @@ class Note extends FlxSkewedSprite
 					wasGoodHit = true;
 			}
 		}
-
 		if (tooLate && !inEditor)
 		{
 			if (alpha > 0.3)
@@ -562,22 +561,18 @@ class Note extends FlxSkewedSprite
 		var strumY:Float = myStrum.y;
 		var strumAngle:Float = myStrum.angle;
 		var strumAlpha:Float = myStrum.alpha;
-		var strumDirection:Float = myStrum.direction;
 
+		var strumDirection:Float = myStrum.direction;
 		distance = (0.45 * (Conductor.songPosition - strumTime) * songSpeed * multSpeed);
 		if (!myStrum.downScroll)
 			distance *= -1;
-
 		var angleDir = strumDirection * Math.PI / 180;
 		if (copyAngle)
 			angle = strumDirection - 90 + strumAngle + offsetAngle;
-
 		if (copyAlpha)
 			alpha = strumAlpha * multAlpha;
-
 		if (copyX)
 			x = strumX + offsetX + Math.cos(angleDir) * distance;
-
 		if (copyY)
 		{
 			y = strumY + offsetY + correctionOffset + Math.sin(angleDir) * distance;
@@ -600,9 +595,9 @@ class Note extends FlxSkewedSprite
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevClipWasGoodHit && !canBeHit))))
 		{
 			var swagRect:FlxRect = clipRect;
+
 			if (swagRect == null)
 				swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
-
 			if (myStrum.downScroll)
 			{
 				if (y - offset.y * scale.y + height >= center)

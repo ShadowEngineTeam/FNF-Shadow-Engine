@@ -711,7 +711,8 @@ class PlayState extends MusicBeatState
 				opponentVocals.pitch = value;
 			FlxG.sound.music.pitch = value;
 			for (pluh in [intro3Sound, intro2Sound, intro1Sound, introGoSound, missnoteSound])
-				if (pluh != null) pluh.pitch = value;
+				if (pluh != null)
+					pluh.pitch = value;
 
 			var ratio:Float = playbackRate / value; // funny word huh
 			if (ratio != 1)
@@ -872,6 +873,7 @@ class PlayState extends MusicBeatState
 	}
 
 	public var videoCutscene:VideoSprite = null;
+
 	public function startVideo(name:String, forMidSong:Bool = false, canSkip:Bool = true, loop:Bool = false, playOnLoad:Bool = true)
 	{
 		#if FEATURE_VIDEOS
@@ -1111,34 +1113,38 @@ class PlayState extends MusicBeatState
 					case 0:
 						intro3Sound = FlxG.sound.play(Paths.sound('intro3' + introSoundsSuffix), 0.6);
 						#if FLX_PITCH
-						if (intro3Sound != null) intro3Sound.pitch = playbackRate;
+						if (intro3Sound != null)
+							intro3Sound.pitch = playbackRate;
 						#end
 						tick = THREE;
-						
+
 					case 1:
 						countdownReady = createCountdownSprite(introAlts[0], antialias);
 						intro2Sound = FlxG.sound.play(Paths.sound('intro2' + introSoundsSuffix), 0.6);
 						#if FLX_PITCH
-						if (intro2Sound != null) intro2Sound.pitch = playbackRate;
+						if (intro2Sound != null)
+							intro2Sound.pitch = playbackRate;
 						#end
 						tick = TWO;
-						
+
 					case 2:
 						countdownSet = createCountdownSprite(introAlts[1], antialias);
 						intro1Sound = FlxG.sound.play(Paths.sound('intro1' + introSoundsSuffix), 0.6);
 						#if FLX_PITCH
-						if (intro1Sound != null) intro1Sound.pitch = playbackRate;
+						if (intro1Sound != null)
+							intro1Sound.pitch = playbackRate;
 						#end
 						tick = ONE;
-						
+
 					case 3:
 						countdownGo = createCountdownSprite(introAlts[2], antialias);
 						introGoSound = FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
 						#if FLX_PITCH
-						if (introGoSound != null) introGoSound.pitch = playbackRate;
+						if (introGoSound != null)
+							introGoSound.pitch = playbackRate;
 						#end
 						tick = GO;
-						
+
 					case 4:
 						tick = START;
 				}
@@ -1473,7 +1479,7 @@ class PlayState extends MusicBeatState
 
 		final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
 		var file:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
-		
+
 		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events' + (isDiffErect ? '-erect' : ""))) || #end FileSystem.exists(file))
 		{
 			var eventsData:Array<Dynamic> = Song.loadFromJson('events' + (isDiffErect ? '-erect' : ""), songName).events;

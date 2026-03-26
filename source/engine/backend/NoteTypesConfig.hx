@@ -104,7 +104,8 @@ class NoteTypesConfig
 			{
 				var str:Dynamic = propArray[i];
 				var id:Null<Int> = Std.parseInt(str.substr(0, str.length - 1).trim());
-				if (id == null) id = 0;
+				if (id == null)
+					id = 0;
 				if (i < propArray.length - 1)
 					obj = obj[id]; // middles
 				else if (setProp)

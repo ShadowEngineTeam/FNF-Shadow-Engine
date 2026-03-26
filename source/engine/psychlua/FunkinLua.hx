@@ -480,14 +480,14 @@ class FunkinLua
 					path = modPath;
 				else
 				#end
-					path = Paths.json(formattedSong + '/' + dialogueFile);
+				path = Paths.json(formattedSong + '/' + dialogueFile);
 
 				luaTrace('startDialogue: Trying to load dialogue: ' + path);
 
 				if (FileSystem.exists(path))
 				{
-var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
-				if (dialogueData != null && dialogueData.dialogue.length > 0)
+					var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
+					if (dialogueData != null && dialogueData.dialogue.length > 0)
 					{
 						cast(game, PlayState).startDialogue(dialogueData, music);
 						luaTrace('startDialogue: Successfully loaded dialogue', false, false, FlxColor.GREEN);
@@ -544,13 +544,12 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 				#end
 			});
 		}
-
-		// Song/Week shit
+		// Song/Week thing
 		set('curBpm', Conductor.bpm);
 		set('crochet', Conductor.crochet);
 		set('stepCrochet', Conductor.stepCrochet);
 
-		// Camera poo
+		// Camera pos
 		set('cameraX', 0);
 		set('cameraY', 0);
 
@@ -582,8 +581,8 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 		set('lowQuality', ClientPrefs.data.lowQuality);
 		set('shadersEnabled', ClientPrefs.data.shaders);
 		set('scriptName', scriptName);
-		set('currentModDirectory', Mods.currentModDirectory);
 
+		set('currentModDirectory', Mods.currentModDirectory);
 		// Noteskin/Splash
 		set('noteSkin', ClientPrefs.data.noteSkin);
 		set('noteSkinPostfix', Note.getNoteSkinPostfix());
@@ -930,8 +929,10 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 		});
 		set("setObjectOrder", function(obj:String, ?position:Int, ?group:String)
 		{
-			if (position != null && position < 0) position = 0;
-			if (position == null) position = -1;
+			if (position != null && position < 0)
+				position = 0;
+			if (position == null)
+				position = -1;
 			var targetObj:FlxBasic = LuaUtils.getObjectDirectly(obj);
 			if (targetObj != null)
 			{
@@ -945,7 +946,8 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 							case TClass(Array): // Is Array
 								function sortZIndex(order:Int, a:FlxBasic, b:FlxBasic):Int
 								{
-									if (a == null || b == null) return 0;
+									if (a == null || b == null)
+										return 0;
 									return flixel.util.FlxSort.byValues(order, a.zIndex, b.zIndex);
 								}
 								targetObj.zIndex = position;
@@ -1478,8 +1480,8 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 		set("luaSpriteExists", game.modchartSprites.exists);
 		set("luaTextExists", game.modchartTexts.exists);
 		set("luaSoundExists", game.modchartSounds.exists);
-
 		set("luaSoundExists", game.modchartSounds.exists);
+
 		set("setObjectCamera", function(obj:String, camera:String = '')
 		{
 			var real:FlxSprite = cast(game.getLuaObject(obj), FlxSprite);
@@ -1969,7 +1971,7 @@ var dialogueData:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
 		}
 	}
 
-public static function getBool(variable:String):Bool
+	public static function getBool(variable:String):Bool
 	{
 		if (lastCalledScript == null)
 			return false;
@@ -2088,6 +2090,7 @@ public static function getBool(variable:String):Bool
 			var fragPath:String = folder + name + '.frag';
 			var vertPath:String = folder + name + '.vert';
 			var frag:Null<String> = null;
+
 			var vert:Null<String> = null;
 			var found:Bool = false;
 

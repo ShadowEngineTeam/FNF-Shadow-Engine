@@ -48,9 +48,12 @@ class Bar extends FlxSpriteGroup
 			rightBar.color = FlxColor.BLACK;
 			rightBar.antialiasing = ClientPrefs.data.antialiasing;
 
-			if (leftBar != null) add(leftBar);
-			if (rightBar != null) add(rightBar);
-			if (bg != null) add(bg);
+			if (leftBar != null)
+				add(leftBar);
+			if (rightBar != null)
+				add(rightBar);
+			if (bg != null)
+				add(bg);
 			regenerateClips();
 		}
 

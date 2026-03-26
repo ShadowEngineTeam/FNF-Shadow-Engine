@@ -105,6 +105,7 @@ class CustomSubstate extends MusicBeatSubstate
 	}
 
 	public var parent:Dynamic = null;
+
 	public function new(name:String, parent:Dynamic)
 	{
 		instance = this;

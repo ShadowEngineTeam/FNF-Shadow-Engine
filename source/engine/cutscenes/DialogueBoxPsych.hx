@@ -125,7 +125,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	function spawnCharacters()
 	{
-		if (dialogueList == null) return;
+		if (dialogueList == null)
+			return;
 		var charsMap:Map<String, Bool> = new Map<String, Bool>();
 		for (i in 0...dialogueList.dialogue.length)
 		{
@@ -262,8 +263,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 					startNextDialog();
 				}
 				var soundPath = Paths.sound(closeSound);
-			if (soundPath != null)
-				FlxG.sound.play(soundPath, closeVolume);
+				if (soundPath != null)
+					FlxG.sound.play(soundPath, closeVolume);
 			}
 			else if (alphabetText != null && alphabetText.finishedText)
 			{
@@ -422,7 +423,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	function startNextDialog():Void
 	{
-		if (dialogueList == null) return;
+		if (dialogueList == null)
+			return;
 		var curDialogue:Null<DialogueLine> = null;
 		do
 		{
@@ -545,7 +547,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	// Had to make it static because of the editors
 	public static function updateBoxOffsets(box:Null<FlxSprite>):Void
 	{
-		if (box == null) return;
+		if (box == null)
+			return;
 		box.centerOffsets();
 		box.updateHitbox();
 		if (box.animation != null && box.animation.curAnim != null && box.animation.curAnim.name != null)

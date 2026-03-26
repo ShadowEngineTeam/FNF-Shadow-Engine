@@ -35,7 +35,8 @@ class ShadowSlider extends FlxSpriteGroup
 	var _hovered:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(x:Float, y:Float, minValue:Float, maxValue:Float, defaultValue:Float, ?onChange:Float->Void, width:Int = 150, decimalPlaces:Int = 1, showValueLabel:Bool = true)
+	public function new(x:Float, y:Float, minValue:Float, maxValue:Float, defaultValue:Float, ?onChange:Float->Void, width:Int = 150, decimalPlaces:Int = 1,
+			showValueLabel:Bool = true)
 	{
 		super(x, y);
 

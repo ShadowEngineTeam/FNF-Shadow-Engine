@@ -383,7 +383,6 @@ class ChartingState extends MusicBeatState
 		add(nextRenderedSustains);
 		add(nextRenderedNotes);
 
-		
 		add(UI_box);
 
 		// RAAAHH ⚔💀🛡 -- mrchaoss
@@ -1554,41 +1553,37 @@ class ChartingState extends MusicBeatState
 
 		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Game Over Character:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar ?? '',
-			function(text:String)
-			{
-				_song.gameOverChar = text;
-			});
+		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar ?? '', function(text:String)
+		{
+			_song.gameOverChar = text;
+		});
 		tab_group.add(gameOverCharacterInputText);
 		registerBlockerInput(gameOverCharacterInputText);
 
 		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "Death Sound (sounds/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound ?? '',
-			function(text:String)
-			{
-				_song.gameOverSound = text;
-			});
+		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound ?? '', function(text:String)
+		{
+			_song.gameOverSound = text;
+		});
 		tab_group.add(gameOverSoundInputText);
 		registerBlockerInput(gameOverSoundInputText);
 
 		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Loop Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop ?? '',
-			function(text:String)
-			{
-				_song.gameOverLoop = text;
-			});
+		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop ?? '', function(text:String)
+		{
+			_song.gameOverLoop = text;
+		});
 		tab_group.add(gameOverLoopInputText);
 		registerBlockerInput(gameOverLoopInputText);
 
 		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Retry Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd ?? '',
-			function(text:String)
-			{
-				_song.gameOverEnd = text;
-			});
+		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd ?? '', function(text:String)
+		{
+			_song.gameOverEnd = text;
+		});
 		tab_group.add(gameOverEndInputText);
 		registerBlockerInput(gameOverEndInputText);
 	}
@@ -1642,7 +1637,8 @@ class ChartingState extends MusicBeatState
 		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close',
+			ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 

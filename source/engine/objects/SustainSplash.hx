@@ -64,7 +64,8 @@ class SustainSplash extends FlxSprite
 
 	public static function generateSustainSplash(strumNote:StrumNote, targetStrumTime:Float, mustPress:Bool = true):SustainSplash
 	{
-		if (SustainSplash.mainGroup == null) return new SustainSplash();
+		if (SustainSplash.mainGroup == null)
+			return new SustainSplash();
 		var splash:SustainSplash = SustainSplash.mainGroup.recycle(null, () -> new SustainSplash(), false, true);
 		if (splash != null)
 			splash.resetSustainSplash(strumNote, targetStrumTime, mustPress);
@@ -74,7 +75,8 @@ class SustainSplash extends FlxSprite
 
 	public static function hideAtData(noteData:Int):Void
 	{
-		if (SustainSplash.mainGroup == null) return;
+		if (SustainSplash.mainGroup == null)
+			return;
 		for (splash in SustainSplash.mainGroup.members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress && splash.animation.curAnim.name != 'end')
@@ -84,7 +86,8 @@ class SustainSplash extends FlxSprite
 
 	public static function showAtData(noteData:Int):Void
 	{
-		if (SustainSplash.mainGroup == null) return;
+		if (SustainSplash.mainGroup == null)
+			return;
 		for (splash in SustainSplash.mainGroup.members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress)
@@ -94,7 +97,8 @@ class SustainSplash extends FlxSprite
 
 	public static function hasSplashAtData(noteData:Int, mustPess:Bool):Bool
 	{
-		if (SustainSplash.mainGroup == null) return false;
+		if (SustainSplash.mainGroup == null)
+			return false;
 		for (splash in SustainSplash.mainGroup.members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress == mustPess)
@@ -349,12 +353,12 @@ class SustainSplash extends FlxSprite
 	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
 	{
 		if (usePixelTextures != value)
-		{		
+		{
 			#if !haxe5
 			@:bypassAccessor
 			#end
 			usePixelTextures = value;
-	
+
 			if (SustainSplash.mainGroup != null)
 			{
 				for (splash in SustainSplash.mainGroup.members)

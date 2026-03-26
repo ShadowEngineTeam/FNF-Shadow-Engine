@@ -25,13 +25,13 @@ class CustomSoundTray extends FlxSoundTray
 	public function new()
 	{
 		super();
-		
+
 		bg = new Bitmap();
 		backingBar = new Bitmap();
-		
+
 		removeChildren();
 		loadImages();
-		
+
 		y = -height;
 		visible = false;
 		screenCenter();
@@ -42,7 +42,7 @@ class CustomSoundTray extends FlxSoundTray
 	function loadImages():Void
 	{
 		removeChildren();
-		
+
 		bgPath = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
@@ -76,12 +76,12 @@ class CustomSoundTray extends FlxSoundTray
 
 		_bars = [];
 		barPaths = [];
-		
+
 		for (i in 1...11)
 		{
 			var barPath:String = getImagePath('soundtray/bars_$i');
 			barPaths.push(barPath);
-			
+
 			if (FileSystem.exists(barPath))
 			{
 				var barBytes:Null<haxe.io.Bytes> = File.getBytes(barPath);
@@ -128,7 +128,7 @@ class CustomSoundTray extends FlxSoundTray
 		if (FileSystem.exists(modSound))
 			return modSound;
 		#end
-		
+
 		return Paths.getPath('sounds/$key.ogg');
 	}
 
@@ -166,7 +166,7 @@ class CustomSoundTray extends FlxSoundTray
 	override public function show(up:Bool = false):Void
 	{
 		loadImages();
-		
+
 		var globalVolume:Int = Math.round(MathTools.logToLinear(FlxG.sound.volume) * 10);
 
 		if (up)

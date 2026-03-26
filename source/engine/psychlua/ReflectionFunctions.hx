@@ -271,7 +271,8 @@ class ReflectionFunctions
 				else
 				{
 					var target = LuaUtils.getTargetInstance();
-					if (target != null) target.add(obj);
+					if (target != null)
+						target.add(obj);
 				}
 			}
 			else

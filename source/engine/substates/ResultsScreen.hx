@@ -435,26 +435,27 @@ class HitGraph extends Sprite
 		}
 
 		if (bitmap != null)
-            bitmap.bitmapData.dispose();
+			bitmap.bitmapData.dispose();
 
 		var bm = new BitmapData(_width, _height, true, 0x00000000);
 		try
-        {
-            bm.draw(this);
-            bitmap = new Bitmap(bm);
-        }
-        catch (e:Dynamic)
-        {
-            trace('Error drawing HitGraph: $e');
-            bm.dispose();
-        }
+		{
+			bm.draw(this);
+			bitmap = new Bitmap(bm);
+		}
+		catch (e:Dynamic)
+		{
+			trace('Error drawing HitGraph: $e');
+			bm.dispose();
+		}
 	}
 
 	public function fitX(x:Float)
 	{
 		var musicLength = FlxG.sound.music?.length ?? 1.0;
-        if (musicLength <= 0) musicLength = 1.0;
-        return (x / musicLength) * _width;
+		if (musicLength <= 0)
+			musicLength = 1.0;
+		return (x / musicLength) * _width;
 	}
 
 	public function addToHistory(diff:Float, judge:String, time:Float)
@@ -465,10 +466,10 @@ class HitGraph extends Sprite
 	public function update():Void
 	{
 		if (_width <= 0 || _height <= 0)
-        {
-            trace('Invalid graph dimensions: $_width x $_height');
-            return;
-        }
+		{
+			trace('Invalid graph dimensions: $_width x $_height');
+			return;
+		}
 
 		drawGraph();
 	}

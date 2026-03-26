@@ -35,7 +35,7 @@ class StrumNote extends FlxSkewedSprite
 	}
 
 	public static var _activeStrumNotes:Array<StrumNote> = [];
-	
+
 	public static var usePixelTextures(default, set):Null<Bool>;
 
 	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
@@ -54,7 +54,7 @@ class StrumNote extends FlxSkewedSprite
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
 	{
-		if (ClientPrefs.data.disableRGBNotes) 
+		if (ClientPrefs.data.disableRGBNotes)
 		{
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
@@ -92,7 +92,8 @@ class StrumNote extends FlxSkewedSprite
 		var skin:String = if (daTexture != null && daTexture.length > 1) daTexture else Note.defaultNoteSkin;
 		var customSkin:String = skin + skinPostfix;
 
-		if (Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+		if (Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}',
+			Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 		else
 			skin = Note.defaultNoteSkin;

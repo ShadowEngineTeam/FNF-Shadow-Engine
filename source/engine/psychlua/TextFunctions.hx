@@ -194,7 +194,8 @@ class TextFunctions
 			{
 				var textElement:FlxText = game.modchartTexts.get(tag);
 				var target = LuaUtils.getTargetInstance();
-				if (target != null) target.add(textElement);
+				if (target != null)
+					target.add(textElement);
 			}
 		});
 		funk.set("removeLuaText", function(tag:String, destroy:Bool = true)
@@ -206,7 +207,8 @@ class TextFunctions
 
 			var textElement:FlxText = game.modchartTexts.get(tag);
 			var target = LuaUtils.getTargetInstance();
-			if (target != null) target.remove(textElement, true);
+			if (target != null)
+				target.remove(textElement, true);
 			if (destroy)
 			{
 				textElement.kill();
