@@ -20,13 +20,13 @@ class MusicPlayer extends FlxGroup
 	public var playingMusic:Bool = false;
 	public var curTime:Float = 0;
 
-	var songBG:Null<FlxSprite> = null;
-	var songTxt:Null<FlxText> = null;
-	var timeTxt:Null<FlxText> = null;
+	var songBG:FlxSprite = new FlxSprite();
+	var songTxt:FlxText = new FlxText();
+	var timeTxt:FlxText = new FlxText();
 	var progressBar:Null<FlxBar> = null;
-	var playbackBG:Null<FlxSprite> = null;
+	var playbackBG:FlxSprite = new FlxSprite();
 	var playbackSymbols:Array<FlxText> = [];
-	var playbackTxt:Null<FlxText> = null;
+	var playbackTxt:FlxText = new FlxText();
 
 	var wasPlaying:Bool = false;
 

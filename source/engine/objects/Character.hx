@@ -114,14 +114,10 @@ class Character extends FlxAnimate
 					alpha = 0.6;
 				}
 
+				@:nullSafety(Off)
 				try
 				{
-					var jsonStr:Null<String> = File.getContent(path);
-					if (jsonStr != null)
-					{
-						var jsonContent:Dynamic = Json.parse(jsonStr, path);
-						loadCharacterFile(jsonContent);
-					}
+					loadCharacterFile(Json.parse(File.getContent(path), path));
 				}
 				catch (e:Dynamic)
 				{

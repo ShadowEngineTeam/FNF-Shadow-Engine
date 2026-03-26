@@ -38,8 +38,6 @@ class ShadowStepper extends FlxSpriteGroup
 	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0,
 			?onChange:Float->Void, width:Int = 64)
 	{
-		super(x, y);
-
 		step = stepSize;
 		min = minValue;
 		max = maxValue;
@@ -49,14 +47,16 @@ class ShadowStepper extends FlxSpriteGroup
 		_height = ShadowStyle.HEIGHT_INPUT;
 
 		drawBackground();
+		
+		super(x, y);
 		add(bg);
 
 		var arrowHeight:Int = Std.int(_height / 2);
-		upArrow = new FlxSprite(_width - _arrowWidth, 0);
+		upArrow.setPosition(_width - _arrowWidth, 0);
 		drawUpArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(upArrow);
 
-		downArrow = new FlxSprite(_width - _arrowWidth, arrowHeight);
+		downArrow.setPosition(_width - _arrowWidth, arrowHeight);
 		drawDownArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(downArrow);
 

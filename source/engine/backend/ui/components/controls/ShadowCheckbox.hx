@@ -25,18 +25,21 @@ class ShadowCheckbox extends FlxSpriteGroup
 
 	public function new(x:Float, y:Float, text:String, defaultValue:Bool = false, ?onChange:Bool->Void)
 	{
-		super(x, y);
 		_size = ShadowStyle.HEIGHT_CHECKBOX;
 		callback = onChange;
 
 		drawBox(ShadowStyle.BORDER_DARK);
+		
+		super(x, y);
 		add(box);
 
 		drawCheckmark();
 		checkmark.visible = false;
 		add(checkmark);
 
-		label = new FlxText(_size + ShadowStyle.SPACING_SM, 0, 0, text);
+		label.text = text;
+		label.fieldWidth = 0;
+		label.x = _size +ShadowStyle.SPACING_SM;
 		label.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		label.antialiasing = ShadowStyle.antialiasing;
 		label.y = (_size - label.height) / 2;

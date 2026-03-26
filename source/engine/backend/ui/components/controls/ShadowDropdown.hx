@@ -26,13 +26,13 @@ class ShadowDropdown extends FlxSpriteGroup
 	var header:FlxSprite = new FlxSprite();
 	var headerText:FlxText = new FlxText();
 	var arrow:FlxSprite = new FlxSprite();
-	var dropList:Null<ShadowDropdownList> = null;
-	var listBg:Null<FlxSprite> = null;
+	var dropList:Null<ShadowDropdownList>;
+	var listBg:Null<FlxSprite>;
 	var isOpen:Bool = false;
 
-	var _rowHighlight:Null<FlxSprite> = null;
+	var _rowHighlight:Null<FlxSprite>;
 	var _rowItems:Array<FlxText> = [];
-
+	
 	var _width:Int = 150;
 	var _height:Int = 28;
 	var _maxVisible:Int = 6;
@@ -57,18 +57,20 @@ class ShadowDropdown extends FlxSpriteGroup
 		_height = ShadowStyle.HEIGHT_INPUT;
 		_maxVisible = maxVisibleItems;
 
-		super(x, y);
-
 		drawHeader(ShadowStyle.BORDER_DARK);
+		
+		super(x, y);
 		add(header);
 
-		headerText = new FlxText(ShadowStyle.SPACING_SM, 0, _width - 24, options.length > 0 ? options[0] : "");
+		headerText.text = options.length > 0 ? options[0] : "";
+		headerText.fieldWidth = _width - 24;
+		headerText.x = ShadowStyle.SPACING_SM;
 		headerText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		headerText.antialiasing = ShadowStyle.antialiasing;
 		headerText.y = (_height - headerText.height) / 2;
 		add(headerText);
 
-		arrow = new FlxSprite(_width - 16, 0);
+		arrow.setPosition(_width - 16, 0);
 		drawArrow();
 		add(arrow);
 
@@ -240,12 +242,13 @@ class ShadowDropdown extends FlxSpriteGroup
 	{
 		if (dropList == null)
 			return;
+		var dl:ShadowDropdownList = dropList;
 
 		if (listBg == null)
 		{
 			listBg = new FlxSprite(0, 0);
 			listBg.cameras = cameras;
-			dropList.add(listBg);
+			dl.add(listBg);
 		}
 
 		if (_rowHighlight == null)
@@ -254,7 +257,7 @@ class ShadowDropdown extends FlxSpriteGroup
 			_rowHighlight.makeGraphic(_width - 2, _height, ShadowStyle.BG_MEDIUM);
 			_rowHighlight.visible = false;
 			_rowHighlight.cameras = cameras;
-			dropList.add(_rowHighlight);
+			dl.add(_rowHighlight);
 		}
 
 		while (_rowItems.length < _maxVisible)
@@ -265,7 +268,7 @@ class ShadowDropdown extends FlxSpriteGroup
 			t.visible = false;
 			t.cameras = cameras;
 			_rowItems.push(t);
-			dropList.add(t);
+			dl.add(t);
 		}
 	}
 

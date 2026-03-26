@@ -113,10 +113,11 @@ class ShadowCamera extends FlxCamera
 
 		this.id = id;
 
-		@:privateAccess var emptyBitmap:BitmapData = new BitmapData(1, 1, true, 0);
-		@:privateAccess _backgroundFrame = new FlxFrame(new FlxGraphic('', emptyBitmap));
-		if (_backgroundFrame != null)
+		@:nullSafety(Off)
+		{
+			_backgroundFrame = new FlxFrame(new FlxGraphic('', null));
 			_backgroundFrame.frame = new FlxRect();
+		}
 
 		_blendShader = new RuntimeCustomBlendShader();
 

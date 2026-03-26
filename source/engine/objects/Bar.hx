@@ -6,9 +6,9 @@ import flixel.graphics.FlxGraphic;
 @:nullSafety
 class Bar extends FlxSpriteGroup
 {
-	public var leftBar:Null<FlxSprite> = null;
-	public var rightBar:Null<FlxSprite> = null;
-	public var bg:Null<FlxSprite> = null;
+	public var leftBar:FlxSprite = new FlxSprite();
+	public var rightBar:FlxSprite = new FlxSprite();
+	public var bg:FlxSprite = new FlxSprite();
 	public var valueFunction:Null<Void->Float> = null;
 	public var percent(default, set):Float = 0;
 	public var bounds:Dynamic = {min: 0, max: 1};
@@ -24,8 +24,6 @@ class Bar extends FlxSpriteGroup
 
 	public function new(x:Float, y:Float, image:String = 'healthBar', ?valueFunction:Void->Float, boundX:Float = 0, boundY:Float = 1)
 	{
-		super(x, y);
-
 		this.valueFunction = valueFunction;
 		bounds.min = boundX;
 		bounds.max = boundY;
@@ -33,28 +31,28 @@ class Bar extends FlxSpriteGroup
 		var img:Null<FlxGraphic> = Paths.image(image);
 		if (img != null)
 		{
-			bg = new FlxSprite();
 			bg.loadGraphic(img);
 			bg.antialiasing = ClientPrefs.data.antialiasing;
 			barWidth = Std.int(bg.width - 6);
 			barHeight = Std.int(bg.height - 6);
 
-			leftBar = new FlxSprite();
 			leftBar.makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
 			leftBar.antialiasing = ClientPrefs.data.antialiasing;
 
-			rightBar = new FlxSprite();
 			rightBar.makeGraphic(Std.int(bg.width), Std.int(bg.height), FlxColor.WHITE);
 			rightBar.color = FlxColor.BLACK;
 			rightBar.antialiasing = ClientPrefs.data.antialiasing;
 
-			if (leftBar != null)
-				add(leftBar);
-			if (rightBar != null)
-				add(rightBar);
-			if (bg != null)
-				add(bg);
+			super(x, y);
+
+			add(leftBar);
+			add(rightBar);
+			add(bg);
 			regenerateClips();
+		}
+		else
+		{
+			super(x, y);
 		}
 
 		moves = false;

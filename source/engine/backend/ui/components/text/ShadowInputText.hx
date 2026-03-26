@@ -78,11 +78,11 @@ class ShadowInputText extends FlxText
 	public var fieldBorderColor(default, set):Int = FlxColor.BLACK;
 	public var fieldBorderThickness(default, set):Int = 1;
 	public var backgroundColor(default, set):Int = FlxColor.WHITE;
-	private var backgroundSprite:Null<FlxSprite> = null;
+	private var backgroundSprite:FlxSprite = new FlxSprite();
 	private var _caretTimer:Null<FlxTimer> = null;
 	private var caret:FlxSprite = new FlxSprite();
 	private var selectionSprite:FlxSprite = new FlxSprite();
-	private var fieldBorderSprite:Null<FlxSprite> = null;
+	private var fieldBorderSprite:FlxSprite = new FlxSprite();
 	private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
 	private var _charBoundaries:Null<Array<FlxRect>> = null;
 	private var lastScroll:Int = 0;
@@ -93,14 +93,8 @@ class ShadowInputText extends FlxText
 	public function new(X:Float = 0, Y:Float = 0, Width:Int = 150, ?Text:String, size:Int = 8, TextColor:Int = FlxColor.BLACK,
 			BackgroundColor:Int = FlxColor.WHITE, EmbeddedFont:Bool = true)
 	{
-		super(X, Y, Width, Text, size, EmbeddedFont);
-		backgroundColor = BackgroundColor;
-
 		if (BackgroundColor != FlxColor.TRANSPARENT)
 			background = true;
-
-		color = TextColor;
-		caretColor = TextColor;
 
 		caret.makeGraphic(caretWidth, Std.int((size ?? 8) + 2));
 		_caretTimer = new FlxTimer();
@@ -109,15 +103,21 @@ class ShadowInputText extends FlxText
 		selectionSprite.y = Y;
 		selectionSprite.visible = false;
 
+		if (background)
+		{
+			fieldBorderSprite.setPosition(X, Y);
+			backgroundSprite.setPosition(X, Y);
+		}
+
+		super(X, Y, Width, Text, size, EmbeddedFont);
+		backgroundColor = BackgroundColor;
+
+		color = TextColor;
+		caretColor = TextColor;
+
 		caretIndex = 0;
 		_selectionAnchor = caretIndex;
 		hasFocus = false;
-
-		if (background)
-		{
-			fieldBorderSprite = new FlxSprite(X, Y);
-			backgroundSprite = new FlxSprite(X, Y);
-		}
 
 		lines = 1;
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 1);

@@ -105,7 +105,7 @@ class PsychCamera extends ShadowCamera
 			}
 		}
 
-		var mult:Float = 1 - Math.exp(-(elapsed ?? 0) * followLerp);
+		var mult:Float = 1 - Math.exp(-(elapsed ?? 1) * followLerp);
 		scroll.x += (_scrollTarget.x - scroll.x) * mult;
 		scroll.y += (_scrollTarget.y - scroll.y) * mult;
 		// trace('lerp on this frame: $mult');

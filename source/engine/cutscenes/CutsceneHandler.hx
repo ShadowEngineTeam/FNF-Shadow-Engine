@@ -32,9 +32,7 @@ class CutsceneHandler extends FlxBasic
 			if (onStart != null)
 				onStart();
 		});
-		var playState = PlayState.instance;
-		if (playState != null)
-			playState.add(this);
+		PlayState.instance?.add(this);
 	}
 
 	private var cutsceneTime:Float = 0;
@@ -44,8 +42,7 @@ class CutsceneHandler extends FlxBasic
 	{
 		super.update(elapsed);
 
-		var playState = PlayState.instance;
-		if (FlxG.state != playState || !firstFrame)
+		if (FlxG.state != PlayState.instance || !firstFrame)
 		{
 			firstFrame = true;
 			return;
@@ -61,17 +58,14 @@ class CutsceneHandler extends FlxBasic
 
 			for (spr in objects)
 			{
-				var pState = PlayState.instance;
-				if (pState != null)
-					pState.remove(spr);
+				PlayState.instance?.remove(spr);
 				spr.kill();
 				spr.destroy();
 			}
 
 			kill();
 			destroy();
-			if (playState != null)
-				playState.remove(this);
+			PlayState.instance?.remove(this);
 		}
 
 		while (timedEvents.length > 0 && timedEvents[0][0] <= cutsceneTime)

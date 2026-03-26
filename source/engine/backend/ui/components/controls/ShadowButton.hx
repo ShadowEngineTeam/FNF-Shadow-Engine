@@ -24,18 +24,20 @@ class ShadowButton extends FlxSpriteGroup
 
 	public function new(x:Float, y:Float, text:String, ?onClick:Void->Void, width:Int = 100, height:Int = 28)
 	{
-		super(x, y);
 		_width = width;
 		_height = height;
 		callback = onClick;
 
-		drawBackground(ShadowStyle.BG_MEDIUM, ShadowStyle.BORDER_DARK);
-		add(bg);
-
-		label = new FlxText(0, 0, width, text);
+		label.text = text;
+		label.fieldWidth = width;
 		label.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		label.antialiasing = ShadowStyle.antialiasing;
 		label.y = (_height - label.height) / 2;
+
+		drawBackground(ShadowStyle.BG_MEDIUM, ShadowStyle.BORDER_DARK);
+		
+		super(x, y);
+		add(bg);
 		add(label);
 	}
 

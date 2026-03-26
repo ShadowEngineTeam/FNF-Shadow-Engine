@@ -13,14 +13,14 @@ import flixel.ui.FlxButton as UIButton;
 class MobileControlSelectSubState extends MusicBeatSubstate
 {
 	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox'];
-	var control:Null<MobileControls> = null;
-	var leftArrow:Null<FlxSprite> = null;
-	var rightArrow:Null<FlxSprite> = null;
-	var itemText:Null<Alphabet> = null;
-	var positionText:Null<FlxText> = null;
-	var positionTextBg:Null<FlxSprite> = null;
-	var bg:Null<FlxBackdrop> = null;
-	var ui:Null<ShadowCamera> = null;
+	var control:Null<MobileControls>;
+	var leftArrow:Null<FlxSprite>;
+	var rightArrow:Null<FlxSprite>;
+	var itemText:Null<Alphabet>;
+	var positionText:Null<FlxText>;
+	var positionTextBg:Null<FlxSprite>;
+	var bg:Null<FlxBackdrop>;
+	var ui:Null<ShadowCamera>;
 	var curOption:Int = MobileData.mode;
 	var buttonBinded:Bool = false;
 	var bindButton:Null<TouchButton> = null;

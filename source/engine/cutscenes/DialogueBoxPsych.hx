@@ -38,8 +38,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	public var nextDialogueThing:Null<Void->Void> = null;
 	public var skipDialogueThing:Null<Void->Void> = null;
 
-	var bgFade:Null<FlxSprite> = null;
-	var box:Null<FlxSprite> = null;
+	var bgFade:Null<FlxSprite>;
+	var box:Null<FlxSprite>;
 	var textToType:String = '';
 
 	var arrayCharacters:Array<DialogueCharacter> = [];
@@ -72,39 +72,33 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 
 		bgFade = new FlxSprite(-500, -500).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.WHITE);
-		if (bgFade != null)
-		{
-			bgFade.scrollFactor.set();
-			bgFade.visible = true;
-			bgFade.alpha = 0;
-			add(bgFade);
-		}
+		bgFade.scrollFactor.set();
+		bgFade.visible = true;
+		bgFade.alpha = 0;
+		add(bgFade);
 
 		this.dialogueList = dialogueList;
 		spawnCharacters();
 
 		box = new FlxSprite(70, 370);
-		if (box != null)
-		{
-			box.antialiasing = ClientPrefs.data.antialiasing;
-			var boxAtlas = Paths.getSparrowAtlas('speech_bubble');
-			if (boxAtlas != null)
-				box.frames = boxAtlas;
-			box.scrollFactor.set();
-			box.animation.addByPrefix('normal', 'speech bubble normal', 24);
-			box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
-			box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
-			box.animation.addByPrefix('angryOpen', 'speech bubble loud open', 24, false);
-			box.animation.addByPrefix('center-normal', 'speech bubble middle', 24);
-			box.animation.addByPrefix('center-normalOpen', 'Speech Bubble Middle Open', 24, false);
-			box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
-			box.animation.addByPrefix('center-angryOpen', 'speech bubble Middle loud open', 24, false);
-			box.animation.play('normal', true);
-			box.visible = false;
-			box.setGraphicSize(Std.int(box.width * 0.9));
-			box.updateHitbox();
-			add(box);
-		}
+		box.antialiasing = ClientPrefs.data.antialiasing;
+		var boxAtlas = Paths.getSparrowAtlas('speech_bubble');
+		if (boxAtlas != null)
+			box.frames = boxAtlas;
+		box.scrollFactor.set();
+		box.animation.addByPrefix('normal', 'speech bubble normal', 24);
+		box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
+		box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
+		box.animation.addByPrefix('angryOpen', 'speech bubble loud open', 24, false);
+		box.animation.addByPrefix('center-normal', 'speech bubble middle', 24);
+		box.animation.addByPrefix('center-normalOpen', 'Speech Bubble Middle Open', 24, false);
+		box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
+		box.animation.addByPrefix('center-angryOpen', 'speech bubble Middle loud open', 24, false);
+		box.animation.play('normal', true);
+		box.visible = false;
+		box.setGraphicSize(Std.int(box.width * 0.9));
+		box.updateHitbox();
+		add(box);
 
 		alphabetText = new TypedAlphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, '');
 		if (alphabetText != null)
