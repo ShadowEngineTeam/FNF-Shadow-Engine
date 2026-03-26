@@ -29,6 +29,7 @@ using StringTools;
 #endif
 ')
 #end
+@:nullSafety
 final class MemoryUtil
 {
 	/**
@@ -190,7 +191,7 @@ final class MemoryUtil
 		if (process.exitCode() == 0)
 			memoryOutput = Std.int(Std.parseFloat(process.stdout.readAll().toString().trim().split("\n")[1]));
 		if (memoryOutput != -1)
-			return memoryMap[memoryOutput] == null ? 'Unknown ($memoryOutput)' : memoryMap[memoryOutput];
+			return memoryMap[memoryOutput] ?? 'Unknown ($memoryOutput)';
 		#elseif (mac || ios)
 		var process = new Process("system_profiler", ["SPMemoryDataType"]);
 		var reg = ~/Type: (.+)/;

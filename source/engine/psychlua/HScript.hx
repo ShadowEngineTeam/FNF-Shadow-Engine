@@ -10,12 +10,13 @@ import psychlua.FunkinLua;
 #if FEATURE_HSCRIPT
 import tea.SScript;
 
+@:nullSafety
 class HScript extends SScript
 {
-	public var modFolder:String;
+	public var modFolder:String = '';
 
 	#if FEATURE_LUA
-	public var parentLua:FunkinLua;
+	public var parentLua:Null<FunkinLua> = null;
 
 	public static function initHaxeModule(parent:FunkinLua)
 	{
@@ -46,7 +47,7 @@ class HScript extends SScript
 	}
 	#end
 
-	public var origin:String;
+	public var origin:String = '';
 
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
 	{
@@ -64,7 +65,7 @@ class HScript extends SScript
 		if (parent != null)
 		{
 			this.origin = parent.scriptName;
-			this.modFolder = parent.modFolder;
+			this.modFolder = parent.modFolder ?? '';
 		}
 		#end
 
@@ -85,7 +86,7 @@ class HScript extends SScript
 		//trace('hscript file loaded successfully: $origin (${Std.int(Date.now().getTime() - times)}ms)');
 	}
 
-	var varsToBring:Any = null;
+	var varsToBring:Null<Any> = null;
 
 	override function preset()
 	{
@@ -168,9 +169,18 @@ class HScript extends SScript
 		set('keyboardPressed', function(name:String) return Reflect.getProperty(FlxG.keys.pressed, name));
 		set('keyboardReleased', function(name:String) return Reflect.getProperty(FlxG.keys.justReleased, name));
 
-		set('anyGamepadJustPressed', function(name:String) return FlxG.gamepads.anyJustPressed(name));
-		set('anyGamepadPressed', function(name:String) FlxG.gamepads.anyPressed(name));
-		set('anyGamepadReleased', function(name:String) return FlxG.gamepads.anyJustReleased(name));
+		@:nullSafety(Off)
+		set('anyGamepadJustPressed', function(name:String):Bool {
+			return FlxG.gamepads.anyJustPressed(name) == true;
+		});
+		@:nullSafety(Off)
+		set('anyGamepadPressed', function(name:String):Bool {
+			return FlxG.gamepads.anyPressed(name) == true;
+		});
+		@:nullSafety(Off)
+		set('anyGamepadReleased', function(name:String):Bool {
+			return FlxG.gamepads.anyJustReleased(name) == true;
+		});
 
 		set('gamepadAnalogX', function(id:Int, ?leftStick:Bool = true)
 		{
@@ -178,7 +188,7 @@ class HScript extends SScript
 			if (controller == null)
 				return 0.0;
 
-			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+			return controller.getXAxis(leftStick == true ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 		set('gamepadAnalogY', function(id:Int, ?leftStick:Bool = true)
 		{
@@ -186,7 +196,7 @@ class HScript extends SScript
 			if (controller == null)
 				return 0.0;
 
-			return controller.getYAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+			return controller.getYAxis(leftStick == true ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 		set('gamepadJustPressed', function(id:Int, name:String)
 		{
@@ -227,7 +237,7 @@ class HScript extends SScript
 				case 'right':
 					return Controls.instance.NOTE_RIGHT_P;
 				default:
-					return Controls.instance.justPressed(name);
+					return Controls.instance?.justPressed(name) ?? false;
 			}
 			return false;
 		});
@@ -245,7 +255,7 @@ class HScript extends SScript
 				case 'right':
 					return Controls.instance.NOTE_RIGHT;
 				default:
-					return Controls.instance.pressed(name);
+					return Controls.instance?.pressed(name) ?? false;
 			}
 			return false;
 		});
@@ -263,7 +273,7 @@ class HScript extends SScript
 				case 'right':
 					return Controls.instance.NOTE_RIGHT_R;
 				default:
-					return Controls.instance.justReleased(name);
+					return Controls.instance?.justReleased(name) ?? false;
 			}
 			return false;
 		});
@@ -289,7 +299,7 @@ class HScript extends SScript
 			if (funk == null)
 				funk = parentLua;
 
-			if (parentLua != null)
+			if (funk != null)
 				funk.addLocalCallback(name, func);
 			else
 				FunkinLua.luaTrace('createCallback ($name): 3rd argument is null', false, false, FlxColor.RED);
@@ -301,7 +311,7 @@ class HScript extends SScript
 			try
 			{
 				var str:String = '';
-				if (libPackage.length > 0)
+				if (libPackage != null && libPackage.length > 0)
 					str = libPackage + '.';
 
 				set(libName, Type.resolveClass(str + libName));
@@ -367,7 +377,7 @@ class HScript extends SScript
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):TeaCall
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Null<TeaCall>
 	{
 		if (funcToRun == null)
 			return null;
@@ -382,7 +392,7 @@ class HScript extends SScript
 			return null;
 		}
 
-		final callValue = call(funcToRun, funcArgs);
+		final callValue = call(funcToRun, funcArgs ?? []);
 		if (!callValue.succeeded)
 		{
 			final e = callValue.exceptions[0];
@@ -403,7 +413,7 @@ class HScript extends SScript
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):TeaCall
+	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):Null<TeaCall>
 	{
 		if (funcToRun == null)
 			return null;
@@ -418,7 +428,9 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				if (funk.hscript == null)
+					return null;
+				final retVal:Null<TeaCall> = funk.hscript.executeCode(funcToRun, funcArgs ?? []);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)
@@ -426,9 +438,12 @@ class HScript extends SScript
 							|| LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 
 					final e = retVal.exceptions[0];
-					final calledFunc:String = if (funk.hscript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
+					final hscriptOrigin = funk.hscript.origin;
+					var calledFunc:String = funcToRun ?? '';
+					if (funk.hscript == null || hscriptOrigin != funk.lastCalledFunction)
+						calledFunc = funk.lastCalledFunction;
 					if (e != null)
-						FunkinLua.luaTrace(funk.hscript.origin + ":" + calledFunc + " - " + e, false, false, FlxColor.RED);
+						FunkinLua.luaTrace(hscriptOrigin + ":" + calledFunc + " - " + e, false, false, FlxColor.RED);
 					return null;
 				}
 				else if (funk.hscript.returnValue != null)
@@ -444,13 +459,18 @@ class HScript extends SScript
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null)
 		{
 			#if FEATURE_HSCRIPT
-			var callValue = funk.hscript.executeFunction(funcToRun, funcArgs);
-			if (!callValue.succeeded)
+			if (funk.hscript == null)
+				return null;
+			var callValue:Null<TeaCall> = funk.hscript.executeFunction(funcToRun, funcArgs ?? []);
+			if (callValue == null || !callValue.succeeded)
 			{
-				var e = callValue.exceptions[0];
-				if (e != null)
-					FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
-						false, FlxColor.RED);
+				if (callValue != null)
+				{
+					var e = callValue.exceptions[0];
+					if (e != null && funk.hscript != null)
+						FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
+							false, FlxColor.RED);
+				}
 				return null;
 			}
 			else
@@ -463,7 +483,7 @@ class HScript extends SScript
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '')
 		{
 			var str:String = '';
-			if (libPackage.length > 0)
+			if (libPackage != null && libPackage.length > 0)
 				str = libPackage + '.';
 			else if (libName == null)
 				libName = '';
@@ -487,7 +507,8 @@ class HScript extends SScript
 				}
 				catch (e:Dynamic)
 				{
-					FunkinLua.luaTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+					final hsOrigin = funk.hscript != null ? funk.hscript.origin : '';
+					FunkinLua.luaTrace(hsOrigin + ":" + funk.lastCalledFunction + " - " + e, false, false, FlxColor.RED);
 				}
 			}
 			#else
@@ -499,7 +520,7 @@ class HScript extends SScript
 
 	override public function destroy()
 	{
-		origin = null;
+		origin = '';
 		#if FEATURE_LUA parentLua = null; #end
 
 		super.destroy();

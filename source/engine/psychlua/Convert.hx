@@ -256,7 +256,7 @@ class Convert
 			if (callbackMethod == null)
 			{
 				// trace('checking last script');
-				var last:FunkinLua = FunkinLua.lastCalledScript;
+				var last:Null<FunkinLua> = FunkinLua.lastCalledScript;
 				if (last == null || last.lua != l)
 				{
 					// trace('looping thru scripts');

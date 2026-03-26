@@ -9,23 +9,24 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowStepper extends FlxSpriteGroup
 {
 	public var value(get, set):Float;
-	public var callback:Float->Void;
+	public var callback:Null<Float->Void>;
 
 	public var min:Float;
 	public var max:Float;
 	public var step:Float;
 	public var decimals:Int;
 
-	var bg:FlxSprite;
-	var valueText:FlxText;
-	var upArrow:FlxSprite;
-	var downArrow:FlxSprite;
+	var bg:FlxSprite = new FlxSprite();
+	var valueText:FlxText = new FlxText();
+	var upArrow:FlxSprite = new FlxSprite();
+	var downArrow:FlxSprite = new FlxSprite();
 
-	var _width:Int;
-	var _height:Int;
+	var _width:Int = 64;
+	var _height:Int = 28;
 	var _arrowWidth:Int = 16;
 	var _upHovered:Bool = false;
 	var _downHovered:Bool = false;
@@ -46,7 +47,6 @@ class ShadowStepper extends FlxSpriteGroup
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 
-		bg = new FlxSprite();
 		drawBackground();
 		add(bg);
 

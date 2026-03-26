@@ -18,6 +18,7 @@ typedef LuaTweenOptions =
 	ease:EaseFunction
 }
 
+@:nullSafety
 class LuaUtils
 {
 	public static final Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";
@@ -133,7 +134,8 @@ class LuaUtils
 			{
 				if (settings == null)
 					settings = new Map<String, Dynamic>();
-				var data:String = File.getContent(path);
+				var data:Null<String> = File.getContent(path);
+				if (data != null)
 				try
 				{
 					// FunkinLua.luaTrace('getModSetting: Trying to find default value for "$saveTag" in Mod: "$modName"');
@@ -298,7 +300,7 @@ class LuaUtils
 	{
 		var obj:Dynamic = getObjectDirectly(split[0], checkForTextsToo);
 		var end = split.length;
-		if (getProperty)
+		if (getProperty == true)
 			end = split.length - 1;
 
 		for (i in 1...end)
@@ -321,10 +323,14 @@ class LuaUtils
 		}
 	}
 
-	inline public static function getTextObject(name:String):FlxText
+	inline public static function getTextObject(name:String):Null<FlxText>
 	{
-		return #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
-		Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
+		#if FEATURE_LUA
+		final state = FunkinLua.getCurrentMusicState();
+		if (state != null && state.modchartTexts.exists(name))
+			return state.modchartTexts.get(name);
+		#end
+		return cast Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
 	}
 
 	public static function isOfTypes(value:Any, types:Array<Dynamic>)
@@ -376,7 +382,9 @@ class LuaUtils
 				var myIndices:Array<Int> = [];
 				for (i in 0...strIndices.length)
 				{
-					myIndices.push(Std.parseInt(strIndices[i]));
+					final parsed = Std.parseInt(strIndices[i]);
+					if (parsed != null)
+						myIndices.push(parsed);
 				}
 				indices = myIndices;
 			}
@@ -396,20 +404,37 @@ class LuaUtils
 
 	public static function loadFrames(spr:FlxSprite, image:String, spriteType:String, ?animateSettings:{?swfMode:Bool, ?cacheOnLoad:Bool})
 	{
-		switch (spriteType.toLowerCase().trim())
+		var type = spriteType != null ? spriteType.toLowerCase().trim() : "sparrow";
+		switch (type)
 		{
 			// case "texture_noaa" | "textureatlas_noaa" | "tex_noaa":
 			// spr.frames = AtlasFrameMaker.construct(image, null, true);
 
 			case 'aseprite' | 'jsoni8':
-				spr.frames = Paths.getAsepriteAtlas(image);
+				{
+					final frames = Paths.getAsepriteAtlas(image);
+					if (frames != null)
+						spr.frames = frames;
+				}
 
 			case "packer" | "packeratlas" | "pac":
-				spr.frames = Paths.getPackerAtlas(image);
+				{
+					final frames = Paths.getPackerAtlas(image);
+					if (frames != null)
+						spr.frames = frames;
+				}
 			case "texture" | "textureatlas" | "tex":
-				spr.frames = Paths.getTextureAtlas(image, animateSettings != null ? {swfMode: animateSettings.swfMode ?? false, cacheOnLoad: animateSettings.cacheOnLoad ?? false} : null);
+				{
+					final frames = Paths.getTextureAtlas(image, animateSettings != null ? {swfMode: animateSettings.swfMode ?? false, cacheOnLoad: animateSettings.cacheOnLoad ?? false} : null);
+					if (frames != null)
+						spr.frames = frames;
+				}
 			default:
-				spr.frames = Paths.getSparrowAtlas(image);
+				{
+					final frames = Paths.getSparrowAtlas(image);
+					if (frames != null)
+						spr.frames = frames;
+				}
 		}
 	}
 
@@ -421,10 +446,13 @@ class LuaUtils
 			return;
 		}
 
-		var target:FlxText = cast(FunkinLua.getCurrentMusicState().modchartTexts.get(tag), FlxText);
-		FunkinLua.getCurrentMusicState().remove(target, true);
-		target.kill();
-		target.destroy();
+		var target:Null<FlxText> = FunkinLua.getCurrentMusicState().modchartTexts.get(tag);
+		if (target != null)
+		{
+			FunkinLua.getCurrentMusicState().remove(target, true);
+			target.kill();
+			target.destroy();
+		}
 		FunkinLua.getCurrentMusicState().modchartTexts.remove(tag);
 		#end
 	}
@@ -437,10 +465,13 @@ class LuaUtils
 			return;
 		}
 
-		var target:ModchartSprite = cast(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), ModchartSprite);
-		FunkinLua.getCurrentMusicState().remove(target, true);
-		target.kill();
-		target.destroy();
+		var target:Null<ModchartSprite> = FunkinLua.getCurrentMusicState().modchartSprites.get(tag);
+		if (target != null)
+		{
+			FunkinLua.getCurrentMusicState().remove(target, true);
+			target.kill();
+			target.destroy();
+		}
 		FunkinLua.getCurrentMusicState().modchartSprites.remove(tag);
 		#end
 	}
@@ -448,11 +479,16 @@ class LuaUtils
 	public static function cancelTween(tag:String)
 	{
 		#if FEATURE_LUA
-		if (FunkinLua.getCurrentMusicState().modchartTweens.exists(tag))
+		final state = FunkinLua.getCurrentMusicState();
+		if (state != null && state.modchartTweens.exists(tag))
 		{
-			FunkinLua.getCurrentMusicState().modchartTweens.get(tag).cancel();
-			FunkinLua.getCurrentMusicState().modchartTweens.get(tag).destroy();
-			FunkinLua.getCurrentMusicState().modchartTweens.remove(tag);
+			var tween = state.modchartTweens.get(tag);
+			if (tween != null)
+			{
+				tween.cancel();
+				tween.destroy();
+			}
+			state.modchartTweens.remove(tag);
 		}
 		#end
 	}
@@ -470,12 +506,16 @@ class LuaUtils
 	public static function cancelTimer(tag:String)
 	{
 		#if FEATURE_LUA
-		if (FunkinLua.getCurrentMusicState().modchartTimers.exists(tag))
+		final state = FunkinLua.getCurrentMusicState();
+		if (state != null && state.modchartTimers.exists(tag))
 		{
-			var theTimer:FlxTimer = cast(FunkinLua.getCurrentMusicState().modchartTimers.get(tag), FlxTimer);
-			theTimer.cancel();
-			theTimer.destroy();
-			FunkinLua.getCurrentMusicState().modchartTimers.remove(tag);
+			var theTimer:Null<FlxTimer> = state.modchartTimers.get(tag);
+			if (theTimer != null)
+			{
+				theTimer.cancel();
+				theTimer.destroy();
+			}
+			state.modchartTimers.remove(tag);
 		}
 		#end
 	}
@@ -498,9 +538,10 @@ class LuaUtils
 	}
 
 	// buncho string stuffs
-	public static function getTweenTypeByString(?type:String = '')
+	public static function getTweenTypeByString(?type:String = ''):FlxTweenType
 	{
-		switch (type.toLowerCase().trim())
+		final tween:String = type != null ? type.toLowerCase().trim() : '';
+		switch (tween)
 		{
 			case 'backward':
 				return FlxTweenType.BACKWARD;
@@ -514,9 +555,10 @@ class LuaUtils
 		return FlxTweenType.ONESHOT;
 	}
 
-	public static function getTweenEaseByString(?ease:String = '')
+	public static function getTweenEaseByString(?ease:String = ''):EaseFunction
 	{
-		switch (ease.toLowerCase().trim())
+		final easeOutput = ease != null ? ease.toLowerCase().trim() : '';
+		switch (easeOutput)
 		{
 			case 'backin':
 				return FlxEase.backIn;
@@ -654,17 +696,21 @@ class LuaUtils
 
 	public static function cameraFromString(cam:String):FlxCamera
 	{
-		if (FunkinLua.getCurrentMusicState().modchartCameras.exists(cam))
-			return FunkinLua.getCurrentMusicState().modchartCameras.get(cam);
-		else
-			return switch (cam.toLowerCase())
-			{
-				case 'camhud' | 'hud':
-					PlayState.instance.camHUD;
-				case 'camother' | 'other':
-					PlayState.instance.camOther;
-				default:
-					PlayState.instance.camGame;
-			}
+		final state = FunkinLua.getCurrentMusicState();
+		if (state != null && state.modchartCameras.exists(cam))
+		{
+			final result = state.modchartCameras.get(cam);
+			if (result != null)
+				return result;
+		}
+		return switch (cam.toLowerCase())
+		{
+			case 'camhud' | 'hud':
+				PlayState.instance.camHUD;
+			case 'camother' | 'other':
+				PlayState.instance.camOther;
+			default:
+				PlayState.instance.camGame;
+		};
 	}
 }

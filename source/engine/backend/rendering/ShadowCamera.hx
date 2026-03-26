@@ -18,8 +18,6 @@ import flixel.graphics.tile.FlxDrawTrianglesItem;
 
 using backend.BitmapDataUtil;
 
-@:nullSafety
-
 /**
  * A FlxCamera with additional powerful features:
  * - Added the ability to grab the camera screen as a `BitmapData` and use it as a texture.
@@ -47,6 +45,7 @@ using backend.BitmapDataUtil;
 @:access(flixel.graphics.frames.FlxFrame)
 @:access(openfl.display.OpenGLRenderer)
 @:access(openfl.geom.ColorTransform)
+@:nullSafety
 class ShadowCamera extends FlxCamera
 {
 	/**

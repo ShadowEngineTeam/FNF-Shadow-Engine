@@ -2,10 +2,11 @@ package psychlua;
 
 import flixel.FlxObject;
 
+@:nullSafety
 class CustomSubstate extends MusicBeatSubstate
 {
 	public static var name:String = 'unnamed';
-	public static var instance:CustomSubstate;
+	public static var instance:Null<CustomSubstate> = null;
 
 	#if FEATURE_LUA
 	public static function implement(funk:FunkinLua)
@@ -19,7 +20,7 @@ class CustomSubstate extends MusicBeatSubstate
 
 	public static function openCustomSubstate(name:String, ?pauseGame:Bool = false)
 	{
-		if (pauseGame)
+		if (pauseGame == true)
 		{
 			FlxG.camera.followLerp = 0;
 			FunkinLua.getCurrentMusicState().persistentUpdate = false;
@@ -52,18 +53,24 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		if (instance != null)
 		{
-			var tagObject:FlxObject = cast(FunkinLua.getCurrentMusicState().variables.get(tag), FlxObject);
+			var tagObj:Null<Dynamic> = FunkinLua.getCurrentMusicState().variables.get(tag);
+			var tagObject:Null<FlxObject> = (tagObj != null) ? cast tagObj : null;
 			#if FEATURE_LUA
 			if (tagObject == null)
-				tagObject = cast(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), FlxObject);
+			{
+				tagObj = FunkinLua.getCurrentMusicState().modchartSprites.get(tag);
+				if (tagObj != null)
+					tagObject = cast tagObj;
+			}
 			#end
 
 			if (tagObject != null)
 			{
-				if (pos < 0)
+				var insertPos:Int = (pos != null) ? pos : -1;
+				if (insertPos < 0)
 					instance.add(tagObject);
 				else
-					instance.insert(pos, tagObject);
+					instance.insert(insertPos, tagObject);
 				return true;
 			}
 		}

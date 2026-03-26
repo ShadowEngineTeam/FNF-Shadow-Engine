@@ -9,14 +9,15 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowButton extends FlxSpriteGroup
 {
-	public var bg:FlxSprite;
-	public var label:FlxText;
-	public var callback:Void->Void;
+	public var bg:FlxSprite = new FlxSprite();
+	public var label:FlxText = new FlxText();
+	public var callback:Null<Void->Void>;
 
-	var _width:Int;
-	var _height:Int;
+	var _width:Int = 100;
+	var _height:Int = 28;
 	var _hovered:Bool = false;
 	var _pressed:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
@@ -28,7 +29,6 @@ class ShadowButton extends FlxSpriteGroup
 		_height = height;
 		callback = onClick;
 
-		bg = new FlxSprite();
 		drawBackground(ShadowStyle.BG_MEDIUM, ShadowStyle.BORDER_DARK);
 		add(bg);
 

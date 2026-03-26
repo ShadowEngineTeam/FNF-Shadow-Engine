@@ -3,6 +3,7 @@ package shaders;
 import openfl.display.BitmapData;
 import openfl.display.BlendMode;
 
+@:nullSafety
 class RuntimeCustomBlendShader extends RuntimePostEffectShader
 {
 	// only different name purely for hashlink fix
@@ -10,7 +11,8 @@ class RuntimeCustomBlendShader extends RuntimePostEffectShader
 
 	function set_sourceSwag(value:Null<BitmapData>):Null<BitmapData>
 	{
-		this.setBitmapData("sourceSwag", value);
+		if (value != null)
+			this.setBitmapData("sourceSwag", value);
 		return sourceSwag = value;
 	}
 

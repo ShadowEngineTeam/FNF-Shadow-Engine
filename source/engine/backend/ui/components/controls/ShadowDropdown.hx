@@ -10,31 +10,32 @@ import flixel.FlxCamera;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowDropdown extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;
-	public var selectedLabel(get, null):String;
-	public var callback:Int->Void;
+	public var selectedLabel(get, null):String = "";
+	public var callback:Null<Int->Void>;
 	public var hasFocus:Bool = false;
 
 	private static var _instances:Array<ShadowDropdown> = [];
 	private static var _clickConsumedFrame:Int = -1;
-	private static var _clickConsumer:ShadowDropdown = null;
+	private static var _clickConsumer:Null<ShadowDropdown> = null;
 
-	var options:Array<String>;
-	var header:FlxSprite;
-	var headerText:FlxText;
-	var arrow:FlxSprite;
-	var dropList:ShadowDropdownList;
-	var listBg:FlxSprite;
+	var options:Array<String> = [];
+	var header:FlxSprite = new FlxSprite();
+	var headerText:FlxText = new FlxText();
+	var arrow:FlxSprite = new FlxSprite();
+	var dropList:Null<ShadowDropdownList> = null;
+	var listBg:Null<FlxSprite> = null;
 	var isOpen:Bool = false;
 
-	var _rowHighlight:FlxSprite;
+	var _rowHighlight:Null<FlxSprite> = null;
 	var _rowItems:Array<FlxText> = [];
 
-	var _width:Int;
-	var _height:Int;
-	var _maxVisible:Int;
+	var _width:Int = 150;
+	var _height:Int = 28;
+	var _maxVisible:Int = 6;
 	var _scrollIndex:Int = 0;
 	var _headerHovered:Bool = false;
 	var _selectedIndex:Int = 0;
@@ -50,16 +51,14 @@ class ShadowDropdown extends FlxSpriteGroup
 
 	public function new(x:Float, y:Float, items:Array<String>, ?onChange:Int->Void, width:Int = 150, maxVisibleItems:Int = 6)
 	{
-		super(x, y);
-
-		_instances.push(this);
 		options = items;
 		callback = onChange;
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 		_maxVisible = maxVisibleItems;
 
-		header = new FlxSprite(0, 0);
+		super(x, y);
+
 		drawHeader(ShadowStyle.BORDER_DARK);
 		add(header);
 
@@ -79,6 +78,8 @@ class ShadowDropdown extends FlxSpriteGroup
 		dropList.exists = false;
 		dropList.active = false;
 		add(dropList);
+
+		_instances.push(this);
 
 		_ignoreClickUntilTick = Std.int(FlxG.game.ticks);
 		_ignoreUntilMouseRelease = (FlxG.mouse.pressed || FlxG.mouse.pressedRight || FlxG.mouse.pressedMiddle);
@@ -317,25 +318,32 @@ class ShadowDropdown extends FlxSpriteGroup
 		}
 
 		ensureListAssets();
-		_rowHighlight.x = this.x;
+		if (_rowHighlight != null)
+			_rowHighlight.x = this.x;
 
 		var listHeight:Int = visibleCount * _height;
 
-		listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
-		for (i in 0..._width)
-			listBg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
-		for (i in 0...listHeight)
+		if (listBg != null)
 		{
-			listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
-			listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
+			listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
+			for (i in 0..._width)
+				listBg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
+			for (i in 0...listHeight)
+			{
+				listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
+				listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
+			}
+			listBg.x = this.x;
+			listBg.y = this.y + _height;
+			listBg.visible = true;
 		}
-		listBg.x = this.x;
-		listBg.y = this.y + _height;
-		listBg.visible = true;
 
-		dropList.visible = true;
-		dropList.exists = true;
-		dropList.active = true;
+		if (dropList != null)
+		{
+			dropList.visible = true;
+			dropList.exists = true;
+			dropList.active = true;
+		}
 
 		var highlightIndex:Int = -1;
 

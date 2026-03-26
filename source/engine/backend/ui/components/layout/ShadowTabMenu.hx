@@ -15,26 +15,27 @@ typedef TabDef =
 	var label:String;
 }
 
+@:nullSafety
 class ShadowTabMenu extends FlxSpriteGroup
 {
 	public var selectedTab(get, set):Int;
-	public var callback:Int->Void;
+	public var callback:Null<Int->Void>;
 	public var collapsed(default, set):Bool = false;
 	public var showMinimizeButton(default, set):Bool = true;
 
 	var tabs:Array<TabDef>;
-	var tabButtons:Array<FlxSpriteGroup>;
-	var tabContents:Map<String, FlxSpriteGroup>;
-	var panelBg:FlxSprite;
-	var tabBar:FlxSprite;
-	var accentLine:FlxSprite;
-	var minimizeBtn:FlxSprite;
+	var tabButtons:Array<FlxSpriteGroup> = [];
+	var tabContents:Map<String, FlxSpriteGroup> = new Map();
+	var panelBg:FlxSprite = new FlxSprite();
+	var tabBar:FlxSprite = new FlxSprite();
+	var accentLine:FlxSprite = new FlxSprite();
+	var minimizeBtn:FlxSprite = new FlxSprite();
 
-	var _width:Int;
-	var _height:Int;
+	var _width:Int = 400;
+	var _height:Int = 300;
 
-	var _tabWidth:Int;
-	var _tabAreaWidth:Int;
+	var _tabWidth:Int = 0;
+	var _tabAreaWidth:Int = 0;
 	var _tabStartX:Int = 0;
 
 	var _headerRightPad:Int = 3;
@@ -61,14 +62,10 @@ class ShadowTabMenu extends FlxSpriteGroup
 		_width = width;
 		_height = height;
 
-		tabContents = new Map();
-		tabButtons = [];
-
-		panelBg = new FlxSprite(0, ShadowStyle.HEIGHT_TAB);
+		panelBg.setPosition(0, ShadowStyle.HEIGHT_TAB);
 		drawPanel();
 		add(panelBg);
 
-		tabBar = new FlxSprite();
 		drawTabBar();
 		add(tabBar);
 
@@ -359,7 +356,7 @@ class ShadowTabMenu extends FlxSpriteGroup
 		return value;
 	}
 
-	public function getTabGroup(name:String):FlxSpriteGroup
+	public function getTabGroup(name:String):Null<FlxSpriteGroup>
 		return tabContents.get(name);
 
 	public function addToTab(name:String, sprite:FlxSprite)

@@ -2,6 +2,7 @@ package backend.rendering;
 
 // PsychCamera handles followLerp based on elapsed
 // and stops camera from snapping at higher framerates
+
 @:nullSafety
 class PsychCamera extends ShadowCamera
 {

@@ -2,6 +2,7 @@ package backend.codename;
 
 import haxe.macro.Expr;
 
+@:nullSafety
 final class MathUtil
 {
 	/**

@@ -5,6 +5,7 @@ import flixel.util.FlxSave;
 import openfl.utils.Assets;
 
 // Things to trivialize some dumb stuff like splitting strings on older Lua
+@:nullSafety
 class ExtraFunctions
 {
 	public static function implement(funk:FunkinLua)
@@ -23,9 +24,31 @@ class ExtraFunctions
 			return Reflect.getProperty(FlxG.keys.justReleased, name.toUpperCase());
 		});
 
-		funk.set("anyGamepadJustPressed", function(name:String) return FlxG.gamepads.anyJustPressed(name.toUpperCase()));
-		funk.set("anyGamepadPressed", function(name:String) return FlxG.gamepads.anyPressed(name.toUpperCase()));
-		funk.set("anyGamepadReleased", function(name:String) return FlxG.gamepads.anyJustReleased(name.toUpperCase()));
+		@:nullSafety(Off)
+		funk.set("anyGamepadJustPressed", function(name:String):Bool
+		{
+			return FlxG.gamepads.anyJustPressed(name.toUpperCase()) == true;
+		});
+		@:nullSafety(Off)
+		funk.set("anyGamepadPressed", function(name:String):Bool
+		{
+			return FlxG.gamepads.anyPressed(name.toUpperCase()) == true;
+		});
+		@:nullSafety(Off)
+		funk.set("anyGamepadReleased", function(name:String):Bool
+		{
+			return FlxG.gamepads.anyJustReleased(name.toUpperCase()) == true;
+		});
+		@:nullSafety(Off)
+		funk.set("anyGamepadPressed", function(name:String):Bool
+		{
+			return FlxG.gamepads.anyPressed(name.toUpperCase()) == true;
+		});
+		@:nullSafety(Off)
+		funk.set("anyGamepadReleased", function(name:String):Bool
+		{
+			return FlxG.gamepads.anyJustReleased(name.toUpperCase()) == true;
+		});
 
 		funk.set("gamepadAnalogX", function(id:Int, ?leftStick:Bool = true)
 		{
@@ -33,7 +56,7 @@ class ExtraFunctions
 			if (controller == null)
 				return 0.0;
 
-			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+			return controller.getXAxis(leftStick == true ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 		funk.set("gamepadAnalogY", function(id:Int, ?leftStick:Bool = true)
 		{
@@ -41,7 +64,7 @@ class ExtraFunctions
 			if (controller == null)
 				return 0.0;
 
-			return controller.getYAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
+			return controller.getYAxis(leftStick == true ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 		funk.set("gamepadJustPressed", function(id:Int, name:String)
 		{
@@ -138,20 +161,22 @@ class ExtraFunctions
 		});
 		funk.set("flushSaveData", function(name:String)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				FunkinLua.getCurrentMusicState().modchartSaves.get(name).flush();
+				save.flush();
 				return;
 			}
 			FunkinLua.luaTrace('flushSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("getDataFromSave", function(name:String, field:String, ?defaultValue:Dynamic = null)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				var saveData:FlxSave = cast(FunkinLua.getCurrentMusicState().modchartSaves.get(name), FlxSave).data;
-				if (Reflect.hasField(saveData, field))
-					return Reflect.field(saveData, field);
+				var saveData:FlxSave = cast(save, FlxSave);
+				if (Reflect.hasField(saveData.data, field))
+					return Reflect.field(saveData.data, field);
 				else
 					return defaultValue;
 			}
@@ -160,18 +185,20 @@ class ExtraFunctions
 		});
 		funk.set("setDataFromSave", function(name:String, field:String, value:Dynamic)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				Reflect.setField(cast(FunkinLua.getCurrentMusicState().modchartSaves.get(name), FlxSave).data, field, value);
+				Reflect.setField(cast(save, FlxSave).data, field, value);
 				return;
 			}
 			FunkinLua.luaTrace('setDataFromSave: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("eraseSaveData", function(name:String)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				FunkinLua.getCurrentMusicState().modchartSaves.get(name).erase();
+				save.erase();
 				return;
 			}
 			FunkinLua.luaTrace('eraseSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);
@@ -180,7 +207,7 @@ class ExtraFunctions
 		// File management
 		funk.set("checkFileExists", function(filename:String, ?absolute:Bool = false)
 		{
-			if (absolute)
+			if (absolute == true)
 				return FileSystem.exists(filename);
 
 			#if FEATURE_MODS
@@ -197,7 +224,7 @@ class ExtraFunctions
 			try
 			{
 				#if FEATURE_MODS
-				if (!absolute)
+				if (absolute != true)
 				{
 					File.saveContent(Paths.mods(path), content);
 					return true;
@@ -218,7 +245,7 @@ class ExtraFunctions
 			try
 			{
 				#if FEATURE_MODS
-				if (!ignoreModFolders)
+				if (ignoreModFolders != true)
 				{
 					var modPath = Paths.modFolders(path);
 					if (FileSystem.exists(modPath))
@@ -277,7 +304,9 @@ class ExtraFunctions
 			{
 				if (exclude == '')
 					break;
-				toExclude.push(Std.parseInt(excludeArray[i].trim()));
+				var parsed = Std.parseInt(excludeArray[i].trim());
+				if (parsed != null)
+					toExclude.push(parsed);
 			}
 			return FlxG.random.int(min, max, toExclude);
 		});
@@ -289,7 +318,9 @@ class ExtraFunctions
 			{
 				if (exclude == '')
 					break;
-				toExclude.push(Std.parseFloat(excludeArray[i].trim()));
+				var parsed = Std.parseFloat(excludeArray[i].trim());
+				if (!Math.isNaN(parsed))
+					toExclude.push(parsed);
 			}
 			return FlxG.random.float(min, max, toExclude);
 		});

@@ -9,15 +9,16 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowCheckbox extends FlxSpriteGroup
 {
 	public var checked(get, set):Bool;
-	public var callback:Bool->Void;
-	public var box:FlxSprite;
-	public var checkmark:FlxSprite;
-	public var label:FlxText;
+	public var callback:Null<Bool->Void>;
+	public var box:FlxSprite = new FlxSprite();
+	public var checkmark:FlxSprite = new FlxSprite();
+	public var label:FlxText = new FlxText();
 
-	var _size:Int;
+	var _size:Int = 16;
 	var _hovered:Bool = false;
 	var _checked:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
@@ -28,11 +29,9 @@ class ShadowCheckbox extends FlxSpriteGroup
 		_size = ShadowStyle.HEIGHT_CHECKBOX;
 		callback = onChange;
 
-		box = new FlxSprite();
 		drawBox(ShadowStyle.BORDER_DARK);
 		add(box);
 
-		checkmark = new FlxSprite();
 		drawCheckmark();
 		checkmark.visible = false;
 		add(checkmark);

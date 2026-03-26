@@ -102,25 +102,40 @@ class RuntimePostEffectShader extends FlxRuntimeShader
 	public function new(fragmentSource:String = null)
 	{
 		super(fragmentSource, null);
-		uScreenResolution.value = [FlxG.width, FlxG.height];
-		uCameraBounds.value = [0, 0, FlxG.width, FlxG.height];
-		uFrameBounds.value = [0, 0, FlxG.width, FlxG.height];
+		setScreenResolution(FlxG.width, FlxG.height);
+		setCameraBounds(0, 0, FlxG.width, FlxG.height);
+		setFrameBounds(0, 0, FlxG.width, FlxG.height);
+	}
+
+	public function setScreenResolution(width:Float, height:Float):Void
+	{
+		setFloatArray("uScreenResolution", [width, height]);
+	}
+
+	public function setCameraBounds(left:Float, top:Float, right:Float, bottom:Float):Void
+	{
+		setFloatArray("uCameraBounds", [left, top, right, bottom]);
+	}
+
+	public function setFrameBounds(left:Float, top:Float, right:Float, bottom:Float):Void
+	{
+		setFloatArray("uFrameBounds", [left, top, right, bottom]);
 	}
 
 	// basically `updateViewInfo(FlxG.width, FlxG.height, FlxG.camera)` is good
 	public function updateViewInfo(screenWidth:Float, screenHeight:Float, camera:FlxCamera):Void
 	{
-		uScreenResolution.value = [screenWidth, screenHeight];
-		uCameraBounds.value = [camera.viewLeft, camera.viewTop, camera.viewRight, camera.viewBottom];
+		setScreenResolution(screenWidth, screenHeight);
+		setCameraBounds(camera.viewLeft, camera.viewTop, camera.viewRight, camera.viewBottom);
 	}
 
 	public function updateFrameInfo(frame:FlxFrame)
 	{
 		// NOTE: uv.right is actually the right pos and uv.bottom is the bottom pos
-		uFrameBounds.value = [frame.uv.left, frame.uv.top, frame.uv.right, frame.uv.bottom];
+		setFrameBounds(frame.uv.left, frame.uv.top, frame.uv.right, frame.uv.bottom);
 	}
 
-	override function __createGLProgram(vertexSource:String, fragmentSource:String):GLProgram
+	override function __createGLProgram(vertexSource:String, fragmentSource:String):Null<GLProgram>
 	{
 		try
 		{

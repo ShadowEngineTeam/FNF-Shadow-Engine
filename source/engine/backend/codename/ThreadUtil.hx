@@ -9,6 +9,7 @@ import sys.thread.Mutex;
 private typedef Thread = Dynamic;
 #end
 
+@:nullSafety
 final class ThreadUtil
 {
 	inline static function error(text:String)

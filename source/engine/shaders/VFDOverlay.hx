@@ -10,7 +10,7 @@ class VFDOverlay extends GraphicsShader
 
 	function set_elapsedTime(value:Float):Float
 	{
-		u_time.value = [value];
+		data.u_time.value = [value];
 		return value;
 	}
 

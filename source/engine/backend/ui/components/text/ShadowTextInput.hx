@@ -9,25 +9,26 @@ import backend.ui.ShadowStyle;
 import backend.ui.components.text.ShadowInputText;
 import backend.ui.components.controls.ShadowDropdown;
 
+@:nullSafety
 class ShadowTextInput extends FlxSpriteGroup
 {
-	public var input:ShadowInputText;
-	public var callback:String->Void;
+	public var input:Null<ShadowInputText> = null;
+	public var callback:Null<String->Void>;
 	public var text(get, set):String;
 
-	var bg:FlxSprite;
-	var _width:Int;
-	var _height:Int;
+	var bg:FlxSprite = new FlxSprite();
+	var _width:Int = 150;
+	var _height:Int = 28;
 	var _hovered:Bool = false;
 
 	public function new(x:Float, y:Float, width:Int, ?defaultText:String, ?onChange:String->Void)
 	{
-		super(x, y);
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 		callback = onChange;
 
-		bg = new FlxSprite();
+		super(x, y);
+
 		bg.makeGraphic(_width, _height, ShadowStyle.BG_INPUT, true);
 		drawBorder(ShadowStyle.BORDER_DARK);
 		add(bg);
