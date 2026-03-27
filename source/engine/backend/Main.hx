@@ -184,8 +184,8 @@ class Main extends Sprite
 		if (event.shiftKey && event.keyCode == FlxKey.F4)
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
-			FlxG.switchState(new MainMenuState());
 			Paths.clearStoredMemory();
+			FlxG.switchState(new MainMenuState());
 		}
 	}
 

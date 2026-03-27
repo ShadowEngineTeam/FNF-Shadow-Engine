@@ -41,6 +41,9 @@ class CustomSoundTray extends FlxSoundTray
 
 	function loadImages():Void
 	{
+		if (imagesLoaded)
+			return;
+		
 		removeChildren();
 
 		bgPath = getImagePath('soundtray/volumebox');
@@ -108,6 +111,8 @@ class CustomSoundTray extends FlxSoundTray
 				_bars.push(emptyBar);
 			}
 		}
+
+		imagesLoaded = true;
 	}
 
 	function getImagePath(key:String):String
@@ -119,17 +124,6 @@ class CustomSoundTray extends FlxSoundTray
 		#end
 
 		return Paths.getPath('images/$key.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-	}
-
-	function getSoundPath(key:String):String
-	{
-		#if FEATURE_MODS
-		var modSound:String = Paths.modsSounds('sounds', key);
-		if (FileSystem.exists(modSound))
-			return modSound;
-		#end
-
-		return Paths.getPath('sounds/$key.ogg');
 	}
 
 	function coolLerp(base:Float, target:Float, ratio:Float):Float
@@ -165,17 +159,28 @@ class CustomSoundTray extends FlxSoundTray
 
 	override public function show(up:Bool = false):Void
 	{
-		loadImages();
-
 		var globalVolume:Int = Math.round(MathTools.logToLinear(FlxG.sound.volume) * 10);
 
-		if (up)
-			if (_lastVolume == 10 && globalVolume == 10)
-				volumeMaxSound = getSoundPath('soundtray/VolMAX');
+		if (!silent)
+		{
+			var soundKey:String = null;
+			if (up)
+			{
+				if (_lastVolume == 10 && globalVolume == 10)
+					soundKey = 'soundtray/VolMAX';
+				else
+					soundKey = 'soundtray/Volup';
+			}
 			else
-				volumeUpSound = getSoundPath('soundtray/Volup');
-		else
-			volumeDownSound = getSoundPath('soundtray/Voldown');
+				soundKey = 'soundtray/Voldown';
+
+			if (soundKey != null)
+			{
+				var sound = Paths.sound(soundKey, 'shared');
+				if (sound != null)
+					FlxG.sound.play(sound);
+			}
+		}
 
 		_timer = 1;
 		lerpYPos = 10;
