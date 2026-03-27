@@ -35,10 +35,9 @@ class Paths
 		'assets/shared/music/freakyMenu.ogg'
 	];
 
-	// define the locally tracked assets
 	public static final currentTrackedAssets:Map<String, FlxGraphic> = [];
 	public static final currentTrackedSounds:Map<String, Sound> = [];
-	public static final localTrackedAssets:Array<String> = [];
+	public static var localTrackedAssets:Array<String> = [];
 
 	// haya I love you for the base cache dump I took to the max
 	public static function excludeAsset(key:String):Void
@@ -104,7 +103,7 @@ class Paths
 			}
 		}
 
-		localTrackedAssets.resize(0);
+		localTrackedAssets = [];
 		openfl.Assets.cache.clear("songs");
 	}
 
@@ -268,7 +267,8 @@ class Paths
 		file = modsImages(key);
 		if (currentTrackedAssets.exists(file))
 		{
-			localTrackedAssets.push(file);
+			if (!localTrackedAssets.contains(file))
+				localTrackedAssets.push(file);
 			return currentTrackedAssets.get(file);
 		}
 		else if (FileSystem.exists(file))
@@ -283,7 +283,8 @@ class Paths
 				file = getPath('images/$key.$ext', getImageAssetType(ext), library);
 				if (currentTrackedAssets.exists(file))
 				{
-					localTrackedAssets.push(file);
+					if (!localTrackedAssets.contains(file))
+						localTrackedAssets.push(file);
 					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
@@ -304,7 +305,8 @@ class Paths
 		
 		if (currentTrackedAssets.exists('__flixel_logo'))
 		{
-			localTrackedAssets.push('__flixel_logo');
+			if (!localTrackedAssets.contains('__flixel_logo'))
+				localTrackedAssets.push('__flixel_logo');
 			return currentTrackedAssets.get('__flixel_logo');
 		}
 
@@ -322,7 +324,8 @@ class Paths
 				return null;
 		}
 
-		localTrackedAssets.push(file);
+		if (!localTrackedAssets.contains(file))
+			localTrackedAssets.push(file);
 		/*if (bitmap.readable)
 		{
 			var texture:RectangleTexture = FlxG.stage.context3D.createRectangleTexture(bitmap.width, bitmap.height, BGRA, true);
@@ -398,7 +401,8 @@ class Paths
 		{
 			if (!currentTrackedSounds.exists(file))
 				currentTrackedSounds.set(file, Sound.fromFile(file));
-			localTrackedAssets.push(file);
+			if (!localTrackedAssets.contains(file))
+				localTrackedAssets.push(file);
 			return currentTrackedSounds.get(file);
 		}
 		#end
@@ -418,7 +422,8 @@ class Paths
 				currentTrackedSounds.set(gottenPath, Sound.fromBytes(File.getBytes(retKey)));
 		}
 
-		localTrackedAssets.push(gottenPath);
+		if (!localTrackedAssets.contains(gottenPath))
+			localTrackedAssets.push(gottenPath);
 		return currentTrackedSounds.get(gottenPath);
 	}
 

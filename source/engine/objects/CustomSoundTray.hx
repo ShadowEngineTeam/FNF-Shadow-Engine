@@ -17,9 +17,8 @@ class CustomSoundTray extends FlxSoundTray
 
 	var bg:Bitmap;
 	var backingBar:Bitmap;
-	var bgPath:String;
-	var backingPath:String;
-	var barPaths:Array<String> = [];
+	var barBitmaps:Array<Bitmap> = [];
+	var imagesLoaded:Bool = false;
 
 	public function new()
 	{
@@ -28,9 +27,6 @@ class CustomSoundTray extends FlxSoundTray
 
 		bg = new Bitmap();
 		backingBar = new Bitmap();
-		bgPath = "";
-		backingPath = "";
-		barPaths = [];
 		
 		loadImages();
 		
@@ -43,42 +39,53 @@ class CustomSoundTray extends FlxSoundTray
 
 	function loadImages():Void
 	{
+		if (imagesLoaded)
+			return;
+		
 		removeChildren();
 		
-		bgPath = getImagePath('soundtray/volumebox');
+		var bgPath:String = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
-			bg = new Bitmap(BitmapData.fromBytes(File.getBytes(bgPath)));
-			bg.scaleX = graphicScale;
-			bg.scaleY = graphicScale;
-			bg.smoothing = true;
-			addChild(bg);
+			var bgGraphic = Paths.image('soundtray/volumebox');
+			if (bgGraphic != null)
+			{
+				bg.bitmapData = bgGraphic.bitmap;
+				bg.scaleX = graphicScale;
+				bg.scaleY = graphicScale;
+				bg.smoothing = true;
+				addChild(bg);
+			}
 		}
 
-		backingPath = getImagePath('soundtray/bars_10');
+		var backingPath:String = getImagePath('soundtray/bars_10');
 		if (FileSystem.exists(backingPath))
 		{
-			backingBar = new Bitmap(BitmapData.fromBytes(File.getBytes(backingPath)));
-			backingBar.x = 9;
-			backingBar.y = 5;
-			backingBar.scaleX = graphicScale;
-			backingBar.scaleY = graphicScale;
-			backingBar.smoothing = true;
-			addChild(backingBar);
-			backingBar.alpha = 0.4;
+			var backingGraphic = Paths.image('soundtray/bars_10');
+			if (backingGraphic != null)
+			{
+				backingBar.bitmapData = backingGraphic.bitmap;
+				backingBar.x = 9;
+				backingBar.y = 5;
+				backingBar.scaleX = graphicScale;
+				backingBar.scaleY = graphicScale;
+				backingBar.smoothing = true;
+				addChild(backingBar);
+				backingBar.alpha = 0.4;
+			}
 		}
 
 		_bars = [];
-		barPaths = [];
+		barBitmaps = [];
 		
 		for (i in 1...11)
 		{
 			var barPath:String = getImagePath('soundtray/bars_$i');
-			barPaths.push(barPath);
 			
 			if (FileSystem.exists(barPath))
 			{
-				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(File.getBytes(barPath)));
+				var barGraphic = Paths.image('soundtray/bars_$i');
+				var bar:Bitmap = new Bitmap(barGraphic != null ? barGraphic.bitmap : null);
 				bar.x = 9;
 				bar.y = 5;
 				bar.scaleX = graphicScale;
@@ -86,13 +93,17 @@ class CustomSoundTray extends FlxSoundTray
 				bar.smoothing = true;
 				addChild(bar);
 				_bars.push(bar);
+				barBitmaps.push(bar);
 			}
 			else
 			{
 				var emptyBar:Bitmap = new Bitmap();
 				_bars.push(emptyBar);
+				barBitmaps.push(emptyBar);
 			}
 		}
+		
+		imagesLoaded = true;
 	}
 
 	function getImagePath(key:String):String
@@ -104,17 +115,6 @@ class CustomSoundTray extends FlxSoundTray
 		#end
 
 		return Paths.getPath('images/$key.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-	}
-
-	function getSoundPath(key:String):String
-	{
-		#if FEATURE_MODS
-		var modSound:String = Paths.modsSounds('sounds', key);
-		if (FileSystem.exists(modSound))
-			return modSound;
-		#end
-		
-		return Paths.getPath('sounds/$key.ogg');
 	}
 
 	function coolLerp(base:Float, target:Float, ratio:Float):Float
@@ -150,17 +150,28 @@ class CustomSoundTray extends FlxSoundTray
 
 	override public function show(up:Bool = false):Void
 	{
-		loadImages();
-		
 		var globalVolume:Int = Math.round(MathTools.logToLinear(FlxG.sound.volume) * 10);
 
-		if (up)
-			if (_lastVolume == 10 && globalVolume == 10)
-				volumeMaxSound = getSoundPath('soundtray/VolMAX');
+		if (!silent)
+		{
+			var soundKey:String = null;
+			if (up)
+			{
+				if (_lastVolume == 10 && globalVolume == 10)
+					soundKey = 'soundtray/VolMAX';
+				else
+					soundKey = 'soundtray/Volup';
+			}
 			else
-				volumeUpSound = getSoundPath('soundtray/Volup');
-		else
-			volumeDownSound = getSoundPath('soundtray/Voldown');
+				soundKey = 'soundtray/Voldown';
+
+			if (soundKey != null)
+			{
+				var sound = Paths.sound(soundKey, 'shared');
+				if (sound != null)
+					FlxG.sound.play(sound);
+			}
+		}
 
 		_timer = 1;
 		lerpYPos = 10;
@@ -169,17 +180,6 @@ class CustomSoundTray extends FlxSoundTray
 
 		if (FlxG.sound.muted || FlxG.sound.volume == 0)
 			globalVolume = 0;
-
-		if (!silent)
-		{
-			var sound = up ? volumeUpSound : volumeDownSound;
-
-			if (_lastVolume == 10 && globalVolume == 10)
-				sound = volumeMaxSound;
-
-			if (sound != null)
-				FlxG.sound.play(Sound.fromBytes(File.getBytes(sound)));
-		}
 
 		_lastVolume = globalVolume;
 
