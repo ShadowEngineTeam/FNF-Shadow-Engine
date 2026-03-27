@@ -21,6 +21,7 @@ class CustomSoundTray extends FlxSoundTray
 	var bgPath:String = "";
 	var backingPath:String = "";
 	var barPaths:Array<String> = [];
+	var imagesLoaded:Bool = false;
 
 	public function new()
 	{
