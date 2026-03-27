@@ -2056,6 +2056,7 @@ class FunkinLua
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
 	#end
 
+	@:nullSafety(Off)
 	public function initLuaShader(name:String)
 	{
 		if (!ClientPrefs.data.shaders)
@@ -2064,7 +2065,7 @@ class FunkinLua
 		#if !flash
 		if (runtimeShaders.exists(name))
 		{
-			var shaderData:Null<Array<String>> = runtimeShaders.get(name);
+			var shaderData:Array<String> = runtimeShaders.get(name);
 			if (shaderData != null && (shaderData[0] != null || shaderData[1] != null))
 			{
 				luaTrace('Shader $name was already initialized!');
@@ -2088,9 +2089,8 @@ class FunkinLua
 
 			var fragPath:String = folder + name + '.frag';
 			var vertPath:String = folder + name + '.vert';
-			var frag:Null<String> = null;
-
-			var vert:Null<String> = null;
+			var frag:String = null;
+			var vert:String = null;
 			var found:Bool = false;
 
 			if (FileSystem.exists(fragPath))
@@ -2107,7 +2107,7 @@ class FunkinLua
 
 			if (found)
 			{
-				runtimeShaders.set(name, [frag ?? '', vert ?? '']);
+				runtimeShaders.set(name, [frag, vert]);
 				// trace('Found shader $name!');
 				return true;
 			}

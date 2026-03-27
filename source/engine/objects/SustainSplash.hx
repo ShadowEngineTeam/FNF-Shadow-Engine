@@ -2,7 +2,6 @@
 
 package objects;
 
-import flixel.graphics.frames.FlxAtlasFrames;
 import shaders.ColorSwap;
 import shaders.RGBPalette;
 import shaders.PixelSplashShader.PixelSplashShaderRef;
@@ -13,7 +12,6 @@ using backend.CoolUtil;
 class SustainSplash extends FlxSprite
 {
 	public static var DEFAULT_TEXTURE(get, never):String;
-
 	public static var startCrochet:Float = 0;
 	public static var frameRate:Int = 0;
 	public static var mainGroup:Null<FlxTypedGroup<SustainSplash>> = null;
@@ -37,22 +35,31 @@ class SustainSplash extends FlxSprite
 	private var reachedEnd:Bool = false;
 	private var rgbShader:Null<PixelSplashShaderRef> = null;
 
+	@:noCompletion
+	static function getGroup():FlxTypedGroup<SustainSplash>
+	{
+		@:nullSafety(Off)
+		var group:FlxTypedGroup<SustainSplash> = mainGroup;
+		return group;
+	}
+
 	public static function init(group:FlxTypedGroup<SustainSplash>, startCrochet:Float, frameRate:Int):Void
 	{
 		SustainSplash.startCrochet = startCrochet;
 		SustainSplash.frameRate = frameRate;
 		SustainSplash.mainGroup = group;
 
+		final tex:String = texture ?? DEFAULT_TEXTURE;
 		final textures:Array<String> = [];
 		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
-			textures.push('${texture}Purple');
-			textures.push('${texture}Blue');
-			textures.push('${texture}Green');
-			textures.push('${texture}Red');
+			textures.push('${tex}Purple');
+			textures.push('${tex}Blue');
+			textures.push('${tex}Green');
+			textures.push('${tex}Red');
 		}
 		else
-			textures.push(texture);
+			textures.push(tex);
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			for (i in 0...textures.length)
@@ -64,20 +71,15 @@ class SustainSplash extends FlxSprite
 
 	public static function generateSustainSplash(strumNote:StrumNote, targetStrumTime:Float, mustPress:Bool = true):SustainSplash
 	{
-		if (SustainSplash.mainGroup == null)
-			return new SustainSplash();
-		var splash:SustainSplash = SustainSplash.mainGroup.recycle(null, () -> new SustainSplash(), false, true);
-		if (splash != null)
-			splash.resetSustainSplash(strumNote, targetStrumTime, mustPress);
+		var splash:SustainSplash = SustainSplash.getGroup().recycle(null, () -> new SustainSplash(), false, true);
+		splash.resetSustainSplash(strumNote, targetStrumTime, mustPress);
 
 		return splash;
 	}
 
 	public static function hideAtData(noteData:Int):Void
 	{
-		if (SustainSplash.mainGroup == null)
-			return;
-		for (splash in SustainSplash.mainGroup.members)
+		for (splash in SustainSplash.getGroup().members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress && splash.animation.curAnim.name != 'end')
 				splash.visible = false;
@@ -86,9 +88,7 @@ class SustainSplash extends FlxSprite
 
 	public static function showAtData(noteData:Int):Void
 	{
-		if (SustainSplash.mainGroup == null)
-			return;
-		for (splash in SustainSplash.mainGroup.members)
+		for (splash in SustainSplash.getGroup().members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress)
 				splash.visible = true;
@@ -97,9 +97,7 @@ class SustainSplash extends FlxSprite
 
 	public static function hasSplashAtData(noteData:Int, mustPess:Bool):Bool
 	{
-		if (SustainSplash.mainGroup == null)
-			return false;
-		for (splash in SustainSplash.mainGroup.members)
+		for (splash in SustainSplash.getGroup().members)
 		{
 			if (splashIsValid(splash, noteData) && splash.mustPress == mustPess)
 				return true;
@@ -119,8 +117,7 @@ class SustainSplash extends FlxSprite
 		SustainSplash.frameRate = 0;
 		SustainSplash.texture = DEFAULT_TEXTURE;
 		SustainSplash.usePixelTextures = null;
-		if (SustainSplash.mainGroup != null)
-			SustainSplash.mainGroup.destroy();
+		SustainSplash.getGroup().destroy();
 	}
 
 	public function resetSustainSplash(strumNote:StrumNote, targetStrumTime:Float, mustPress:Bool = true):Void
@@ -138,7 +135,7 @@ class SustainSplash extends FlxSprite
 		reloadSustainSplash(getTextureNameFromData(noteData, mustPress));
 	}
 
-	public function reloadSustainSplash(texture:String, force:Bool = false):Void
+	public function reloadSustainSplash(?texture:Null<String>, force:Bool = false):Void
 	{
 		if (texture != null && texture != DEFAULT_TEXTURE)
 			precacheSustainSplash();
@@ -146,24 +143,25 @@ class SustainSplash extends FlxSprite
 		if (texture == null)
 			texture = DEFAULT_TEXTURE;
 
-		if (curTexture == texture && !force)
+		final texToUse:String = texture;
+
+		if (curTexture == texToUse && !force)
 		{
 			animation.play('start', true, false, 0);
 			return;
 		}
 
-		curTexture = texture;
+		curTexture = texToUse;
 
 		// SHADOW TODO: This breaks offsets need to figure it out later
 		// flipY = ClientPrefs.data.downScroll;
 
+		var finalTex:String = texToUse;
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-			texture = 'pixelUI/' + texture;
+			finalTex = 'pixelUI/' + texToUse;
 
-		var tex:String = Std.string(SustainSplash.texture);
-		var frameData:Null<FlxAtlasFrames> = Paths.getSparrowAtlas(tex);
-		if (frameData != null)
-			frames = frameData;
+		@:nullSafety(Off)
+		frames = Paths.getSparrowAtlas(finalTex);
 		animation.onFinish.add((name:String) ->
 		{
 			switch (name)
@@ -217,15 +215,16 @@ class SustainSplash extends FlxSprite
 					rgbShader = new PixelSplashShaderRef();
 					rgbShaders[shaderID][noteData] = rgbShader;
 				}
+				else
+					rgbShader = rgbShaders[shaderID][noteData];
 
 				if (rgbShader != null)
+				{
 					rgbShader.shader.mult.value[0] = 0.0;
-
-				rgbShader = rgbShaders[shaderID][noteData];
-				shader = rgbShader.shader;
-				var tempShader = useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null;
-				if (tempShader != null)
-					rgbShader.copyValues(tempShader);
+					shader = rgbShader.shader;
+					if (useRGBShader)
+						rgbShader.copyValues(Note.initializeGlobalRGBShader(noteData));
+				}
 			}
 		}
 	}
@@ -233,11 +232,14 @@ class SustainSplash extends FlxSprite
 	private function precacheSustainSplash():Void
 	{
 		final textures:Array<String> = [];
-		var texToUse:String = texture;
+		var texToUse:Null<String> = texture;
 		if (mustPress && playerTexture != null)
 			texToUse = playerTexture;
 		else if (!mustPress && opponentTexture != null)
 			texToUse = opponentTexture;
+
+		if (texToUse == null)
+			texToUse = texture ?? DEFAULT_TEXTURE;
 
 		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
@@ -263,22 +265,21 @@ class SustainSplash extends FlxSprite
 		if (tex == null)
 			tex = texture;
 
-		if (tex == null)
-			tex = DEFAULT_TEXTURE;
+		final result:String = tex != null ? tex : DEFAULT_TEXTURE;
 
 		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
 			return switch (noteData)
 			{
-				case 0: '${tex}Purple';
-				case 1: '${tex}Blue';
-				case 2: '${tex}Green';
-				case 3: '${tex}Red';
-				default: tex;
+				case 0: '${result}Purple';
+				case 1: '${result}Blue';
+				case 2: '${result}Green';
+				case 3: '${result}Red';
+				default: result;
 			}
 		}
 		else
-			return tex;
+			return result;
 	}
 
 	override function update(elapsed:Float)
@@ -339,12 +340,9 @@ class SustainSplash extends FlxSprite
 		#end
 		texture = value;
 
-		if (SustainSplash.mainGroup != null)
-		{
-			for (splash in SustainSplash.mainGroup.members)
-				if (splash.exists && splash.alive)
-					splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
-		}
+		for (splash in SustainSplash.getGroup().members)
+			if (splash.exists && splash.alive)
+				splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
 
 		return value;
 	}
@@ -359,12 +357,9 @@ class SustainSplash extends FlxSprite
 			#end
 			usePixelTextures = value;
 
-			if (SustainSplash.mainGroup != null)
-			{
-				for (splash in SustainSplash.mainGroup.members)
-					if (splash.exists && splash.alive)
-						splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
-			}
+			for (splash in SustainSplash.getGroup().members)
+				if (splash.exists && splash.alive)
+					splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
 		}
 
 		return value;

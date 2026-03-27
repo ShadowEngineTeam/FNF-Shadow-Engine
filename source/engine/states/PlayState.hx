@@ -4061,6 +4061,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
+	@:nullSafety(Off)
 	public function initLuaShader(name:String):Bool
 	{
 		if (!ClientPrefs.data.shaders)
