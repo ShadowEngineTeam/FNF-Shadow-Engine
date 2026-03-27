@@ -4,13 +4,14 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import openfl.display.GraphicsShader;
 
+@:nullSafety(Off)
 class VFDOverlay extends GraphicsShader
 {
 	public var elapsedTime(default, set):Float = 0;
 
 	function set_elapsedTime(value:Float):Float
 	{
-		data.u_time.value = [value];
+		u_time.value = [value];
 		return value;
 	}
 

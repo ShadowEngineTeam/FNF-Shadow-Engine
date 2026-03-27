@@ -1,6 +1,6 @@
 package shaders;
 
-@:nullSafety
+@:nullSafety(Off)
 class OverlayShader extends FlxShader
 {
 	@:glFragmentSource('

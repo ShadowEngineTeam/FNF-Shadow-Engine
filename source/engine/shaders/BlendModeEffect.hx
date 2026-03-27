@@ -7,7 +7,7 @@ typedef BlendModeShader =
 	var uBlendColor:ShaderParameter<Float>;
 }
 
-@:nullSafety
+@:nullSafety(Off)
 class BlendModeEffect
 {
 	public var shader(default, null):BlendModeShader;
