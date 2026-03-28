@@ -14,27 +14,28 @@ import openfl.text.TextField;
 /**
  * we're so Kade Engine
  */
+@:nullSafety
 class ResultsScreen extends MusicBeatSubstate
 {
-	public var background:FlxSprite;
-	public var text:FlxText;
+	public var background:Null<FlxSprite> = null;
+	public var text:Null<FlxText> = null;
 
-	public var anotherBackground:FlxSprite;
-	public var graph:HitGraph;
-	public var graphSprite:OpenFLSprite;
+	public var anotherBackground:Null<FlxSprite> = null;
+	public var graph:Null<HitGraph> = null;
+	public var graphSprite:Null<OpenFLSprite> = null;
 
-	public var comboText:FlxText;
-	public var contText:FlxText;
-	public var settingsText:FlxText;
+	public var comboText:Null<FlxText> = null;
+	public var contText:Null<FlxText> = null;
+	public var settingsText:Null<FlxText> = null;
 
-	public var music:FlxSound;
+	public var music:Null<FlxSound> = null;
 
-	public var graphData:BitmapData;
+	public var graphData:Null<BitmapData> = null;
 
-	public var ranking:String;
-	public var accuracy:String;
+	public var ranking:Null<String> = '';
+	public var accuracy:Null<String> = '';
 
-	public var resultsCamera:ShadowCamera;
+	public var resultsCamera:Null<ShadowCamera> = null;
 
 	override function create()
 	{
@@ -50,11 +51,15 @@ class ResultsScreen extends MusicBeatSubstate
 		music = new FlxSound();
 		if (PauseSubState.songName != null)
 		{
-			music.loadEmbedded(Paths.music(PauseSubState.songName), true, true);
+			var songPath = Paths.music(PauseSubState.songName);
+			if (songPath != null)
+				music.loadEmbedded(songPath, true, true);
 		}
 		else if (PauseSubState.songName != 'None')
 		{
-			music.loadEmbedded(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)), true, true);
+			var pauseMusicPath = Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic));
+			if (pauseMusicPath != null)
+				music.loadEmbedded(pauseMusicPath, true, true);
 		}
 		music.volume = 0;
 		music.play(false, FlxG.random.int(0, Std.int(music.length / 2)));
@@ -155,8 +160,10 @@ class ResultsScreen extends MusicBeatSubstate
 		FlxTween.tween(anotherBackground, {alpha: 0.6}, 0.5, {
 			onUpdate: function(tween:FlxTween)
 			{
-				graph.alpha = FlxMath.lerp(0, 1, tween.percent);
-				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
+				if (graph != null)
+					graph.alpha = FlxMath.lerp(0, 1, tween.percent);
+				if (graphSprite != null)
+					graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
 			}
 		});
 		resultsCamera = new ShadowCamera();
@@ -165,7 +172,8 @@ class ResultsScreen extends MusicBeatSubstate
 		cameras = [resultsCamera];
 		forEachAlive(function(obj:FlxBasic)
 		{
-			obj.cameras = [resultsCamera];
+			if (resultsCamera != null)
+				obj.cameras = [resultsCamera];
 		});
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
@@ -184,7 +192,8 @@ class ResultsScreen extends MusicBeatSubstate
 
 		if (controls.ACCEPT)
 		{
-			music.stop();
+			if (music != null)
+				music.stop();
 			PlayState.instance.endCallback();
 		}
 
@@ -212,36 +221,37 @@ class ResultsScreen extends MusicBeatSubstate
 /**
  * stolen from https://github.com/HaxeFlixel/flixel/blob/master/flixel/system/debug/stats/StatsGraph.hx
  */
+@:nullSafety
 class HitGraph extends Sprite
 {
 	static inline var AXIS_COLOR:FlxColor = 0xffffff;
 	static inline var AXIS_ALPHA:Float = 0.5;
 	inline static var HISTORY_MAX:Int = 30;
 
-	public var minLabel:TextField;
-	public var curLabel:TextField;
-	public var maxLabel:TextField;
-	public var avgLabel:TextField;
+	public var minLabel:Null<TextField> = null;
+	public var curLabel:Null<TextField> = null;
+	public var maxLabel:Null<TextField> = null;
+	public var avgLabel:Null<TextField> = null;
 
 	public var minValue:Float = -(Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) + 95);
 	public var maxValue:Float = Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) + 95;
 
 	public var showInput:Bool = FlxG.save.data.inputShow;
 
-	public var graphColor:FlxColor;
+	public var graphColor:Null<FlxColor> = 0xffffff;
 
-	public var history:Array<Dynamic> = [];
+	public var history:Null<Array<Dynamic>> = [];
 
-	public var bitmap:Bitmap;
+	public var bitmap:Null<Bitmap> = null;
 
-	public var ts:Float;
+	public var ts:Float = 0;
 
-	var _axis:Shape;
-	var _width:Int;
-	var _height:Int;
-	var _unit:String;
-	var _labelWidth:Int;
-	var _label:String;
+	var _axis:Null<Shape> = null;
+	var _width:Int = 0;
+	var _height:Int = 0;
+	var _unit:String = '';
+	var _labelWidth:Int = 0;
+	var _label:String = '';
 
 	public function new(X:Int, Y:Int, Width:Int, Height:Int)
 	{
@@ -279,6 +289,8 @@ class HitGraph extends Sprite
 	 */
 	function drawAxes():Void
 	{
+		if (_axis == null)
+			return;
 		var gfx = _axis.graphics;
 		gfx.clear();
 		gfx.lineStyle(1, AXIS_COLOR, AXIS_ALPHA);
@@ -316,6 +328,8 @@ class HitGraph extends Sprite
 
 	function drawJudgementLine(ms:Float):Void
 	{
+		if (_axis == null)
+			return;
 		var gfx:Graphics = graphics;
 
 		gfx.lineStyle(1, graphColor, 0.3);
@@ -325,14 +339,16 @@ class HitGraph extends Sprite
 
 		var value = ((ms * ts) - minValue) / range;
 
-		var pointY = _axis.y + ((-value * _height - 1) + _height);
+		var axisX = _axis.x;
+		var axisY = _axis.y;
+		var pointY = axisY + ((-value * _height - 1) + _height);
 
-		var graphX = _axis.x + 1;
+		var graphX = axisX + 1;
 
 		if (ms == 45)
-			gfx.moveTo(graphX, _axis.y + pointY);
+			gfx.moveTo(graphX, axisY + pointY);
 
-		var graphX = _axis.x + 1;
+		var graphX = axisX + 1;
 
 		gfx.drawRect(graphX, pointY, _width, 1);
 
@@ -381,7 +397,7 @@ class HitGraph extends Sprite
 		gfx.endFill();
 
 		var range:Float = Math.max(maxValue - minValue, maxValue * 0.1);
-		var graphX = _axis.x + 1;
+		var graphX = (_axis != null ? _axis.x : 0) + 1;
 
 		if (showInput)
 		{
@@ -405,33 +421,36 @@ class HitGraph extends Sprite
 			}
 		}
 
-		for (i in 0...history.length)
+		if (history != null)
 		{
-			var value = (history[i][0] - minValue) / range;
-			var judge = history[i][1];
-
-			switch (judge)
+			for (i in 0...history.length)
 			{
-				case "sick":
-					gfx.beginFill(0x00FFFF);
-				case "good":
-					gfx.beginFill(0x00FF00);
-				case "bad":
-					gfx.beginFill(0xFF0000);
-				case "shit":
-					gfx.beginFill(0x8b0000);
-				case "miss":
-					gfx.beginFill(0x580000);
-				default:
-					gfx.beginFill(0xFFFFFF);
+				var value = (history[i][0] - minValue) / range;
+				var judge = history[i][1];
+
+				switch (judge)
+				{
+					case "sick":
+						gfx.beginFill(0x00FFFF);
+					case "good":
+						gfx.beginFill(0x00FF00);
+					case "bad":
+						gfx.beginFill(0xFF0000);
+					case "shit":
+						gfx.beginFill(0x8b0000);
+					case "miss":
+						gfx.beginFill(0x580000);
+					default:
+						gfx.beginFill(0xFFFFFF);
+				}
+				var pointY = ((-value * _height - 1) + _height);
+
+				/*if (i == 0)
+					gfx.moveTo(graphX, _axis.y + pointY); */
+				gfx.drawRect(fitX(history[i][2]), pointY, 4, 4);
+
+				gfx.endFill();
 			}
-			var pointY = ((-value * _height - 1) + _height);
-
-			/*if (i == 0)
-				gfx.moveTo(graphX, _axis.y + pointY); */
-			gfx.drawRect(fitX(history[i][2]), pointY, 4, 4);
-
-			gfx.endFill();
 		}
 
 		if (bitmap != null)
@@ -460,7 +479,8 @@ class HitGraph extends Sprite
 
 	public function addToHistory(diff:Float, judge:String, time:Float)
 	{
-		history.push([diff, judge, time]);
+		if (history != null)
+			history.push([diff, judge, time]);
 	}
 
 	public function update():Void
@@ -477,14 +497,19 @@ class HitGraph extends Sprite
 	public function average():Float
 	{
 		var sum:Float = 0;
-		for (value in history)
-			sum += value;
-		return sum / history.length;
+		if (history != null)
+		{
+			for (value in history)
+				sum += value;
+			return sum / history.length;
+		}
+		return 0;
 	}
 
 	public function destroy():Void
 	{
 		_axis = FlxDestroyUtil.removeChild(this, _axis);
+		_axis = null;
 		history = null;
 	}
 }

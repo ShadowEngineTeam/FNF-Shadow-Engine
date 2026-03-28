@@ -342,7 +342,7 @@ class LuaUtils
 		return false;
 	}
 
-	public static inline function getTargetInstance()
+	public static inline function getTargetInstance():Dynamic
 	{
 		return FunkinLua.getCurrentMusicState() is PlayState ? PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance : FunkinLua.getCurrentMusicState().stateInstance;
 	}

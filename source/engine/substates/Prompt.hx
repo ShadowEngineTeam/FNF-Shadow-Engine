@@ -1,22 +1,23 @@
 package substates;
 
+@:nullSafety
 class Prompt extends MusicBeatSubstate
 {
-	public var okc:Void->Void;
-	public var cancelc:Void->Void;
+	public var okc:Null<Void->Void> = null;
+	public var cancelc:Null<Void->Void> = null;
 
-	var overlay:FlxSprite;
-	var panel:ShadowPanel;
-	var buttonAccept:FlxSprite;
-	var buttonCancel:FlxSprite;
-	var labelAccept:FlxText;
-	var labelCancel:FlxText;
-	var questionText:FlxText;
+	var overlay:Null<FlxSprite> = null;
+	var panel:Null<ShadowPanel> = null;
+	var buttonAccept:Null<FlxSprite> = null;
+	var buttonCancel:Null<FlxSprite> = null;
+	var labelAccept:Null<FlxText> = null;
+	var labelCancel:Null<FlxText> = null;
+	var questionText:Null<FlxText> = null;
 
 	var theText:String = '';
 	var goAnyway:Bool = false;
-	var acceptLabel:String;
-	var cancelLabel:String;
+	var acceptLabel:String = '';
+	var cancelLabel:String = '';
 
 	var selected:Int = 0;
 	var buttonWidth:Int = 120;
@@ -95,8 +96,10 @@ class Prompt extends MusicBeatSubstate
 		updateSelection();
 	}
 
-	function drawButton(button:FlxSprite, isSelected:Bool, isHovered:Bool = false)
+	function drawButton(button:Null<FlxSprite>, isSelected:Bool, isHovered:Bool = false)
 	{
+		if (button == null)
+			return;
 		var fillColor:FlxColor = isSelected ? ShadowStyle.ACCENT : ShadowStyle.BG_MEDIUM;
 		var borderColor:FlxColor = isSelected ? ShadowStyle.ACCENT_HOVER : ShadowStyle.BORDER_DARK;
 
@@ -122,14 +125,16 @@ class Prompt extends MusicBeatSubstate
 
 	function updateSelection()
 	{
-		var hoverAccept:Bool = FlxG.mouse.overlaps(buttonAccept, camera);
-		var hoverCancel:Bool = FlxG.mouse.overlaps(buttonCancel, camera);
+		var hoverAccept:Bool = buttonAccept != null ? FlxG.mouse.overlaps(buttonAccept, camera) : false;
+		var hoverCancel:Bool = buttonCancel != null ? FlxG.mouse.overlaps(buttonCancel, camera) : false;
 
 		drawButton(buttonAccept, selected == 0, hoverAccept);
 		drawButton(buttonCancel, selected == 1, hoverCancel);
 
-		labelAccept.color = selected == 0 ? FlxColor.WHITE : ShadowStyle.TEXT_PRIMARY;
-		labelCancel.color = selected == 1 ? FlxColor.WHITE : ShadowStyle.TEXT_PRIMARY;
+		if (labelAccept != null)
+			labelAccept.color = selected == 0 ? FlxColor.WHITE : ShadowStyle.TEXT_PRIMARY;
+		if (labelCancel != null)
+			labelCancel.color = selected == 1 ? FlxColor.WHITE : ShadowStyle.TEXT_PRIMARY;
 	}
 
 	override function update(elapsed:Float)
@@ -145,13 +150,13 @@ class Prompt extends MusicBeatSubstate
 		if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
 		{
 			selected = 0;
-			//FlxG.sound.play(Paths.sound('scrollMenu'));
+			// FlxG.sound.play(Paths.sound('scrollMenu'));
 			updateSelection();
 		}
 		else if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D)
 		{
 			selected = 1;
-			//FlxG.sound.play(Paths.sound('scrollMenu'));
+			// FlxG.sound.play(Paths.sound('scrollMenu'));
 			updateSelection();
 		}
 
@@ -185,7 +190,7 @@ class Prompt extends MusicBeatSubstate
 
 	function confirm()
 	{
-		//FlxG.sound.play(Paths.sound('confirmMenu'));
+		// FlxG.sound.play(Paths.sound('confirmMenu'));
 
 		if (selected == 0)
 		{

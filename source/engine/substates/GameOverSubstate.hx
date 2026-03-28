@@ -7,11 +7,12 @@ import states.StoryMenuState;
 import states.FreeplayState;
 import lime.ui.Haptic;
 
+@:nullSafety
 class GameOverSubstate extends MusicBeatSubstate
 {
-	public var boyfriend:Character;
+	public var boyfriend:Null<Character> = null;
 
-	var camFollow:FlxObject;
+	var camFollow:Null<FlxObject> = null;
 	var moveCamera:Bool = false;
 	var playingDeathSound:Bool = false;
 
@@ -22,7 +23,7 @@ class GameOverSubstate extends MusicBeatSubstate
 	public static var loopSoundName:String = 'gameOver';
 	public static var endSoundName:String = 'gameOverEnd';
 
-	public static var instance:GameOverSubstate;
+	public static var instance:Null<GameOverSubstate> = null;
 
 	public static function resetVariables()
 	{
@@ -62,9 +63,11 @@ class GameOverSubstate extends MusicBeatSubstate
 		boyfriend.y += boyfriend.positionArray[1] - PlayState.instance.boyfriend.positionArray[1];
 		add(boyfriend);
 
-		FlxG.sound.play(Paths.sound(deathSoundName));
+		var deathSnd = Paths.sound(deathSoundName);
+		if (deathSnd != null)
+			FlxG.sound.play(deathSnd);
 		FlxG.camera.scroll.set();
-		FlxG.camera.target = null;
+		Reflect.setProperty(FlxG.camera, "target", null);
 
 		boyfriend.playAnim('firstDeath');
 
@@ -111,27 +114,40 @@ class GameOverSubstate extends MusicBeatSubstate
 			else
 				MusicBeatState.switchState(new FreeplayState());
 
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			var menuMusic = Paths.music('freakyMenu');
+			if (menuMusic != null)
+				FlxG.sound.playMusic(menuMusic);
 			callOnScripts('onGameOverConfirm', [false]);
 		}
 
-		if (boyfriend.animation.curAnim != null)
+		var bf = boyfriend;
+		if (bf != null)
 		{
-			if (boyfriend.animation.curAnim.name == 'firstDeath' && boyfriend.animation.curAnim.finished && startedDeath)
-				boyfriend.playAnim('deathLoop');
-
-			if (boyfriend.animation.curAnim.name == 'firstDeath')
+			var anim = bf.animation;
+			if (anim != null)
 			{
-				if (boyfriend.animation.curAnim.curFrame >= 12 && !moveCamera)
+				var curAnim = anim.curAnim;
+				if (curAnim != null)
 				{
-					FlxG.camera.follow(camFollow, LOCKON, 0.6);
-					moveCamera = true;
-				}
+					if (curAnim.name == 'firstDeath' && curAnim.finished && startedDeath)
+						bf.playAnim('deathLoop');
 
-				if (boyfriend.animation.curAnim.finished && !playingDeathSound)
-				{
-					startedDeath = true;
-					coolStartDeath();
+					if (curAnim.name == 'firstDeath')
+					{
+						if (curAnim.curFrame >= 12 && !moveCamera)
+						{
+							var cf = camFollow;
+							if (cf != null)
+								FlxG.camera.follow(cf, LOCKON, 0.6);
+							moveCamera = true;
+						}
+
+						if (curAnim.finished && !playingDeathSound)
+						{
+							startedDeath = true;
+							coolStartDeath();
+						}
+					}
 				}
 			}
 		}
@@ -147,7 +163,9 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	function coolStartDeath(?volume:Float = 1):Void
 	{
-		FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
+		var loopSnd = Paths.music(loopSoundName);
+		if (loopSnd != null)
+			FlxG.sound.playMusic(loopSnd, volume);
 	}
 
 	function endBullshit():Void
@@ -155,9 +173,13 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (!isEnding)
 		{
 			isEnding = true;
-			boyfriend.playAnim('deathConfirm', true);
+			var bf = boyfriend;
+			if (bf != null)
+				bf.playAnim('deathConfirm', true);
 			FlxG.sound.music.stop();
-			FlxG.sound.play(Paths.music(endSoundName));
+			var endSnd = Paths.music(endSoundName);
+			if (endSnd != null)
+				FlxG.sound.play(endSnd);
 			new FlxTimer().start(0.7, function(tmr:FlxTimer)
 			{
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()

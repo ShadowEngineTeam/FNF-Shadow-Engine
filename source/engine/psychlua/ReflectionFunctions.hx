@@ -261,6 +261,7 @@ class ReflectionFunctions
 			{
 				var obj:Dynamic = FunkinLua.getCurrentMusicState().variables.get(objectName);
 				var inFrontVal:Bool = inFront ?? false;
+				@:nullSafety(Off)
 				if (FunkinLua.getCurrentMusicState() is PlayState && !inFrontVal)
 				{
 					if (!PlayState.instance.isDead)

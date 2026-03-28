@@ -5,20 +5,20 @@ import backend.Highscore;
 import flixel.addons.transition.FlxTransitionableState;
 import objects.HealthIcon;
 
+@:nullSafety
 class ResetScoreSubState extends MusicBeatSubstate
 {
-	var bg:FlxSprite;
+	var bg:Null<FlxSprite> = null;
 	var alphabetArray:Array<Alphabet> = [];
-	var icon:HealthIcon;
+	var icon:Null<HealthIcon> = null;
 	var onYes:Bool = false;
-	var yesText:Alphabet;
-	var noText:Alphabet;
+	var yesText:Null<Alphabet> = null;
+	var noText:Null<Alphabet> = null;
 
-	var song:String;
-	var difficulty:Int;
-	var week:Int;
+	var song:String = '';
+	var difficulty:Int = 0;
+	var week:Int = 0;
 
-	// Week -1 = Freeplay
 	public function new(song:String, difficulty:Int, character:String, week:Int = -1)
 	{
 		this.song = song;
@@ -29,7 +29,9 @@ class ResetScoreSubState extends MusicBeatSubstate
 		var name:String = song;
 		if (week > -1)
 		{
-			name = WeekData.weeksLoaded.get(WeekData.weeksList[week]).weekName;
+			var weekData = WeekData.weeksLoaded.get(WeekData.weeksList[week]);
+			if (weekData != null)
+				name = weekData.weekName;
 		}
 		name += ' (' + Difficulty.getString(difficulty) + ')?';
 
@@ -38,7 +40,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		add(bg);
 
-		var tooLong:Float = (name.length > 18) ? 0.8 : 1; // Fucking Winter Horrorland
+		var tooLong:Float = (name.length > 18) ? 0.8 : 1;
 		var text:Alphabet = new Alphabet(0, 180, "Reset the score of", true);
 		text.screenCenter(X);
 		alphabetArray.push(text);
@@ -55,11 +57,15 @@ class ResetScoreSubState extends MusicBeatSubstate
 		if (week == -1)
 		{
 			icon = new HealthIcon(character);
-			icon.setGraphicSize(Std.int(icon.width * tooLong));
-			icon.updateHitbox();
-			icon.setPosition(text.x - icon.width + (10 * tooLong), text.y - 30);
-			icon.alpha = 0;
-			add(icon);
+			var iconRef = icon;
+			if (iconRef != null)
+			{
+				iconRef.setGraphicSize(Std.int(iconRef.width * tooLong));
+				iconRef.updateHitbox();
+				iconRef.setPosition(text.x - iconRef.width + (10 * tooLong), text.y - 30);
+				iconRef.alpha = 0;
+				add(iconRef);
+			}
 		}
 
 		yesText = new Alphabet(0, text.y + 150, 'Yes', true);
@@ -81,9 +87,13 @@ class ResetScoreSubState extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
-		bg.alpha += elapsed * 1.5;
-		if (bg.alpha > 0.6)
-			bg.alpha = 0.6;
+		var bgRef = bg;
+		if (bgRef != null)
+		{
+			bgRef.alpha += elapsed * 1.5;
+			if (bgRef.alpha > 0.6)
+				bgRef.alpha = 0.6;
+		}
 
 		for (i in 0...alphabetArray.length)
 		{
@@ -91,17 +101,25 @@ class ResetScoreSubState extends MusicBeatSubstate
 			spr.alpha += elapsed * 2.5;
 		}
 		if (week == -1)
-			icon.alpha += elapsed * 2.5;
+		{
+			var iconRef = icon;
+			if (iconRef != null)
+				iconRef.alpha += elapsed * 2.5;
+		}
 
 		if (controls.UI_LEFT_P || controls.UI_RIGHT_P)
 		{
-			FlxG.sound.play(Paths.sound('scrollMenu'), 1);
+			var sound = Paths.sound('scrollMenu');
+			if (sound != null)
+				FlxG.sound.play(sound, 1);
 			onYes = !onYes;
 			updateOptions();
 		}
 		if (controls.BACK)
 		{
-			FlxG.sound.play(Paths.sound('cancelMenu'), 1);
+			var sound = Paths.sound('cancelMenu');
+			if (sound != null)
+				FlxG.sound.play(sound, 1);
 			ClientPrefs.saveSettings();
 			close();
 		}
@@ -118,12 +136,14 @@ class ResetScoreSubState extends MusicBeatSubstate
 					Highscore.resetWeek(WeekData.weeksList[week], difficulty);
 				}
 			}
-			FlxG.sound.play(Paths.sound('cancelMenu'), 1);
+			var sound = Paths.sound('cancelMenu');
+			if (sound != null)
+				FlxG.sound.play(sound, 1);
 			ClientPrefs.saveSettings();
 			close();
 		}
 		#if FEATURE_MOBILE_CONTROLS
-		if (touchPad == null) // sometimes it dosent add the vpad, hopefully this fixes it
+		if (touchPad == null)
 		{
 			addTouchPad("LEFT_RIGHT", "A_B");
 			addTouchPadCamera(false);
@@ -138,12 +158,24 @@ class ResetScoreSubState extends MusicBeatSubstate
 		var alphas:Array<Float> = [0.6, 1.25];
 		var confirmInt:Int = onYes ? 1 : 0;
 
-		yesText.alpha = alphas[confirmInt];
-		yesText.scale.set(scales[confirmInt], scales[confirmInt]);
-		noText.alpha = alphas[1 - confirmInt];
-		noText.scale.set(scales[1 - confirmInt], scales[1 - confirmInt]);
+		var yesTextRef = yesText;
+		var noTextRef = noText;
+		if (yesTextRef != null)
+		{
+			yesTextRef.alpha = alphas[confirmInt];
+			yesTextRef.scale.set(scales[confirmInt], scales[confirmInt]);
+		}
+		if (noTextRef != null)
+		{
+			noTextRef.alpha = alphas[1 - confirmInt];
+			noTextRef.scale.set(scales[1 - confirmInt], scales[1 - confirmInt]);
+		}
 		if (week == -1)
-			icon.animation.curAnim.curFrame = confirmInt;
+		{
+			var iconRef = icon;
+			if (iconRef != null && iconRef.animation != null && iconRef.animation.curAnim != null)
+				iconRef.animation.curAnim.curFrame = confirmInt;
+		}
 
 		callOnScripts('onChangeSelection');
 	}

@@ -1370,6 +1370,7 @@ class FunkinLua
 				targetInst.add(mySprite);
 			else
 			{
+				@:nullSafety(Off)
 				if (!game.isDead)
 					game.insert(game.members.indexOf(LuaUtils.getLowestCharacterGroup()), mySprite);
 				else
