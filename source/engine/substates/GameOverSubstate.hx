@@ -67,7 +67,8 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (deathSnd != null)
 			FlxG.sound.play(deathSnd);
 		FlxG.camera.scroll.set();
-		Reflect.setProperty(FlxG.camera, "target", null);
+		@:nullSafety(Off)
+		FlxG.camera.target = null;
 
 		boyfriend.playAnim('firstDeath');
 
