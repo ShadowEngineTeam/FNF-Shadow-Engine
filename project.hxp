@@ -26,6 +26,13 @@ class Project extends HXProject
 	static final PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
 	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "compatibility", "gpu_textures"];
+	static final CPPIA_SOURCES_COPY:Array<String> = [
+		"flixel/util/FlxSignal.hx",
+		"openfl/display/Shader.hx",
+		"openfl/utils/_internal/ShaderMacro.hx",
+		"openfl/utils/_internal/AssetsMacro.hx",
+		"lime/_internal/macros/AssetsMacro.hx",
+		"flixel/system/macros/FlxMacroUtil.hx"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -312,6 +319,21 @@ class Project extends HXProject
 			addHaxeFlag("-dce no");
 			addMacroFlag("macros.KeepMacro.keepClasses()");
 		}
+
+		var str:String = "[";
+		for (i => file in CPPIA_SOURCES_COPY)
+		{
+			str += "'";
+			str += file;
+			str += "'";
+			if (i < CPPIA_SOURCES_COPY.length - 1)
+				str += ", ";
+			else
+				str += "]";
+
+		}
+		
+		addMacroFlag("macros.CPPIAClassesMacro.generate('cppia/stubs/src', " + str + ")");
 
 		// see https://haxe.org/manual/cr-static-analyzer.html
 		// setHaxedef("analyzer-optimize");

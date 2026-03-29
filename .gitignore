@@ -14,3 +14,6 @@ vs_Community.exe
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# cppia stubs
+cppia/stubs/*
