@@ -10,6 +10,7 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
+@:nullSafety
 class OptionsState extends MusicBeatState
 {
 	var options:Array<String> = [
@@ -26,7 +27,7 @@ class OptionsState extends MusicBeatState
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 
 	private static var curSelected:Int = 0;
-	public static var menuBG:FlxSprite;
+	public static var menuBG:Null<FlxSprite>;
 	public static var onPlayState:Bool = false;
 
 	var tipText:FlxText;

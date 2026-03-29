@@ -28,6 +28,7 @@ typedef TitleData =
 	bpm:Float
 }
 
+@:nullSafety
 class TitleState extends MusicBeatState
 {
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
@@ -127,7 +128,7 @@ class TitleState extends MusicBeatState
 	var gfDance:FlxSprite;
 	var danceLeft:Bool = false;
 	var titleText:FlxSprite;
-	var swagShader:ColorSwap = null;
+	var swagShader:Null<ColorSwap> = null;
 
 	function startIntro()
 	{
@@ -359,7 +360,7 @@ class TitleState extends MusicBeatState
 		super.update(elapsed);
 	}
 
-	function createCoolText(textArray:Array<String>, ?offset:Float = 0)
+	function createCoolText(textArray:Array<String>, offset:Float = 0)
 	{
 		for (i in 0...textArray.length)
 		{
@@ -374,7 +375,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	function addMoreText(text:String, ?offset:Float = 0)
+	function addMoreText(text:String, offset:Float = 0)
 	{
 		if (textGroup != null && credGroup != null)
 		{

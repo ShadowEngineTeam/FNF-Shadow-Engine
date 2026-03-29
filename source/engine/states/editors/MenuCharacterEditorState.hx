@@ -10,10 +10,11 @@ import openfl.events.IOErrorEvent;
 import openfl.net.FileFilter;
 import objects.MenuCharacter;
 
+@:nullSafety
 class MenuCharacterEditorState extends MusicBeatState
 {
 	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
-	var characterFile:MenuCharacterFile = null;
+	var characterFile:Null<MenuCharacterFile> = null;
 	var defaultCharacters:Array<String> = ['dad', 'bf', 'gf'];
 
 	var camEditor:ShadowCamera;
@@ -359,7 +360,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			UI_offsetLabel.text = '[' + characterFile.position[0] + ', ' + characterFile.position[1] + ']';
 	}
 
-	var _file:FileReference = null;
+	var _file:Null<FileReference> = null;
 
 	function loadCharacter()
 	{
@@ -378,7 +379,7 @@ class MenuCharacterEditorState extends MusicBeatState
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
 
-		var fullPath:String = null;
+		var fullPath:Null<String> = null;
 		@:privateAccess
 		if (_file.__path != null)
 			fullPath = _file.__path;

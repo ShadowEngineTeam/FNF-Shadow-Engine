@@ -6,9 +6,10 @@ import objects.NoteSplash;
 
 using StringTools;
 
+@:nullSafety
 class NoteSplashDebugState extends MusicBeatState
 {
-	var config:NoteSplashConfig;
+	var config:Null<NoteSplashConfig>;
 	var forceFrame:Int = -1;
 	var curSelected:Int = 0;
 	var maxNotes:Int = 4;
@@ -26,7 +27,7 @@ class NoteSplashDebugState extends MusicBeatState
 	var curFrameText:FlxText;
 	var curAnimText:FlxText;
 	var savedText:FlxText;
-	var selecArr:Array<Float> = null;
+	var selecArr:Null<Array<Float>> = null;
 	var idk:Bool = (Controls.instance.mobileC) ? true : false; // im lazy to remove and add alot so idk
 
 	var missingTextBG:FlxSprite;
@@ -401,7 +402,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 	var textureName:String = defaultTexture;
 	var texturePath:String = '';
-	var copiedArray:Array<Float> = null;
+	var copiedArray:Null<Array<Float>> = null;
 
 	function loadFrames()
 	{
@@ -554,7 +555,7 @@ class NoteSplashDebugState extends MusicBeatState
 		return config.offsets[FlxMath.wrap(animID, 0, config.offsets.length - 1)];
 	}
 
-	function addAnimAndCheck(spr:FlxSprite, name:String, anim:String, ?framerate:Int = 24, ?loop:Bool = false)
+	function addAnimAndCheck(spr:FlxSprite, name:String, anim:String, framerate:Int = 24, loop:Bool = false)
 	{
 		spr.animation.addByPrefix(name, anim, framerate, loop);
 		return spr.animation.getByName(name) != null;
