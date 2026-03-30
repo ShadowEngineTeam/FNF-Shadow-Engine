@@ -9,7 +9,7 @@
     {
       "name": "openfl",
       "type": "git",
-      "ref": "aa7209d704d40b4c44b9a72593dc59496854da4c",
+      "ref": "a85b45f21c7e1a4c19663a193bf4ea961faf0dfa",
       "url": "https://github.com/FunkinCrew/openfl"
     },
     {
@@ -87,7 +87,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "7ccda74ec7b6c5ba0b3ae4d3f8d64582331b4da1",
+      "ref": "82164fd5091543fc188020414d0d4ec38c935cb3",
       "url": "https://github.com/MaybeMaru/flixel-animate"
     },
 	{
