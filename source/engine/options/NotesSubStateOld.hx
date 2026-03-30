@@ -7,34 +7,37 @@ import objects.Note;
 
 using StringTools;
 
+@:nullSafety
 class NotesSubStateOld extends MusicBeatSubstate
 {
 	private static var curSelected:Int = 0;
 	private static var typeSelected:Int = 0;
 
-	private var grpNumbers:FlxTypedGroup<Alphabet>;
-	private var grpNotes:FlxTypedGroup<FlxSprite>;
+	private var grpNumbers:FlxTypedGroup<Alphabet> = new FlxTypedGroup<Alphabet>();
+	private var grpNotes:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
 	private var shaderArray:Array<ColorSwap> = [];
 	var curValue:Float = 0;
 	var holdTime:Float = 0;
 	var nextAccept:Int = 5;
 
-	var blackBG:FlxSprite;
-	var hsbText:Alphabet;
-	var changeKeysText:Alphabet;
+	var blackBG:FlxSprite = new FlxSprite();
+	var hsbText:Alphabet = new Alphabet(0, 0, "", true);
+	var changeKeysText:Null<Alphabet> = null;
 
 	var posX:Int = 230;
 
 	var camY:Float = 0;
 	var targetCamY:Float = 0;
 
-	public function new()
+public function new()
 	{
-		controls.isInSubstate = true;
-
 		super();
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		controls.isInSubstate = true;
+
+		var graphic = Paths.image('menuDesat');
+		var bg:FlxSprite = new FlxSprite();
+		if (graphic != null) bg.loadGraphic(graphic);
 		bg.color = 0xFFEA71FD;
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.data.antialiasing;
@@ -87,7 +90,8 @@ class NotesSubStateOld extends MusicBeatSubstate
 			}
 
 			var note:FlxSprite = new FlxSprite(posX, yPos);
-			note.frames = Paths.getSparrowAtlas('NOTE_assets');
+			var frames = Paths.getSparrowAtlas('NOTE_assets');
+			if (frames != null) note.frames = frames;
 
 			var animName:String = Note.colArray[i % Note.colArray.length] + '0';
 			note.animation.addByPrefix('idle', animName);
@@ -146,17 +150,17 @@ class NotesSubStateOld extends MusicBeatSubstate
 				if (controls.UI_LEFT_P)
 				{
 					updateValue(-1);
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 				}
 				else if (controls.UI_RIGHT_P)
 				{
 					updateValue(1);
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 				}
 				else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET)
 				{
 					resetValue(curSelected, typeSelected);
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 				}
 				if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
 				{
@@ -185,32 +189,32 @@ class NotesSubStateOld extends MusicBeatSubstate
 				}
 				if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
 				{
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 					holdTime = 0;
 				}
 			}
 		}
 		else
 		{
-			if (controls.UI_UP_P)
+if (controls.UI_UP_P)
 			{
 				changeSelection(-1);
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 			}
 			if (controls.UI_DOWN_P)
 			{
 				changeSelection(1);
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 			}
 			if (controls.UI_LEFT_P)
 			{
 				changeType(-1);
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 			}
 			if (controls.UI_RIGHT_P)
 			{
 				changeType(1);
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 			}
 			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET)
 			{
@@ -218,11 +222,11 @@ class NotesSubStateOld extends MusicBeatSubstate
 				{
 					resetValue(curSelected, i);
 				}
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				var snd = Paths.sound('cancelMenu'); if (snd != null) FlxG.sound.play(snd);
 			}
 			if (controls.ACCEPT && nextAccept <= 0)
 			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 				changingNote = true;
 				holdTime = 0;
 				for (i in 0...grpNumbers.length)
@@ -259,7 +263,7 @@ class NotesSubStateOld extends MusicBeatSubstate
 				changeSelection();
 			}
 			changingNote = false;
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			var snd = Paths.sound('cancelMenu'); if (snd != null) FlxG.sound.play(snd);
 		}
 
 		if (nextAccept > 0)

@@ -13,51 +13,54 @@ import flixel.addons.transition.FlxTransitionableState;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
+@:nullSafety
 class NotesSubState extends MusicBeatSubstate
 {
 	var onModeColumn:Bool = true;
 	var curSelectedMode:Int = 0;
 	var curSelectedNote:Int = 0;
 	var onPixel:Bool = false;
-	var dataArray:Array<Array<FlxColor>>;
+	var dataArray:Array<Array<FlxColor>> = [];
 
-	var hexTypeLine:FlxSprite;
+	var hexTypeLine:FlxSprite = new FlxSprite();
 	var hexTypeNum:Int = -1;
 	var hexTypeVisibleTimer:Float = 0;
 
-	var copyButton:FlxSprite;
-	var pasteButton:FlxSprite;
+	var copyButton:FlxSprite = new FlxSprite();
+	var pasteButton:FlxSprite = new FlxSprite();
 
-	var colorGradient:FlxSprite;
-	var colorGradientSelector:FlxSprite;
-	var colorPalette:FlxSprite;
-	var colorWheel:FlxSprite;
-	var colorWheelSelector:FlxSprite;
+	var colorGradient:FlxSprite = new FlxSprite();
+	var colorGradientSelector:FlxSprite = new FlxSprite();
+	var colorPalette:FlxSprite = new FlxSprite();
+	var colorWheel:FlxSprite = new FlxSprite();
+	var colorWheelSelector:FlxShapeCircle = new FlxShapeCircle(0, 0, 8, {thickness: 0}, FlxColor.WHITE);
 
-	var alphabetR:Alphabet;
-	var alphabetG:Alphabet;
-	var alphabetB:Alphabet;
-	var alphabetHex:Alphabet;
+	var alphabetR:Null<Alphabet> = null;
+	var alphabetG:Null<Alphabet> = null;
+	var alphabetB:Null<Alphabet> = null;
+	var alphabetHex:Null<Alphabet> = null;
 
-	var modeBG:FlxSprite;
-	var notesBG:FlxSprite;
+	var modeBG:FlxSprite = new FlxSprite();
+	var notesBG:FlxSprite = new FlxSprite();
 
 	// controller support
-	var controllerPointer:FlxSprite;
+	var controllerPointer:FlxShapeCircle = new FlxShapeCircle(0, 0, 20, {thickness: 0}, FlxColor.WHITE);
 	var _lastControllerMode:Bool = false;
-	var tipTxt:FlxText;
+	var tipTxt:FlxText = new FlxText();
 
 	public function new()
 	{
-		controls.isInSubstate = true;
-
 		super();
+
+		controls.isInSubstate = true;
 
 		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Note Colors Menu", null);
 		#end
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		var bg:FlxSprite = new FlxSprite();
+		var bgImg = Paths.image('menuDesat');
+		if (bgImg != null) bg.loadGraphic(bgImg);
 		bg.color = 0xFFEA71FD;
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.data.antialiasing;
@@ -111,11 +114,15 @@ class NotesSubState extends MusicBeatSubstate
 		text.setScale(0.4);
 		add(text);
 
-		copyButton = new FlxSprite(760, 50).loadGraphic(Paths.image('noteColorMenu/copy'));
+		copyButton = new FlxSprite(760, 50);
+		var copyImg = Paths.image('noteColorMenu/copy');
+		if (copyImg != null) copyButton.loadGraphic(copyImg);
 		copyButton.alpha = 0.6;
 		add(copyButton);
 
-		pasteButton = new FlxSprite(1180, 50).loadGraphic(Paths.image('noteColorMenu/paste'));
+		pasteButton = new FlxSprite(1180, 50);
+		var pasteImg = Paths.image('noteColorMenu/paste');
+		if (pasteImg != null) pasteButton.loadGraphic(pasteImg);
 		pasteButton.alpha = 0.6;
 		add(pasteButton);
 
@@ -127,13 +134,17 @@ class NotesSubState extends MusicBeatSubstate
 		colorGradientSelector.offset.y = 5;
 		add(colorGradientSelector);
 
-		colorPalette = new FlxSprite(820, 580).loadGraphic(Paths.image('noteColorMenu/palette'));
+		colorPalette = new FlxSprite(820, 580);
+		var palImg = Paths.image('noteColorMenu/palette');
+		if (palImg != null) colorPalette.loadGraphic(palImg);
 		colorPalette.scale.set(20, 20);
 		colorPalette.updateHitbox();
 		colorPalette.antialiasing = false;
 		add(colorPalette);
 
-		colorWheel = new FlxSprite(860, 200).loadGraphic(Paths.image('noteColorMenu/colorWheel'));
+		colorWheel = new FlxSprite(860, 200);
+		var wheelImg = Paths.image('noteColorMenu/colorWheel');
+		if (wheelImg != null) colorWheel.loadGraphic(wheelImg);
 		colorWheel.setGraphicSize(360, 360);
 		colorWheel.updateHitbox();
 		add(colorWheel);
@@ -159,7 +170,7 @@ class NotesSubState extends MusicBeatSubstate
 
 		spawnNotes();
 		updateNotes(true);
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+		var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 
 		var tipX = 20;
 		var tipY = 660;
@@ -210,9 +221,9 @@ class NotesSubState extends MusicBeatSubstate
 			tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
 	}
 
-	var _storedColor:FlxColor;
+	var _storedColor:FlxColor = FlxColor.WHITE;
 	var changingNote:Bool = false;
-	var holdingOnObj:FlxSprite;
+	var holdingOnObj:Null<FlxSprite> = null;
 	var allowedTypeKeys:Map<FlxKey, String> = [
 		ZERO => '0',
 		ONE => '1',
@@ -247,7 +258,7 @@ class NotesSubState extends MusicBeatSubstate
 		if (controls.BACK)
 		{
 			FlxG.mouse.visible = false;
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			var snd = Paths.sound('cancelMenu'); if (snd != null) FlxG.sound.play(snd);
 			ClientPrefs.saveSettings();
 			controls.isInSubstate = false;
 			close();
@@ -312,7 +323,7 @@ class NotesSubState extends MusicBeatSubstate
 			onPixel = !onPixel;
 			spawnNotes();
 			updateNotes(true);
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+			var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 		}
 
 		if (hexTypeNum > -1)
@@ -327,13 +338,17 @@ class NotesSubState extends MusicBeatSubstate
 			else if (allowedTypeKeys.exists(keyPressed))
 			{
 				// trace('keyPressed: $keyPressed, lil str: ' + allowedTypeKeys.get(keyPressed));
-				var curColor:String = alphabetHex.text;
-				var newColor:String = curColor.substring(0, hexTypeNum) + allowedTypeKeys.get(keyPressed) + curColor.substring(hexTypeNum + 1);
+				var curColor:String = alphabetHex != null ? alphabetHex.text : "000000";
+				var keyPress = allowedTypeKeys.get(keyPressed);
+				var newColor:String = keyPress != null ? curColor.substring(0, hexTypeNum) + keyPress + curColor.substring(hexTypeNum + 1) : curColor;
 
-				var colorHex:FlxColor = FlxColor.fromString('#' + newColor);
-				setShaderColor(colorHex);
-				_storedColor = getShaderColor();
-				updateColors();
+				var colorHex:Null<FlxColor> = FlxColor.fromString('#' + newColor);
+				if (colorHex != null)
+				{
+					setShaderColor(colorHex);
+					_storedColor = getShaderColor();
+					updateColors();
+				}
 
 				// move you to next letter
 				hexTypeNum++;
@@ -360,7 +375,7 @@ class NotesSubState extends MusicBeatSubstate
 					centerHexTypeLine();
 					hexTypeLine.visible = true;
 				}
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 			}
 			if (!end)
 				hexTypeLine.visible = Math.floor(hexTypeVisibleTimer * 2) % 2 == 0;
@@ -408,7 +423,7 @@ class NotesSubState extends MusicBeatSubstate
 			if (generalPressed)
 			{
 				Clipboard.text = getShaderColor().toHexString(false, false);
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 				trace('copied: ' + Clipboard.text);
 			}
 			hexTypeNum = -1;
@@ -424,12 +439,14 @@ class NotesSubState extends MusicBeatSubstate
 				if (newColor != null && formattedText.length == 6)
 				{
 					setShaderColor(newColor);
-					FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+					var snd2 = Paths.sound('scrollMenu'); if (snd2 != null) FlxG.sound.play(snd2, 0.6);
 					_storedColor = getShaderColor();
 					updateColors();
 				}
 				else // errored
-					FlxG.sound.play(Paths.sound('cancelMenu'), 0.6);
+				{
+					var snd3 = Paths.sound('cancelMenu'); if (snd3 != null) FlxG.sound.play(snd3, 0.6);
+				}
 			}
 			hexTypeNum = -1;
 		}
@@ -448,7 +465,7 @@ class NotesSubState extends MusicBeatSubstate
 						curSelectedMode = note.ID;
 						onModeColumn = true;
 						updateNotes();
-						FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+						var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 					}
 				});
 			}
@@ -461,10 +478,13 @@ class NotesSubState extends MusicBeatSubstate
 						modeBG.visible = notesBG.visible = false;
 						curSelectedNote = note.ID;
 						onModeColumn = false;
-						bigNote.rgbShader.parent = Note.globalRgbShaders[note.ID];
-						bigNote.shader = Note.globalRgbShaders[note.ID].shader;
+						if (bigNote != null && bigNote.rgbShader != null)
+						{
+							bigNote.rgbShader.parent = Note.globalRgbShaders[note.ID];
+							bigNote.shader = Note.globalRgbShaders[note.ID].shader;
+						}
 						updateNotes();
-						FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+						var snd2 = Paths.sound('scrollMenu'); if (snd2 != null) FlxG.sound.play(snd2, 0.6);
 					}
 				});
 			}
@@ -482,7 +502,7 @@ class NotesSubState extends MusicBeatSubstate
 			{
 				setShaderColor(colorPalette.pixels.getPixel32(Std.int((pointerX() - colorPalette.x) / colorPalette.scale.x),
 					Std.int((pointerY() - colorPalette.y) / colorPalette.scale.y)));
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+				var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 				updateColors();
 			}
 			else if (pointerOverlaps(skinNote))
@@ -490,18 +510,21 @@ class NotesSubState extends MusicBeatSubstate
 				onPixel = !onPixel;
 				spawnNotes();
 				updateNotes(true);
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+				var snd2 = Paths.sound('scrollMenu'); if (snd2 != null) FlxG.sound.play(snd2, 0.6);
 			}
 			else if (pointerY() >= hexTypeLine.y && pointerY() < hexTypeLine.y + hexTypeLine.height && Math.abs(pointerX() - 1000) <= 84)
 			{
 				FlxG.stage.window.textInputEnabled = true;
 				hexTypeNum = 0;
-				for (letter in alphabetHex.letters)
+				if (alphabetHex != null)
 				{
-					if (letter.x - letter.offset.x + letter.width <= pointerX())
-						hexTypeNum++;
-					else
-						break;
+					for (letter in alphabetHex.letters)
+					{
+						if (letter.x - letter.offset.x + letter.width <= pointerX())
+							hexTypeNum++;
+						else
+							break;
+					}
 				}
 				if (hexTypeNum > 5)
 					hexTypeNum = 5;
@@ -519,7 +542,7 @@ class NotesSubState extends MusicBeatSubstate
 				holdingOnObj = null;
 				_storedColor = getShaderColor();
 				updateColors();
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+				var snd3 = Paths.sound('scrollMenu'); if (snd3 != null) FlxG.sound.play(snd3, 0.6);
 			}
 			else if (generalMoved || generalPressed)
 			{
@@ -554,22 +577,26 @@ class NotesSubState extends MusicBeatSubstate
 			{
 				for (i in 0...3)
 				{
-					var strumRGB:RGBShaderReference = myNotes.members[curSelectedNote].rgbShader;
-					var color:FlxColor = !onPixel ? ClientPrefs.defaultData.arrowRGB[curSelectedNote][i] : ClientPrefs.defaultData.arrowRGBPixel[curSelectedNote][i];
-					switch (i)
+					var strumNote = myNotes.members[curSelectedNote];
+					if (strumNote != null && strumNote.rgbShader != null)
 					{
-						case 0:
-							getShader().r = strumRGB.r = color;
-						case 1:
-							getShader().g = strumRGB.g = color;
-						case 2:
-							getShader().b = strumRGB.b = color;
+						var strumRGB:RGBShaderReference = strumNote.rgbShader;
+						var color:FlxColor = !onPixel ? ClientPrefs.defaultData.arrowRGB[curSelectedNote][i] : ClientPrefs.defaultData.arrowRGBPixel[curSelectedNote][i];
+						switch (i)
+						{
+							case 0:
+								getShader().r = strumRGB.r = color;
+							case 1:
+								getShader().g = strumRGB.g = color;
+							case 2:
+								getShader().b = strumRGB.b = color;
+						}
+						dataArray[curSelectedNote][i] = color;
 					}
-					dataArray[curSelectedNote][i] = color;
 				}
 			}
 			setShaderColor(!onPixel ? ClientPrefs.defaultData.arrowRGB[curSelectedNote][curSelectedMode] : ClientPrefs.defaultData.arrowRGBPixel[curSelectedNote][curSelectedMode]);
-			FlxG.sound.play(Paths.sound('cancelMenu'), 0.6);
+			var snd = Paths.sound('cancelMenu'); if (snd != null) FlxG.sound.play(snd, 0.6);
 			updateColors();
 		}
 	}
@@ -605,6 +632,7 @@ class NotesSubState extends MusicBeatSubstate
 	function centerHexTypeLine()
 	{
 		// trace(hexTypeNum);
+		if (alphabetHex == null) return;
 		if (hexTypeNum > 0)
 		{
 			var letter = alphabetHex.letters[hexTypeNum - 1];
@@ -630,7 +658,7 @@ class NotesSubState extends MusicBeatSubstate
 		modeBG.visible = true;
 		notesBG.visible = false;
 		updateNotes();
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 	}
 
 	function changeSelectionNote(change:Int = 0)
@@ -643,10 +671,13 @@ class NotesSubState extends MusicBeatSubstate
 
 		modeBG.visible = false;
 		notesBG.visible = true;
-		bigNote.rgbShader.parent = Note.globalRgbShaders[curSelectedNote];
-		bigNote.shader = Note.globalRgbShaders[curSelectedNote].shader;
+		if (bigNote != null && bigNote.rgbShader != null)
+		{
+			bigNote.rgbShader.parent = Note.globalRgbShaders[curSelectedNote];
+			bigNote.shader = Note.globalRgbShaders[curSelectedNote].shader;
+		}
 		updateNotes();
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		var snd = Paths.sound('scrollMenu'); if (snd != null) FlxG.sound.play(snd);
 	}
 
 	// alphabets
@@ -660,10 +691,10 @@ class NotesSubState extends MusicBeatSubstate
 	}
 
 	// notes sprites functions
-	var skinNote:FlxSprite;
-	var modeNotes:FlxTypedGroup<FlxSprite>;
-	var myNotes:FlxTypedGroup<StrumNote>;
-	var bigNote:Note;
+	var skinNote:Null<FlxSprite> = null;
+	var modeNotes:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
+	var myNotes:FlxTypedGroup<StrumNote> = new FlxTypedGroup<StrumNote>();
+	var bigNote:Null<Note> = null;
 
 	public function spawnNotes()
 	{
@@ -698,7 +729,9 @@ class NotesSubState extends MusicBeatSubstate
 
 		// respawn stuff
 		var res:Int = onPixel ? 160 : 17;
-		skinNote = new FlxSprite(48, 24).loadGraphic(Paths.image('noteColorMenu/' + (onPixel ? 'note' : 'notePixel')), true, res, res);
+		var skinImg = Paths.image('noteColorMenu/' + (onPixel ? 'note' : 'notePixel'));
+		skinNote = new FlxSprite(48, 24);
+		if (skinImg != null) skinNote.loadGraphic(skinImg, true, res, res);
 		skinNote.antialiasing = ClientPrefs.data.antialiasing;
 		skinNote.setGraphicSize(68);
 		skinNote.updateHitbox();
@@ -711,8 +744,9 @@ class NotesSubState extends MusicBeatSubstate
 		var res:Int = !onPixel ? 160 : 17;
 		for (i in 0...3)
 		{
-			var newNote:FlxSprite = new FlxSprite(230 + (100 * i),
-				100).loadGraphic(Paths.image('noteColorMenu/' + (!onPixel ? 'note' : 'notePixel')), true, res, res);
+			var noteImg = Paths.image('noteColorMenu/' + (!onPixel ? 'note' : 'notePixel'));
+			var newNote:FlxSprite = new FlxSprite(230 + (100 * i), 100);
+			if (noteImg != null) newNote.loadGraphic(noteImg, true, res, res);
 			newNote.antialiasing = ClientPrefs.data.antialiasing;
 			newNote.setGraphicSize(85);
 			newNote.updateHitbox();
@@ -728,7 +762,7 @@ class NotesSubState extends MusicBeatSubstate
 		for (i in 0...dataArray.length)
 		{
 			Note.initializeGlobalRGBShader(i);
-			var newNote:StrumNote = new StrumNote(150 + (480 / dataArray.length * i), 200, i, 0, null);
+			var newNote:StrumNote = new StrumNote(150 + (480 / dataArray.length * i), 200, i, 0, '');
 			newNote.setGraphicSize(102);
 			newNote.useRGBShader = true;
 			newNote.updateHitbox();
@@ -740,7 +774,7 @@ class NotesSubState extends MusicBeatSubstate
 		bigNote.setPosition(250, 325);
 		bigNote.setGraphicSize(250);
 		bigNote.updateHitbox();
-		bigNote.rgbShader.parent = Note.globalRgbShaders[curSelectedNote];
+		if (bigNote.rgbShader != null) bigNote.rgbShader.parent = Note.globalRgbShaders[curSelectedNote];
 		bigNote.shader = Note.globalRgbShaders[curSelectedNote].shader;
 		for (i in 0...Note.colArray.length)
 		{
@@ -757,18 +791,23 @@ class NotesSubState extends MusicBeatSubstate
 	function updateNotes(?instant:Bool = false)
 	{
 		for (note in modeNotes)
-			note.alpha = (curSelectedMode == note.ID) ? 1 : 0.6;
+		{
+			if (note != null)
+				note.alpha = (curSelectedMode == note.ID) ? 1 : 0.6;
+		}
 
 		for (note in myNotes)
 		{
+			if (note == null) continue;
 			var newAnim:String = curSelectedNote == note.ID ? 'confirm' : 'pressed';
 			note.alpha = (curSelectedNote == note.ID) ? 1 : 0.6;
 			if (note.animation.curAnim == null || note.animation.curAnim.name != newAnim)
 				note.playAnim(newAnim, true);
-			if (instant)
+			if (instant && note.animation.curAnim != null)
 				note.animation.curAnim.finish();
 		}
-		bigNote.animation.play('note$curSelectedNote', true);
+		if (bigNote != null)
+			bigNote.animation.play('note$curSelectedNote', true);
 		updateColors();
 	}
 
@@ -776,12 +815,15 @@ class NotesSubState extends MusicBeatSubstate
 	{
 		var color:FlxColor = getShaderColor();
 		var wheelColor:FlxColor = specific == null ? getShaderColor() : specific;
-		alphabetR.text = Std.string(color.red);
-		alphabetG.text = Std.string(color.green);
-		alphabetB.text = Std.string(color.blue);
-		alphabetHex.text = color.toHexString(false, false);
-		for (letter in alphabetHex.letters)
-			letter.color = color;
+		if (alphabetR != null) alphabetR.text = Std.string(color.red);
+		if (alphabetG != null) alphabetG.text = Std.string(color.green);
+		if (alphabetB != null) alphabetB.text = Std.string(color.blue);
+		if (alphabetHex != null)
+		{
+			alphabetHex.text = color.toHexString(false, false);
+			for (letter in alphabetHex.letters)
+				letter.color = color;
+		}
 
 		colorWheel.color = FlxColor.fromHSB(0, 0, color.brightness);
 		colorWheelSelector.setPosition(colorWheel.x + colorWheel.width / 2, colorWheel.y + colorWheel.height / 2);
@@ -793,15 +835,19 @@ class NotesSubState extends MusicBeatSubstate
 		}
 		colorGradientSelector.y = colorGradient.y + colorGradient.height * (1 - color.brightness);
 
-		var strumRGB:RGBShaderReference = myNotes.members[curSelectedNote].rgbShader;
-		switch (curSelectedMode)
+		var strumNote = myNotes.members[curSelectedNote];
+		if (strumNote != null && strumNote.rgbShader != null)
 		{
-			case 0:
-				getShader().r = strumRGB.r = color;
-			case 1:
-				getShader().g = strumRGB.g = color;
-			case 2:
-				getShader().b = strumRGB.b = color;
+			var strumRGB:RGBShaderReference = strumNote.rgbShader;
+			switch (curSelectedMode)
+			{
+				case 0:
+					getShader().r = strumRGB.r = color;
+				case 1:
+					getShader().g = strumRGB.g = color;
+				case 2:
+					getShader().b = strumRGB.b = color;
+			}
 		}
 	}
 
