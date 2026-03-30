@@ -13,7 +13,6 @@ import states.editors.MasterEditorMenu;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.frames.FlxAtlasFrames;
 
-@:nullSafety
 class WeekEditorState extends MusicBeatState
 {
 	var txtWeekTitle:FlxText;
@@ -24,9 +23,9 @@ class WeekEditorState extends MusicBeatState
 	var weekThing:MenuItem;
 	var missingFileText:FlxText;
 
-	var weekFile:Null<WeekFile> = null;
+	var weekFile:WeekFile = null;
 
-	public function new(?weekFile:WeekFile)
+	public function new(weekFile:WeekFile = null)
 	{
 		super();
 		this.weekFile = WeekData.createWeekFile();
@@ -487,7 +486,7 @@ class WeekEditorState extends MusicBeatState
 		lock.x = weekThing.width + 10 + weekThing.x;
 	}
 
-	private static var _file:Null<FileReference>;
+	private static var _file:FileReference;
 
 	public static function loadWeek()
 	{
@@ -499,7 +498,7 @@ class WeekEditorState extends MusicBeatState
 		_file.browse([jsonFilter]);
 	}
 
-	public static var loadedWeek:Null<WeekFile> = null;
+	public static var loadedWeek:WeekFile = null;
 	public static var loadError:Bool = false;
 
 	private static function onLoadComplete(_):Void
@@ -509,18 +508,18 @@ class WeekEditorState extends MusicBeatState
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
 
-		var fullPath:Null<String> = null;
+		var fullPath:String = null;
 		@:privateAccess
 		if (_file.__path != null)
 			fullPath = _file.__path;
 
 		if (fullPath != null)
 		{
-			var rawJson:Null<String> = File.getContent(fullPath);
+			var rawJson:String = File.getContent(fullPath);
 			if (rawJson != null)
 			{
 				loadedWeek = cast Json.parse(rawJson, fullPath);
-				if (loadedWeek != null && loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
+				if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null)
 				{
 					var cutName:String = _file.name.substr(0, _file.name.length - 5);
 					trace("Successfully loaded file: " + cutName);
@@ -597,12 +596,11 @@ class WeekEditorState extends MusicBeatState
 	}
 }
 
-@:nullSafety
 class WeekEditorFreeplayState extends MusicBeatState
 {
-	var weekFile:Null<WeekFile> = null;
+	var weekFile:WeekFile = null;
 
-	public function new(?weekFile:WeekFile)
+	public function new(weekFile:WeekFile = null)
 	{
 		super();
 		this.weekFile = WeekData.createWeekFile();

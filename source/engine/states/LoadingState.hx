@@ -15,7 +15,6 @@ import backend.Song;
 import backend.StageData;
 import objects.Character;
 
-@:nullSafety
 class LoadingState extends MusicBeatState
 {
 	public static var loaded:Int = 0;
@@ -27,7 +26,7 @@ class LoadingState extends MusicBeatState
 	static var loadedMutex:Mutex = new Mutex();
 	#end
 
-	function new(?target:FlxState, stopMusic:Bool)
+	function new(target:FlxState, stopMusic:Bool)
 	{
 		this.target = target;
 		this.stopMusic = stopMusic;
@@ -39,7 +38,7 @@ class LoadingState extends MusicBeatState
 	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, intrusive:Bool = true)
 		MusicBeatState.switchState(getNextState(target, stopMusic, intrusive));
 
-	var target:Null<FlxState> = null;
+	var target:FlxState = null;
 	var stopMusic:Bool = false;
 	var dontUpdate:Bool = false;
 
@@ -150,8 +149,8 @@ class LoadingState extends MusicBeatState
 	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
 	{
 		var directory:String = 'shared';
-		var weekDir:Null<String> = StageData.forceNextDirectory;
-		@:nullSafety(Off) StageData.forceNextDirectory = null;
+		var weekDir:String = StageData.forceNextDirectory;
+		StageData.forceNextDirectory = null;
 
 		if (weekDir != null && weekDir.length > 0 && weekDir != '')
 			directory = weekDir;
@@ -197,7 +196,7 @@ class LoadingState extends MusicBeatState
 	static var musicToPrepare:Array<String> = [];
 	static var songsToPrepare:Array<String> = [];
 
-	public static function prepare(?images:Array<String>, ?sounds:Array<String>, ?music:Array<String>)
+	public static function prepare(images:Array<String> = null, sounds:Array<String> = null, music:Array<String> = null)
 	{
 		if (images != null)
 			imagesToPrepare = imagesToPrepare.concat(images);
@@ -251,7 +250,7 @@ class LoadingState extends MusicBeatState
 		var player2:String = song.player2;
 		var gfVersion:String = song.gfVersion;
 		var needsVoices:Bool = song.needsVoices;
-		var prefixVocals:Null<String> = needsVoices ? '$folder/Voices' + Difficulty.getSongPrefix() : null;
+		var prefixVocals:String = needsVoices ? '$folder/Voices' + Difficulty.getSongPrefix() : null;
 		if (gfVersion == null)
 			gfVersion = 'gf';
 
@@ -279,7 +278,7 @@ class LoadingState extends MusicBeatState
 				arr.remove(null);
 	}
 
-	static function clearInvalidFrom(arr:Array<String>, prefix:String, ext:String, type:AssetType, ?library:String)
+	static function clearInvalidFrom(arr:Array<String>, prefix:String, ext:String, type:AssetType, ?library:String = null)
 	{
 		for (i in 0...arr.length)
 		{

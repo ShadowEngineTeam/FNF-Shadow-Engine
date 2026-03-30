@@ -7,7 +7,6 @@ import objects.Note;
 
 using StringTools;
 
-@:nullSafety
 class NotesSubStateOld extends MusicBeatSubstate
 {
 	private static var curSelected:Int = 0;

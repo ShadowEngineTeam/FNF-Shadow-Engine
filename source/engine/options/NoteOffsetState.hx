@@ -10,7 +10,6 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
-@:nullSafety
 class NoteOffsetState extends MusicBeatState
 {
 	var stageDirectory:String = 'week1';
@@ -32,7 +31,7 @@ class NoteOffsetState extends MusicBeatState
 	var timeBar:Bar;
 	var timeTxt:FlxText;
 	var beatText:Alphabet;
-	var beatTween:Null<FlxTween>;
+	var beatTween:FlxTween;
 
 	var changeModeText:FlxText;
 
@@ -199,8 +198,8 @@ class NoteOffsetState extends MusicBeatState
 	var onComboMenu:Bool = true;
 	var holdingObjectType:Null<Bool> = null;
 
-	var startMousePos:Null<FlxPoint> = FlxPoint.get();
-	var startComboOffset:Null<FlxPoint> = FlxPoint.get();
+	var startMousePos:FlxPoint = FlxPoint.get();
+	var startComboOffset:FlxPoint = FlxPoint.get();
 
 	override public function update(elapsed:Float)
 	{
@@ -239,7 +238,7 @@ class NoteOffsetState extends MusicBeatState
 		{
 			if (FlxG.keys.justPressed.ANY || FlxG.gamepads.anyJustPressed(ANY))
 			{
-				var controlArray:Null<Array<Bool>> = null;
+				var controlArray:Array<Bool> = null;
 				if (!controls.controllerMode)
 				{
 					controlArray = [
@@ -362,7 +361,7 @@ class NoteOffsetState extends MusicBeatState
 			{
 				if (FlxG.mouse.justMoved || analogMoved)
 				{
-					var mousePos:Null<FlxPoint> = null;
+					var mousePos:FlxPoint = null;
 					if (!controls.controllerMode)
 						mousePos = FlxG.mouse.getViewPosition(camHUD);
 					else
@@ -454,7 +453,7 @@ class NoteOffsetState extends MusicBeatState
 		super.update(elapsed);
 	}
 
-	var zoomTween:Null<FlxTween>;
+	var zoomTween:FlxTween;
 	var lastBeatHit:Int = -1;
 
 	override public function beatHit()

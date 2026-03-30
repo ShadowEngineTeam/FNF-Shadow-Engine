@@ -15,7 +15,6 @@ import openfl.geom.ColorTransform;
 /**
  * A utility class for `BitmapData`s.
  */
-@:nullSafety
 @:access(openfl.display.BitmapData)
 @:access(openfl.display3D.textures.TextureBase)
 @:access(openfl.display3D.Context3D)

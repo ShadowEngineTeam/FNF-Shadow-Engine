@@ -5,7 +5,6 @@ import objects.Note;
 import objects.StrumNote;
 import backend.ui.ShadowStyle;
 
-@:nullSafety
 class VisualsUISubState extends BaseOptionsMenu
 {
 	public static var pauseMusics:Array<String> = ['None', 'Breakfast', 'Tea Time'];

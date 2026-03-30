@@ -4,7 +4,6 @@ import flixel.graphics.FlxGraphic;
 import openfl.display.BlendMode;
 import shaders.AdjustColorShader;
 
-@:nullSafety
 class StageErect extends BaseStage
 {
 	var peeps:BGSprite;

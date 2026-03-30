@@ -7,7 +7,7 @@ package external.memory;
 @:buildXml('<include name="../../../../source/engine/external/memory/build.xml" />')
 #end
 @:include("memory.h")
-extern #end @:nullSafety class Memory
+extern #end class Memory
 {
 	#if cpp
 	@:native("getMemoryUsage")

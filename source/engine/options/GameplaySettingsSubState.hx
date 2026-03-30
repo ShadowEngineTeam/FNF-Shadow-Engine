@@ -2,7 +2,6 @@ package options;
 
 import lime.ui.Haptic;
 
-@:nullSafety
 class GameplaySettingsSubState extends BaseOptionsMenu
 {
 	#if mobile

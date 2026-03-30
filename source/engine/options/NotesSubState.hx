@@ -13,7 +13,6 @@ import flixel.addons.transition.FlxTransitionableState;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
-@:nullSafety
 class NotesSubState extends MusicBeatSubstate
 {
 	var onModeColumn:Bool = true;
@@ -213,7 +212,7 @@ class NotesSubState extends MusicBeatSubstate
 
 	var _storedColor:FlxColor;
 	var changingNote:Bool = false;
-	var holdingOnObj:Null<FlxSprite>;
+	var holdingOnObj:FlxSprite;
 	var allowedTypeKeys:Map<FlxKey, String> = [
 		ZERO => '0',
 		ONE => '1',
@@ -755,7 +754,7 @@ class NotesSubState extends MusicBeatSubstate
 		PlayState.stageUI = "normal";
 	}
 
-	function updateNotes(instant:Bool = false)
+	function updateNotes(?instant:Bool = false)
 	{
 		for (note in modeNotes)
 			note.alpha = (curSelectedMode == note.ID) ? 1 : 0.6;

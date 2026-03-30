@@ -2,11 +2,10 @@ package options;
 
 import objects.Character;
 
-@:nullSafety
 class GraphicsSettingsSubState extends BaseOptionsMenu
 {
 	var antialiasingOption:Int;
-	var boyfriend:Null<Character> = null;
+	var boyfriend:Character = null;
 
 	#if mobile
 	final platform:String = "Phones";
