@@ -2,6 +2,7 @@ package shaders;
 
 import objects.Note;
 
+@:nullSafety(Off)
 class RGBPalette
 {
 	public var shader(default, null):RGBPaletteShader = new RGBPaletteShader();

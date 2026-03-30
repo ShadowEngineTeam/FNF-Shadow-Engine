@@ -1,8 +1,9 @@
 package objects;
 
+@:nullSafety
 class TypedAlphabet extends Alphabet
 {
-	public var onFinish:Void->Void = null;
+	public var onFinish:Null<Void->Void> = null;
 	public var finishedText:Bool = false;
 	public var delay:Float = 0.05;
 	public var sound:String = 'dialogue';
@@ -12,7 +13,7 @@ class TypedAlphabet extends Alphabet
 	{
 		super(x, y, text, bold);
 
-		this.delay = delay;
+		this.delay = (delay != null) ? delay : 0.05;
 	}
 
 	override private function set_text(newText:String)
@@ -37,7 +38,9 @@ class TypedAlphabet extends Alphabet
 				showCharacterUpTo(_curLetter + 1);
 				if (!playedSound && sound != '' && (delay > 0.025 || _curLetter % 2 == 0))
 				{
-					FlxG.sound.play(Paths.sound(sound), volume);
+					var soundToPlay = Paths.sound(sound);
+					if (soundToPlay != null)
+						FlxG.sound.play(soundToPlay, volume);
 				}
 				playedSound = true;
 
@@ -88,7 +91,11 @@ class TypedAlphabet extends Alphabet
 
 		showCharacterUpTo(letters.length - 1);
 		if (sound != '')
-			FlxG.sound.play(Paths.sound(sound), volume);
+		{
+			var soundToPlay = Paths.sound(sound);
+			if (soundToPlay != null)
+				FlxG.sound.play(soundToPlay, volume);
+		}
 		finishedText = true;
 
 		if (onFinish != null)

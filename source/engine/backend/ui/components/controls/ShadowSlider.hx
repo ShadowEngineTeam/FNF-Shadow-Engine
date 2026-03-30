@@ -9,23 +9,24 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowSlider extends FlxSpriteGroup
 {
 	public var value(get, set):Float;
-	public var callback:Float->Void;
+	public var callback:Null<Float->Void>;
 
 	public var min:Float;
 	public var max:Float;
 	public var decimals:Int;
 	public var showValue:Bool;
 
-	var track:FlxSprite;
-	var fill:FlxSprite;
-	var thumb:FlxSprite;
-	var valueText:FlxText;
+	var track:FlxSprite = new FlxSprite();
+	var fill:FlxSprite = new FlxSprite();
+	var thumb:FlxSprite = new FlxSprite();
+	var valueText:Null<FlxText>;
 
-	var _width:Int;
-	var _height:Int;
+	var _width:Int = 150;
+	var _height:Int = 28;
 	var _thumbWidth:Int = 12;
 	var _thumbHeight:Int = 20;
 	var _trackHeight:Int = 8;
@@ -34,10 +35,9 @@ class ShadowSlider extends FlxSpriteGroup
 	var _hovered:Bool = false;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(x:Float, y:Float, minValue:Float, maxValue:Float, defaultValue:Float, ?onChange:Float->Void, width:Int = 150, decimalPlaces:Int = 1, showValueLabel:Bool = true)
+	public function new(x:Float, y:Float, minValue:Float, maxValue:Float, defaultValue:Float, ?onChange:Float->Void, width:Int = 150, decimalPlaces:Int = 1,
+			showValueLabel:Bool = true)
 	{
-		super(x, y);
-
 		min = minValue;
 		max = maxValue;
 		decimals = decimalPlaces;
@@ -47,15 +47,17 @@ class ShadowSlider extends FlxSpriteGroup
 		_height = ShadowStyle.HEIGHT_INPUT;
 
 		var trackY:Int = Std.int((_height - _trackHeight) / 2);
-		track = new FlxSprite(0, trackY);
+		track.y = trackY;
 		drawTrack();
+		
+		super(x, y);
 		add(track);
 
-		fill = new FlxSprite(1, trackY + 1);
+		fill.setPosition(1, trackY + 1);
 		fill.makeGraphic(1, _trackHeight - 2, ShadowStyle.ACCENT, true);
 		add(fill);
 
-		thumb = new FlxSprite(0, Std.int((_height - _thumbHeight) / 2));
+		thumb.y = Std.int((_height - _thumbHeight) / 2);
 		drawThumb(ShadowStyle.BG_LIGHT);
 		add(thumb);
 

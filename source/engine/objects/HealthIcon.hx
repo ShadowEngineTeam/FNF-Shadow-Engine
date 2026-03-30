@@ -1,8 +1,11 @@
 package objects;
 
+import flixel.graphics.FlxGraphic;
+
+@:nullSafety
 class HealthIcon extends FlxSprite
 {
-	public var sprTracker:FlxSprite;
+	public var sprTracker:Null<FlxSprite> = null;
 
 	private var isOldIcon:Bool = false;
 	private var isPlayer:Bool = false;
@@ -21,8 +24,9 @@ class HealthIcon extends FlxSprite
 	{
 		super.update(elapsed);
 
-		if (sprTracker != null)
-			setPosition(sprTracker.x + sprTracker.width + 12, sprTracker.y - 30);
+		var tracker = sprTracker;
+		if (tracker != null)
+			setPosition(tracker.x + tracker.width + 12, tracker.y - 30);
 	}
 
 	private var iconOffsets:Array<Float> = [0, 0];
@@ -37,27 +41,29 @@ class HealthIcon extends FlxSprite
 			if (!Paths.fileExists('images/' + name + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 				name = 'icons/icon-face'; // Prevents crash from missing icon
 
-			var graphic = Paths.image(name);
+			var graphic:Null<FlxGraphic> = Paths.image(name);
+			if (graphic != null)
+			{
+				var frames = Math.floor(graphic.width / 150);
+				loadGraphic(graphic, true, Math.floor(graphic.width / frames), Math.floor(graphic.height));
 
-			var frames = Math.floor(graphic.width / 150);
-			loadGraphic(graphic, true, Math.floor(graphic.width / frames), Math.floor(graphic.height));
+				iconOffsets[0] = (width - 150) / 2;
+				iconOffsets[1] = (height - 150) / 2;
+				updateHitbox();
 
-			iconOffsets[0] = (width - 150) / 2;
-			iconOffsets[1] = (height - 150) / 2;
-			updateHitbox();
+				var frameIndices:Array<Int> = [];
+				for (i in 0...frames)
+					frameIndices.push(i);
 
-			var frameIndices:Array<Int> = [];
-			for (i in 0...frames)
-				frameIndices.push(i);
+				animation.add(char, frameIndices, 0, false, isPlayer);
+				animation.play(char);
+				this.char = char;
 
-			animation.add(char, frameIndices, 0, false, isPlayer);
-			animation.play(char);
-			this.char = char;
-
-			if (char.endsWith('-pixel'))
-				antialiasing = false;
-			else
-				antialiasing = ClientPrefs.data.antialiasing;
+				if (char.endsWith('-pixel'))
+					antialiasing = false;
+				else
+					antialiasing = ClientPrefs.data.antialiasing;
+			}
 		}
 	}
 

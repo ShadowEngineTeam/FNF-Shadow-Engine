@@ -11,6 +11,7 @@ typedef SwagSection =
 	var altAnim:Bool;
 }
 
+@:nullSafety
 class Section
 {
 	public var sectionNotes:Array<Dynamic> = [];

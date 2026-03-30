@@ -4,32 +4,30 @@ import flixel.FlxG;
 import flixel.system.frontEnds.SoundFrontEnd;
 import flixel.system.ui.FlxSoundTray;
 import openfl.display.Bitmap;
-import openfl.display.BitmapData;
-import openfl.media.Sound;
+import backend.Paths;
 
+@:nullSafety
 class CustomSoundTray extends FlxSoundTray
 {
 	var graphicScale:Float = 0.3;
 	var lerpYPos:Float = 0;
 	var alphaTarget:Float = 0;
-	var volumeMaxSound:String;
 	var _lastVolume:Int = -1;
 
-	var bg:Bitmap;
-	var backingBar:Bitmap;
-	var barBitmaps:Array<Bitmap> = [];
+	var bg:Null<Bitmap> = null;
+	var backingBar:Null<Bitmap> = null;
 	var imagesLoaded:Bool = false;
 
 	public function new()
 	{
 		super();
-		removeChildren();
 
 		bg = new Bitmap();
 		backingBar = new Bitmap();
-		
+
+		removeChildren();
 		loadImages();
-		
+
 		y = -height;
 		visible = false;
 		screenCenter();
@@ -43,49 +41,38 @@ class CustomSoundTray extends FlxSoundTray
 			return;
 		
 		removeChildren();
-		
-		var bgPath:String = getImagePath('soundtray/volumebox');
-		if (FileSystem.exists(bgPath))
+
+		var bgGraphic = Paths.image('soundtray/volumebox', 'shared');
+		if (bgGraphic != null)
 		{
-			var bgGraphic = Paths.image('soundtray/volumebox');
-			if (bgGraphic != null)
-			{
-				bg.bitmapData = bgGraphic.bitmap;
-				bg.scaleX = graphicScale;
-				bg.scaleY = graphicScale;
-				bg.smoothing = true;
-				addChild(bg);
-			}
+			bg = new Bitmap(bgGraphic.bitmap);
+			bg.scaleX = graphicScale;
+			bg.scaleY = graphicScale;
+			bg.smoothing = true;
+			addChild(bg);
 		}
 
-		var backingPath:String = getImagePath('soundtray/bars_10');
-		if (FileSystem.exists(backingPath))
+		var backingGraphic = Paths.image('soundtray/bars_10', 'shared');
+		if (backingGraphic != null)
 		{
-			var backingGraphic = Paths.image('soundtray/bars_10');
-			if (backingGraphic != null)
-			{
-				backingBar.bitmapData = backingGraphic.bitmap;
-				backingBar.x = 9;
-				backingBar.y = 5;
-				backingBar.scaleX = graphicScale;
-				backingBar.scaleY = graphicScale;
-				backingBar.smoothing = true;
-				addChild(backingBar);
-				backingBar.alpha = 0.4;
-			}
+			backingBar = new Bitmap(backingGraphic.bitmap);
+			backingBar.x = 9;
+			backingBar.y = 5;
+			backingBar.scaleX = graphicScale;
+			backingBar.scaleY = graphicScale;
+			backingBar.smoothing = true;
+			addChild(backingBar);
+			backingBar.alpha = 0.4;
 		}
 
 		_bars = [];
-		barBitmaps = [];
-		
+
 		for (i in 1...11)
 		{
-			var barPath:String = getImagePath('soundtray/bars_$i');
-			
-			if (FileSystem.exists(barPath))
+			var barGraphic = Paths.image('soundtray/bars_$i', 'shared');
+			if (barGraphic != null)
 			{
-				var barGraphic = Paths.image('soundtray/bars_$i');
-				var bar:Bitmap = new Bitmap(barGraphic != null ? barGraphic.bitmap : null);
+				var bar:Bitmap = new Bitmap(barGraphic.bitmap);
 				bar.x = 9;
 				bar.y = 5;
 				bar.scaleX = graphicScale;
@@ -93,28 +80,15 @@ class CustomSoundTray extends FlxSoundTray
 				bar.smoothing = true;
 				addChild(bar);
 				_bars.push(bar);
-				barBitmaps.push(bar);
 			}
 			else
 			{
 				var emptyBar:Bitmap = new Bitmap();
 				_bars.push(emptyBar);
-				barBitmaps.push(emptyBar);
 			}
 		}
-		
+
 		imagesLoaded = true;
-	}
-
-	function getImagePath(key:String):String
-	{
-		#if FEATURE_MODS
-		var modPath:String = Paths.modsImages(key);
-		if (FileSystem.exists(modPath))
-			return modPath;
-		#end
-
-		return Paths.getPath('images/$key.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 	}
 
 	function coolLerp(base:Float, target:Float, ratio:Float):Float
@@ -154,7 +128,7 @@ class CustomSoundTray extends FlxSoundTray
 
 		if (!silent)
 		{
-			var soundKey:String = null;
+			var soundKey:Null<String> = null;
 			if (up)
 			{
 				if (_lastVolume == 10 && globalVolume == 10)

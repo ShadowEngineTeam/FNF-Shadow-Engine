@@ -35,6 +35,7 @@ enum abstract LoadFilters(Int) from Int from UInt to Int to UInt
 	var FREEPLAY:Int = (1 << 3);
 }
 
+@:nullSafety
 class StageData
 {
 	public static function dummy():StageFile
@@ -57,7 +58,7 @@ class StageData
 		};
 	}
 
-	public static var forceNextDirectory:String = null;
+	public static var forceNextDirectory:Null<String> = null;
 
 	public static function loadDirectory(SONG:SwagSong)
 	{
@@ -79,7 +80,7 @@ class StageData
 			stage = 'stage';
 		}
 
-		var stageFile:StageFile = getStageFile(stage);
+		var stageFile:Null<StageFile> = getStageFile(stage);
 		if (stageFile == null) // preventing crashes
 		{
 			forceNextDirectory = '';
@@ -90,10 +91,10 @@ class StageData
 		}
 	}
 
-	public static function getStageFile(stage:String):StageFile
+	public static function getStageFile(stage:String):Null<StageFile>
 	{
 		var path:String = Paths.getSharedPath('stages/' + stage + '.json');
-		var rawJson:String = null;
+		var rawJson:Null<String> = null;
 		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders('stages/' + stage + '.json');
 		if (FileSystem.exists(modPath))
@@ -106,7 +107,9 @@ class StageData
 		if (FileSystem.exists(path))
 			rawJson = File.getContent(path);
 
-		return cast Json.parse(rawJson, path);
+		if (rawJson != null)
+			return cast Json.parse(rawJson, path);
+		return null;
 	}
 
 	public static function vanillaSongStage(songName):String
@@ -114,8 +117,8 @@ class StageData
 
 	public static var reservedNames:Array<String> = ['gf', 'gfGroup', 'dad', 'dadGroup', 'boyfriend', 'boyfriendGroup']; // blocks these names from being used on stage editor's name input text
 
-	public static function addObjectsToState(objectList:Array<Dynamic>, gf:FlxSprite, dad:FlxSprite, boyfriend:FlxSprite, ?group:Dynamic = null,
-			?ignoreFilters:Bool = false)
+	public static function addObjectsToState(objectList:Array<Dynamic>, gf:FlxSprite, dad:FlxSprite, boyfriend:FlxSprite, group:Dynamic = null,
+			ignoreFilters:Bool = false)
 	{
 		var addedObjects:Map<String, FlxSprite> = [];
 		for (num => data in objectList)
@@ -159,9 +162,17 @@ class StageData
 					if (data.type != 'square')
 					{
 						if (data.type == 'sprite')
-							spr.loadGraphic(Paths.image(data.image));
+						{
+							var graphic = Paths.image(data.image);
+							if (graphic != null)
+								spr.loadGraphic(graphic);
+						}
 						else
-							spr.frames = Paths.getAtlas(data.image);
+						{
+							var atlas = Paths.getAtlas(data.image);
+							if (atlas != null)
+								spr.frames = atlas;
+						}
 
 						if (data.type == 'animatedSprite' && data.animations != null)
 						{

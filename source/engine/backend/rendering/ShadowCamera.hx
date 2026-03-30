@@ -45,6 +45,7 @@ using backend.BitmapDataUtil;
 @:access(flixel.graphics.frames.FlxFrame)
 @:access(openfl.display.OpenGLRenderer)
 @:access(openfl.geom.ColorTransform)
+@:nullSafety
 class ShadowCamera extends FlxCamera
 {
 	/**
@@ -98,7 +99,7 @@ class ShadowCamera extends FlxCamera
 	public var id:String;
 
 	var _blendShader:RuntimeCustomBlendShader;
-	var _backgroundFrame:FlxFrame;
+	var _backgroundFrame:Null<FlxFrame>;
 
 	var _blendRenderTexture:RenderTexture;
 	var _backgroundRenderTexture:RenderTexture;
@@ -112,8 +113,11 @@ class ShadowCamera extends FlxCamera
 
 		this.id = id;
 
-		_backgroundFrame = new FlxFrame(new FlxGraphic('', null));
-		_backgroundFrame.frame = new FlxRect();
+		@:nullSafety(Off)
+		{
+			_backgroundFrame = new FlxFrame(new FlxGraphic('', null));
+			_backgroundFrame.frame = new FlxRect();
+		}
 
 		_blendShader = new RuntimeCustomBlendShader();
 
@@ -124,7 +128,8 @@ class ShadowCamera extends FlxCamera
 		_cameraTexture = new BitmapData(this.width, this.height);
 	}
 
-	override function drawPixels(?frame:FlxFrame, ?pixels:BitmapData, matrix:FlxMatrix, ?transform:ColorTransform, ?blend:BlendMode, ?smoothing:Bool = false, ?shader:FlxShader):Void
+	override function drawPixels(?frame:FlxFrame, ?pixels:BitmapData, matrix:FlxMatrix, ?transform:ColorTransform, ?blend:BlendMode, ?smoothing:Bool = false,
+			?shader:FlxShader):Void
 	{
 		var shouldUseShader:Bool = (!hasKhronosExtension && KHR_BLEND_MODES.contains(blend)) || SHADER_REQUIRED_BLEND_MODES.contains(blend);
 
@@ -133,7 +138,8 @@ class ShadowCamera extends FlxCamera
 		if (shouldUseShader)
 		{
 			_cameraTexture.drawCameraScreen(this);
-			_backgroundFrame.frame.set(0, 0, this.width, this.height);
+			if (_backgroundFrame != null)
+				_backgroundFrame.frame.set(0, 0, this.width, this.height);
 
 			// Clear the camera's graphics
 			// It'll get redrawn anyway
@@ -160,14 +166,16 @@ class ShadowCamera extends FlxCamera
 			_blendShader.blendSwag = blend;
 			_blendShader.updateViewInfo(width, height, this);
 
-			_backgroundFrame.parent.bitmap = _blendRenderTexture.graphic.bitmap;
+			if (_backgroundFrame != null)
+				_backgroundFrame.parent.bitmap = _blendRenderTexture.graphic.bitmap;
 
 			_backgroundRenderTexture.init(Std.int(this.width * Lib.current.stage.window.scale), Std.int(this.height * Lib.current.stage.window.scale));
 			_backgroundRenderTexture.drawToCamera((camera, matrix) ->
 			{
 				camera.zoom = this.zoom;
 				matrix.scale(Lib.current.stage.window.scale, Lib.current.stage.window.scale);
-				camera.drawPixels(_backgroundFrame, null, matrix, canvas.transform.colorTransform, null, false, _blendShader);
+				if (_backgroundFrame != null)
+					camera.drawPixels(_backgroundFrame, null, matrix, canvas.transform.colorTransform, null, false, _blendShader);
 			});
 
 			_backgroundRenderTexture.render();
@@ -185,24 +193,24 @@ class ShadowCamera extends FlxCamera
 		}
 	}
 
-	override function startQuadBatch(graphic:FlxGraphic, colored:Bool, hasColorOffsets:Bool = false, ?blend:BlendMode, smooth:Bool = false, ?shader:FlxShader):FlxDrawQuadsItem
+	override function startQuadBatch(graphic:FlxGraphic, colored:Bool, hasColorOffsets:Bool = false, ?blend:BlendMode, smooth:Bool = false,
+			?shader:FlxShader):FlxDrawQuadsItem
 	{
 		// Can't batch complex non-coherent blends, so always force a new batch
 		if (hasKhronosExtension && !(OpenGLRenderer.__coherentBlendsSupported ?? false) && KHR_BLEND_MODES.contains(blend))
 		{
-			var itemToReturn = null;
-
-			if (FlxCamera._storageTilesHead != null)
+			var itemToReturn:FlxDrawQuadsItem = if (FlxCamera._storageTilesHead != null)
 			{
-				itemToReturn = FlxCamera._storageTilesHead;
+				var item = FlxCamera._storageTilesHead;
 				var newHead = FlxCamera._storageTilesHead.nextTyped;
-				itemToReturn.reset();
+				item.reset();
 				FlxCamera._storageTilesHead = newHead;
+				item;
 			}
 			else
 			{
-				itemToReturn = new FlxDrawQuadsItem();
-			}
+				new FlxDrawQuadsItem();
+			};
 
 			// TODO: catch this error when the dev actually messes up, not in the draw phase
 			if (graphic.isDestroyed)
@@ -213,7 +221,8 @@ class ShadowCamera extends FlxCamera
 			itemToReturn.colored = colored;
 			itemToReturn.hasColorOffsets = hasColorOffsets;
 			itemToReturn.blend = blend;
-			itemToReturn.shader = shader;
+			if (shader != null)
+				itemToReturn.shader = shader;
 
 			itemToReturn.nextTyped = _headTiles;
 			_headTiles = itemToReturn;
@@ -236,7 +245,8 @@ class ShadowCamera extends FlxCamera
 		return super.startQuadBatch(graphic, colored, hasColorOffsets, blend, smooth, shader);
 	}
 
-	override function startTrianglesBatch(graphic:FlxGraphic, smoothing:Bool = false, isColored:Bool = false, ?blend:BlendMode, ?hasColorOffsets:Bool, ?shader:FlxShader):FlxDrawTrianglesItem
+	override function startTrianglesBatch(graphic:FlxGraphic, smoothing:Bool = false, isColored:Bool = false, ?blend:BlendMode, ?hasColorOffsets:Bool,
+			?shader:FlxShader):FlxDrawTrianglesItem
 	{
 		if (hasKhronosExtension && !(OpenGLRenderer.__coherentBlendsSupported ?? false) && KHR_BLEND_MODES.contains(blend))
 			return getNewDrawTrianglesItem(graphic, smoothing, isColored, blend, hasColorOffsets, shader);

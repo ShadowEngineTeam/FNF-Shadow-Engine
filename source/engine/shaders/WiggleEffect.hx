@@ -1,6 +1,7 @@
 package shaders;
 
 // STOLEN FROM HAXEFLIXEL DEMO LOL
+@:nullSafety(Off)
 enum WiggleEffectType
 {
 	DREAMY;
@@ -10,6 +11,7 @@ enum WiggleEffectType
 	FLAG;
 }
 
+@:nullSafety(Off)
 class WiggleEffect
 {
 	public var shader(default, null):WiggleShader = new WiggleShader();
@@ -62,6 +64,7 @@ class WiggleEffect
 	}
 }
 
+@:nullSafety(Off)
 class WiggleShader extends FlxShader
 {
 	@:glFragmentSource('

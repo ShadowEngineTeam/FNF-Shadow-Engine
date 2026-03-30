@@ -11,6 +11,7 @@ import hxluajit.Types;
  * 
  * We didn't use hxluajit-wrapper because we wanted to have our functions and methods as similar as possible to linc_luajit
  */
+@:nullSafety
 class Convert
 {
 	public static function addCallback(l:State, name:String, func:Dynamic)
@@ -255,7 +256,7 @@ class Convert
 			if (callbackMethod == null)
 			{
 				// trace('checking last script');
-				var last:FunkinLua = FunkinLua.lastCalledScript;
+				var last:Null<FunkinLua> = FunkinLua.lastCalledScript;
 				if (last == null || last.lua != l)
 				{
 					// trace('looping thru scripts');

@@ -1,5 +1,6 @@
 package shaders;
 
+@:nullSafety(Off)
 class ColorSwap
 {
 	public var shader(default, null):ColorSwapShader = new ColorSwapShader();

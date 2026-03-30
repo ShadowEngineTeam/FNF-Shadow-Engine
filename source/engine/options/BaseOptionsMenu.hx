@@ -467,7 +467,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			return;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.firstActive;
-		var model:FlxGamepadModel = gamepad != null ? gamepad.detectedModel : UNKNOWN;
+		var model:FlxGamepadModel = gamepad?.detectedModel ?? UNKNOWN;
 		var letter = alpha.letters[0];
 		if (model == PS4)
 		{
@@ -553,5 +553,5 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 	function reloadCheckboxes()
 		for (checkbox in checkboxGroup)
-			checkbox.daValue = Std.string(optionsArray[checkbox.ID].getValue()) == 'true'; // Do not take off the Std.string() from this, it will break a thing in Mod Settings Menu
+			checkbox.isChecked = Std.string(optionsArray[checkbox.ID].getValue()) == 'true'; // Do not take off the Std.string() from this, it will break a thing in Mod Settings Menu
 }

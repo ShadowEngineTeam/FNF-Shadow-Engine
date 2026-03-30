@@ -10,6 +10,7 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
+@:nullSafety
 class OptionsState extends MusicBeatState
 {
 	var options:Array<String> = [
@@ -23,13 +24,13 @@ class OptionsState extends MusicBeatState
 		'Mobile Options'
 		#end
 	];
-	private var grpOptions:FlxTypedGroup<Alphabet>;
+	private var grpOptions:FlxTypedGroup<Alphabet> = new FlxTypedGroup<Alphabet>();
 
 	private static var curSelected:Int = 0;
-	public static var menuBG:FlxSprite;
+	public static var menuBG:Null<FlxSprite> = null;
 	public static var onPlayState:Bool = false;
 
-	var tipText:FlxText;
+	var tipText:FlxText = new FlxText();
 	#if (target.threaded) var mutex:Mutex = new Mutex(); #end
 
 	function openSelectedSubstate(label:String)
@@ -63,8 +64,8 @@ class OptionsState extends MusicBeatState
 		}
 	}
 
-	var selectorLeft:Alphabet;
-	var selectorRight:Alphabet;
+	var selectorLeft:Null<Alphabet> = null;
+	var selectorRight:Null<Alphabet> = null;
 
 	override function create()
 	{
@@ -72,7 +73,9 @@ class OptionsState extends MusicBeatState
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		var bg:FlxSprite = new FlxSprite();
+		var graphic = Paths.image('menuDesat');
+		if (graphic != null) bg.loadGraphic(graphic);
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = 0xFFea71fd;
 		bg.updateHitbox();
@@ -175,7 +178,8 @@ class OptionsState extends MusicBeatState
 			if (controls.BACK)
 			{
 				exiting = true;
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				var sound = Paths.sound('cancelMenu');
+				if (sound != null) FlxG.sound.play(sound);
 				if (onPlayState)
 				{
 					StageData.loadDirectory(PlayState.SONG);
@@ -209,13 +213,20 @@ class OptionsState extends MusicBeatState
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
-				selectorLeft.x = item.x - 63;
-				selectorLeft.y = item.y;
-				selectorRight.x = item.x + item.width + 15;
-				selectorRight.y = item.y;
+				if (selectorLeft != null)
+				{
+					selectorLeft.x = item.x - 63;
+					selectorLeft.y = item.y;
+				}
+				if (selectorRight != null)
+				{
+					selectorRight.x = item.x + item.width + 15;
+					selectorRight.y = item.y;
+				}
 			}
 		}
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		var sound = Paths.sound('scrollMenu');
+		if (sound != null) FlxG.sound.play(sound);
 	}
 
 	override function destroy()

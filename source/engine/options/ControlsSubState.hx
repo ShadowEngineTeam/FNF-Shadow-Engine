@@ -234,7 +234,7 @@ class ControlsSubState extends MusicBeatSubstate
 			return;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.firstActive;
-		var model:FlxGamepadModel = gamepad != null ? gamepad.detectedModel : UNKNOWN;
+		var model:FlxGamepadModel = gamepad?.detectedModel ?? UNKNOWN;
 		var letter = alpha.letters[0];
 		if (model == PS4)
 		{
@@ -366,7 +366,8 @@ class ControlsSubState extends MusicBeatSubstate
 					closeBinding();
 				}
 			}
-			else if ((FlxG.keys.pressed.BACKSPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.pressed #end) || FlxG.gamepads.anyPressed(BACK))
+			else if ((FlxG.keys.pressed.BACKSPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.pressed #end)
+				|| FlxG.gamepads.anyPressed(BACK))
 			{
 				holdingEsc += elapsed;
 				if (holdingEsc > 0.5)

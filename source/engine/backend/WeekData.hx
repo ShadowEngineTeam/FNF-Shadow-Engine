@@ -19,6 +19,7 @@ typedef WeekFile =
 	var difficulties:String;
 }
 
+@:nullSafety
 class WeekData
 {
 	public static var weeksLoaded:Map<String, WeekData> = new Map<String, WeekData>();
@@ -27,20 +28,20 @@ class WeekData
 	public var folder:String = '';
 
 	// JSON variables
-	public var songs:Array<Dynamic>;
-	public var weekCharacters:Array<String>;
-	public var weekBackground:String;
-	public var weekBefore:String;
-	public var storyName:String;
-	public var weekName:String;
-	public var freeplayColor:Array<Int>;
-	public var startUnlocked:Bool;
-	public var hiddenUntilUnlocked:Bool;
-	public var hideStoryMode:Bool;
-	public var hideFreeplay:Bool;
-	public var difficulties:String;
+	public var songs:Array<Dynamic> = [];
+	public var weekCharacters:Array<String> = [];
+	public var weekBackground:String = '';
+	public var weekBefore:String = '';
+	public var storyName:String = '';
+	public var weekName:String = '';
+	public var freeplayColor:Array<Int> = [146, 113, 253];
+	public var startUnlocked:Bool = true;
+	public var hiddenUntilUnlocked:Bool = false;
+	public var hideStoryMode:Bool = false;
+	public var hideFreeplay:Bool = false;
+	public var difficulties:String = '';
 
-	public var fileName:String;
+	public var fileName:String = '';
 
 	public static function createWeekFile():WeekFile
 	{
@@ -110,7 +111,7 @@ class WeekData
 				var fileToCheck:String = directories[j] + 'weeks/' + sexList[i] + '.json';
 				if (!weeksLoaded.exists(sexList[i]))
 				{
-					var week:WeekFile = getWeekFile(fileToCheck);
+					var week:Null<WeekFile> = getWeekFile(fileToCheck);
 					if (week != null)
 					{
 						var weekFile:WeekData = new WeekData(week, sexList[i]);
@@ -185,7 +186,7 @@ class WeekData
 	{
 		if (!weeksLoaded.exists(weekToCheck))
 		{
-			var week:WeekFile = getWeekFile(path);
+			var week:Null<WeekFile> = getWeekFile(path);
 			if (week != null)
 			{
 				var weekFile:WeekData = new WeekData(week, weekToCheck);
@@ -204,9 +205,9 @@ class WeekData
 		}
 	}
 
-	private static function getWeekFile(path:String):WeekFile
+	private static function getWeekFile(path:String):Null<WeekFile>
 	{
-		var rawJson:String = null;
+		var rawJson:Null<String> = null;
 		if (FileSystem.exists(path))
 		{
 			rawJson = File.getContent(path);
@@ -234,7 +235,7 @@ class WeekData
 	}
 
 	// Used on LoadingState, nothing really too relevant
-	public static function getCurrentWeek():WeekData
+	public static function getCurrentWeek():Null<WeekData>
 	{
 		return weeksLoaded.get(weeksList[PlayState.storyWeek]);
 	}

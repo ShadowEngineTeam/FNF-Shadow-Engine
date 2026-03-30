@@ -6,6 +6,7 @@ import lime.app.Application;
 import hxdiscord_rpc.Discord;
 import hxdiscord_rpc.Types;
 
+@:nullSafety
 class DiscordClient
 {
 	public static var isInitialized:Bool = false;
@@ -42,11 +43,13 @@ class DiscordClient
 	private static function onReady(request:cpp.RawConstPointer<DiscordUser>):Void
 	{
 		var requestPtr:cpp.Star<DiscordUser> = cpp.ConstPointer.fromRaw(request).ptr;
+		var username:String = (requestPtr != null && requestPtr.username != null) ? requestPtr.username : '';
+		var discriminator:String = (requestPtr != null && requestPtr.discriminator != null) ? requestPtr.discriminator : '0';
 
-		if (Std.parseInt(cast(requestPtr.discriminator, String)) != 0) // New Discord IDs/Discriminator system
-			trace('(Discord) Connected to User (${cast (requestPtr.username, String)}#${cast (requestPtr.discriminator, String)})');
+		if (Std.parseInt(discriminator) != 0) // New Discord IDs/Discriminator system
+			trace('(Discord) Connected to User ($username#$discriminator)');
 		else // Old discriminators
-			trace('(Discord) Connected to User (${cast (requestPtr.username, String)})');
+			trace('(Discord) Connected to User ($username)');
 
 		changePresence();
 	}
@@ -67,7 +70,7 @@ class DiscordClient
 		discordHandlers.ready = cpp.Function.fromStaticFunction(onReady);
 		discordHandlers.disconnected = cpp.Function.fromStaticFunction(onDisconnected);
 		discordHandlers.errored = cpp.Function.fromStaticFunction(onError);
-		Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, null);
+		Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, "");
 
 		if (!isInitialized)
 			trace("(Discord) Client initialized");
@@ -93,19 +96,21 @@ class DiscordClient
 			?endTimestamp:Float)
 	{
 		var startTimestamp:Float = 0;
-		if (hasStartTimestamp)
+		var hasTimestamp:Bool = (hasStartTimestamp == true);
+		var endTime:Float = endTimestamp ?? 0;
+		if (hasTimestamp)
 			startTimestamp = Date.now().getTime();
-		if (endTimestamp > 0)
-			endTimestamp = startTimestamp + endTimestamp;
+		if (endTime > 0)
+			endTime = startTimestamp + endTime;
 
-		presence.details = details;
-		presence.state = state;
+		presence.details = details ?? 'In the Menus';
+		presence.state = state ?? '';
 		presence.largeImageKey = 'icon';
 		presence.largeImageText = "Version: " + states.MainMenuState.shadowEngineVersion;
-		presence.smallImageKey = smallImageKey;
+		presence.smallImageKey = smallImageKey ?? '';
 		// Obtained times are in milliseconds so they are divided so Discord can use it
 		presence.startTimestamp = Std.int(startTimestamp / 1000);
-		presence.endTimestamp = Std.int(endTimestamp / 1000);
+		presence.endTimestamp = Std.int(endTime / 1000);
 		updatePresence();
 
 		// trace('Discord RPC Updated. Arguments: $details, $state, $smallImageKey, $hasStartTimestamp, $endTimestamp');

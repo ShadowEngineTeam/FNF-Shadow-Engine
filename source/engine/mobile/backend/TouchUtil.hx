@@ -7,13 +7,14 @@ import flixel.input.touch.FlxTouch;
  * ...
  * @author: Karim Akra
  */
+@:nullSafety
 class TouchUtil
 {
 	public static var pressed(get, never):Bool;
 	public static var justPressed(get, never):Bool;
 	public static var justReleased(get, never):Bool;
 	public static var released(get, never):Bool;
-	public static var touch(get, never):FlxTouch;
+	public static var touch(get, never):Null<FlxTouch>;
 
 	public static function overlaps(object:FlxObject, ?camera:FlxCamera):Bool
 	{
@@ -81,7 +82,7 @@ class TouchUtil
 	}
 
 	@:noCompletion
-	private static function get_touch():FlxTouch
+	private static function get_touch():Null<FlxTouch>
 	{
 		for (touch in FlxG.touches.list)
 			if (touch != null)

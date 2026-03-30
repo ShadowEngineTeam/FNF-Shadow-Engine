@@ -91,7 +91,7 @@ class MainMenuState extends MusicBeatState
 		add(psychVer);
 		changeItem();
 
-		#if FEATURE_MOBILE_CONTROLS 
+		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("UP_DOWN", "A_B_E");
 		#end
 

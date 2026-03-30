@@ -1,6 +1,7 @@
 package objects;
 
 import openfl.utils.Assets;
+import flixel.graphics.frames.FlxAtlasFrames;
 
 typedef MenuCharacterFile =
 {
@@ -12,9 +13,10 @@ typedef MenuCharacterFile =
 	var flipX:Bool;
 }
 
+@:nullSafety
 class MenuCharacter extends FlxSprite
 {
-	public var character:String;
+	public var character:String = "";
 	public var hasConfirmAnimation:Bool = false;
 
 	private static var DEFAULT_CHARACTER:String = 'bf';
@@ -60,17 +62,21 @@ class MenuCharacter extends FlxSprite
 				if (!FileSystem.exists(path))
 					path = Paths.getSharedPath(defaultPath);
 
-				var rawJson:String = File.getContent(path);
+				var rawJson:Null<String> = File.getContent(path);
+				if (rawJson == null)
+					return;
 
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson, path);
-				frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+				var atlas:Null<FlxAtlasFrames> = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+				if (atlas != null)
+					frames = atlas;
 				animation.addByPrefix('idle', charFile.idle_anim, 24);
 
 				var confirmAnim:String = charFile.confirm_anim;
 				if (confirmAnim != null && confirmAnim.length > 0 && confirmAnim != charFile.idle_anim)
 				{
 					animation.addByPrefix('confirm', confirmAnim, 24, false);
-					if (animation.getByName('confirm') != null) // check for invalid animation
+					if (animation.getByName('confirm') != null)
 						hasConfirmAnimation = true;
 				}
 

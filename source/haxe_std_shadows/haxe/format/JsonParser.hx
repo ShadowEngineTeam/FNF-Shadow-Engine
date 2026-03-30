@@ -48,10 +48,10 @@ class JsonParser
 	}
 
 	var str:String;
-	var file:String;
+	var file:Null<String>;
 	var pos:Int;
 
-	function new(str:String, file:String)
+	function new(str:String, ?file:String)
 	{
 		this.str = str;
 		this.file = file;

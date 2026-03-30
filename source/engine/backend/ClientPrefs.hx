@@ -6,7 +6,9 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import states.TitleState;
 
 // Add a variable here and it will get automatically saved
-@:structInit class SaveVariables
+@:structInit
+@:nullSafety
+class SaveVariables
 {
 	// Mobile and Mobile Controls Releated
 	public var extraButtons:String = "NONE"; // mobile extra button option

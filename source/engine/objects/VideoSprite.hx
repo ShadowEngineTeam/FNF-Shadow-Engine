@@ -5,21 +5,22 @@ import flixel.addons.display.FlxPieDial;
 import hxvlc.flixel.FlxVideoSprite;
 #end
 
+@:nullSafety
 class VideoSprite extends FlxSpriteGroup
 {
 	#if FEATURE_VIDEOS
-	public var finishCallback:Void->Void = null;
-	public var onSkip:Void->Void = null;
+	public var finishCallback:Null<Void->Void> = null;
+	public var onSkip:Null<Void->Void> = null;
 
 	final _timeToSkip:Float = 1;
 
 	public var holdingTime:Float = 0;
-	public var videoSprite:FlxVideoSprite;
-	public var skipSprite:FlxPieDial;
-	public var cover:FlxSprite;
+	public var videoSprite:Null<FlxVideoSprite> = null;
+	public var skipSprite:Null<FlxPieDial> = null;
+	public var cover:Null<FlxSprite> = null;
 	public var canSkip(default, set):Bool = false;
 
-	private var videoName:String;
+	private var videoName:String = '';
 
 	public var waiting:Bool = false;
 
@@ -49,26 +50,35 @@ class VideoSprite extends FlxSpriteGroup
 			this.canSkip = true;
 
 		// callbacks
-		if (!shouldLoop)
-			videoSprite.bitmap.onEndReached.add(finishVideo);
+		var vs = videoSprite;
+		var vsBitmap = (vs != null) ? vs.bitmap : null;
+		if (!shouldLoop && vsBitmap != null)
+			vsBitmap.onEndReached.add(finishVideo);
 
-		videoSprite.bitmap.onFormatSetup.add(function()
+		if (vsBitmap != null)
 		{
-			/*
-				#if hxvlc
-				var wd:Int = videoSprite.bitmap.formatWidth;
-				var hg:Int = videoSprite.bitmap.formatHeight;
-				trace('Video Resolution: ${wd}x${hg}');
-				videoSprite.scale.set(FlxG.width / wd, FlxG.height / hg);
-				#end
-			 */
-			videoSprite.setGraphicSize(FlxG.width);
-			videoSprite.updateHitbox();
-			videoSprite.screenCenter();
-		});
+			vsBitmap.onFormatSetup.add(function()
+			{
+				/*
+					#if hxvlc
+					var wd:Int = vsBitmap.formatWidth;
+					var hg:Int = vsBitmap.formatHeight;
+					trace('Video Resolution: ${wd}x${hg}');
+					vs.scale.set(FlxG.width / wd, FlxG.height / hg);
+					#end
+				 */
+				if (vs != null)
+				{
+					vs.setGraphicSize(FlxG.width);
+					vs.updateHitbox();
+					vs.screenCenter();
+				}
+			});
 
-		// start video and adjust resolution to screen size
-		videoSprite.load(videoName, shouldLoop ? ['input-repeat=65545'] : null);
+			// start video and adjust resolution to screen size
+			if (vs != null)
+				vs.load(videoName, shouldLoop ? ['input-repeat=65545'] : null);
+		}
 	}
 
 	var alreadyDestroyed:Bool = false;
@@ -115,7 +125,16 @@ class VideoSprite extends FlxSpriteGroup
 	{
 		if (canSkip)
 		{
-			if (Controls.instance.pressed('accept') || mobile.backend.TouchUtil.pressed)
+			var controlsPressed = false;
+			if (Controls.instance != null)
+			{
+				if (Controls.instance.pressed('accept'))
+					controlsPressed = true;
+			}
+			if (mobile.backend.TouchUtil.pressed)
+				controlsPressed = true;
+
+			if (controlsPressed)
 			{
 				holdingTime = Math.max(0, Math.min(_timeToSkip, holdingTime + elapsed));
 			}
@@ -130,7 +149,10 @@ class VideoSprite extends FlxSpriteGroup
 				if (onSkip != null)
 					onSkip();
 				finishCallback = null;
-				videoSprite.bitmap.onEndReached.dispatch();
+				var vs = videoSprite;
+				var vsBitmap = (vs != null) ? vs.bitmap : null;
+				if (vsBitmap != null)
+					vsBitmap.onEndReached.dispatch();
 				//trace('Skipped video');
 				return;
 			}

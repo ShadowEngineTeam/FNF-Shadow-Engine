@@ -4,6 +4,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import openfl.display.GraphicsShader;
 
+@:nullSafety(Off)
 class VFDOverlay extends GraphicsShader
 {
 	public var elapsedTime(default, set):Float = 0;

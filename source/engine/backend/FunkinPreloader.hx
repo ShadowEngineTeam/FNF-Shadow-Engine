@@ -20,6 +20,7 @@ import backend.Paths;
 using StringTools;
 
 // @:bitmap("assets/preloader/banner.png")
+@:nullSafety
 class LogoImage extends BitmapData
 {
 }

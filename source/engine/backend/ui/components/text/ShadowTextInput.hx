@@ -9,30 +9,31 @@ import backend.ui.ShadowStyle;
 import backend.ui.components.text.ShadowInputText;
 import backend.ui.components.controls.ShadowDropdown;
 
+@:nullSafety
 class ShadowTextInput extends FlxSpriteGroup
 {
-	public var input:ShadowInputText;
-	public var callback:String->Void;
+	public var input:Null<ShadowInputText> = null;
+	public var callback:Null<String->Void>;
 	public var text(get, set):String;
 
-	var bg:FlxSprite;
-	var _width:Int;
-	var _height:Int;
+	var bg:FlxSprite = new FlxSprite();
+	var _width:Int = 150;
+	var _height:Int = 28;
 	var _hovered:Bool = false;
 
 	public function new(x:Float, y:Float, width:Int, ?defaultText:String, ?onChange:String->Void)
 	{
-		super(x, y);
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 		callback = onChange;
 
-		bg = new FlxSprite();
+		super(x, y);
+
 		bg.makeGraphic(_width, _height, ShadowStyle.BG_INPUT, true);
 		drawBorder(ShadowStyle.BORDER_DARK);
 		add(bg);
 
-		var startText:String = defaultText != null ? defaultText : "";
+		var startText:String = defaultText ?? "";
 		input = new ShadowInputText(2, 0, _width - 4, "", ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, FlxColor.TRANSPARENT, true);
 		input.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		input.antialiasing = ShadowStyle.antialiasing;
@@ -96,7 +97,7 @@ class ShadowTextInput extends FlxSpriteGroup
 			input.hasFocus = value;
 
 	function get_text():String
-		return input != null ? input.text : "";
+		return input?.text ?? "";
 
 	function set_text(value:String):String
 	{

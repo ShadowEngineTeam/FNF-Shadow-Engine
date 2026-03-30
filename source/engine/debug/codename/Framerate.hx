@@ -11,14 +11,15 @@ import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import flixel.util.FlxTimer;
 
+@:nullSafety
 class Framerate extends Sprite
 {
-	public static var instance:Framerate;
+	public static var instance:Null<Framerate> = null;
 	public static var isLoaded:Bool = false;
 
-	public static var textFormat:TextFormat;
-	public static var fpsCounter:FramerateCounter;
-	public static var memoryCounter:MemoryCounter;
+	public static var textFormat:Null<TextFormat> = null;
+	public static var fpsCounter:Null<FramerateCounter> = null;
+	public static var memoryCounter:Null<MemoryCounter> = null;
 
 	public static var fontName:String = #if windows '${Sys.getEnv("windir")}\\Fonts\\consola.ttf' #else "_typewriter" #end;
 
@@ -31,11 +32,11 @@ class Framerate extends Sprite
 
 	public static var offset:FlxPoint = new FlxPoint();
 
-	public var bgSprite:Bitmap;
+	public var bgSprite:Null<Bitmap> = null;
 
 	public var categories:Array<FramerateCategory> = [];
 
-	@:isVar public static var __bitmap(get, null):BitmapData = null;
+	@:isVar public static var __bitmap(get, null):Null<BitmapData> = null;
 
 	private static function get___bitmap():BitmapData
 	{
@@ -59,9 +60,6 @@ class Framerate extends Sprite
 
 		isLoaded = true;
 
-		x = 10;
-		y = 2;
-
 		FlxG.signals.gameResized.add(function(w, h)
 		{
 			setScale(Math.min(openfl.Lib.current.stage.stageWidth / FlxG.width, openfl.Lib.current.stage.stageHeight / FlxG.height));
@@ -69,12 +67,14 @@ class Framerate extends Sprite
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, function(e:KeyboardEvent)
 		{
-			if (Controls.instance.justReleased('fpsCounter'))
+			var ctrl = Controls.instance;
+			if (ctrl != null && ctrl.justReleased('fpsCounter'))
 			{
 				debugMode = (debugMode + 1) % 3;
 				@:privateAccess
 				{
-					memoryCounter.refreshText(memoryCounter.memory, memoryCounter.memoryPeak);
+					if (memoryCounter != null)
+						memoryCounter.refreshText(memoryCounter.memory, memoryCounter.memoryPeak);
 				}
 			}
 		});
@@ -82,6 +82,8 @@ class Framerate extends Sprite
 		if (__bitmap == null)
 			__bitmap = new BitmapData(1, 1, 0xFF000000);
 
+		x = 10;
+		y = 2;
 		bgSprite = new Bitmap(__bitmap);
 		bgSprite.alpha = 0;
 		addChild(bgSprite);
@@ -95,8 +97,10 @@ class Framerate extends Sprite
 	{
 		for (c in categories)
 			c.reload();
-		memoryCounter.reload();
-		fpsCounter.reload();
+		if (memoryCounter != null)
+			memoryCounter.reload();
+		if (fpsCounter != null)
+			fpsCounter.reload();
 	}
 
 	private function __addCategory(category:FramerateCategory)
@@ -105,7 +109,7 @@ class Framerate extends Sprite
 		__addToList(category);
 	}
 
-	private var __lastAddedSprite:DisplayObject = null;
+	private var __lastAddedSprite:Null<DisplayObject> = null;
 
 	private function __addToList(spr:DisplayObject)
 	{
@@ -161,19 +165,29 @@ class Framerate extends Sprite
 		if (alpha < 0.05)
 			return;
 		super.__enterFrame(t);
-		bgSprite.alpha = debugAlpha * 0.5;
+		if (bgSprite != null)
+			bgSprite.alpha = debugAlpha * 0.5;
 
 		x = 10 + offset.x;
 		y = 2 + offset.y;
 
-		var width = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width) + (x * 2);
-		var height = memoryCounter.y + memoryCounter.height;
-		bgSprite.x = -x;
-		bgSprite.y = offset.x;
-		bgSprite.scaleX = width;
-		bgSprite.scaleY = height;
+		var width = 0.0;
+		var height = 0.0;
+		if (fpsCounter != null && memoryCounter != null)
+		{
+			width = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width) + (x * 2);
+			height = memoryCounter.y + memoryCounter.height;
+		}
+		if (bgSprite != null)
+		{
+			bgSprite.x = -x;
+			bgSprite.y = offset.x;
+			bgSprite.scaleX = width;
+			bgSprite.scaleY = height;
+		}
 
 		var selectable = debugMode == 2; // idk i tried to make it more readable:sob: - Nex
+		if (memoryCounter != null && fpsCounter != null)
 		{
 			memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
 		}

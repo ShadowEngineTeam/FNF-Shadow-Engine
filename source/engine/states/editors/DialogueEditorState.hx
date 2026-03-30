@@ -91,7 +91,7 @@ class DialogueEditorState extends MusicBeatState
 		daText = new TypedAlphabet(DialogueBoxPsych.DEFAULT_TEXT_X, DialogueBoxPsych.DEFAULT_TEXT_Y, DEFAULT_TEXT);
 		daText.setScale(0.7);
 		add(daText);
-		
+
 		addEditorBox();
 		changeText();
 		#if FEATURE_MOBILE_CONTROLS
@@ -421,12 +421,10 @@ class DialogueEditorState extends MusicBeatState
 			var negaMult:Array<Int> = [1, -1];
 			var controlAnim:Array<Bool> = [
 				FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end,
-				FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end
-			];
+				FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end];
 			var controlText:Array<Bool> = [
 				FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end,
-				FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end
-			];
+				FlxG.keys.justPressed.A  #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end];
 			for (i in 0...controlAnim.length)
 			{
 				if (controlAnim[i] && character.jsonFile.animations.length > 0)

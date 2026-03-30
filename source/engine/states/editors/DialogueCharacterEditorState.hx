@@ -172,8 +172,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			{name: 'Animations', label: 'Animations'},
 			{name: 'Character', label: 'Character'},
 		];
-		UI_mainbox = new ShadowTabMenu(13, 55, mainTabs, editorMainWidth,
-			editorMainHeight);
+		UI_mainbox = new ShadowTabMenu(13, 55, mainTabs, editorMainWidth, editorMainHeight);
 		UI_mainbox.scrollFactor.set();
 		UI_mainbox.cameras = [camHUD];
 		addAnimationsUI();
@@ -184,8 +183,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		lastTab = TAB_CHARACTER;
 
 		var typeTabs:Array<TabDef> = [{name: 'Character Type', label: 'Character Type'}];
-		UI_typebox = new ShadowTabMenu(290, 55, typeTabs, editorTypeWidth,
-			editorTypeHeight);
+		UI_typebox = new ShadowTabMenu(290, 55, typeTabs, editorTypeWidth, editorTypeHeight);
 		UI_typebox.scrollFactor.set();
 		UI_typebox.cameras = [camHUD];
 		addTypeUI();
@@ -658,23 +656,15 @@ class DialogueCharacterEditorState extends MusicBeatState
 				var moved:Bool = false;
 				var animShit:DialogueAnimArray = character.dialogueAnimations.get(curSelectedAnim);
 				var controlArrayLoop:Array<Bool> = [
-					FlxG.keys.justPressed.A
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft2.justPressed #end,
-					FlxG.keys.justPressed.W
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp2.justPressed #end,
-					FlxG.keys.justPressed.D
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight2.justPressed #end,
-					FlxG.keys.justPressed.S
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown2.justPressed #end];
+					FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft2.justPressed #end,
+					FlxG.keys.justPressed.W #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp2.justPressed #end,
+					FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight2.justPressed #end,
+					FlxG.keys.justPressed.S #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown2.justPressed #end];
 				var controlArrayIdle:Array<Bool> = [
-					FlxG.keys.justPressed.LEFT
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end,
-					FlxG.keys.justPressed.UP
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end,
-					FlxG.keys.justPressed.RIGHT
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end,
-					FlxG.keys.justPressed.DOWN
-					#if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end];
+					FlxG.keys.justPressed.LEFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonLeft.justPressed #end,
+					FlxG.keys.justPressed.UP #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end,
+					FlxG.keys.justPressed.RIGHT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonRight.justPressed #end,
+					FlxG.keys.justPressed.DOWN #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end];
 				for (i in 0...controlArrayLoop.length)
 				{
 					if (controlArrayLoop[i])

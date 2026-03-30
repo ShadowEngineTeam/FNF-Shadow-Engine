@@ -3,10 +3,11 @@ package backend;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 
+@:nullSafety
 class MusicBeatSubstate extends FlxSubState implements IMusicState
 {
-	public var stateInstance:FlxState = null;
-	public static var instance:MusicBeatSubstate;
+	public var stateInstance:Null<FlxState> = null;
+	public static var instance:Null<MusicBeatSubstate> = null;
 
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -39,25 +40,33 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
-	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	private var luaDebugCam:ShadowCamera;
-	private var currentClassName:String;
+	private var luaDebugGroup:Null<FlxTypedGroup<psychlua.DebugLuaText>> = null;
+	private var luaDebugCam:Null<ShadowCamera> = null;
+	private var currentClassName:String = '';
 	#end
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public var controls(get, never):Controls;
 
+	private static var _fallbackControls:Null<Controls> = null;
+
 	private function get_controls():Controls
-		return Controls.instance;
+	{
+		if (Controls.instance != null)
+			return Controls.instance;
+		if (_fallbackControls == null)
+			_fallbackControls = new Controls();
+		return _fallbackControls;
+	}
 
 	#if FEATURE_MOBILE_CONTROLS
-	public var touchPad:TouchPad;
-	public var touchPadCam:ShadowCamera;
-	public var luaTouchPad:TouchPad;
-	public var luaTouchPadCam:ShadowCamera;
-	public var mobileControls:IMobileControls;
-	public var mobileControlsCam:ShadowCamera;
+	public var touchPad:Null<TouchPad> = null;
+	public var touchPadCam:Null<ShadowCamera> = null;
+	public var luaTouchPad:Null<TouchPad> = null;
+	public var luaTouchPadCam:Null<ShadowCamera> = null;
+	public var mobileControls:Null<IMobileControls> = null;
+	public var mobileControlsCam:Null<ShadowCamera> = null;
 
 	public function addTouchPad(DPad:String, Action:String)
 	{
@@ -135,7 +144,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public function makeLuaTouchPad(DPadMode:String, ActionMode:String)
 	{
-		if (members.contains(luaTouchPad))
+		if (luaTouchPad != null && members.contains(luaTouchPad))
 			return;
 
 		if (!variables.exists("luaTouchPad"))
@@ -151,6 +160,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			return;
 
 		var target = LuaUtils.getTargetInstance();
+		if (target == null)
+			return;
 		target.insert(target.members.length + 1, luaTouchPad);
 	}
 
@@ -181,17 +192,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonPressed(MobileInputID.fromString(button));
+				return luaTouchPad.buttonPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in buttonIds)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyPressed(idArray);
 			}
-			else
-				return false;
 		}
 		return false;
 	}
@@ -201,13 +210,13 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustPressed(MobileInputID.fromString(button));
+				return luaTouchPad.buttonJustPressed(cast MobileInputID.fromString(button));
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in buttonIds)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustPressed(idArray);
 			}
 			else
@@ -221,13 +230,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			{
+				return luaTouchPad.buttonJustReleased(cast MobileInputID.fromString(button));
+			}
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in buttonIds)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyJustReleased(idArray);
 			}
 			else
@@ -241,13 +252,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		if (luaTouchPad != null)
 		{
 			if (Std.isOfType(button, String))
-				return luaTouchPad.buttonJustReleased(MobileInputID.fromString(button));
+			{
+				return luaTouchPad.buttonReleased(cast MobileInputID.fromString(button));
+			}
 			else if (Std.isOfType(button, Array))
 			{
-				var FUCK:Array<String> = button;
+				var buttonIds:Array<String> = button; // haxe said "You Can't Iterate On A Dyanmic Value Please Specificy Iterator or Iterable *insert nerd emoji*" so that's the only i found to fix
 				var idArray:Array<MobileInputID> = [];
-				for (strId in FUCK)
-					idArray.push(MobileInputID.fromString(strId));
+				for (strId in buttonIds)
+					idArray.push(cast MobileInputID.fromString(strId));
 				return luaTouchPad.anyReleased(idArray);
 			}
 			else
@@ -424,10 +437,9 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	private function updateCurStep():Void
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
-
-		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
-		curDecStep = lastChange.stepTime + shit;
-		curStep = lastChange.stepTime + Math.floor(shit);
+		var stepOffset = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / (lastChange.stepCrochet ?? Conductor.stepCrochet);
+		curDecStep = lastChange.stepTime + stepOffset;
+		curStep = lastChange.stepTime + Math.floor(stepOffset);
 	}
 
 	public function stepHit():Void
@@ -449,12 +461,12 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		callOnScripts('onSectionHit');
 	}
 
-	public function getBeatsOnSection()
+	public function getBeatsOnSection():Float
 	{
-		var val:Null<Float> = 4;
+		var val:Null<Float> = null;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
 			val = PlayState.SONG.notes[curSection].sectionBeats;
-		return val == null ? 4 : val;
+		return val ?? 4;
 	}
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
@@ -483,7 +495,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	}
 	#end
 
-	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
+	public function getLuaObject(tag:String, text:Bool = true):Null<FlxSprite>
 	{
 		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
@@ -609,9 +621,10 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			if (len <= 0)
 				len = e.message.length;
 			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
-			var newScript:HScript = cast(SScript.global.get(file), HScript);
-			if (newScript != null)
+			var scriptFromGlobal = SScript.global.get(file);
+			if (scriptFromGlobal != null)
 			{
+				var newScript:HScript = cast scriptFromGlobal;
 				newScript.destroy();
 				hscriptArray.remove(newScript);
 			}
@@ -683,7 +696,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		return returnVal;
 	}
 
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;

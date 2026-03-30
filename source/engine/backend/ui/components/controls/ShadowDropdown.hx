@@ -10,31 +10,32 @@ import flixel.FlxCamera;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowDropdown extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;
-	public var selectedLabel(get, null):String;
-	public var callback:Int->Void;
+	public var selectedLabel(get, null):String = "";
+	public var callback:Null<Int->Void>;
 	public var hasFocus:Bool = false;
 
 	private static var _instances:Array<ShadowDropdown> = [];
 	private static var _clickConsumedFrame:Int = -1;
-	private static var _clickConsumer:ShadowDropdown = null;
+	private static var _clickConsumer:Null<ShadowDropdown> = null;
 
-	var options:Array<String>;
-	var header:FlxSprite;
-	var headerText:FlxText;
-	var arrow:FlxSprite;
-	var dropList:ShadowDropdownList;
-	var listBg:FlxSprite;
+	var options:Array<String> = [];
+	var header:FlxSprite = new FlxSprite();
+	var headerText:FlxText = new FlxText();
+	var arrow:FlxSprite = new FlxSprite();
+	var dropList:Null<ShadowDropdownList>;
+	var listBg:Null<FlxSprite>;
 	var isOpen:Bool = false;
 
-	var _rowHighlight:FlxSprite;
+	var _rowHighlight:Null<FlxSprite>;
 	var _rowItems:Array<FlxText> = [];
-
-	var _width:Int;
-	var _height:Int;
-	var _maxVisible:Int;
+	
+	var _width:Int = 150;
+	var _height:Int = 28;
+	var _maxVisible:Int = 6;
 	var _scrollIndex:Int = 0;
 	var _headerHovered:Bool = false;
 	var _selectedIndex:Int = 0;
@@ -50,26 +51,26 @@ class ShadowDropdown extends FlxSpriteGroup
 
 	public function new(x:Float, y:Float, items:Array<String>, ?onChange:Int->Void, width:Int = 150, maxVisibleItems:Int = 6)
 	{
-		super(x, y);
-
-		_instances.push(this);
 		options = items;
 		callback = onChange;
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 		_maxVisible = maxVisibleItems;
 
-		header = new FlxSprite(0, 0);
 		drawHeader(ShadowStyle.BORDER_DARK);
+		
+		super(x, y);
 		add(header);
 
-		headerText = new FlxText(ShadowStyle.SPACING_SM, 0, _width - 24, options.length > 0 ? options[0] : "");
+		headerText.text = options.length > 0 ? options[0] : "";
+		headerText.fieldWidth = _width - 24;
+		headerText.x = ShadowStyle.SPACING_SM;
 		headerText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		headerText.antialiasing = ShadowStyle.antialiasing;
 		headerText.y = (_height - headerText.height) / 2;
 		add(headerText);
 
-		arrow = new FlxSprite(_width - 16, 0);
+		arrow.setPosition(_width - 16, 0);
 		drawArrow();
 		add(arrow);
 
@@ -79,6 +80,8 @@ class ShadowDropdown extends FlxSpriteGroup
 		dropList.exists = false;
 		dropList.active = false;
 		add(dropList);
+
+		_instances.push(this);
 
 		_ignoreClickUntilTick = Std.int(FlxG.game.ticks);
 		_ignoreUntilMouseRelease = (FlxG.mouse.pressed || FlxG.mouse.pressedRight || FlxG.mouse.pressedMiddle);
@@ -239,12 +242,13 @@ class ShadowDropdown extends FlxSpriteGroup
 	{
 		if (dropList == null)
 			return;
+		var dl:ShadowDropdownList = dropList;
 
 		if (listBg == null)
 		{
 			listBg = new FlxSprite(0, 0);
 			listBg.cameras = cameras;
-			dropList.add(listBg);
+			dl.add(listBg);
 		}
 
 		if (_rowHighlight == null)
@@ -253,7 +257,7 @@ class ShadowDropdown extends FlxSpriteGroup
 			_rowHighlight.makeGraphic(_width - 2, _height, ShadowStyle.BG_MEDIUM);
 			_rowHighlight.visible = false;
 			_rowHighlight.cameras = cameras;
-			dropList.add(_rowHighlight);
+			dl.add(_rowHighlight);
 		}
 
 		while (_rowItems.length < _maxVisible)
@@ -264,7 +268,7 @@ class ShadowDropdown extends FlxSpriteGroup
 			t.visible = false;
 			t.cameras = cameras;
 			_rowItems.push(t);
-			dropList.add(t);
+			dl.add(t);
 		}
 	}
 
@@ -317,25 +321,32 @@ class ShadowDropdown extends FlxSpriteGroup
 		}
 
 		ensureListAssets();
-		_rowHighlight.x = this.x;
+		if (_rowHighlight != null)
+			_rowHighlight.x = this.x;
 
 		var listHeight:Int = visibleCount * _height;
 
-		listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
-		for (i in 0..._width)
-			listBg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
-		for (i in 0...listHeight)
+		if (listBg != null)
 		{
-			listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
-			listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
+			listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
+			for (i in 0..._width)
+				listBg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
+			for (i in 0...listHeight)
+			{
+				listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
+				listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
+			}
+			listBg.x = this.x;
+			listBg.y = this.y + _height;
+			listBg.visible = true;
 		}
-		listBg.x = this.x;
-		listBg.y = this.y + _height;
-		listBg.visible = true;
 
-		dropList.visible = true;
-		dropList.exists = true;
-		dropList.active = true;
+		if (dropList != null)
+		{
+			dropList.visible = true;
+			dropList.exists = true;
+			dropList.active = true;
+		}
 
 		var highlightIndex:Int = -1;
 

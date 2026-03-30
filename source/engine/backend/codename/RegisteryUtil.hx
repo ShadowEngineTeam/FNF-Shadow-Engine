@@ -17,6 +17,7 @@ enum abstract RegistryHive(Int)
 #include <vector>
 ')
 #end
+@:nullSafety
 class RegistryUtil
 {
 	#if (windows && cpp)

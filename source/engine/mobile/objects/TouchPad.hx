@@ -8,6 +8,7 @@ import flixel.util.FlxSignal.FlxTypedSignal;
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
 @:access(mobile.objects.TouchButton)
+@:nullSafety
 class TouchPad extends MobileInputManager implements IMobileControls
 {
 	public var buttonLeft:TouchButton = new TouchButton(0, 0, [MobileInputID.LEFT, MobileInputID.NOTE_LEFT]);
@@ -47,7 +48,7 @@ class TouchPad extends MobileInputManager implements IMobileControls
 	public var buttonExtra:TouchButton = new TouchButton(0, 0, [MobileInputID.EXTRA_1]);
 	public var buttonExtra2:TouchButton = new TouchButton(0, 0, [MobileInputID.EXTRA_2]);
 
-	public var instance:MobileInputManager;
+	public var instance:Null<MobileInputManager>;
 	public var onButtonDown:FlxTypedSignal<TouchButton->Void> = new FlxTypedSignal<TouchButton->Void>();
 	public var onButtonUp:FlxTypedSignal<TouchButton->Void> = new FlxTypedSignal<TouchButton->Void>();
 
@@ -57,6 +58,7 @@ class TouchPad extends MobileInputManager implements IMobileControls
 	 * @param   DPadMode     The D-Pad mode. `LEFT_FULL` for example.
 	 * @param   ActionMode   The action buttons mode. `A_B_C` for example.
 	 */
+	@:nullSafety(Off)
 	public function new(DPad:String, Action:String, ?Extra:ExtraActions = NONE)
 	{
 		super();
@@ -122,6 +124,7 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		}
 	}
 
+	@:nullSafety(Off)
 	public function setExtrasDefaultPos()
 	{
 		var int:Int = 0;
@@ -141,6 +144,7 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		MobileData.save.flush();
 	}
 
+	@:nullSafety(Off)
 	public function setExtrasPos()
 	{
 		var int:Int = 0;
@@ -162,7 +166,8 @@ class TouchPad extends MobileInputManager implements IMobileControls
 		}
 	}
 
-	private function createButton(X:Float, Y:Float, Graphic:String, ?Color:FlxColor = 0xFFFFFF, ?IDs:Array<MobileInputID>):TouchButton
+	@:nullSafety(Off)
+	private function createButton(X:Float, Y:Float, Graphic:String, ?Color:FlxColor, ?IDs:Array<MobileInputID>):TouchButton
 	{
 		var button = new TouchButton(X, Y, IDs);
 		button.label = new FlxSprite();

@@ -24,7 +24,7 @@ class CreditsState extends MusicBeatState
 			DESC
 			LINK
 			COLOR
-		*/
+		 */
 		["Shadow Engine Team"],
 		[
 			"Homura",

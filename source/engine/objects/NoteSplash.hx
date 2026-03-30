@@ -7,6 +7,7 @@ import flixel.graphics.frames.FlxFrame;
 
 using backend.CoolUtil;
 
+@:nullSafety
 typedef NoteSplashConfig =
 {
 	anim:String,
@@ -15,27 +16,28 @@ typedef NoteSplashConfig =
 	offsets:Array<Array<Float>>
 }
 
+@:nullSafety
 class NoteSplash extends FlxSprite
 {
-	public var colorSwap:ColorSwap = null;
-	public var rgbShader:PixelSplashShaderRef;
+	public var colorSwap:Null<ColorSwap> = null;
+	public var rgbShader:Null<PixelSplashShaderRef> = null;
 
-	private var idleAnim:String;
-	private var _textureLoaded:String = null;
-	private var _configLoaded:String = null;
+	private var idleAnim:String = '';
+	private var _textureLoaded:Null<String> = null;
+	private var _configLoaded:Null<String> = null;
 
 	public static var usePixelTextures(default, set):Null<Bool>;
 
 	public static var defaultNoteSplash(get, never):String;
 	public static var configs:Map<String, NoteSplashConfig> = new Map<String, NoteSplashConfig>();
 
-	public static var mainGroup:FlxTypedGroup<NoteSplash>;
+	public static var mainGroup:Null<FlxTypedGroup<NoteSplash>> = null;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
 
-		var skin:String = null;
+		var skin:Null<String> = null;
 		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
 			skin = PlayState.SONG.splashSkin;
 		else
@@ -71,7 +73,7 @@ class NoteSplash extends FlxSprite
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 		aliveTime = 0;
 
-		var texture:String = null;
+		var texture:Null<String> = null;
 		if (note != null && note.noteSplashData.texture != null)
 			texture = note.noteSplashData.texture;
 		else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
@@ -79,13 +81,13 @@ class NoteSplash extends FlxSprite
 		else
 			texture = defaultNoteSplash + getSplashSkinPostfix();
 
-		var config:NoteSplashConfig = null;
+		var config:Null<NoteSplashConfig> = null;
 		if (_textureLoaded != texture)
 			config = loadAnims((PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture);
-		else
+		else if (_configLoaded != null)
 			config = precacheConfig(_configLoaded);
 
-		var tempShader:RGBPalette = null;
+		var tempShader:Null<RGBPalette> = null;
 		if (ClientPrefs.data.disableRGBNotes)
 		{
 			var hue:Float = 0;
@@ -106,34 +108,43 @@ class NoteSplash extends FlxSprite
 				}
 			}
 
-			colorSwap.hue = hue;
-			colorSwap.saturation = saturation;
-			colorSwap.brightness = brightness;
+			if (colorSwap != null)
+			{
+				colorSwap.hue = hue;
+				colorSwap.saturation = saturation;
+				colorSwap.brightness = brightness;
+			}
 		}
 		else
 		{
-			if ((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteCustomColor))
+			if ((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || PlayState.SONG.disableNoteCustomColor == false))
 			{
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
-					if (note.noteSplashData.r != -1)
+					if (note.noteSplashData.r != -1 && note.rgbShader != null)
 						note.rgbShader.r = note.noteSplashData.r;
-					if (note.noteSplashData.g != -1)
+					if (note.noteSplashData.g != -1 && note.rgbShader != null)
 						note.rgbShader.g = note.noteSplashData.g;
-					if (note.noteSplashData.b != -1)
+					if (note.noteSplashData.b != -1 && note.rgbShader != null)
 						note.rgbShader.b = note.noteSplashData.b;
-					tempShader = note.rgbShader.parent;
+					if (note.rgbShader != null)
+						tempShader = note.rgbShader.parent;
 				}
 				else
-					tempShader = Note.globalRgbShaders[direction];
+					tempShader = Note.initializeGlobalRGBShader(direction);
 			}
 		}
 
 		alpha = ClientPrefs.data.splashAlpha;
 		if (note != null)
 			alpha = note.noteSplashData.a;
-		if (!ClientPrefs.data.disableRGBNotes)
-			rgbShader.copyValues(tempShader);
+		if (!ClientPrefs.data.disableRGBNotes && rgbShader != null)
+		{
+			if (tempShader != null)
+				rgbShader.copyValues(tempShader);
+			else
+				rgbShader.copyValues(new RGBPalette());
+		}
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
@@ -179,23 +190,29 @@ class NoteSplash extends FlxSprite
 	function loadAnims(skin:String, ?animName:String = null):NoteSplashConfig
 	{
 		maxAnims = 0;
-		frames = Paths.getSparrowAtlas(skin);
-		var config:NoteSplashConfig = null;
+		var sparrowFrames = Paths.getSparrowAtlas(skin);
+		if (sparrowFrames != null)
+			frames = sparrowFrames;
+		var config:Null<NoteSplashConfig> = null;
 		if (frames == null)
 		{
 			skin = defaultNoteSplash + getSplashSkinPostfix();
-			frames = Paths.getSparrowAtlas(skin);
+			sparrowFrames = Paths.getSparrowAtlas(skin);
+			if (sparrowFrames != null)
+				frames = sparrowFrames;
 			if (frames == null) // if you really need this, you really fucked something up
 			{
 				skin = defaultNoteSplash;
-				frames = Paths.getSparrowAtlas(skin);
+				sparrowFrames = Paths.getSparrowAtlas(skin);
+				if (sparrowFrames != null)
+					frames = sparrowFrames;
 			}
 		}
 		config = precacheConfig(skin);
 		_configLoaded = skin;
 
 		if (animName == null)
-			animName = config != null ? config.anim : 'note splash';
+			animName = config?.anim ?? 'note splash';
 
 		while (true)
 		{
@@ -205,7 +222,7 @@ class NoteSplash extends FlxSprite
 				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', 24, false))
 				{
 					// trace('maxAnims: $maxAnims');
-					return config;
+					return config ?? defaultConfig();
 				}
 			}
 			maxAnims++;
@@ -233,12 +250,22 @@ class NoteSplash extends FlxSprite
 
 		var config:NoteSplashConfig = {
 			anim: configFile[0],
-			minFps: Std.parseInt(framerates[0]),
-			maxFps: Std.parseInt(framerates[1]),
+			minFps: Std.parseInt(framerates[0]) != null ? Std.parseInt(framerates[0]) : 24,
+			maxFps: Std.parseInt(framerates[1]) != null ? Std.parseInt(framerates[1]) : 30,
 			offsets: offs
 		};
 		configs.set(skin, config);
 		return config;
+	}
+
+	function defaultConfig():NoteSplashConfig
+	{
+		return {
+			anim: 'note splash',
+			minFps: 24,
+			maxFps: 30,
+			offsets: [[0, 0], [0, 0], [0, 0], [0, 0]]
+		};
 	}
 
 	function addAnimAndCheck(name:String, anim:String, ?framerate:Int = 24, ?loop:Bool = false)

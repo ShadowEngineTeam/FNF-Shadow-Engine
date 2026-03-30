@@ -5,6 +5,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
+@:nullSafety
 class FramerateCategory extends Sprite
 {
 	public var title:TextField;
@@ -18,7 +19,6 @@ class FramerateCategory extends Sprite
 	{
 		super();
 
-		x = 10;
 		this.title = new TextField();
 		this.text = new TextField();
 
@@ -40,6 +40,7 @@ class FramerateCategory extends Sprite
 		this.text.multiline = true;
 
 		this.text.y = this.title.y + this.title.height + 2;
+		x = 10;
 	}
 
 	public function reload() {}
@@ -50,9 +51,10 @@ class FramerateCategory extends Sprite
 			return;
 		super.__enterFrame(t);
 
-		var width = Math.max(this.title.width, this.text.width) + (Framerate.instance.x * 2);
+		var instanceX = Framerate.instance?.x ?? 10;
+		var width = Math.max(this.title.width, this.text.width) + (instanceX * 2);
 		var height = this.text.height + this.text.y;
-		bgSprite.x = -Framerate.instance.x;
+		bgSprite.x = -instanceX;
 		bgSprite.scaleX = width;
 		bgSprite.scaleY = height;
 	}

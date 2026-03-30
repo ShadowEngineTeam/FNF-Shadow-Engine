@@ -1,24 +1,35 @@
 package objects;
 
+import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.graphics.FlxGraphic;
+
+@:nullSafety
 class BGSprite extends FlxSprite
 {
-	private var idleAnim:String;
+	private var idleAnim:Null<String> = null;
 
 	public function new(image:String, x:Float = 0, y:Float = 0, ?scrollX:Float = 1, ?scrollY:Float = 1, ?animArray:Array<String> = null, ?loop:Bool = false)
 	{
 		super(x, y);
 
-		if (animArray != null)
+		var sx:Float = scrollX ?? 1;
+		var sy:Float = scrollY ?? 1;
+
+		if (animArray != null && image != null)
 		{
-			frames = Paths.getSparrowAtlas(image);
-			for (i in 0...animArray.length)
+			var atlas:Null<FlxAtlasFrames> = Paths.getSparrowAtlas(image);
+			if (atlas != null)
 			{
-				var anim:String = animArray[i];
-				animation.addByPrefix(anim, anim, 24, loop);
-				if (idleAnim == null)
+				frames = atlas;
+				for (i in 0...animArray.length)
 				{
-					idleAnim = anim;
-					animation.play(anim);
+					var anim:String = animArray[i];
+					animation.addByPrefix(anim, anim, 24, loop);
+					if (idleAnim == null)
+					{
+						idleAnim = anim;
+						animation.play(anim);
+					}
 				}
 			}
 		}
@@ -26,11 +37,13 @@ class BGSprite extends FlxSprite
 		{
 			if (image != null)
 			{
-				loadGraphic(Paths.image(image));
+				var img:Null<FlxGraphic> = Paths.image(image);
+				if (img != null)
+					loadGraphic(img);
 			}
 			active = false;
 		}
-		scrollFactor.set(scrollX, scrollY);
+		scrollFactor.set(sx, sy);
 		antialiasing = ClientPrefs.data.antialiasing;
 	}
 
@@ -38,7 +51,8 @@ class BGSprite extends FlxSprite
 	{
 		if (idleAnim != null)
 		{
-			animation.play(idleAnim, forceplay);
+			var fp:Bool = forceplay ?? false;
+			animation.play(idleAnim, fp);
 		}
 	}
 }

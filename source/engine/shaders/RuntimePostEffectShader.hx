@@ -7,6 +7,7 @@ import flixel.addons.display.FlxRuntimeShader;
 import lime.graphics.opengl.GLProgram;
 import lime.utils.Log;
 
+@:nullSafety(Off)
 class RuntimePostEffectShader extends FlxRuntimeShader
 {
 	@:glVertexHeader('

@@ -14,27 +14,30 @@ import openfl.text.TextField;
 /**
  * we're so Kade Engine
  */
+@:nullSafety
 class ResultsScreen extends MusicBeatSubstate
 {
-	public var background:FlxSprite;
-	public var text:FlxText;
+	public var background:Null<FlxSprite>;
+	public var text:Null<FlxText>;
 
-	public var anotherBackground:FlxSprite;
-	public var graph:HitGraph;
-	public var graphSprite:OpenFLSprite;
+	public var anotherBackground:Null<FlxSprite>;
+	public var graph:Null<HitGraph>;
+	public var graphSprite:Null<OpenFLSprite>;
 
-	public var comboText:FlxText;
-	public var contText:FlxText;
-	public var settingsText:FlxText;
+	public var comboText:Null<FlxText>;
+	public var contText:Null<FlxText>;
+	public var settingsText:Null<FlxText>;
 
-	public var music:FlxSound;
+	public var music:Null<FlxSound>;
 
-	public var graphData:BitmapData;
+	public var graphData:Null<BitmapData>;
 
-	public var ranking:String;
-	public var accuracy:String;
+	public var ranking:Null<String>;
+	public var accuracy:Null<String>;
 
-	public var fuckingCamera:ShadowCamera;
+	public var fuckingCamera:Null<ShadowCamera>;
+
+	var instance:Null<PlayState>;
 
 	override function create()
 	{
@@ -47,15 +50,17 @@ class ResultsScreen extends MusicBeatSubstate
 		background.scrollFactor.set();
 		add(background);
 
+		instance = PlayState.instance;
 		music = new FlxSound();
-		if (PauseSubState.songName != null)
+		var songName = PauseSubState.songName;
+		var musicPath = songName != null && songName != 'None' ? Paths.music(songName) : null;
+		if (musicPath == null)
 		{
-			music.loadEmbedded(Paths.music(PauseSubState.songName), true, true);
+			var pauseMusic = Paths.formatToSongPath(ClientPrefs.data.pauseMusic ?? 'breakfast');
+			musicPath = Paths.music(pauseMusic);
 		}
-		else if (PauseSubState.songName != 'None')
-		{
-			music.loadEmbedded(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)), true, true);
-		}
+		if (musicPath != null)
+			music.loadEmbedded(musicPath, true, true);
 		music.volume = 0;
 		music.play(false, FlxG.random.int(0, Std.int(music.length / 2)));
 
@@ -67,23 +72,24 @@ class ResultsScreen extends MusicBeatSubstate
 		text.scrollFactor.set();
 		add(text);
 
-		var score = PlayState.instance.songScore;
+		instance = PlayState.instance;
+		var score = instance?.songScore ?? 0;
 		if (PlayState.isStoryMode)
 		{
 			score = PlayState.campaignScore;
 			text.text = "Week Cleared!";
 		}
 
-		var sicks = PlayState.instance.totalSick;
-		var goods = PlayState.instance.totalGood;
-		var bads = PlayState.instance.totalBad;
-		var shits = PlayState.instance.totalShit;
+		var sicks = instance?.totalSick ?? 0;
+		var goods = instance?.totalGood ?? 0;
+		var bads = instance?.totalBad ?? 0;
+		var shits = instance?.totalShit ?? 0;
 		var comboTxt:String = "";
 
-		if (PlayState.instance.cpuControlled)
-			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nHighest Combo: ${PlayState.instance.maxCombo}\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
+		if (instance?.cpuControlled ?? false)
+			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nHighest Combo: ${instance?.maxCombo ?? 0}\n\nPlayback Rate: ${instance?.playbackRate ?? 1.0}x';
 		else
-			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.instance.songMisses)}\nHighest Combo: ${PlayState.instance.maxCombo}\nScore: ${FlxStringUtil.formatMoney(PlayState.instance.songScore, false)}\nAccuracy: ${CoolUtil.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%\n\nPlayback Rate: ${PlayState.instance.playbackRate}x';
+			comboTxt = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\nShits - ${shits}\n\nMisses: ${(PlayState.isStoryMode ? PlayState.campaignMisses : instance?.songMisses ?? 0)}\nHighest Combo: ${instance?.maxCombo ?? 0}\nScore: ${FlxStringUtil.formatMoney(instance?.songScore ?? 0, false)}\nAccuracy: ${CoolUtil.floorDecimal((instance?.ratingPercent ?? 0) * 100, 2)}%\n\nPlayback Rate: ${instance?.playbackRate ?? 1.0}x';
 
 		comboText = new FlxText(20, -75, 0, comboTxt);
 		comboText.setFormat(Paths.font("Comfortaa-Bold.ttf"), 28, FlxColor.WHITE);
@@ -113,35 +119,45 @@ class ResultsScreen extends MusicBeatSubstate
 
 		add(graphSprite);
 
-		var sicks = truncateFloat(PlayState.instance.totalSick / PlayState.instance.totalGood, 1);
-		var goods = truncateFloat(PlayState.instance.totalGood / PlayState.instance.totalBad, 1);
+		var totalGood = instance?.totalGood ?? 1;
+		var totalBad = instance?.totalBad ?? 1;
+		var sicks = truncateFloat((instance?.totalSick ?? 0) / totalGood, 1);
+		var goods = truncateFloat(totalGood / totalBad, 1);
 
-		if (sicks == Math.POSITIVE_INFINITY || sicks == Math.NaN)
+		if (sicks == Math.POSITIVE_INFINITY || Math.isNaN(sicks))
 			sicks = 0;
-		if (goods == Math.POSITIVE_INFINITY || goods == Math.NaN)
+		if (goods == Math.POSITIVE_INFINITY || Math.isNaN(goods))
 			goods = 0;
 
 		var mean:Float = 0;
+		var playbackRate = instance?.playbackRate ?? 1.0;
 
-		for (i in 0...PlayState.instance.songSaveNotes.length)
+		var songSaveNotes = instance?.songSaveNotes ?? [];
+		var songJudges = instance?.songJudges ?? [];
+		var safeFrames = ClientPrefs.data.safeFrames ?? 45;
+		var diffThreshold = 166 * Math.floor((safeFrames / 60) * 1000) / 166;
+
+		for (i in 0...songSaveNotes.length)
 		{
-			var obj = PlayState.instance.songSaveNotes[i];
-			var obj2 = PlayState.instance.songJudges[i];
-			var obj3 = obj[0];
-			var diff = obj[3];
-			var judge = obj2;
-			if (diff != (166 * Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) / 166))
+			var obj:Array<Dynamic> = songSaveNotes[i];
+			var obj2 = songJudges[i];
+			if (obj == null)
+				continue;
+			var obj3 = obj[0] ?? 0;
+			var diff:Float = obj[3] ?? 0;
+			var judge = obj2 ?? '';
+			if (diff != diffThreshold)
 				mean += diff;
-			if (obj[1] != -1)
-				graph.addToHistory(diff / PlayState.instance.playbackRate, judge, obj3 / PlayState.instance.playbackRate);
+			if ((obj[1] ?? -1) != -1)
+				graph.addToHistory(diff / playbackRate, judge, obj3 / playbackRate);
 		}
 
 		graph.update();
 
-		mean = truncateFloat(mean / PlayState.instance.totalNotesHit, 2);
+		mean = truncateFloat(mean / (instance?.totalNotesHit ?? 1), 2);
 
 		settingsText = new FlxText(20, FlxG.height + 50, 0,
-			'Mean: ${mean}ms (SICK:${ClientPrefs.data.sickWindow}ms,GOOD:${ClientPrefs.data.goodWindow}ms,BAD:${ClientPrefs.data.badWindow}ms)');
+			'Mean: ${mean}ms (SICK:${ClientPrefs.data.sickWindow ?? 50}ms,GOOD:${ClientPrefs.data.goodWindow ?? 100}ms,BAD:${ClientPrefs.data.badWindow ?? 150}ms)');
 		settingsText.setFormat(Paths.font("Comfortaa-Bold.ttf"), 16, FlxColor.WHITE);
 		settingsText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 2, 1);
 		settingsText.scrollFactor.set();
@@ -155,17 +171,21 @@ class ResultsScreen extends MusicBeatSubstate
 		FlxTween.tween(anotherBackground, {alpha: 0.6}, 0.5, {
 			onUpdate: function(tween:FlxTween)
 			{
-				graph.alpha = FlxMath.lerp(0, 1, tween.percent);
-				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
+				if (graph != null)
+					graph.alpha = FlxMath.lerp(0, 1, tween.percent);
+				if (graphSprite != null)
+					graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
 			}
 		});
 		fuckingCamera = new ShadowCamera();
 		fuckingCamera.bgColor.alpha = 0;
 		FlxG.cameras.add(fuckingCamera, false);
-		cameras = [fuckingCamera];
+		if (fuckingCamera != null)
+			cameras = [fuckingCamera];
 		forEachAlive(function(obj:FlxBasic)
 		{
-			obj.cameras = [fuckingCamera];
+			if (fuckingCamera != null)
+				obj.cameras = [fuckingCamera];
 		});
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
@@ -185,14 +205,16 @@ class ResultsScreen extends MusicBeatSubstate
 		if (controls.ACCEPT)
 		{
 			music.stop();
-			PlayState.instance.endCallback();
+			instance?.endCallback();
 		}
 
-		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS touchPad?.buttonB?.justPressed || #end controls.RESET)
 		{
-			PlayState.instance.paused = true; // For lua
+			if (instance != null)
+				instance.paused = true;
 			FlxG.sound.music.volume = 0;
-			PlayState.instance.vocals.volume = 0;
+			if (instance != null && instance.vocals != null)
+				instance.vocals.volume = 0;
 
 			MusicBeatState.resetState();
 		}
@@ -223,10 +245,10 @@ class HitGraph extends Sprite
 	public var maxLabel:TextField;
 	public var avgLabel:TextField;
 
-	public var minValue:Float = -(Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) + 95);
-	public var maxValue:Float = Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) + 95;
+	public var minValue:Float = -(Math.floor(((ClientPrefs.data.safeFrames ?? 45) / 60) * 1000) + 95);
+	public var maxValue:Float = Math.floor(((ClientPrefs.data.safeFrames ?? 45) / 60) * 1000) + 95;
 
-	public var showInput:Bool = FlxG.save.data.inputShow;
+	public var showInput:Bool = FlxG.save.data?.inputShow ?? false;
 
 	public var graphColor:FlxColor;
 
@@ -258,7 +280,7 @@ class HitGraph extends Sprite
 		_axis = new Shape();
 		_axis.x = _labelWidth + 10;
 
-		ts = Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) / 166;
+		ts = Math.floor(((ClientPrefs.data.safeFrames ?? 45) / 60) * 1000) / 166;
 
 		var early = createTextField(10, 10, FlxColor.WHITE, 12);
 		var late = createTextField(10, _height - 20, FlxColor.WHITE, 12);
@@ -320,7 +342,7 @@ class HitGraph extends Sprite
 
 		gfx.lineStyle(1, graphColor, 0.3);
 
-		var ts = Math.floor((ClientPrefs.data.safeFrames / 60) * 1000) / 166;
+		var ts = Math.floor(((ClientPrefs.data.safeFrames ?? 45) / 60) * 1000) / 166;
 		var range:Float = Math.max(maxValue - minValue, maxValue * 0.1);
 
 		var value = ((ms * ts) - minValue) / range;
@@ -385,30 +407,38 @@ class HitGraph extends Sprite
 
 		if (showInput)
 		{
-			for (i in 0...PlayState.instance.anaArray.length)
+			var anaArray = PlayState.instance?.anaArray ?? [];
+			for (i in 0...anaArray.length)
 			{
-				var ana = PlayState.instance.anaArray[i];
+				var ana = anaArray[i];
+				if (ana == null)
+					continue;
 
-				var value = (ana.key * 25 - minValue) / range;
+				var value = ((ana.key ?? 0) * 25 - minValue) / range;
 
 				if (ana.hit)
 					gfx.beginFill(0xFFFF00);
 				else
 					gfx.beginFill(0xC2B280);
 
-				if (ana.hitTime < 0)
+				var hitTime:Float = ana.hitTime ?? -1;
+				if (hitTime < 0)
 					continue;
 
 				var pointY = (-value * _height - 1) + _height;
-				gfx.drawRect(graphX + fitX(ana.hitTime), pointY, 2, 2);
+				gfx.drawRect(graphX + fitX(hitTime), pointY, 2, 2);
 				gfx.endFill();
 			}
 		}
 
 		for (i in 0...history.length)
 		{
-			var value = (history[i][0] - minValue) / range;
-			var judge = history[i][1];
+			var entry:Array<Dynamic> = history[i];
+			if (entry == null)
+				continue;
+
+			var value = ((entry[0] ?? 0) - minValue) / range;
+			var judge = entry[1] ?? '';
 
 			switch (judge)
 			{
@@ -427,34 +457,33 @@ class HitGraph extends Sprite
 			}
 			var pointY = ((-value * _height - 1) + _height);
 
-			/*if (i == 0)
-				gfx.moveTo(graphX, _axis.y + pointY); */
-			gfx.drawRect(fitX(history[i][2]), pointY, 4, 4);
+			gfx.drawRect(fitX(entry[2] ?? 0), pointY, 4, 4);
 
 			gfx.endFill();
 		}
 
 		if (bitmap != null)
-            bitmap.bitmapData.dispose();
+			bitmap.bitmapData.dispose();
 
 		var bm = new BitmapData(_width, _height, true, 0x00000000);
 		try
-        {
-            bm.draw(this);
-            bitmap = new Bitmap(bm);
-        }
-        catch (e:Dynamic)
-        {
-            trace('Error drawing HitGraph: $e');
-            bm.dispose();
-        }
+		{
+			bm.draw(this);
+			bitmap = new Bitmap(bm);
+		}
+		catch (e:Dynamic)
+		{
+			trace('Error drawing HitGraph: $e');
+			bm.dispose();
+		}
 	}
 
 	public function fitX(x:Float)
 	{
 		var musicLength = FlxG.sound.music?.length ?? 1.0;
-        if (musicLength <= 0) musicLength = 1.0;
-        return (x / musicLength) * _width;
+		if (musicLength <= 0)
+			musicLength = 1.0;
+		return (x / musicLength) * _width;
 	}
 
 	public function addToHistory(diff:Float, judge:String, time:Float)
@@ -465,10 +494,10 @@ class HitGraph extends Sprite
 	public function update():Void
 	{
 		if (_width <= 0 || _height <= 0)
-        {
-            trace('Invalid graph dimensions: $_width x $_height');
-            return;
-        }
+		{
+			trace('Invalid graph dimensions: $_width x $_height');
+			return;
+		}
 
 		drawGraph();
 	}

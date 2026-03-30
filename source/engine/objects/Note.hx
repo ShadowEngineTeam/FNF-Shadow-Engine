@@ -38,6 +38,7 @@ typedef NoteSplashData =
  * 
  * If you want to make a custom note type, you should search for: "function set_noteType"
 **/
+@:nullSafety
 class Note extends FlxSkewedSprite
 {
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -51,26 +52,26 @@ class Note extends FlxSkewedSprite
 	public var ignoreNote:Bool = false;
 	public var hitByOpponent:Bool = false;
 	public var noteWasHit:Bool = false;
-	public var prevNote:Note;
-	public var nextNote:Note;
+	public var prevNote:Null<Note> = null;
+	public var nextNote:Null<Note> = null;
 
 	public var spawned:Bool = false;
 
 	public var tail:Array<Note> = []; // for sustains
-	public var parent:Note;
+	public var parent:Null<Note> = null;
 	public var blockHit:Bool = false; // only works for player
 
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
-	public var noteType(default, set):String = null;
+	public var noteType(default, set):Null<String> = null;
 
 	public var eventName:String = '';
 	public var eventLength:Int = 0;
 	public var eventVal1:String = '';
 	public var eventVal2:String = '';
 
-	public var colorSwap:ColorSwap;
-	public var rgbShader:RGBShaderReference;
+	public var colorSwap:Null<ColorSwap> = null;
+	public var rgbShader:Null<RGBShaderReference> = null;
 
 	public static var globalRgbShaders:Array<RGBPalette> = [];
 
@@ -123,7 +124,7 @@ class Note extends FlxSkewedSprite
 	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
 	public var ratingDisabled:Bool = false;
 
-	public var texture(default, set):String = null;
+	public var texture(default, set):Null<String> = null;
 
 	public var noAnimation:Bool = false;
 	public var noMissAnimation:Bool = false;
@@ -144,7 +145,7 @@ class Note extends FlxSkewedSprite
 			for (note in _activeNotes)
 				note.reloadNote(note.texture);
 		}
-		
+
 		return value;
 	}
 
@@ -180,7 +181,7 @@ class Note extends FlxSkewedSprite
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			arr = ClientPrefs.data.arrowRGBPixel[noteData];
 
-		if (noteData > -1 && noteData <= arr.length)
+		if (noteData > -1 && noteData <= arr.length && rgbShader != null)
 		{
 			rgbShader.r = arr[0];
 			rgbShader.g = arr[1];
@@ -190,9 +191,9 @@ class Note extends FlxSkewedSprite
 
 	private function set_noteType(value:String):String
 	{
-		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
+		noteSplashData.texture = (PlayState.SONG != null && PlayState.SONG.splashSkin != null) ? PlayState.SONG.splashSkin : 'noteSplashes';
 		if (ClientPrefs.data.disableRGBNotes)
-			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length && colorSwap != null)
 			{
 				colorSwap.hue = noteSplashHue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
 				colorSwap.saturation = noteSplashSaturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
@@ -212,18 +213,24 @@ class Note extends FlxSkewedSprite
 					{
 						reloadNote('HURTNOTE_assets');
 						// note and splash data colors
-						colorSwap.hue = noteSplashHue = 0;
-						colorSwap.saturation = noteSplashSaturation = 0;
-						colorSwap.brightness = noteSplashBrightness = 0;
+						if (colorSwap != null)
+						{
+							colorSwap.hue = noteSplashHue = 0;
+							colorSwap.saturation = noteSplashSaturation = 0;
+							colorSwap.brightness = noteSplashBrightness = 0;
+						}
 
 						noteSplashData.texture = 'HURTnoteSplashes';
 					}
 					else
 					{
 						// note colors
-						rgbShader.r = 0xFF101010;
-						rgbShader.g = 0xFFFF0000;
-						rgbShader.b = 0xFF990022;
+						if (rgbShader != null)
+						{
+							rgbShader.r = 0xFF101010;
+							rgbShader.g = 0xFFFF0000;
+							rgbShader.b = 0xFF990022;
+						}
 
 						// splash data and colors
 						noteSplashData.r = 0xFFFF0000;
@@ -269,15 +276,15 @@ class Note extends FlxSkewedSprite
 			prevNote = this;
 
 		this.prevNote = prevNote;
-		isSustainNote = sustainNote;
-		this.inEditor = inEditor;
+		isSustainNote = (sustainNote == null) ? false : sustainNote;
+		this.inEditor = (inEditor == null) ? false : inEditor;
 		this.moves = false;
 
 		x += (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
 		this.strumTime = strumTime;
-		if (!inEditor)
+		if (inEditor == null || !inEditor)
 			this.strumTime += ClientPrefs.data.noteOffset;
 
 		this.noteData = noteData;
@@ -293,7 +300,7 @@ class Note extends FlxSkewedSprite
 			else
 			{
 				rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
-				if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
+				if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor && rgbShader != null)
 					rgbShader.enabled = false;
 			}
 
@@ -391,15 +398,13 @@ class Note extends FlxSkewedSprite
 		if (postfix == null)
 			postfix = '';
 
-		var skin:String = texture;
-		if (texture.length < 1)
+		var skin:String = (texture != null) ? texture : '';
+		if (texture == null || texture.length < 1)
 		{
-			skin = PlayState.SONG != null ? PlayState.SONG.playerArrowSkin : null;
-			if (skin == null || skin.length < 1)
-				skin = defaultNoteSkin;
+			skin = (PlayState.SONG != null && PlayState.SONG.playerArrowSkin != null) ? PlayState.SONG.playerArrowSkin : defaultNoteSkin;
 		}
 
-		var animName:String = null;
+		var animName:Null<String> = null;
 		if (animation.curAnim != null)
 		{
 			animName = animation.curAnim.name;
@@ -423,14 +428,22 @@ class Note extends FlxSkewedSprite
 			var imgPath = 'pixelUI/' + skinPixel + (skinPostfix != '' ? skinPostfix : '');
 			if (isSustainNote)
 			{
-				graphic = Paths.image(imgPath + 'ENDS');
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
-				originalHeight = graphic.height / 2;
+				var endGraphic:Null<FlxGraphic> = Paths.image(imgPath + 'ENDS');
+				if (endGraphic != null)
+				{
+					graphic = endGraphic;
+					loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
+					originalHeight = graphic.height / 2;
+				}
 			}
 			else
 			{
-				graphic = Paths.image(imgPath);
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
+				var pixelGraphic:Null<FlxGraphic> = Paths.image(imgPath);
+				if (pixelGraphic != null)
+				{
+					graphic = pixelGraphic;
+					loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
+				}
 			}
 
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
@@ -446,7 +459,9 @@ class Note extends FlxSkewedSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas(skin);
+			var sparrowFrames = Paths.getSparrowAtlas(skin);
+			if (sparrowFrames != null)
+				frames = sparrowFrames;
 			loadNoteAnims();
 			if (!isSustainNote)
 			{
@@ -527,11 +542,12 @@ class Note extends FlxSkewedSprite
 
 			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
 			{
-				if ((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition)
+				var prevNoteCheck:Null<Note> = prevNote;
+				var prevWasGoodHit:Bool = (prevNoteCheck != null && prevNoteCheck.wasGoodHit);
+				if ((isSustainNote && prevWasGoodHit) || strumTime <= Conductor.songPosition)
 					wasGoodHit = true;
 			}
 		}
-
 		if (tooLate && !inEditor)
 		{
 			if (alpha > 0.3)
@@ -545,22 +561,18 @@ class Note extends FlxSkewedSprite
 		var strumY:Float = myStrum.y;
 		var strumAngle:Float = myStrum.angle;
 		var strumAlpha:Float = myStrum.alpha;
-		var strumDirection:Float = myStrum.direction;
 
+		var strumDirection:Float = myStrum.direction;
 		distance = (0.45 * (Conductor.songPosition - strumTime) * songSpeed * multSpeed);
 		if (!myStrum.downScroll)
 			distance *= -1;
-
 		var angleDir = strumDirection * Math.PI / 180;
 		if (copyAngle)
 			angle = strumDirection - 90 + strumAngle + offsetAngle;
-
 		if (copyAlpha)
 			alpha = strumAlpha * multAlpha;
-
 		if (copyX)
 			x = strumX + offsetX + Math.cos(angleDir) * distance;
-
 		if (copyY)
 		{
 			y = strumY + offsetY + correctionOffset + Math.sin(angleDir) * distance;
@@ -578,12 +590,14 @@ class Note extends FlxSkewedSprite
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
 		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
-		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
+		var prevNoteClip:Null<Note> = prevNote;
+		var prevClipWasGoodHit:Bool = (prevNoteClip != null && prevNoteClip.wasGoodHit);
+		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevClipWasGoodHit && !canBeHit))))
 		{
 			var swagRect:FlxRect = clipRect;
+
 			if (swagRect == null)
 				swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
-
 			if (myStrum.downScroll)
 			{
 				if (y - offset.y * scale.y + height >= center)

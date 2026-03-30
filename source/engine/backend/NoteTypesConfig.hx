@@ -8,6 +8,7 @@ typedef NoteTypeProperty =
 	value:Dynamic
 }
 
+@:nullSafety
 class NoteTypesConfig
 {
 	private static var noteTypesData:Map<String, Array<NoteTypeProperty>> = new Map<String, Array<NoteTypeProperty>>();
@@ -20,9 +21,12 @@ class NoteTypesConfig
 		if (noteTypesData.exists(name))
 			return noteTypesData.get(name);
 
-		var str:String = Paths.getTextFromFile('custom_notetypes/$name.txt');
+		var str:Null<String> = Paths.getTextFromFile('custom_notetypes/$name.txt');
 		if (str == null || !str.contains(':') || !str.contains('='))
+		{
 			noteTypesData.set(name, null);
+			return null;
+		}
 
 		var parsed:Array<NoteTypeProperty> = [];
 		var lines:Array<String> = CoolUtil.listFromString(str);
@@ -53,7 +57,7 @@ class NoteTypesConfig
 
 	public static function applyNoteTypeData(note:Note, name:String)
 	{
-		var data:Array<NoteTypeProperty> = loadNoteTypeData(name);
+		var data:Null<Array<NoteTypeProperty>> = loadNoteTypeData(name);
 		if (data == null || data.length < 1)
 			return;
 
@@ -99,7 +103,9 @@ class NoteTypesConfig
 			for (i in 0...propArray.length)
 			{
 				var str:Dynamic = propArray[i];
-				var id:Int = Std.parseInt(str.substr(0, str.length - 1).trim());
+				var id:Null<Int> = Std.parseInt(str.substr(0, str.length - 1).trim());
+				if (id == null)
+					id = 0;
 				if (i < propArray.length - 1)
 					obj = obj[id]; // middles
 				else if (setProp)
@@ -117,7 +123,7 @@ class NoteTypesConfig
 		return Reflect.getProperty(obj, slice);
 	}
 
-	private static function _interpretValue(value:String):Any
+	private static function _interpretValue(value:String):Null<Any>
 	{
 		if (value.charAt(0) == "'" || value.charAt(0) == '"')
 		{

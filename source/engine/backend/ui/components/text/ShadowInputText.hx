@@ -17,6 +17,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Rectangle;
 import backend.ui.components.controls.ShadowDropdown;
 
+@:nullSafety
 class ShadowInputText extends FlxText
 {
 	public static inline var NO_FILTER:Int = 0;
@@ -34,7 +35,7 @@ class ShadowInputText extends FlxText
 	public static inline var ENTER_ACTION:String = "enter";
 	public static inline var INPUT_ACTION:String = "input";
 
-	public var customFilterPattern(default, set):EReg;
+	public var customFilterPattern(default, set):EReg = ~/^.*$/;
 
 	function set_customFilterPattern(cfp:EReg)
 	{
@@ -43,9 +44,9 @@ class ShadowInputText extends FlxText
 		return customFilterPattern;
 	}
 
-	public var callback:String->String->Void;
+	public var callback:Null<String->String->Void>;
 	public var background:Bool = false;
-	public var caretColor(default, set):Int;
+	public var caretColor(default, set):Int = FlxColor.BLACK;
 
 	function set_caretColor(i:Int):Int
 	{
@@ -64,27 +65,27 @@ class ShadowInputText extends FlxText
 	}
 
 	public var selectionColor(default, set):FlxColor = FlxColor.fromRGB(0, 0, 0, 96);
-	public var params(default, set):Array<Dynamic>;
+	public var params(default, set):Array<Dynamic> = [];
 	public var passwordMode(get, set):Bool;
 	public var hasFocus(default, set):Bool = false;
 	public var caretIndex(default, set):Int = 0;
-	public var focusGained:Void->Void;
-	public var focusLost:Void->Void;
+	public var focusGained:Null<Void->Void>;
+	public var focusLost:Null<Void->Void>;
 	public var forceCase(default, set):Int = ALL_CASES;
 	public var maxLength(default, set):Int = 0;
-	public var lines(default, set):Int;
+	public var lines(default, set):Int = 1;
 	public var filterMode(default, set):Int = NO_FILTER;
 	public var fieldBorderColor(default, set):Int = FlxColor.BLACK;
 	public var fieldBorderThickness(default, set):Int = 1;
 	public var backgroundColor(default, set):Int = FlxColor.WHITE;
-	private var backgroundSprite:FlxSprite;
-	private var _caretTimer:FlxTimer;
-	private var caret:FlxSprite;
-	private var selectionSprite:FlxSprite;
-	private var fieldBorderSprite:FlxSprite;
+	private var backgroundSprite:FlxSprite = new FlxSprite();
+	private var _caretTimer:Null<FlxTimer> = null;
+	private var caret:FlxSprite = new FlxSprite();
+	private var selectionSprite:FlxSprite = new FlxSprite();
+	private var fieldBorderSprite:FlxSprite = new FlxSprite();
 	private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
-	private var _charBoundaries:Array<FlxRect>;
-	private var lastScroll:Int;
+	private var _charBoundaries:Null<Array<FlxRect>> = null;
+	private var lastScroll:Int = 0;
 	private var _selectionAnchor:Int = 0;
 	private var _selecting:Bool = false;
 	private var _suppressCaretScroll:Bool = false;
@@ -92,31 +93,31 @@ class ShadowInputText extends FlxText
 	public function new(X:Float = 0, Y:Float = 0, Width:Int = 150, ?Text:String, size:Int = 8, TextColor:Int = FlxColor.BLACK,
 			BackgroundColor:Int = FlxColor.WHITE, EmbeddedFont:Bool = true)
 	{
-		super(X, Y, Width, Text, size, EmbeddedFont);
-		backgroundColor = BackgroundColor;
-
 		if (BackgroundColor != FlxColor.TRANSPARENT)
 			background = true;
+
+		caret.makeGraphic(caretWidth, Std.int((size ?? 8) + 2));
+		_caretTimer = new FlxTimer();
+
+		selectionSprite.x = X;
+		selectionSprite.y = Y;
+		selectionSprite.visible = false;
+
+		if (background)
+		{
+			fieldBorderSprite.setPosition(X, Y);
+			backgroundSprite.setPosition(X, Y);
+		}
+
+		super(X, Y, Width, Text, size, EmbeddedFont);
+		backgroundColor = BackgroundColor;
 
 		color = TextColor;
 		caretColor = TextColor;
 
-		caret = new FlxSprite();
-		caret.makeGraphic(caretWidth, Std.int(size + 2));
-		_caretTimer = new FlxTimer();
-
-		selectionSprite = new FlxSprite(X, Y);
-		selectionSprite.visible = false;
-
 		caretIndex = 0;
 		_selectionAnchor = caretIndex;
 		hasFocus = false;
-
-		if (background)
-		{
-			fieldBorderSprite = new FlxSprite(X, Y);
-			backgroundSprite = new FlxSprite(X, Y);
-		}
 
 		lines = 1;
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 1);
@@ -197,7 +198,9 @@ class ShadowInputText extends FlxText
 			#end
 		}
 
-		if (caretColor != caret.color || caret.height != size + 2)
+		@:nullSafety(Off)
+		var actualSize:Int = (size > 0) ? size : 8;
+		if (caretColor != caret.color || caret.height != actualSize + 2)
 			caret.color = caretColor;
 
 		drawSprite(caret);
@@ -208,7 +211,7 @@ class ShadowInputText extends FlxText
 		#end
 	}
 
-	private function drawSprite(Sprite:FlxSprite):Void
+	private function drawSprite(Sprite:Null<FlxSprite>):Void
 	{
 		if (Sprite != null && Sprite.visible)
 		{
@@ -684,7 +687,7 @@ class ShadowInputText extends FlxText
 		#end
 	}
 
-	private function getCharBoundaries(charIndex:Int):Rectangle
+	private function getCharBoundaries(charIndex:Int):Null<Rectangle>
 	{
 		if (_charBoundaries == null || _charBoundaries.length == 0 || charIndex < 0)
 			return null;
@@ -710,7 +713,7 @@ class ShadowInputText extends FlxText
 	{
 		if (text != null && text.length > 0 && _charBoundaries != null && _charBoundaries.length > 0)
 		{
-			var boundary:Rectangle = getCharBoundaries(text.length - 1);
+			var boundary:Null<Rectangle> = getCharBoundaries(text.length - 1);
 			if (boundary != null)
 				return x + boundary.right + 4;
 		}
@@ -763,7 +766,19 @@ class ShadowInputText extends FlxText
 		if (selectionSprite == null || textField == null)
 			return;
 
-		if (text == null || text.length == 0 || !hasSelection() || _charBoundaries == null || _charBoundaries.length == 0)
+		if (text == null || text.length == 0 || !hasSelection())
+		{
+			selectionSprite.visible = false;
+			return;
+		}
+
+		if (_charBoundaries == null)
+		{
+			selectionSprite.visible = false;
+			return;
+		}
+
+		if (_charBoundaries.length == 0)
 		{
 			selectionSprite.visible = false;
 			return;
@@ -882,10 +897,13 @@ class ShadowInputText extends FlxText
 			if (i == 0)
 				textH = textField.textHeight;
 
-			_charBoundaries[i].x = magicX + lastW;
-			_charBoundaries[i].y = magicY;
-			_charBoundaries[i].width = (textW - lastW);
-			_charBoundaries[i].height = textH;
+			if (_charBoundaries != null && _charBoundaries[i] != null)
+			{
+				_charBoundaries[i].x = magicX + lastW;
+				_charBoundaries[i].y = magicY;
+				_charBoundaries[i].width = (textW - lastW);
+				_charBoundaries[i].height = textH;
+			}
 			lastW = textW;
 		}
 
@@ -990,7 +1008,7 @@ class ShadowInputText extends FlxText
 		if (targetIndex > textLen)
 			targetIndex = textLen;
 
-		var boundary:Rectangle = null;
+		var boundary:Null<Rectangle> = null;
 
 		// caret at very end uses last char boundary
 		if (targetIndex == textLen && textLen > 0)
@@ -1087,7 +1105,7 @@ class ShadowInputText extends FlxText
 			return;
 		}
 
-		var boundary:Rectangle = null;
+		var boundary:Null<Rectangle> = null;
 		var targetIndex:Int = caretIndex;
 		if (targetIndex < 0)
 			targetIndex = 0;
@@ -1220,7 +1238,9 @@ class ShadowInputText extends FlxText
 
 		if (caret != null)
 		{
-			final caretHeight = Std.int(size + 2);
+			@:nullSafety(Off)
+			var actualSizeInt:Int = (size > 0) ? size : 8;
+			final caretHeight:Int = actualSizeInt + 2;
 			var cw:Int = caretWidth;
 			var ch:Int = caretHeight;
 
@@ -1469,7 +1489,7 @@ class ShadowInputText extends FlxText
 			return caretIndex;
 		}
 
-		var boundaries:Rectangle = null;
+		var boundaries:Null<Rectangle> = null;
 
 		if (caretIndex < textLen)
 		{

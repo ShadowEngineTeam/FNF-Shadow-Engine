@@ -3,6 +3,7 @@ package shaders;
 import openfl.display.BitmapData;
 import openfl.display.BlendMode;
 
+@:nullSafety(Off)
 class RuntimeCustomBlendShader extends RuntimePostEffectShader
 {
 	// only different name purely for hashlink fix

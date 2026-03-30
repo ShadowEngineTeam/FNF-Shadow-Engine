@@ -5,9 +5,10 @@ import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import backend.ClientPrefs;
 
+@:nullSafety
 class ShadowStyle
 {
-	private static var _focusedPanel:FlxSpriteGroup = null;
+	private static var _focusedPanel:Null<FlxSpriteGroup> = null;
 
 	public static function setFocus(panel:FlxSpriteGroup):Void
 	{
@@ -24,7 +25,7 @@ class ShadowStyle
 		_focusedPanel = null;
 	}
 
-	public static function getFocusedPanel():FlxSpriteGroup
+	public static function getFocusedPanel():Null<FlxSpriteGroup>
 	{
 		return _focusedPanel;
 	}
@@ -178,7 +179,7 @@ class ShadowStyle
 
 	public static function applySavedTheme():Void
 	{
-		var theme:String = ClientPrefs.data.uiTheme != null ? ClientPrefs.data.uiTheme : ShadowTHEME_DARK;
+		var theme:String = ClientPrefs.data.uiTheme ?? ShadowTHEME_DARK;
 		setShadowThemeByName(theme);
 	}
 

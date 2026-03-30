@@ -1,5 +1,6 @@
 package backend;
 
+@:nullSafety
 class Difficulty
 {
 	public static var defaultList(default, never):Array<String> = ['Easy', 'Normal', 'Hard'];
@@ -28,7 +29,7 @@ class Difficulty
 		if (week == null)
 			week = WeekData.getCurrentWeek();
 
-		var diffStr:String = week.difficulties;
+		var diffStr:Null<String> = week?.difficulties;
 		if (diffStr != null && diffStr.length > 0)
 		{
 			var diffs:Array<String> = diffStr.trim().split(',');
@@ -70,12 +71,13 @@ class Difficulty
 	{
 		final idx:Int = num ?? PlayState.storyDifficulty;
 		final raw:String = list[idx];
-		final dash:String = includeDash ? "-" : "";
+		final includeVal:Bool = includeDash ?? true;
+		final dash:String = includeVal ? "-" : "";
 
 		if (raw.toLowerCase() == "erect" || raw.toLowerCase() == "nightmare")
 			return dash + "Erect";
 
-		return includeDash ? "" : null;
+		return includeVal ? "" : null;
 	}
 
 	inline public static function getDefault():String

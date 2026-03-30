@@ -4,13 +4,14 @@ import flixel.input.keyboard.FlxKey;
 import options.BaseOptionsMenu;
 import options.Option;
 
+@:nullSafety
 class MobileOptionsSubState extends BaseOptionsMenu
 {
 	#if FEATURE_MOBILE_CONTROLS
 	final exControlTypes:Array<String> = ["NONE", "SINGLE", "DOUBLE"];
 	final hintOptions:Array<String> = ["No Gradient", "No Gradient (Old)", "Gradient", "Hidden"];
 	#end
-	var option:Option;
+	var option:Null<Option>;
 
 	public function new()
 	{
@@ -31,7 +32,8 @@ class MobileOptionsSubState extends BaseOptionsMenu
 		option.decimals = 1;
 		option.onChange = () ->
 		{
-			touchPad.alpha = curOption.getValue();
+			if (touchPad != null)
+				touchPad.alpha = curOption.getValue();
 			ClientPrefs.toggleVolumeKeys();
 		};
 		addOption(option);

@@ -5,13 +5,14 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowLabel extends FlxText
 {
 	public function new(x:Float, y:Float, text:String, ?size:Int, ?color:FlxColor, fieldWidth:Int = 0)
 	{
 		super(x, y, fieldWidth, text);
-		var fontSize:Int = size != null ? size : ShadowStyle.FONT_SIZE_MD;
-		var textColor = color != null ? color : ShadowStyle.TEXT_PRIMARY;
+		var fontSize:Int = size ?? ShadowStyle.FONT_SIZE_MD;
+		var textColor = color ?? ShadowStyle.TEXT_PRIMARY;
 		setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), fontSize, textColor);
 		antialiasing = ShadowStyle.antialiasing;
 	}

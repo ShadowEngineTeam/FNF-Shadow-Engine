@@ -3,15 +3,16 @@ package cutscenes;
 import flixel.FlxBasic;
 import flixel.util.FlxSort;
 
+@:nullSafety
 class CutsceneHandler extends FlxBasic
 {
 	public var timedEvents:Array<Dynamic> = [];
-	public var finishCallback:Void->Void = null;
-	public var finishCallback2:Void->Void = null;
-	public var onStart:Void->Void = null;
+	public var finishCallback:Null<Void->Void> = null;
+	public var finishCallback2:Null<Void->Void> = null;
+	public var onStart:Null<Void->Void> = null;
 	public var endTime:Float = 0;
 	public var objects:Array<FlxSprite> = [];
-	public var music:String = null;
+	public var music:Null<String> = null;
 
 	public function new()
 	{
@@ -21,13 +22,17 @@ class CutsceneHandler extends FlxBasic
 		{
 			if (music != null)
 			{
-				FlxG.sound.playMusic(Paths.music(music), 0, false);
-				FlxG.sound.music.fadeIn();
+				var musicPath = Paths.music(music);
+				if (musicPath != null)
+					FlxG.sound.playMusic(musicPath, 0, false);
+				var musicSound = FlxG.sound.music;
+				if (musicSound != null)
+					musicSound.fadeIn();
 			}
 			if (onStart != null)
 				onStart();
 		});
-		PlayState.instance.add(this);
+		PlayState.instance?.add(this);
 	}
 
 	private var cutsceneTime:Float = 0;
@@ -46,25 +51,31 @@ class CutsceneHandler extends FlxBasic
 		cutsceneTime += elapsed;
 		if (endTime <= cutsceneTime)
 		{
-			finishCallback();
+			if (finishCallback != null)
+				finishCallback();
 			if (finishCallback2 != null)
 				finishCallback2();
 
 			for (spr in objects)
 			{
-				PlayState.instance.remove(spr);
+				PlayState.instance?.remove(spr);
 				spr.kill();
 				spr.destroy();
 			}
 
 			kill();
 			destroy();
-			PlayState.instance.remove(this);
+			PlayState.instance?.remove(this);
 		}
 
 		while (timedEvents.length > 0 && timedEvents[0][0] <= cutsceneTime)
 		{
-			timedEvents[0][1]();
+			var event:Array<Dynamic> = timedEvents[0];
+			if (event != null && event[1] != null)
+			{
+				var func:Void->Void = cast event[1];
+				func();
+			}
 			timedEvents.shift();
 		}
 	}

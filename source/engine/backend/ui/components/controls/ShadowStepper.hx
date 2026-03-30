@@ -9,23 +9,24 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowStepper extends FlxSpriteGroup
 {
 	public var value(get, set):Float;
-	public var callback:Float->Void;
+	public var callback:Null<Float->Void>;
 
 	public var min:Float;
 	public var max:Float;
 	public var step:Float;
 	public var decimals:Int;
 
-	var bg:FlxSprite;
-	var valueText:FlxText;
-	var upArrow:FlxSprite;
-	var downArrow:FlxSprite;
+	var bg:FlxSprite = new FlxSprite();
+	var valueText:FlxText = new FlxText();
+	var upArrow:FlxSprite = new FlxSprite();
+	var downArrow:FlxSprite = new FlxSprite();
 
-	var _width:Int;
-	var _height:Int;
+	var _width:Int = 64;
+	var _height:Int = 28;
 	var _arrowWidth:Int = 16;
 	var _upHovered:Bool = false;
 	var _downHovered:Bool = false;
@@ -34,10 +35,9 @@ class ShadowStepper extends FlxSpriteGroup
 	var _scrollSpeed:Float = 40;
 	var _mousePos:FlxPoint = new FlxPoint();
 
-	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0, ?onChange:Float->Void, width:Int = 64)
+	public function new(x:Float, y:Float, stepSize:Float = 1, defaultValue:Float = 0, minValue:Float = -999, maxValue:Float = 999, decimalPlaces:Int = 0,
+			?onChange:Float->Void, width:Int = 64)
 	{
-		super(x, y);
-
 		step = stepSize;
 		min = minValue;
 		max = maxValue;
@@ -46,16 +46,17 @@ class ShadowStepper extends FlxSpriteGroup
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 
-		bg = new FlxSprite();
 		drawBackground();
+		
+		super(x, y);
 		add(bg);
 
 		var arrowHeight:Int = Std.int(_height / 2);
-		upArrow = new FlxSprite(_width - _arrowWidth, 0);
+		upArrow.setPosition(_width - _arrowWidth, 0);
 		drawUpArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(upArrow);
 
-		downArrow = new FlxSprite(_width - _arrowWidth, arrowHeight);
+		downArrow.setPosition(_width - _arrowWidth, arrowHeight);
 		drawDownArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(downArrow);
 

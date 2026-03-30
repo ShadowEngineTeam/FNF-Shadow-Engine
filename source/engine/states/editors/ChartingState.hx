@@ -383,7 +383,6 @@ class ChartingState extends MusicBeatState
 		add(nextRenderedSustains);
 		add(nextRenderedNotes);
 
-		
 		add(UI_box);
 
 		// RAAAHH ⚔💀🛡 -- mrchaoss
@@ -1083,7 +1082,7 @@ class ChartingState extends MusicBeatState
 
 		var row4:Int = row3 + ShadowStyle.HEIGHT_CHECKBOX + rowGap + 4;
 		tab_group.add(new ShadowLabel(pad, row4, "Note Texture (Player):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSkinInputText = new ShadowTextInput(pad, row4 + labelOffset, 250, editorPlayerArrowSkin != null ? editorPlayerArrowSkin : '', function(text:String)
+		noteSkinInputText = new ShadowTextInput(pad, row4 + labelOffset, 250, editorPlayerArrowSkin ?? '', function(text:String)
 		{
 			editorPlayerArrowSkin = text;
 		});
@@ -1092,7 +1091,7 @@ class ChartingState extends MusicBeatState
 
 		var row5:Int = row4 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row5, "Note Texture (Opponent):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin != null ? editorOpponentArrowSkin : '',
+		noteSkinInputText2 = new ShadowTextInput(pad, row5 + labelOffset, 250, editorOpponentArrowSkin ?? '',
 			function(text:String)
 			{
 				editorOpponentArrowSkin = text;
@@ -1102,7 +1101,7 @@ class ChartingState extends MusicBeatState
 
 		var row6:Int = row5 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row6, "Note Splashes Texture:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		noteSplashesInputText = new ShadowTextInput(pad, row6 + labelOffset, 150, _song.splashSkin != null ? _song.splashSkin : '', function(text:String)
+		noteSplashesInputText = new ShadowTextInput(pad, row6 + labelOffset, 150, _song.splashSkin ?? '', function(text:String)
 		{
 			_song.splashSkin = text;
 		});
@@ -1554,41 +1553,37 @@ class ChartingState extends MusicBeatState
 
 		var row0:Int = pad;
 		tab_group.add(new ShadowLabel(pad, row0, "Game Over Character:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar != null ? _song.gameOverChar : '',
-			function(text:String)
-			{
-				_song.gameOverChar = text;
-			});
+		gameOverCharacterInputText = new ShadowTextInput(pad, row0 + labelOffset, inputWidth, _song.gameOverChar ?? '', function(text:String)
+		{
+			_song.gameOverChar = text;
+		});
 		tab_group.add(gameOverCharacterInputText);
 		registerBlockerInput(gameOverCharacterInputText);
 
 		var row1:Int = row0 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row1, "Death Sound (sounds/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound != null ? _song.gameOverSound : '',
-			function(text:String)
-			{
-				_song.gameOverSound = text;
-			});
+		gameOverSoundInputText = new ShadowTextInput(pad, row1 + labelOffset, inputWidth, _song.gameOverSound ?? '', function(text:String)
+		{
+			_song.gameOverSound = text;
+		});
 		tab_group.add(gameOverSoundInputText);
 		registerBlockerInput(gameOverSoundInputText);
 
 		var row2:Int = row1 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row2, "Loop Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop != null ? _song.gameOverLoop : '',
-			function(text:String)
-			{
-				_song.gameOverLoop = text;
-			});
+		gameOverLoopInputText = new ShadowTextInput(pad, row2 + labelOffset, inputWidth, _song.gameOverLoop ?? '', function(text:String)
+		{
+			_song.gameOverLoop = text;
+		});
 		tab_group.add(gameOverLoopInputText);
 		registerBlockerInput(gameOverLoopInputText);
 
 		var row3:Int = row2 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row3, "Retry Music (music/):", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
-		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd != null ? _song.gameOverEnd : '',
-			function(text:String)
-			{
-				_song.gameOverEnd = text;
-			});
+		gameOverEndInputText = new ShadowTextInput(pad, row3 + labelOffset, inputWidth, _song.gameOverEnd ?? '', function(text:String)
+		{
+			_song.gameOverEnd = text;
+		});
 		tab_group.add(gameOverEndInputText);
 		registerBlockerInput(gameOverEndInputText);
 	}
@@ -1642,7 +1637,8 @@ class ChartingState extends MusicBeatState
 		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close',
+			ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -1668,7 +1664,7 @@ class ChartingState extends MusicBeatState
 		{
 			var playerVocals = Paths.voices(currentSongName,
 				(characterData.vocalsP1 == null || characterData.vocalsP1.length < 1) ? 'Player' : characterData.vocalsP1 + Difficulty.getSongPrefix());
-			vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
+			vocals.loadEmbedded(playerVocals ?? Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
 		}
 		vocals.autoDestroy = false;
 		FlxG.sound.list.add(vocals);
@@ -2179,13 +2175,13 @@ class ChartingState extends MusicBeatState
 						var increase:Float = 1 / snap;
 						if (FlxG.mouse.wheel > 0)
 						{
-							var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
-							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+							var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 						}
 						else
 						{
-							var fuck:Float = CoolUtil.quantize(beat, snap) + increase;
-							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+							var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 						}
 					}
 					pauseAndSetVocalsTime();
@@ -2224,13 +2220,13 @@ class ChartingState extends MusicBeatState
 					var increase:Float = 1 / snap;
 					if (FlxG.keys.pressed.UP)
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) - increase; // (Math.floor((beat+snap) / snap) * snap);
-						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase; // (Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 					}
 					else
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
-						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(quantizedBeat);
 					}
 				}
 			}
@@ -2283,7 +2279,7 @@ class ChartingState extends MusicBeatState
 					}
 				}
 
-				var feces:Float;
+				var targetTime:Float;
 				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
 				{
 					FlxG.sound.music.pause();
@@ -2298,15 +2294,15 @@ class ChartingState extends MusicBeatState
 					var increase:Float = 1 / snap;
 					if (FlxG.keys.pressed.UP)
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
-						feces = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) - increase;
+						targetTime = Conductor.beatToSeconds(quantizedBeat);
 					}
 					else
 					{
-						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
-						feces = Conductor.beatToSeconds(fuck);
+						var quantizedBeat:Float = CoolUtil.quantize(beat, snap) + increase; // (Math.floor((beat+snap) / snap) * snap);
+						targetTime = Conductor.beatToSeconds(quantizedBeat);
 					}
-					FlxTween.tween(FlxG.sound.music, {time: feces}, 0.1, {ease: FlxEase.circOut});
+					FlxTween.tween(FlxG.sound.music, {time: targetTime}, 0.1, {ease: FlxEase.circOut});
 					pauseAndSetVocalsTime();
 
 					var dastrum = 0;
@@ -2317,7 +2313,7 @@ class ChartingState extends MusicBeatState
 					}
 
 					var secStart:Float = sectionStartTime();
-					var datime:Float = (feces - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
+					var datime:Float = (targetTime - secStart) - (dastrum - secStart); // idk math find out why it doesn't work on any other section other than 0
 					if (curSelectedNote != null)
 					{
 						var controlArray:Array<Bool> = [
@@ -3663,7 +3659,7 @@ class ChartingState extends MusicBeatState
 
 		if (_song.notes[section] != null)
 			val = _song.notes[section].sectionBeats;
-		return val != null ? val : 4;
+		return val ?? 4;
 	}
 }
 

@@ -1,33 +1,39 @@
 package objects;
 
+@:nullSafety
 class AttachedText extends Alphabet
 {
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
-	public var sprTracker:FlxSprite;
+	public var sprTracker:Null<FlxSprite> = null;
 	public var copyVisible:Bool = true;
 	public var copyAlpha:Bool = false;
 
 	public function new(text:String = "", ?offsetX:Float = 0, ?offsetY:Float = 0, ?bold = false, ?scale:Float = 1)
 	{
+		var ox:Float = offsetX ?? 0;
+		var oy:Float = offsetY ?? 0;
+		var s:Float = scale ?? 1;
+
 		super(0, 0, text, bold);
 
-		this.setScale(scale);
+		this.setScale(s);
 		this.isMenuItem = false;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
+		this.offsetX = ox;
+		this.offsetY = oy;
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (sprTracker != null)
+		var tracker = sprTracker;
+		if (tracker != null)
 		{
-			setPosition(sprTracker.x + offsetX, sprTracker.y + offsetY);
+			setPosition(tracker.x + offsetX, tracker.y + offsetY);
 			if (copyVisible)
-				visible = sprTracker.visible;
+				visible = tracker.visible;
 
 			if (copyAlpha)
-				alpha = sprTracker.alpha;
+				alpha = tracker.alpha;
 		}
 
 		super.update(elapsed);

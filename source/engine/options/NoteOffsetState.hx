@@ -10,32 +10,33 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
+@:nullSafety
 class NoteOffsetState extends MusicBeatState
 {
 	var stageDirectory:String = 'week1';
-	var boyfriend:Character;
-	var gf:Character;
+	var boyfriend:Null<Character> = null;
+	var gf:Null<Character> = null;
 
-	public var camHUD:ShadowCamera;
-	public var camGame:ShadowCamera;
-	public var camOther:ShadowCamera;
+	public var camHUD:Null<ShadowCamera> = null;
+	public var camGame:Null<ShadowCamera> = null;
+	public var camOther:Null<ShadowCamera> = null;
 
-	var coolText:FlxText;
-	var rating:FlxSprite;
-	var comboNums:FlxSpriteGroup;
-	var dumbTexts:FlxTypedGroup<FlxText>;
+	var coolText:FlxText = new FlxText();
+	var rating:FlxSprite = new FlxSprite();
+	var comboNums:FlxSpriteGroup = new FlxSpriteGroup();
+	var dumbTexts:FlxTypedGroup<FlxText> = new FlxTypedGroup<FlxText>();
 
 	var barPercent:Float = 0;
 	var delayMin:Int = -500;
 	var delayMax:Int = 500;
-	var timeBar:Bar;
-	var timeTxt:FlxText;
-	var beatText:Alphabet;
-	var beatTween:FlxTween;
+	var timeBar:Null<Bar> = null;
+	var timeTxt:FlxText = new FlxText();
+	var beatText:Null<Alphabet> = null;
+	var beatTween:Null<FlxTween> = null;
 
-	var changeModeText:FlxText;
+	var changeModeText:FlxText = new FlxText();
 
-	var controllerPointer:FlxSprite;
+	var controllerPointer:Null<FlxSprite> = null;
 	var _lastControllerMode:Bool = false;
 
 	#if (target.threaded) var mutex:Mutex = new Mutex(); #end
@@ -85,7 +86,8 @@ class NoteOffsetState extends MusicBeatState
 		coolText.screenCenter();
 		coolText.x = FlxG.width * 0.35;
 
-		rating = new FlxSprite().loadGraphic(Paths.image('sick'));
+		var img = Paths.image('sick');
+		if (img != null) rating.loadGraphic(img);
 		rating.cameras = [camHUD];
 		rating.antialiasing = ClientPrefs.data.antialiasing;
 		rating.setGraphicSize(Std.int(rating.width * 0.7));
@@ -106,7 +108,9 @@ class NoteOffsetState extends MusicBeatState
 		var daLoop:Int = 0;
 		for (i in seperatedScore)
 		{
-			var numScore:FlxSprite = new FlxSprite(43 * daLoop).loadGraphic(Paths.image('num' + i));
+			var numScore:FlxSprite = new FlxSprite(43 * daLoop);
+			var numImg = Paths.image('num' + i);
+			if (numImg != null) numScore.loadGraphic(numImg);
 			numScore.cameras = [camHUD];
 			numScore.antialiasing = ClientPrefs.data.antialiasing;
 			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
@@ -178,11 +182,13 @@ class NoteOffsetState extends MusicBeatState
 		Thread.create(function()
 		{
 			mutex.acquire();
-			FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
+			var mus = Paths.music('offsetSong');
+			if (mus != null) FlxG.sound.playMusic(mus, 1, true);
 			mutex.release();
 		});
 		#else
-		FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
+		var mus2 = Paths.music('offsetSong');
+		if (mus2 != null) FlxG.sound.playMusic(mus2, 1, true);
 		#end
 
 		#if FEATURE_MOBILE_CONTROLS
@@ -221,10 +227,10 @@ class NoteOffsetState extends MusicBeatState
 		{
 			// trace('changed controller mode');
 			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
+			if (controllerPointer != null) controllerPointer.visible = controls.controllerMode;
 
 			// changed to controller mid state
-			if (controls.controllerMode)
+			if (controls.controllerMode && controllerPointer != null)
 			{
 				var mousePos = FlxG.mouse.getViewPosition(camHUD);
 				controllerPointer.x = mousePos.x;
@@ -238,7 +244,7 @@ class NoteOffsetState extends MusicBeatState
 		{
 			if (FlxG.keys.justPressed.ANY || FlxG.gamepads.anyJustPressed(ANY))
 			{
-				var controlArray:Array<Bool> = null;
+				var controlArray:Null<Array<Bool>> = null;
 				if (!controls.controllerMode)
 				{
 					controlArray = [
@@ -305,7 +311,7 @@ class NoteOffsetState extends MusicBeatState
 			var analogMoved:Bool = false;
 			var gamepadPressed:Bool = false;
 			var gamepadReleased:Bool = false;
-			if (controls.controllerMode)
+			if (controls.controllerMode && controllerPointer != null)
 			{
 				for (gamepad in FlxG.gamepads.getActiveGamepads())
 				{
@@ -327,7 +333,7 @@ class NoteOffsetState extends MusicBeatState
 				holdingObjectType = null;
 				if (!controls.controllerMode)
 					FlxG.mouse.getViewPosition(camHUD, startMousePos);
-				else
+				else if (controllerPointer != null)
 					controllerPointer.getScreenPosition(startMousePos, camHUD);
 
 				if (startMousePos.x - comboNums.x >= 0
@@ -361,16 +367,19 @@ class NoteOffsetState extends MusicBeatState
 			{
 				if (FlxG.mouse.justMoved || analogMoved)
 				{
-					var mousePos:FlxPoint = null;
+					var mousePos:Null<FlxPoint> = null;
 					if (!controls.controllerMode)
 						mousePos = FlxG.mouse.getViewPosition(camHUD);
-					else
+					else if (controllerPointer != null)
 						mousePos = controllerPointer.getScreenPosition(camHUD);
 
-					var addNum:Int = holdingObjectType ? 2 : 0;
-					ClientPrefs.data.comboOffset[addNum + 0] = Math.round((mousePos.x - startMousePos.x) + startComboOffset.x);
-					ClientPrefs.data.comboOffset[addNum + 1] = -Math.round((mousePos.y - startMousePos.y) - startComboOffset.y);
-					repositionCombo();
+					if (mousePos != null)
+					{
+						var addNum:Int = holdingObjectType ? 2 : 0;
+						ClientPrefs.data.comboOffset[addNum + 0] = Math.round((mousePos.x - startMousePos.x) + startComboOffset.x);
+						ClientPrefs.data.comboOffset[addNum + 1] = -Math.round((mousePos.y - startMousePos.y) - startComboOffset.y);
+						repositionCombo();
+					}
 				}
 			}
 
@@ -440,12 +449,18 @@ class NoteOffsetState extends MusicBeatState
 			if (OptionsState.onPlayState)
 			{
 				if (ClientPrefs.data.pauseMusic != 'None')
-					FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)));
+				{
+					var mus = Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic));
+					if (mus != null) FlxG.sound.playMusic(mus);
+				}
 				else
 					FlxG.sound.music.volume = 0;
 			}
 			else
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			{
+				var mus2 = Paths.music('freakyMenu');
+				if (mus2 != null) FlxG.sound.playMusic(mus2);
+			}
 			FlxG.mouse.visible = false;
 		}
 
@@ -453,7 +468,7 @@ class NoteOffsetState extends MusicBeatState
 		super.update(elapsed);
 	}
 
-	var zoomTween:FlxTween;
+	var zoomTween:Null<FlxTween> = null;
 	var lastBeatHit:Int = -1;
 
 	override public function beatHit()
@@ -467,9 +482,8 @@ class NoteOffsetState extends MusicBeatState
 
 		if (curBeat % 2 == 0)
 		{
-			boyfriend.dance();
-			if (!ClientPrefs.data.lowQuality)
-				gf.dance();
+			if (boyfriend != null) boyfriend.dance();
+			if (!ClientPrefs.data.lowQuality && gf != null) gf.dance();
 		}
 
 		if (curBeat % 4 == 2)
@@ -486,18 +500,21 @@ class NoteOffsetState extends MusicBeatState
 				}
 			});
 
+		if (beatText != null)
+		{
 			beatText.alpha = 1;
 			beatText.y = 320;
 			beatText.velocity.y = -150;
-			if (beatTween != null)
-				beatTween.cancel();
-			beatTween = FlxTween.tween(beatText, {alpha: 0}, 1, {
-				ease: FlxEase.sineIn,
-				onComplete: function(twn:FlxTween)
-				{
-					beatTween = null;
-				}
-			});
+		}
+		if (beatTween != null)
+			beatTween.cancel();
+		beatTween = FlxTween.tween(beatText, {alpha: 0}, 1, {
+			ease: FlxEase.sineIn,
+			onComplete: function(twn:FlxTween)
+			{
+				beatTween = null;
+			}
+		});
 		}
 
 		lastBeatHit = curBeat;
@@ -524,7 +541,7 @@ class NoteOffsetState extends MusicBeatState
 			text.scrollFactor.set();
 			text.borderSize = 2;
 			dumbTexts.add(text);
-			text.cameras = [camHUD];
+			if (camHUD != null) text.cameras = [camHUD];
 
 			if (i > 1)
 			{
@@ -563,16 +580,16 @@ class NoteOffsetState extends MusicBeatState
 		comboNums.visible = onComboMenu;
 		dumbTexts.visible = onComboMenu;
 
-		timeBar.visible = !onComboMenu;
+		if (timeBar != null) timeBar.visible = !onComboMenu;
 		timeTxt.visible = !onComboMenu;
-		beatText.visible = !onComboMenu;
+		if (beatText != null) beatText.visible = !onComboMenu;
 
-		controllerPointer.visible = false;
+		if (controllerPointer != null) controllerPointer.visible = false;
 		FlxG.mouse.visible = false;
 		if (onComboMenu)
 		{
 			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
+			if (controllerPointer != null) controllerPointer.visible = controls.controllerMode;
 		}
 
 		var str:String;

@@ -47,6 +47,7 @@ enum CharacterSpriteType
 	TEXTURE_ATLAS;
 }
 
+@:nullSafety
 class Character extends FlxAnimate
 {
 	/**
@@ -97,12 +98,10 @@ class Character extends FlxAnimate
 		super(x, y);
 
 		animOffsets = new Map<String, Array<Dynamic>>();
-		curCharacter = character;
-		this.isPlayer = isPlayer;
+		curCharacter = character ?? DEFAULT_CHARACTER;
+		this.isPlayer = isPlayer ?? false;
 		switch (curCharacter)
 		{
-			// case 'your character name in case you want to hardcode them instead':
-
 			default:
 				var characterPath:String = 'characters/$curCharacter.json';
 
@@ -115,6 +114,7 @@ class Character extends FlxAnimate
 					alpha = 0.6;
 				}
 
+				@:nullSafety(Off)
 				try
 				{
 					loadCharacterFile(Json.parse(File.getContent(path), path));
@@ -152,8 +152,11 @@ class Character extends FlxAnimate
 			spriteType = MULTI_ATLAS;
 			isAnimateAtlas = false;
 			isMultiAtlas = true;
-			frames = Paths.getAtlas(json.image[0]);
-			final split:Array<String> = json.image;
+			var imgArray:Array<String> = json.image;
+			var atlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getAtlas(imgArray[0]);
+			if (atlas != null)
+				frames = atlas;
+			final split:Array<String> = imgArray;
 			if (frames != null)
 				for (imgFile in split)
 				{
@@ -161,24 +164,29 @@ class Character extends FlxAnimate
 					if (daAtlas != null)
 						cast(frames, flixel.graphics.frames.FlxAtlasFrames).addAtlas(daAtlas);
 				}
-			imageFile = json.image[0];
+			imageFile = imgArray[0];
 		}
 		else
 		{
-			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
+			var imgPath:String = json.image;
+			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(imgPath, 'png')}', IMAGE))
 			{
 				spriteType = TEXTURE_ATLAS;
 				isAnimateAtlas = true;
 				isMultiAtlas = false;
-				frames = Paths.getTextureAtlas(json.image);
+				var texAtlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getTextureAtlas(imgPath);
+				if (texAtlas != null)
+					frames = texAtlas;
 			}
 			else
 			{
 				spriteType = SPRITE;
 				isMultiAtlas = isAnimateAtlas = false;
-				frames = Paths.getAtlas(json.image);
+				var sprAtlas:Null<flixel.graphics.frames.FlxAtlasFrames> = Paths.getAtlas(imgPath);
+				if (sprAtlas != null)
+					frames = sprAtlas;
 			}
-			imageFile = json.image;
+			imageFile = imgPath;
 		}
 
 		jsonScale = json.scale;
@@ -197,7 +205,7 @@ class Character extends FlxAnimate
 		singDuration = json.sing_duration;
 		flipX = (json.flip_x != isPlayer);
 		healthColorArray = (json.healthbar_colors != null && json.healthbar_colors.length > 2) ? json.healthbar_colors : [161, 161, 161];
-		vocalsFile = json.vocals_file != null ? json.vocals_file : '';
+		vocalsFile = json.vocals_file ?? '';
 		originalFlipX = (json.flip_x == true);
 		editorIsPlayer = json._editor_isPlayer;
 
@@ -220,7 +228,8 @@ class Character extends FlxAnimate
 				switch (spriteType)
 				{
 					case TEXTURE_ATLAS:
-						if (anim.isFrameLabel)
+						var isFrameLabel:Bool = anim.isFrameLabel ?? false;
+						if (isFrameLabel)
 						{
 							if (animIndices != null && animIndices.length > 0)
 								this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop);
@@ -260,7 +269,7 @@ class Character extends FlxAnimate
 
 		if (heyTimer > 0)
 		{
-			var rate:Float = (PlayState.instance != null ? PlayState.instance.playbackRate : 1.0);
+			var rate:Float = PlayState.instance?.playbackRate ?? 1.0;
 			heyTimer -= elapsed * rate;
 			if (heyTimer <= 0)
 			{
@@ -381,10 +390,10 @@ class Character extends FlxAnimate
 
 		if (animOffsets.exists(AnimName))
 		{
-			var daOffset = animOffsets.get(AnimName);
-			offset.set(daOffset[0], daOffset[1]);
+			var animOffset:Null<Array<Dynamic>> = animOffsets.get(AnimName);
+			if (animOffset != null)
+				offset.set(animOffset[0], animOffset[1]);
 		}
-		// else offset.set(0, 0);
 
 		if (curCharacter.startsWith('gf-') || curCharacter == 'gf')
 		{

@@ -11,6 +11,7 @@ import hxluajit.Types;
  * @author DragShot
  */
 @:allow(psychlua.Convert)
+@:nullSafety
 class LuaFunction
 {
 	@:noCompletion

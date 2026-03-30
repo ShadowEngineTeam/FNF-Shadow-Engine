@@ -9,6 +9,7 @@ import flixel.system.macros.FlxMacroUtil;
  * @author Karim Akra
  */
 @:runtimeValue
+@:nullSafety
 enum abstract MobileInputID(Int) from Int to Int
 {
 	public static var fromStringMap(default, null):Map<String, MobileInputID> = FlxMacroUtil.buildMap("mobile.input.MobileInputID");
@@ -67,16 +68,18 @@ enum abstract MobileInputID(Int) from Int to Int
 	var EXTRA_2 = 43;
 
 	@:from
-	public static inline function fromString(s:String)
+	public static inline function fromString(s:String):MobileInputID
 	{
 		s = s.toUpperCase();
-		return fromStringMap.exists(s) ? fromStringMap.get(s) : NONE;
+		final result = fromStringMap.get(s);
+		return result != null ? result : NONE;
 	}
 
 	@:to
 	public inline function toString():String
 	{
-		return toStringMap.get(this);
+		final result = toStringMap.get(this);
+		return result != null ? result : '';
 	}
 }
 #end

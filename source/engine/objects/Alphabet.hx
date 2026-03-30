@@ -7,9 +7,10 @@ enum Alignment
 	RIGHT;
 }
 
+@:nullSafety
 class Alphabet extends FlxSpriteGroup
 {
-	public var text(default, set):String;
+	public var text(default, set):String = "";
 
 	public var bold:Bool = false;
 	public var letters:Array<AlphaCharacter> = [];
@@ -33,7 +34,7 @@ class Alphabet extends FlxSpriteGroup
 
 		this.startPosition.x = x;
 		this.startPosition.y = y;
-		this.bold = bold;
+		this.bold = (bold == null) ? false : bold;
 		this.text = text;
 
 		moves = false;

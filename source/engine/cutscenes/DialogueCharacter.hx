@@ -22,13 +22,14 @@ typedef DialogueCharacterFile =
 	var scale:Float;
 }
 
+@:nullSafety
 class DialogueCharacter extends FlxSprite
 {
 	private static var IDLE_SUFFIX:String = '-IDLE';
 	public static var DEFAULT_CHARACTER:String = 'bf';
 	public static var DEFAULT_SCALE:Float = 0.7;
 
-	public var jsonFile:DialogueCharacterFile = null;
+	public var jsonFile:Null<DialogueCharacterFile> = null;
 	public var dialogueAnimations:Map<String, DialogueAnimArray> = new Map<String, DialogueAnimArray>();
 
 	public var startingPos:Float = 0; // For center characters, it works as the starting Y, for everything else it works as starting X
@@ -46,11 +47,17 @@ class DialogueCharacter extends FlxSprite
 		this.curCharacter = character;
 
 		reloadCharacterJson(character);
-		frames = Paths.getSparrowAtlas('dialogue/' + jsonFile.image);
+		if (jsonFile != null)
+		{
+			var img:String = jsonFile.image;
+			var atlas = Paths.getSparrowAtlas('dialogue/' + img);
+			if (atlas != null)
+				frames = atlas;
+		}
 		reloadAnimations();
 
 		antialiasing = ClientPrefs.data.antialiasing;
-		if (jsonFile.no_antialiasing == true)
+		if (jsonFile != null && jsonFile.no_antialiasing == true)
 			antialiasing = false;
 	}
 
@@ -68,14 +75,15 @@ class DialogueCharacter extends FlxSprite
 		if (!FileSystem.exists(path))
 			path = Paths.getSharedPath(defaultPath);
 
-		var rawJson:String = File.getContent(path);
-		jsonFile = cast Json.parse(rawJson, path);
+		var rawJson:Null<String> = File.getContent(path);
+		if (rawJson != null)
+			jsonFile = cast Json.parse(rawJson, path);
 	}
 
 	public function reloadAnimations()
 	{
 		dialogueAnimations.clear();
-		if (jsonFile.animations != null && jsonFile.animations.length > 0)
+		if (jsonFile != null && jsonFile.animations != null && jsonFile.animations.length > 0)
 		{
 			for (anim in jsonFile.animations)
 			{
@@ -86,9 +94,9 @@ class DialogueCharacter extends FlxSprite
 		}
 	}
 
-	public function playAnim(animName:String = null, playIdle:Bool = false)
+	public function playAnim(animName:Null<String> = null, playIdle:Bool = false)
 	{
-		var leAnim:String = animName;
+		var targetAnim:Null<String> = animName;
 		if (animName == null || !dialogueAnimations.exists(animName)) // Anim is null, get a random animation
 		{
 			var arrayAnims:Array<String> = [];
@@ -98,38 +106,41 @@ class DialogueCharacter extends FlxSprite
 			}
 			if (arrayAnims.length > 0)
 			{
-				leAnim = arrayAnims[FlxG.random.int(0, arrayAnims.length - 1)];
+				targetAnim = arrayAnims[FlxG.random.int(0, arrayAnims.length - 1)];
 			}
 		}
 
-		if (dialogueAnimations.exists(leAnim)
-			&& (dialogueAnimations.get(leAnim).loop_name == null
-				|| dialogueAnimations.get(leAnim).loop_name.length < 1
-				|| dialogueAnimations.get(leAnim).loop_name == dialogueAnimations.get(leAnim).idle_name))
+		if (targetAnim != null && dialogueAnimations.exists(targetAnim))
 		{
-			playIdle = true;
-		}
-		animation.play(playIdle ? leAnim + IDLE_SUFFIX : leAnim, false);
-
-		if (dialogueAnimations.exists(leAnim))
-		{
-			var anim:DialogueAnimArray = dialogueAnimations.get(leAnim);
-			if (playIdle)
+			var animData:Null<DialogueAnimArray> = dialogueAnimations.get(targetAnim);
+			if (animData != null && (animData.loop_name == null || animData.loop_name.length < 1 || animData.loop_name == animData.idle_name))
 			{
-				offset.set(anim.idle_offsets[0], anim.idle_offsets[1]);
-				// trace('Setting idle offsets: ' + anim.idle_offsets);
+				playIdle = true;
 			}
-			else
+		}
+		if (targetAnim != null)
+			animation.play(playIdle ? targetAnim + IDLE_SUFFIX : targetAnim, false);
+
+		if (targetAnim != null && dialogueAnimations.exists(targetAnim))
+		{
+			var anim:Null<DialogueAnimArray> = dialogueAnimations.get(targetAnim);
+			if (anim != null)
 			{
-				offset.set(anim.loop_offsets[0], anim.loop_offsets[1]);
-				// trace('Setting loop offsets: ' + anim.loop_offsets);
+				if (playIdle)
+				{
+					offset.set(anim.idle_offsets[0], anim.idle_offsets[1]);
+				}
+				else
+				{
+					offset.set(anim.loop_offsets[0], anim.loop_offsets[1]);
+				}
 			}
 		}
 		else
 		{
 			offset.set(0, 0);
 			trace('Offsets not found! Dialogue character is badly formatted, anim: '
-				+ leAnim
+				+ targetAnim
 				+ ', '
 				+ (playIdle ? 'idle anim' : 'loop anim'));
 		}

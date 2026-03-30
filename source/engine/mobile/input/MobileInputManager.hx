@@ -8,6 +8,7 @@ import haxe.ds.Map;
  * A TouchButton group with functions for input handling
  * @author Karim Akra
  */
+@:nullSafety
 class MobileInputManager extends FlxTypedSpriteGroup<TouchButton>
 {
 	/**

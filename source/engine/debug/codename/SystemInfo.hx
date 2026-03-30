@@ -26,6 +26,7 @@ using StringTools;
 @:headerInclude('sys/utsname.h')
 #end
 #end
+@:nullSafety
 class SystemInfo extends FramerateCategory
 {
 	public static var osInfo:String = "Unknown";
@@ -83,8 +84,9 @@ class SystemInfo extends FramerateCategory
 		}
 		#elseif windows
 		var windowsCurrentVersionPath = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-		var buildNumber = Std.parseInt(RegistryUtil.get(HKEY_LOCAL_MACHINE, windowsCurrentVersionPath, "CurrentBuildNumber"));
-		var edition = RegistryUtil.get(HKEY_LOCAL_MACHINE, windowsCurrentVersionPath, "ProductName");
+		var buildNumStr = RegistryUtil.get(HKEY_LOCAL_MACHINE, windowsCurrentVersionPath, "CurrentBuildNumber");
+		var buildNumber:Int = (buildNumStr != null) ? Std.parseInt(buildNumStr) ?? 0 : 0;
+		var edition:String = RegistryUtil.get(HKEY_LOCAL_MACHINE, windowsCurrentVersionPath, "ProductName") ?? "Unknown";
 
 		var lcuKey = "WinREVersion"; // Last Cumulative Update Key On Older Windows Versions
 		if (buildNumber >= 22000) // Windows 11 Initial Release Build Number
@@ -116,7 +118,7 @@ class SystemInfo extends FramerateCategory
 		try
 		{
 			#if windows
-			cpuName = RegistryUtil.get(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "ProcessorNameString");
+			cpuName = RegistryUtil.get(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "ProcessorNameString") ?? "Unknown";
 			#elseif mac
 			var process = new Process("sysctl -a | grep brand_string"); // Somehow this isn't able to use the args but it still works
 			if (process.exitCode() != 0)
