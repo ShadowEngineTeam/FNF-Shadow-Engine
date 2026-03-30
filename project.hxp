@@ -157,7 +157,7 @@ class Project extends HXProject
 
 		if (targetPlatform.startsWith("Web") || targetPlatform.startsWith("Hashlink") || targetPlatform == "Unknown")
 		{
-			trace('Unsupported platform: ${targetPlatform}');
+			error('Unsupported platform: ${targetPlatform}');
 			Sys.exit(1);
 		}
 	}
@@ -305,7 +305,6 @@ class Project extends HXProject
 
 		if (isMobile())
 			setHaxedef("SHARE_MOBILE_FILES");
-		setHaxedef("loop_unroll_max_cost", "25");
 
 		if (FEATURE_DCE.isDisabled())
 		{
