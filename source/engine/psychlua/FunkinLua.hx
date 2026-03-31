@@ -1783,7 +1783,7 @@ class FunkinLua
 			var isString:Bool = !FileSystem.exists(scriptName);
 			var result:Dynamic = null;
 			if (!isString)
-				result = sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : LuaL.dostring(lua, File.getContent(scriptName));
+				result = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
 			else
 				result = LuaL.dostring(lua, scriptName);
 
@@ -2104,5 +2104,5 @@ class FunkinLua
 }
 
 #if FEATURE_LUA
-typedef State = cpp.RawPointer<Lua_State>;
+typedef State = hxluajit.Types.Lua_State;
 #end

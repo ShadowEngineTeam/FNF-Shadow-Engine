@@ -15,7 +15,7 @@ extern #end class Memory
 	public static function getCurrentUsage():#if cpp cpp.SizeT #else Float #end
 	{
 		#if html5
-		return openfl.system.System.totalMemory / 1024 / 1024;
+		return openfl.system.System.totalMemory;
 		#elseif !cpp
 		return 0.0;
 		#end
