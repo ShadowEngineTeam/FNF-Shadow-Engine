@@ -46,7 +46,7 @@ class RenderTexture implements IFlxDestroyable
 
 		_bitmaps = [];
 		_camera = new FlxCamera();
-		_matrix = new FlxMatrix();
+		_matrix = FilterRenderer.matrixPool.get();
 
 		init(width, height);
 	}
@@ -94,6 +94,8 @@ class RenderTexture implements IFlxDestroyable
 		_currentBitmap = null;
 
 		_camera = FlxDestroyUtil.destroy(_camera);
+
+		FilterRenderer.matrixPool.release(_matrix);
 		_matrix = null;
 
 		graphic = FlxDestroyUtil.destroy(graphic);
