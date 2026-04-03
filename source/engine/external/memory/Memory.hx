@@ -11,13 +11,15 @@ extern #end class Memory
 {
 	#if cpp
 	@:native("getMemoryUsage")
-	#end
-	public static function getCurrentUsage():#if cpp cpp.SizeT #else Float #end
+	public static function getCurrentUsage():cpp.SizeT;
+	#else
+	public static inline function getCurrentUsage():Float
 	{
 		#if html5
 		return openfl.system.System.totalMemory;
-		#elseif !cpp
+		#else
 		return 0.0;
 		#end
 	}
+	#end
 }
