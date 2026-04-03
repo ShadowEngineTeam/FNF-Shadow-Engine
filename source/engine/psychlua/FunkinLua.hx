@@ -2104,5 +2104,5 @@ class FunkinLua
 }
 
 #if FEATURE_LUA
-typedef State = hxluajit.Types.Lua_State;
+typedef State = cpp.RawPointer<Lua_State>;
 #end
