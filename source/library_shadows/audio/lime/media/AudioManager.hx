@@ -181,20 +181,21 @@ class AudioManager
 		alConfig.push('drivers=sdl3,null');
 		// alConfig.push('frequency=44100'); // FNF songs are usually 44.1kHz
 		alConfig.push('sample-type=float32');
-		alConfig.push('stereo-mode=speakers');
+		// alConfig.push('stereo-mode=speakers');
 		alConfig.push('channels=stereo');
 		alConfig.push('hrtf=false');
 		alConfig.push('cf_level=0');
 		alConfig.push('output-limiter=false');
-		alConfig.push('front-stablizer=false');
+		alConfig.push('front-stabilizer=false');
 		alConfig.push('volume-adjust=0');
 		alConfig.push('period_size=128');
 		alConfig.push('periods=2');
 		alConfig.push('sources=256');
 		alConfig.push('sends=16');
 		alConfig.push('dither=false');
+		// alConfig.push('resampler=bsinc12');
 		alConfig.push('resampler=bsinc24');
-		alConfig.push('rt-prio=1');
+		alConfig.push('rt-prio=10');
 
 		alConfig.push('[decoder]');
 		alConfig.push('hq-mode=true');
@@ -203,7 +204,7 @@ class AudioManager
 
 		// WASAPI
 		alConfig.push('[wasapi]');
-		alConfig.push('allow-resampler=false');
+		// alConfig.push('allow-resampler=false');
 		alConfig.push('exclusive=true');
 
 		// AAudio
@@ -211,7 +212,7 @@ class AudioManager
 		alConfig.push('performance-mode=low-latency'); 
 		alConfig.push('usage-type=game'); 
 		alConfig.push('content-type=music');
-		alConfig.push('allow-resampler=false');
+		// alConfig.push('allow-resampler=false');
 
 		// OpenSL ES
 		alConfig.push('[opensl]');
@@ -231,7 +232,7 @@ class AudioManager
 		// ALSA
 		alConfig.push('[alsa]');
 		alConfig.push('device=default');
-		alConfig.push('allow-resampler=false');
+		// alConfig.push('allow-resampler=false');
 		alConfig.push('mmap=true');
 
 		// CoreAudio
