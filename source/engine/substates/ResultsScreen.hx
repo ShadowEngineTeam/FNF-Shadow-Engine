@@ -191,6 +191,7 @@ class ResultsScreen extends MusicBeatSubstate
 		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end controls.RESET)
 		{
 			PlayState.instance.paused = true; // For lua
+			music.stop();
 			FlxG.sound.music.volume = 0;
 			PlayState.instance.vocals.volume = 0;
 
