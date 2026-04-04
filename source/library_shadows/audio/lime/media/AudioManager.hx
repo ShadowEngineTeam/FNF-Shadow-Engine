@@ -211,14 +211,12 @@ class AudioManager
 
 		// WASAPI
 		#if windows
-		alConfig.push('\n');
 		alConfig.push('[wasapi]');
 		alConfig.push('exclusive-mode=true');
 		#end
 
 		// AAudio
 		#if android
-		alConfig.push('\n');
 		alConfig.push('[aaudio]');
 		alConfig.push('performance-mode=low-latency');
 		alConfig.push('usage-type=game');
@@ -227,19 +225,18 @@ class AudioManager
 
 		// OpenSL ES
 		#if android
-		alConfig.push('\n');
 		alConfig.push('[opensl]');
 		alConfig.push('buffer-size=128');
 		#end
 
 		// PipeWire
-		alConfig.push('\n');
+		#if linux
 		alConfig.push('[pipewire]');
 		alConfig.push('rt-mix=true');
+		#end
 
 		// PulseAudio
 		#if linux
-		alConfig.push('\n');
 		alConfig.push('[pulse]');
 		alConfig.push('allow-moves=false');
 		alConfig.push('fix-rate=true');
@@ -248,7 +245,6 @@ class AudioManager
 
 		// ALSA
 		#if linux
-		alConfig.push('\n');
 		alConfig.push('[alsa]');
 		alConfig.push('device=default');
 		alConfig.push('mmap=true');
@@ -256,7 +252,6 @@ class AudioManager
 
 		// CoreAudio
 		#if (mac || ios)
-		alConfig.push('\n');
 		alConfig.push('[coreaudio]');
 		alConfig.push('buffer-size=128');
 		#end
