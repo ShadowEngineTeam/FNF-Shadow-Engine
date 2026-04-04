@@ -178,7 +178,17 @@ class AudioManager
 		final alConfig:Array<String> = [];
 
 		alConfig.push('[general]');
-		alConfig.push('drivers=sdl3,null');
+		// alConfig.push('drivers=sdl3,null');
+		#if windows
+		alConfig.push('drivers=wasapi,winmm,dsound,null');
+		#elseif linux
+		alConfig.push('drivers=pipewire,pulse,alsa,jack,oss,null');
+		#elseif (mac || ios)
+		alConfig.push('drivers=coreaudio,null');
+		#elseif android
+		// alConfig.push('drivers=oboe,opensl,null');
+		alConfig.push('drivers=oboe,null');
+		#end
 		alConfig.push('sample-type=float32');
 		alConfig.push('channels=stereo');
 		alConfig.push('stereo-encoding=basic');
@@ -191,42 +201,65 @@ class AudioManager
 		alConfig.push('sources=256');
 		alConfig.push('sends=2');
 		alConfig.push('dither=false');
+		/*#if mobile
+		alConfig.push('resampler=fast_bsinc24');
+		#else*/
 		alConfig.push('resampler=bsinc24');
+		//#end
 		alConfig.push('rt-prio=10');
 		alConfig.push('rt-time-limit=true');
 
 		// WASAPI
+		#if windows
+		alConfig.push('\n');
 		alConfig.push('[wasapi]');
 		alConfig.push('exclusive-mode=true');
+		#end
 
 		// AAudio
+		#if android
+		alConfig.push('\n');
 		alConfig.push('[aaudio]');
 		alConfig.push('performance-mode=low-latency');
 		alConfig.push('usage-type=game');
 		alConfig.push('content-type=music');
+		#end
 
 		// OpenSL ES
+		#if android
+		alConfig.push('\n');
 		alConfig.push('[opensl]');
 		alConfig.push('buffer-size=128');
+		#end
 
 		// PipeWire
+		alConfig.push('\n');
 		alConfig.push('[pipewire]');
 		alConfig.push('rt-mix=true');
 
 		// PulseAudio
+		#if linux
+		alConfig.push('\n');
 		alConfig.push('[pulse]');
 		alConfig.push('allow-moves=false');
 		alConfig.push('fix-rate=true');
 		alConfig.push('adjust-latency=false');
+		#end
 
 		// ALSA
+		#if linux
+		alConfig.push('\n');
 		alConfig.push('[alsa]');
 		alConfig.push('device=default');
 		alConfig.push('mmap=true');
+		#end
 
 		// CoreAudio
+		#if (mac || ios)
+		alConfig.push('\n');
 		alConfig.push('[coreaudio]');
 		alConfig.push('buffer-size=128');
+		#end
 
 		try
 		{
@@ -235,6 +268,11 @@ class AudioManager
 			final content:String = alConfig.join('\n');
 
 			if (!FileSystem.exists(directory)) FileSystem.createDirectory(directory);
+
+			#if mobile
+			// deleting the config file on mobile as we can't reach the file ourselves
+			if (FileSystem.exists(path)) FileSystem.deleteFile(path);
+			#end
 
 			if (!FileSystem.exists(path)) File.saveContent(path, content);
 
