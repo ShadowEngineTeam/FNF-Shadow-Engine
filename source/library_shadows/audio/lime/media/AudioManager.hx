@@ -215,20 +215,6 @@ class AudioManager
 		alConfig.push('exclusive-mode=true');
 		#end
 
-		// AAudio
-		#if android
-		alConfig.push('[aaudio]');
-		alConfig.push('performance-mode=low-latency');
-		alConfig.push('usage-type=game');
-		alConfig.push('content-type=music');
-		#end
-
-		// OpenSL ES
-		#if android
-		alConfig.push('[opensl]');
-		alConfig.push('buffer-size=128');
-		#end
-
 		// PipeWire
 		#if linux
 		alConfig.push('[pipewire]');
@@ -246,14 +232,7 @@ class AudioManager
 		// ALSA
 		#if linux
 		alConfig.push('[alsa]');
-		alConfig.push('device=default');
 		alConfig.push('mmap=true');
-		#end
-
-		// CoreAudio
-		#if (mac || ios)
-		alConfig.push('[coreaudio]');
-		alConfig.push('buffer-size=128');
 		#end
 
 		try
