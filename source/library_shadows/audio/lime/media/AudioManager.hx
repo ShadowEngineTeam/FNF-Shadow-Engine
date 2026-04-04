@@ -177,42 +177,33 @@ class AudioManager
 		#if (lime_openal || lime_openalsoft)
 		final alConfig:Array<String> = [];
 
-		alConfig.push('[General]');
+		alConfig.push('[general]');
 		alConfig.push('drivers=sdl3,null');
-		// alConfig.push('frequency=44100'); // FNF songs are usually 44.1kHz
 		alConfig.push('sample-type=float32');
-		// alConfig.push('stereo-mode=speakers');
 		alConfig.push('channels=stereo');
-		alConfig.push('hrtf=false');
+		alConfig.push('stereo-encoding=basic');
 		alConfig.push('cf_level=0');
 		alConfig.push('output-limiter=false');
-		alConfig.push('front-stabilizer=false');
+		alConfig.push('front-stablizer=false');
 		alConfig.push('volume-adjust=0');
 		alConfig.push('period_size=128');
 		alConfig.push('periods=2');
 		alConfig.push('sources=256');
-		alConfig.push('sends=16');
+		alConfig.push('sends=2');
 		alConfig.push('dither=false');
-		// alConfig.push('resampler=bsinc12');
 		alConfig.push('resampler=bsinc24');
 		alConfig.push('rt-prio=10');
-
-		alConfig.push('[decoder]');
-		alConfig.push('hq-mode=true');
-		alConfig.push('distance-comp=true');
-		alConfig.push('nfc=false');
+		alConfig.push('rt-time-limit=true');
 
 		// WASAPI
 		alConfig.push('[wasapi]');
-		// alConfig.push('allow-resampler=false');
-		alConfig.push('exclusive=true');
+		alConfig.push('exclusive-mode=true');
 
 		// AAudio
 		alConfig.push('[aaudio]');
-		alConfig.push('performance-mode=low-latency'); 
-		alConfig.push('usage-type=game'); 
+		alConfig.push('performance-mode=low-latency');
+		alConfig.push('usage-type=game');
 		alConfig.push('content-type=music');
-		// alConfig.push('allow-resampler=false');
 
 		// OpenSL ES
 		alConfig.push('[opensl]');
@@ -221,18 +212,16 @@ class AudioManager
 		// PipeWire
 		alConfig.push('[pipewire]');
 		alConfig.push('rt-mix=true');
-		alConfig.push('allow-moves=false');
 
 		// PulseAudio
 		alConfig.push('[pulse]');
 		alConfig.push('allow-moves=false');
+		alConfig.push('fix-rate=true');
 		alConfig.push('adjust-latency=false');
-		alConfig.push('fragment-size=128');
 
 		// ALSA
 		alConfig.push('[alsa]');
 		alConfig.push('device=default');
-		// alConfig.push('allow-resampler=false');
 		alConfig.push('mmap=true');
 
 		// CoreAudio
