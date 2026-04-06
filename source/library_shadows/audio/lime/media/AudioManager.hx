@@ -211,8 +211,8 @@ class AudioManager
 
 		// WASAPI
 		#if windows
-		alConfig.push('[wasapi]');
-		alConfig.push('exclusive-mode=true');
+		// alConfig.push('[wasapi]');
+		// alConfig.push('exclusive-mode=true');
 		#end
 
 		// PipeWire
