@@ -180,13 +180,12 @@ class AudioManager
 		alConfig.push('[general]');
 		// alConfig.push('drivers=sdl3,null');
 		#if windows
-		alConfig.push('drivers=wasapi,winmm,dsound,null');
+		alConfig.push('drivers=wasapi,dsound,winmm,null');
 		#elseif linux
 		alConfig.push('drivers=pipewire,pulse,alsa,jack,oss,null');
 		#elseif (mac || ios)
 		alConfig.push('drivers=coreaudio,null');
 		#elseif android
-		// alConfig.push('drivers=oboe,opensl,null');
 		alConfig.push('drivers=oboe,null');
 		#end
 		alConfig.push('sample-type=float32');
@@ -196,18 +195,27 @@ class AudioManager
 		alConfig.push('output-limiter=false');
 		alConfig.push('front-stablizer=false');
 		alConfig.push('volume-adjust=0');
-		alConfig.push('period_size=128');
-		alConfig.push('periods=2');
+		#if android
+		alConfig.push('period_size=882');
+		#else
+		alConfig.push('period_size=441');
+		#end
+		alConfig.push('periods=3');
 		alConfig.push('sources=256');
 		alConfig.push('sends=2');
 		alConfig.push('dither=false');
-		/*#if mobile
-		alConfig.push('resampler=fast_bsinc24');
-		#else*/
+		#if android
+		alConfig.push('resampler=bsinc12');
+		#else
 		alConfig.push('resampler=bsinc24');
-		//#end
+		#end
 		alConfig.push('rt-prio=10');
 		alConfig.push('rt-time-limit=true');
+
+		alConfig.push('[decoder]');
+		alConfig.push('hq-mode=true');
+		alConfig.push('distance-comp=true');
+		alConfig.push('nfc=false');
 
 		// WASAPI
 		#if windows
@@ -237,16 +245,12 @@ class AudioManager
 
 		try
 		{
-			final directory:String = #if (mobile || mac) Path.directory(Path.withoutExtension(System.applicationStorageDirectory)) #else Sys.getCwd() #end;
+			final directory:String = #if mobile StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
 			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
 			final content:String = alConfig.join('\n');
 
-			if (!FileSystem.exists(directory)) FileSystem.createDirectory(directory);
-
-			#if mobile
-			// deleting the config file on mobile as we can't reach the file ourselves
-			if (FileSystem.exists(path)) FileSystem.deleteFile(path);
-			#end
+			if (!FileSystem.exists(directory))
+				FileSystem.createDirectory(directory);
 
 			if (!FileSystem.exists(path)) File.saveContent(path, content);
 
