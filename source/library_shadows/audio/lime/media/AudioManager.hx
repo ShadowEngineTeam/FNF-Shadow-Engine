@@ -245,7 +245,7 @@ class AudioManager
 
 		try
 		{
-			final directory:String = #if mobile StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
+			final directory:String = #if mobile mobile.backend.StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
 			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
 			final content:String = alConfig.join('\n');
 

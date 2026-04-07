@@ -651,10 +651,12 @@ class Shader
 		if (__context.__context.type == OPENGL)
 		{
 			complexBlendsSupported = complexBlendsSupported && (glVersion == "150" || !StringTools.startsWith(glVersion, "1"));
+			standardDerivativesSupported = false;
 		}
 		else if (__context.__context.type == OPENGLES)
 		{
 			complexBlendsSupported = complexBlendsSupported && !StringTools.startsWith(glVersion, "1");
+			standardDerivativesSupported = standardDerivativesSupported && !StringTools.startsWith(glVersion, "3");
 		}
 		#end
 

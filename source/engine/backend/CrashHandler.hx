@@ -109,7 +109,7 @@ class CrashHandler
 			File.saveContent(folder + Date.now().toString().replace(' ', '-').replace(':', "'") + '.txt', message);
 		}
 		catch (e:haxe.Exception)
-			trace('Couldn\'t save error message. (${e.message})');
+			trace(message);
 	}
 	#end
 }
