@@ -48,21 +48,24 @@ class AudioManager
 
 					var alc = context.openal;
 					var device = alc.openDevice();
-					var ctx = alc.createContext(device);
-
-					alc.makeContextCurrent(ctx);
-					alc.processContext(ctx);
-
-					#if !(neko || mobile)
-					if (alc.isExtensionPresent('ALC_SOFT_system_events', device) && alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+					if (device != null)
 					{
-						alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
+						var ctx = alc.createContext(device);
+						alc.makeContextCurrent(ctx);
+						alc.processContext(ctx);
 
-						alc.eventControlSOFT([ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT, ALC.EVENT_TYPE_DEVICE_ADDED_SOFT, ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT], true);
+						#if (lime_openalsoft && !mobile)
+						if (alc.isExtensionPresent('ALC_SOFT_system_events', device) && alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+						{
+							if (alc.isExtensionPresent('AL_SOFT_hold_on_disconnect'))
+								alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
 
-						alc.eventCallbackSOFT(deviceEventCallback);
+							alc.eventControlSOFT([ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT, ALC.EVENT_TYPE_DEVICE_ADDED_SOFT, ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT], true);
+
+							alc.eventCallbackSOFT(deviceEventCallback);
+						}
+						#end
 					}
-					#end
 				}
 				#end
 			}
@@ -136,12 +139,9 @@ class AudioManager
 		#end
 	}
 
+	#if lime_openalsoft
 	@:noCompletion
-	#if hl
-	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:hl.Bytes):Void
-	#else
-	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:String):Void
-	#end
+	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:#if hl hl.Bytes #else String #end):Void
 	{
 		#if !lime_doc_gen
 		if (eventType == ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT && deviceType == ALC.PLAYBACK_DEVICE_SOFT)
@@ -170,6 +170,7 @@ class AudioManager
 		}
 		#end
 	}
+	#end
 
 	@:noCompletion
 	private static function setupConfig():Void
