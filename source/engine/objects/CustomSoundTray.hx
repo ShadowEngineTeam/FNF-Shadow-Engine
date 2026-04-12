@@ -5,7 +5,6 @@ import flixel.system.frontEnds.SoundFrontEnd;
 import flixel.system.ui.FlxSoundTray;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
-import openfl.media.Sound;
 
 class CustomSoundTray extends FlxSoundTray
 {
@@ -47,32 +46,24 @@ class CustomSoundTray extends FlxSoundTray
 		var bgPath:String = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
-			var bgGraphic = Paths.image('soundtray/volumebox');
-			if (bgGraphic != null)
-			{
-				bg.bitmapData = bgGraphic.bitmap;
-				bg.scaleX = graphicScale;
-				bg.scaleY = graphicScale;
-				bg.smoothing = true;
-				addChild(bg);
-			}
+			bg.bitmapData = BitmapData.fromBytes(File.getBytes(bgPath));
+			bg.scaleX = graphicScale;
+			bg.scaleY = graphicScale;
+			bg.smoothing = true;
+			addChild(bg);
 		}
 
 		var backingPath:String = getImagePath('soundtray/bars_10');
 		if (FileSystem.exists(backingPath))
 		{
-			var backingGraphic = Paths.image('soundtray/bars_10');
-			if (backingGraphic != null)
-			{
-				backingBar.bitmapData = backingGraphic.bitmap;
-				backingBar.x = 9;
-				backingBar.y = 5;
-				backingBar.scaleX = graphicScale;
-				backingBar.scaleY = graphicScale;
-				backingBar.smoothing = true;
-				addChild(backingBar);
-				backingBar.alpha = 0.4;
-			}
+			backingBar.bitmapData = BitmapData.fromBytes(File.getBytes(backingPath));
+			backingBar.x = 9;
+			backingBar.y = 5;
+			backingBar.scaleX = graphicScale;
+			backingBar.scaleY = graphicScale;
+			backingBar.smoothing = true;
+			addChild(backingBar);
+			backingBar.alpha = 0.4;
 		}
 
 		_bars = [];
@@ -84,8 +75,7 @@ class CustomSoundTray extends FlxSoundTray
 			
 			if (FileSystem.exists(barPath))
 			{
-				var barGraphic = Paths.image('soundtray/bars_$i');
-				var bar:Bitmap = new Bitmap(barGraphic != null ? barGraphic.bitmap : null);
+				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(File.getBytes(barPath)));
 				bar.x = 9;
 				bar.y = 5;
 				bar.scaleX = graphicScale;
@@ -188,33 +178,5 @@ class CustomSoundTray extends FlxSoundTray
 
 		for (i in 0..._bars.length)
 			_bars[i].visible = i < globalVolume;
-	}
-}
-
-class CustomSoundFrontEnd extends SoundFrontEnd
-{
-	@:privateAccess
-	override function changeVolume(amount:Float):Void
-	{
-		muted = false;
-		volume = MathTools.logToLinear(volume);
-		volume += amount;
-		volume = MathTools.linearToLog(volume);
-		showSoundTray(amount > 0);
-	}
-}
-
-private class MathTools
-{
-	public static function linearToLog(x:Float, minValue:Float = 0.001):Float
-	{
-		x = Math.max(0, Math.min(1, x));
-		return Math.exp(Math.log(minValue) * (1 - x));
-	}
-
-	public static function logToLinear(x:Float, minValue:Float = 0.001):Float
-	{
-		x = Math.max(minValue, Math.min(1, x));
-		return 1 - (Math.log(x) / Math.log(minValue));
 	}
 }
