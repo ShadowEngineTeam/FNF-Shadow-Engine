@@ -98,15 +98,11 @@ class Main extends Sprite
 
 		untyped FlxG.cameras = new backend.rendering.ShadowCameraFrontEnd();
 
-		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate,
-			game.framerate, game.skipSplash, game.startFullscreen);
+		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash,
+			game.startFullscreen);
 
 		@:privateAccess
-		{
-			final soundFrontEnd:flixel.system.frontEnds.SoundFrontEnd = new objects.CustomSoundTray.CustomSoundFrontEnd();
-			FlxG.sound = soundFrontEnd;
-			funkinGame._customSoundTray = objects.CustomSoundTray.CustomSoundTray;
-		}
+		funkinGame._customSoundTray = objects.CustomSoundTray;
 
 		addChild(funkinGame);
 
@@ -135,15 +131,16 @@ class Main extends Sprite
 		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
 		#end
 
+		// V-Slice things smh
+		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
+		FlxG.game.soundTray.active = true;
+		FlxG.inputs.resetOnStateSwitch = false;
 		#if android
 		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
 		#end
-
 		#if native
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
-
-		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)

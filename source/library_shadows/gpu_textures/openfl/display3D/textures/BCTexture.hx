@@ -23,13 +23,15 @@ import openfl.Lib;
 {
 	@:noCompletion private static var __warned:Bool = false;
 	public static inline final BC_MAGIC_NUMBER:Int = 0x20534444;
-	public static inline final IMAGE_DATA_OFFSET = 148;
+	public static final DDS_HEADER_SIZE:Int = 128;
+	public static final DX10_HEADER_SIZE:Int = 148;
 
 	public var supported:Bool = true;
 	public var imageSize(default, null):Int = 0;
 
 	private var __isSRGB:Bool = false;
 	private var __bcFormat:String = "BC7";
+	private var __isDX10:Bool = true;
 
 	private function new(context:Context3D, data:ByteArray)
 	{
@@ -106,7 +108,8 @@ import openfl.Lib;
 		__context.__bindGLTexture2D(__textureID);
 
 		var bytes:Bytes = cast data;
-		var textureBytes = new UInt8Array(#if js @:privateAccess bytes.b.buffer #else bytes #end, IMAGE_DATA_OFFSET, imageSize);
+		var dataOffset = __isDX10 ? DX10_HEADER_SIZE : DDS_HEADER_SIZE;
+		var textureBytes = new UInt8Array(#if js @:privateAccess bytes.b.buffer #else bytes #end, dataOffset, imageSize);
 		gl.compressedTexImage2D(__textureTarget, 0, __internalFormat, __width, __height, 0, textureBytes);
 		gl.texParameteri(__textureTarget, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(__textureTarget, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -146,6 +149,7 @@ import openfl.Lib;
 
 		if (fourCC == "DX10")
 		{
+			__isDX10 = true;
 			// DXGI format stored at offset 128 (after DDS header).
 			bytes.position = 128;
 			var dxgiFormat = bytes.readUnsignedInt();
@@ -200,6 +204,7 @@ import openfl.Lib;
 		}
 		else
 		{
+			__isDX10 = false;
 			// legacy DDS fourCC
 			switch (fourCC)
 			{

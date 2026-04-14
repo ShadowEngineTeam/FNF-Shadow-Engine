@@ -48,34 +48,29 @@ class AudioManager
 
 					var alc = context.openal;
 					var device = alc.openDevice();
-					var ctx = alc.createContext(device);
-
-					alc.makeContextCurrent(ctx);
-					alc.processContext(ctx);
-
-					#if !(neko || mobile)
-					if (alc.isExtensionPresent('ALC_SOFT_system_events', device) && alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+					if (device != null)
 					{
-						alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
+						var ctx = alc.createContext(device);
+						alc.makeContextCurrent(ctx);
+						alc.processContext(ctx);
 
-						alc.eventControlSOFT([ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT, ALC.EVENT_TYPE_DEVICE_ADDED_SOFT, ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT], true);
+						#if (lime_openalsoft && !mobile)
+						if (alc.isExtensionPresent('ALC_SOFT_system_events', device) && alc.isExtensionPresent('ALC_SOFT_reopen_device', device))
+						{
+							if (alc.isExtensionPresent('AL_SOFT_hold_on_disconnect'))
+								alc.disable(AL.STOP_SOURCES_ON_DISCONNECT_SOFT);
 
-						alc.eventCallbackSOFT(deviceEventCallback);
+							alc.eventControlSOFT([ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT, ALC.EVENT_TYPE_DEVICE_ADDED_SOFT, ALC.EVENT_TYPE_DEVICE_REMOVED_SOFT], true);
+
+							alc.eventCallbackSOFT(deviceEventCallback);
+						}
+						#end
 					}
-					#end
 				}
 				#end
 			}
 
 			AudioManager.context = context;
-
-			#if (lime_cffi && !macro && lime_openal && (ios || tvos || mac))
-			var timer = new Timer(100);
-			timer.run = function()
-			{
-				NativeCFFI.lime_al_cleanup();
-			};
-			#end
 		}
 	}
 
@@ -144,12 +139,9 @@ class AudioManager
 		#end
 	}
 
+	#if lime_openalsoft
 	@:noCompletion
-	#if hl
-	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:hl.Bytes):Void
-	#else
-	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:String):Void
-	#end
+	private static function deviceEventCallback(eventType:Int, deviceType:Int, handle:CFFIPointer, message:#if hl hl.Bytes #else String #end):Void
 	{
 		#if !lime_doc_gen
 		if (eventType == ALC.EVENT_TYPE_DEFAULT_DEVICE_CHANGED_SOFT && deviceType == ALC.PLAYBACK_DEVICE_SOFT)
@@ -178,6 +170,7 @@ class AudioManager
 		}
 		#end
 	}
+	#end
 
 	@:noCompletion
 	private static function setupConfig():Void
@@ -185,31 +178,80 @@ class AudioManager
 		#if (lime_openal || lime_openalsoft)
 		final alConfig:Array<String> = [];
 
-		alConfig.push('[General]');
+		alConfig.push('[general]');
+		// alConfig.push('drivers=sdl3,null');
+		#if windows
+		alConfig.push('drivers=wasapi,dsound,winmm,null');
+		#elseif linux
+		alConfig.push('drivers=pipewire,pulse,alsa,jack,oss,null');
+		#elseif (mac || ios)
+		alConfig.push('drivers=coreaudio,null');
+		#elseif android
+		alConfig.push('drivers=oboe,null');
+		#end
 		alConfig.push('sample-type=float32');
-		alConfig.push('stereo-mode=speakers');
-		alConfig.push('hrtf=false');
+		alConfig.push('channels=stereo');
+		alConfig.push('stereo-encoding=basic');
 		alConfig.push('cf_level=0');
 		alConfig.push('output-limiter=false');
 		alConfig.push('front-stablizer=false');
 		alConfig.push('volume-adjust=0');
+		#if android
+		alConfig.push('period_size=882');
+		#else
 		alConfig.push('period_size=441');
-		alConfig.push('sources=512');
-		alConfig.push('sends=64');
+		#end
+		alConfig.push('periods=3');
+		alConfig.push('sources=256');
+		alConfig.push('sends=2');
 		alConfig.push('dither=false');
+		#if android
+		alConfig.push('resampler=bsinc12');
+		#else
+		alConfig.push('resampler=bsinc24');
+		#end
+		alConfig.push('rt-prio=10');
+		alConfig.push('rt-time-limit=true');
 
 		alConfig.push('[decoder]');
 		alConfig.push('hq-mode=true');
 		alConfig.push('distance-comp=true');
 		alConfig.push('nfc=false');
 
+		// WASAPI
+		#if windows
+		// alConfig.push('[wasapi]');
+		// alConfig.push('exclusive-mode=true');
+		#end
+
+		// PipeWire
+		#if linux
+		alConfig.push('[pipewire]');
+		alConfig.push('rt-mix=true');
+		#end
+
+		// PulseAudio
+		#if linux
+		alConfig.push('[pulse]');
+		alConfig.push('allow-moves=false');
+		alConfig.push('fix-rate=true');
+		alConfig.push('adjust-latency=false');
+		#end
+
+		// ALSA
+		#if linux
+		alConfig.push('[alsa]');
+		alConfig.push('mmap=true');
+		#end
+
 		try
 		{
-			final directory:String = Path.directory(Path.withoutExtension(System.applicationStorageDirectory));
+			final directory:String = #if mobile mobile.backend.StorageUtil.getStorageDirectory() #else Sys.getCwd() #end;
 			final path:String = Path.join([directory, #if windows 'alsoft.ini' #else 'alsoft.conf' #end]);
 			final content:String = alConfig.join('\n');
 
-			if (!FileSystem.exists(directory)) FileSystem.createDirectory(directory);
+			if (!FileSystem.exists(directory))
+				FileSystem.createDirectory(directory);
 
 			if (!FileSystem.exists(path)) File.saveContent(path, content);
 

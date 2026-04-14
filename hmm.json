@@ -3,19 +3,19 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "01f75a238e71ec252de9d4af8e200e5e6121a3c7",
+      "ref": "a8b914eaec1dce0efe128f85df634f5c67ce6621",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "aa7209d704d40b4c44b9a72593dc59496854da4c",
+      "ref": "8f082708b291bd842070f96eae5d8cc74c4e3a32",
       "url": "https://github.com/FunkinCrew/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
-      "ref": "4727639305a4432791786a2356d815fd12f0680e",
+      "ref": "2bb82d29f52ef25a0da4a3f0157f7bfb0f648c9a",
       "url": "https://github.com/FunkinCrew/flixel"
     },
     {
@@ -27,13 +27,13 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "e76606f8e160317783fbbacd1dd82903b50bab37",
+      "ref": "5f0e6519d1bf05a63d68b4d0eb32d821f7f1fc51",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
-      "ref": "449600d5efb42082bd9f52b303fc27d2722eff37",
+      "ref": "871e5985fbb1b17be77256d2f960d3917e71faa6",
       "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
@@ -87,13 +87,13 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "7ccda74ec7b6c5ba0b3ae4d3f8d64582331b4da1",
+      "ref": "79f4da2fa815f3b1681f39844d12d5bff6a2c2f0",
       "url": "https://github.com/MaybeMaru/flixel-animate"
     },
-	{
-		"name": "tink_core",
-		"type": "haxelib",
-		"version": "1.26.0"
-	}
+    {
+      "name": "tink_core",
+      "type": "haxelib",
+      "version": "1.26.0"
+    }
   ]
 }

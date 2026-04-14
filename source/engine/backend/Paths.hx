@@ -288,7 +288,7 @@ class Paths
 					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
-					bitmap = BitmapData.fromBytes(File.getBytes(file));
+					bitmap = #if html5 openfl.Assets.getBitmapData(file) #else BitmapData.fromBytes(File.getBytes(file)) #end;
 
 				if (bitmap != null) break;
 			}
@@ -419,7 +419,7 @@ class Paths
 			var retKey:String = (path != null) ? '$path/$key' : key;
 			retKey = getPath('$retKey.ogg', SOUND, library);
 			if (FileSystem.exists(retKey))
-				currentTrackedSounds.set(gottenPath, Sound.fromBytes(File.getBytes(retKey)));
+				currentTrackedSounds.set(gottenPath, #if html5 openfl.Assets.getSound(retKey) #else Sound.fromBytes(File.getBytes(retKey)) #end);
 		}
 
 		if (!localTrackedAssets.contains(gottenPath))
