@@ -645,18 +645,15 @@ class Shader
 		}
 
 		var complexBlendsSupported = OpenGLRenderer.__complexBlendsSupported && isFragment;
-		var standardDerivativesSupported = OpenGLRenderer.__standardDerivativesSupported && isFragment;
 
 		#if lime
 		if (__context.__context.type == OPENGL)
 		{
 			complexBlendsSupported = complexBlendsSupported && (glVersion == "150" || !StringTools.startsWith(glVersion, "1"));
-			standardDerivativesSupported = false;
 		}
 		else if (__context.__context.type == OPENGLES)
 		{
 			complexBlendsSupported = complexBlendsSupported && !StringTools.startsWith(glVersion, "1");
-			standardDerivativesSupported = standardDerivativesSupported && !StringTools.startsWith(glVersion, "3");
 		}
 		#end
 
@@ -672,11 +669,6 @@ class Shader
 				extensions += "#extension GL_ARB_sample_shading : enable\n";
 			}
 			#end
-		}
-
-		if (standardDerivativesSupported)
-		{
-			extensions += "#extension GL_OES_standard_derivatives : enable\n";
 		}
 
 		// #version must be the first directive and cannot be repeated,
