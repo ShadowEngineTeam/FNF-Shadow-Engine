@@ -45,7 +45,7 @@
     {
       "name": "hxluajit",
       "type": "git",
-      "ref": "e5284b7649989634a1f98b40ee7af910065b0ef7",
+      "ref": "da08ec54c6c8356e204fbfe8d161d15b3fac876b",
       "url": "https://github.com/ShadowEngineTeam/hxluajit"
     },
     {
@@ -87,7 +87,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "79f4da2fa815f3b1681f39844d12d5bff6a2c2f0",
+      "ref": "d599e9920468c0c14e69760d665b4da427baf911",
       "url": "https://github.com/MaybeMaru/flixel-animate"
     },
     {
