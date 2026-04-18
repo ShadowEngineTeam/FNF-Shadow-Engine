@@ -3,14 +3,14 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "c4a41f82275206e3e14411928598d24277c5ec11",
+      "ref": "f2851fc4f6f2e241b02d2e42591233abb9c0ac89",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "8f082708b291bd842070f96eae5d8cc74c4e3a32",
-      "url": "https://github.com/FunkinCrew/openfl"
+	  "ref": "db52d3a62befb9d873a7cc85a5e3a5b7924350bb",
+      "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
       "name": "flixel",
