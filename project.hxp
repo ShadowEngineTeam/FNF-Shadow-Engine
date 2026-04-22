@@ -239,6 +239,9 @@ class Project extends HXProject
 		setHaxedef("HXCPP_STACK_LINE");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
+
+		setHaxedef("USING_SHADOW_ENGINE");
+
 		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
 
