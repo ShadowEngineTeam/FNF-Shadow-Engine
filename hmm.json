@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "10d7563130e657a838595a17305c1112d1513138",
+      "ref": "5e8aa41efe44cf779acf9db3bfe3f34e772002da",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -87,7 +87,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "6bbce2753c60b902fc4a7c03bd4f0819a596af73",
+      "ref": "75870e160677ca4d310df94d775e7fad43c767ae",
       "url": "https://github.com/MaybeMaru/flixel-animate"
     },
     {
