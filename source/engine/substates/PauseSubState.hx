@@ -71,6 +71,7 @@ class PauseSubState extends MusicBeatSubstate
 		}
 		catch (e:Dynamic)
 		{
+			trace('Failed to load Pause Song: $e');
 		}
 		pauseMusic.volume = 0;
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
@@ -229,7 +230,7 @@ class PauseSubState extends MusicBeatSubstate
 				}
 		}
 
-		if (controls.ACCEPT && (cantUnpause <= 0 || !controls.controllerMode))
+		if (controls.ACCEPT && cantUnpause <= 0)
 		{
 			if (menuItems == difficultyChoices)
 			{

@@ -710,8 +710,8 @@ class PlayState extends MusicBeatState
 			if (opponentVocals._sound != null)
 				opponentVocals.pitch = value;
 			FlxG.sound.music.pitch = value;
-			for (pluh in [intro3Sound, intro2Sound, intro1Sound, introGoSound, missnoteSound])
-				if (pluh != null) pluh.pitch = value;
+			for (intro in [intro3Sound, intro2Sound, intro1Sound, introGoSound, missnoteSound])
+				if (intro != null) intro.pitch = value;
 
 			var ratio:Float = playbackRate / value; // funny word huh
 			if (ratio != 1)
