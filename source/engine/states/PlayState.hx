@@ -2146,7 +2146,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function set_health(value:Float):Float // You can alter how icon animations work here
+	function set_health(value:Float):Float
 	{
 		if (healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
 		{
