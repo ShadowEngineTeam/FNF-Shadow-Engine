@@ -23,7 +23,7 @@ class Project extends HXProject
 	static final PACKAGE:String = "org.shadowengineteam.fnf";
 	static final MAIN_CLASS:String = "backend.Main";
 
-	static final PRELOADER:String = "backend.FunkinPreloader";
+	static var PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
 	static final LIBRARY_SHADOWS_LIST:Array<String> = ["compatibility", "gpu_textures"];
 
@@ -175,6 +175,9 @@ class Project extends HXProject
 
 		app.main = MAIN_CLASS;
 		app.file = EXECUTABLE;
+
+		if (isHashLink())
+			PRELOADER = "flixel.system.FlxBasePreloader";
 		app.preloader = PRELOADER;
 
 		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}/';
