@@ -22,6 +22,7 @@ class PauseSubState extends MusicBeatSubstate
 	];
 	var difficultyChoices = [];
 	var curSelected:Int = 0;
+	var pauseTweens:Array<FlxTween> = [];
 
 	var pauseMusic:FlxSound;
 	var practiceText:FlxText;
@@ -128,10 +129,10 @@ class PauseSubState extends MusicBeatSubstate
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 		blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
 
-		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
-		FlxTween.tween(levelInfo, {alpha: 1, y: 20}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
-		FlxTween.tween(levelDifficulty, {alpha: 1, y: levelDifficulty.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.5});
-		FlxTween.tween(blueballedTxt, {alpha: 1, y: blueballedTxt.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7});
+		pauseTweens.push(FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut}));
+		pauseTweens.push(FlxTween.tween(levelInfo, {alpha: 1, y: 20}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3}));
+		pauseTweens.push(FlxTween.tween(levelDifficulty, {alpha: 1, y: levelDifficulty.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.5}));
+		pauseTweens.push(FlxTween.tween(blueballedTxt, {alpha: 1, y: blueballedTxt.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7}));
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
@@ -380,6 +381,12 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function destroy()
 	{
+		for (tween in pauseTweens)
+			if (tween != null)
+				tween.cancel();
+		pauseTweens = null;
+
+		FlxG.sound.list.remove(pauseMusic);
 		pauseMusic.destroy();
 
 		super.destroy();
