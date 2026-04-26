@@ -2102,40 +2102,46 @@ class PlayState extends MusicBeatState
 		final iconP2HasLoseIcon:Bool = (iconP2.animation.curAnim.frames.length >= 2);
 		final iconP2HasWinIcon:Bool = (iconP2.animation.curAnim.frames.length >= 3);
 
+		inline function setFrameIfDifferent(icon:HealthIcon, frame:Int)
+		{
+			if (icon.animation.curAnim.curFrame != frame)
+				icon.animation.curAnim.curFrame = frame;
+		}
+
 		if (characterPlayingAsDad)
 		{
 			if (healthBar.percent > 80)
 			{
-				iconP1.animation.curAnim.curFrame = iconP1HasLoseIcon ? 1 : 0;
-				iconP2.animation.curAnim.curFrame = iconP2HasWinIcon ? 2 : 0;
+				setFrameIfDifferent(iconP1, iconP1HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP2, iconP2HasWinIcon ? 2 : 0);
 			}
 			else if (healthBar.percent < 20)
 			{
-				iconP2.animation.curAnim.curFrame = iconP2HasLoseIcon ? 1 : 0;
-				iconP1.animation.curAnim.curFrame = iconP1HasWinIcon ? 2 : 0;
+				setFrameIfDifferent(iconP2, iconP2HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP1, iconP1HasWinIcon ? 2 : 0);
 			}
 			else
 			{
-				iconP1.animation.curAnim.curFrame = 0;
-				iconP2.animation.curAnim.curFrame = 0;
+				setFrameIfDifferent(iconP1, 0);
+				setFrameIfDifferent(iconP2, 0);
 			}
 		}
 		else
 		{
 			if (healthBar.percent < 20)
 			{
-				iconP1.animation.curAnim.curFrame = iconP1HasLoseIcon ? 1 : 0;
-				iconP2.animation.curAnim.curFrame = iconP2HasWinIcon ? 2 : 0;
+				setFrameIfDifferent(iconP1, iconP1HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP2, iconP2HasWinIcon ? 2 : 0);
 			}
 			else if (healthBar.percent > 80)
 			{
-				iconP2.animation.curAnim.curFrame = iconP2HasLoseIcon ? 1 : 0;
-				iconP1.animation.curAnim.curFrame = iconP1HasWinIcon ? 2 : 0;
+				setFrameIfDifferent(iconP2, iconP2HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP1, iconP1HasWinIcon ? 2 : 0);
 			}
 			else
 			{
-				iconP2.animation.curAnim.curFrame = 0;
-				iconP1.animation.curAnim.curFrame = 0;
+				setFrameIfDifferent(iconP2, 0);
+				setFrameIfDifferent(iconP1, 0);
 			}
 		}
 	}
