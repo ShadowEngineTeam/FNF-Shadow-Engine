@@ -1894,6 +1894,7 @@ class PlayState extends MusicBeatState
 
 		updateIconsScale(elapsed);
 		updateIconsPosition();
+		updateIconsStatus();
 
 		if (startedCountdown && !paused)
 		{
@@ -2094,22 +2095,8 @@ class PlayState extends MusicBeatState
 		iconP2.x = healthBar.barCenter - (150 * iconP2.scale.x) / 2 - iconOffset * 2;
 	}
 
-	var iconsAnimations:Bool = true;
-
-	function set_health(value:Float):Float // You can alter how icon animations work here
+	public dynamic function updateIconsStatus()
 	{
-		if (!iconsAnimations || healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
-		{
-			health = value;
-			return health;
-		}
-
-		// update health bar
-		health = value;
-		var newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max),
-			healthBar.bounds.min, healthBar.bounds.max, 0, 100);
-		healthBar.percent = (newPercent != null ? newPercent : 0);
-
 		final iconP1HasLoseIcon:Bool = (iconP1.animation.curAnim.frames.length >= 2);
 		final iconP1HasWinIcon:Bool = (iconP1.animation.curAnim.frames.length >= 3);
 		final iconP2HasLoseIcon:Bool = (iconP2.animation.curAnim.frames.length >= 2);
@@ -2151,6 +2138,21 @@ class PlayState extends MusicBeatState
 				iconP1.animation.curAnim.curFrame = 0;
 			}
 		}
+	}
+
+	function set_health(value:Float):Float // You can alter how icon animations work here
+	{
+		if (healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
+		{
+			health = value;
+			return health;
+		}
+
+		// update health bar
+		health = value;
+		var newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max),
+			healthBar.bounds.min, healthBar.bounds.max, 0, 100);
+		healthBar.percent = (newPercent != null ? newPercent : 0);
 		return health;
 	}
 
