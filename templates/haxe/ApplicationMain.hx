@@ -34,7 +34,6 @@ class ApplicationMain
 
 		// Disable Windows error reporting (avoids sending bug reports to Microsoft).
 		Native.disableErrorReporting();
-		#end
 
 		// Set the console output to UTF-8 on Windows to support Unicode characters.
 		Native.setConsoleOutputToUTF8();
@@ -116,7 +115,7 @@ class ApplicationMain
 			title: "::title::",
 			width: ::width::,
 			x: ::x::,
-			y: ::y::,
+			y: ::y::
 		};
 
 		attributes.context =
@@ -126,7 +125,9 @@ class ApplicationMain
 			colorDepth: ::colorDepth::,
 			depth: ::depthBuffer::,
 			hardware: ::hardware::,
+			#if web
 			preserveDrawingBuffer: true,
+			#end
 			stencil: ::stencilBuffer::,
 			type: null,
 			vsync: ::vsync::
