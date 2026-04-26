@@ -193,7 +193,7 @@ class ShadowInputText extends FlxText
 				drawComplex(camera);
 
 			#if FLX_DEBUG
-			FlxBasic.visibleCount++;
+			flixel.FlxBasic.visibleCount++;
 			#end
 		}
 
