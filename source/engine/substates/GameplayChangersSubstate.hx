@@ -346,7 +346,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (option.type == 'percent')
 			val *= 100;
 		var def:Dynamic = option.defaultValue;
-		option.text = text.replace('%v', val).replace('%d', def);
+		option.text = text.replace('%v', Std.string(val)).replace('%d', Std.string(def));
 	}
 
 	function clearHold()

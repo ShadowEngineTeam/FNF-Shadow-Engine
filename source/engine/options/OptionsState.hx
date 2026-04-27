@@ -76,11 +76,26 @@ class OptionsState extends MusicBeatState
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = 0xFFea71fd;
 		bg.updateHitbox();
-
 		bg.screenCenter();
 		add(bg);
 
-		tipText = new FlxText(150, FlxG.height - #if android 40 #else 24 #end, 0, 'Press ${controls.mobileC ? #if (android && FEATURE_MOBILE_CONTROLS) 'X' #else 'C' #end : 'CTRL'} to Go Mobile Controls Menu' #if android + '\nPress ${controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT'} to Open DATA Folder' #end, 16);
+		var tipY:Int = FlxG.height - #if android 40 #else 24 #end;
+
+		#if FEATURE_MOBILE_CONTROLS
+		var mobileKey:String = controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
+		var mobileText:String = 'Press ${mobileKey} to Go Mobile Controls Menu';
+		#else
+		var mobileText:String = '';
+		#end
+
+		#if android
+		var dataKey:String = controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
+		var dataText:String = '\nPress ${dataKey} to Open DATA Folder';
+		#else
+		var dataText:String = '';
+		#end
+
+		tipText = new FlxText(150, tipY, 0, mobileText + dataText, 16);
 		tipText.setFormat("VCR OSD Mono", 17, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tipText.borderSize = 1.25;
 		tipText.scrollFactor.set();

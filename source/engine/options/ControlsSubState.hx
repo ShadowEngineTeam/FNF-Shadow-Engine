@@ -194,13 +194,13 @@ class ControlsSubState extends MusicBeatSubstate
 			var key:String = null;
 			if (onKeyboardMode)
 			{
-				var savKey:Array<Null<FlxKey>> = ClientPrefs.keyBinds.get(option[2]);
-				key = InputFormatter.getKeyName((savKey[n] != null) ? savKey[n] : NONE);
+				var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option[2]);
+				key = InputFormatter.getKeyName((savKey != null && savKey.length > n) ? savKey[n] : FlxKey.NONE);
 			}
 			else
 			{
-				var savKey:Array<Null<FlxGamepadInputID>> = ClientPrefs.gamepadBinds.get(option[2]);
-				key = InputFormatter.getGamepadName((savKey[n] != null) ? savKey[n] : NONE);
+				var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option[2]);
+				key = InputFormatter.getGamepadName((savKey != null && savKey.length > n) ? savKey[n] : FlxGamepadInputID.NONE);
 			}
 
 			var attach:Alphabet = new Alphabet(textX + 210, 248, key, false);
@@ -466,13 +466,13 @@ class ControlsSubState extends MusicBeatSubstate
 						var key:String = null;
 						if (onKeyboardMode)
 						{
-							var savKey:Array<Null<FlxKey>> = ClientPrefs.keyBinds.get(option);
-							key = InputFormatter.getKeyName(savKey[n] != null ? savKey[n] : NONE);
+							var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option);
+							key = InputFormatter.getKeyName((savKey != null && savKey.length > n) ? savKey[n] : FlxKey.NONE);
 						}
 						else
 						{
-							var savKey:Array<Null<FlxGamepadInputID>> = ClientPrefs.gamepadBinds.get(option);
-							key = InputFormatter.getGamepadName(savKey[n] != null ? savKey[n] : NONE);
+							var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option);
+							key = InputFormatter.getGamepadName((savKey != null && savKey.length > n) ? savKey[n] : FlxGamepadInputID.NONE);
 						}
 						updateBind(Math.floor(curSelected * 2) + n, key);
 					}
