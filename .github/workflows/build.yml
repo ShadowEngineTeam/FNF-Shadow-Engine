@@ -50,20 +50,22 @@ jobs:
         if: ${{ startsWith(inputs.name, 'Linux') }}
         shell: bash
         run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-22 main" | sudo tee /etc/apt/sources.list.d/llvm.list
           case "${{ inputs.name }}" in
             "Linux i686")
               sudo dpkg --add-architecture i386
               sudo apt update
-              sudo apt install -y gcc-multilib g++-multilib libvlc-dev:i386 libvlccore-dev:i386
+              sudo apt install -y clang-22 lld-22 gcc-12-i686-linux-gnu g++-12-i686-linux-gnu libvlc-dev:i386 libvlccore-dev:i386
               ;;
             "Linux ARMV7")
               sudo dpkg --add-architecture armhf
               sudo apt update
-              sudo apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libvlc-dev:armhf libvlccore-dev:armhf
+              sudo apt install -y clang-22 lld-22 gcc-12-arm-linux-gnueabihf g++-12-arm-linux-gnueabihf libvlc-dev:armhf libvlccore-dev:armhf
               ;;
             "Linux x86_64"|"Linux ARM64")
               sudo apt update
-              sudo apt install -y libvlc-dev libvlccore-dev
+              sudo apt install -y clang-22 lld-22 gcc-12 g++-12 libvlc-dev libvlccore-dev
               ;;
           esac
 
@@ -96,7 +98,13 @@ jobs:
         run: |
           case "${{ inputs.name }}" in
             "Linux ARMV7")
-              CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ linux32 haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
+              CC="clang-22 --target=arm-linux-gnueabihf" CXX="clang++-22 --target=arm-linux-gnueabihf" linux32 haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
+              ;;
+            "Linux i686")
+              CC="clang-22 --target=i686-linux-gnu" CXX="clang++-22 --target=i686-linux-gnu" linux32 haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
+              ;;
+            "Linux x86_64"|"Linux ARM64")
+              CC="clang-22" CXX="clang++-22" haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
               ;;
             *)
               haxelib run lime build ${{ inputs.buildArgs }} -D ${{ inputs.assetType }}
