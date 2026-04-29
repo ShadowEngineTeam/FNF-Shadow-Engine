@@ -42,6 +42,14 @@ class Project extends HXProject
 	{
 		super();
 
+		#if !target.unicode
+		if (isWindowsHost())
+		{
+			// Enable code page 65001 for unicode support
+			Sys.command("chcp 65001 > nul");
+		}
+		#end
+
 		CompileFlag.project = this;
 
 		haxe.Log.trace = (v:Dynamic, ?info:haxe.PosInfos) ->
@@ -682,6 +690,15 @@ class Project extends HXProject
 
 	inline function isDisplay():Bool
 		return command == "display";
+
+	inline function isWindowsHost():Bool
+		return System.hostPlatform == WINDOWS;
+
+	inline function isMacHost():Bool
+		return System.hostPlatform == MAC;
+
+  	inline function isLinuxHost():Bool
+		return System.hostPlatform == LINUX;
 
 	inline function isWeb():Bool
 		return platformType == PlatformType.WEB;
