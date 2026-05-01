@@ -741,10 +741,11 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		if (excludeValues == null)
 			excludeValues = [LuaUtils.Function_Continue];
 
-		var result:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		if (result == null || excludeValues.contains(result))
-			result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		return result;
+		var luaResult:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		var hsResult:Dynamic = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		if (hsResult != null && !excludeValues.contains(hsResult))
+			return hsResult;
+		return luaResult;
 	}
 
 	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null,
