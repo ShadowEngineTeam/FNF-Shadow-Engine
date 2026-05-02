@@ -503,7 +503,6 @@ class WeekEditorState extends MusicBeatState
 
 	private static function onLoadComplete(_):Void
 	{
-		#if sys
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
@@ -533,9 +532,6 @@ class WeekEditorState extends MusicBeatState
 		loadError = true;
 		loadedWeek = null;
 		_file = null;
-		#else
-		trace("File couldn't be loaded! You aren't on Desktop, are you?");
-		#end
 	}
 
 	private static function onLoadCancel(_):Void

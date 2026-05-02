@@ -585,7 +585,6 @@ class DialogueEditorState extends MusicBeatState
 
 	function onLoadComplete(_):Void
 	{
-		#if sys
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
@@ -613,9 +612,6 @@ class DialogueEditorState extends MusicBeatState
 			}
 		}
 		_file = null;
-		#else
-		trace("File couldn't be loaded! You aren't on Desktop, are you?");
-		#end
 	}
 
 	function onLoadCancel(_):Void

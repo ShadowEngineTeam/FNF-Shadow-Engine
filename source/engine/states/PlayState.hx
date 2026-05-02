@@ -21,9 +21,7 @@ import states.editors.CharacterEditorState;
 import states.editors.ChartingState;
 import substates.PauseSubState;
 import substates.GameOverSubstate;
-#if !flash
 import flixel.addons.display.FlxRuntimeShader;
-#end
 import objects.Note.EventNote;
 import objects.*;
 import states.stages.objects.*;
@@ -702,7 +700,6 @@ class PlayState extends MusicBeatState
 
 	function set_playbackRate(value:Float):Float
 	{
-		#if FLX_PITCH
 		if (generatedMusic)
 		{
 			vocals.pitch = value;
@@ -730,9 +727,6 @@ class PlayState extends MusicBeatState
 			videoCutscene.videoSprite.bitmap.rate = value;
 		#end
 		setOnScripts('playbackRate', playbackRate);
-		#else
-		playbackRate = 1.0; // ensuring -Crow
-		#end
 		return playbackRate;
 	}
 
@@ -1110,33 +1104,25 @@ class PlayState extends MusicBeatState
 				{
 					case 0:
 						intro3Sound = FlxG.sound.play(Paths.sound('intro3' + introSoundsSuffix), 0.6);
-						#if FLX_PITCH
 						if (intro3Sound != null) intro3Sound.pitch = playbackRate;
-						#end
 						tick = THREE;
 						
 					case 1:
 						countdownReady = createCountdownSprite(introAlts[0], antialias);
 						intro2Sound = FlxG.sound.play(Paths.sound('intro2' + introSoundsSuffix), 0.6);
-						#if FLX_PITCH
 						if (intro2Sound != null) intro2Sound.pitch = playbackRate;
-						#end
 						tick = TWO;
 						
 					case 2:
 						countdownSet = createCountdownSprite(introAlts[1], antialias);
 						intro1Sound = FlxG.sound.play(Paths.sound('intro1' + introSoundsSuffix), 0.6);
-						#if FLX_PITCH
 						if (intro1Sound != null) intro1Sound.pitch = playbackRate;
-						#end
 						tick = ONE;
 						
 					case 3:
 						countdownGo = createCountdownSprite(introAlts[2], antialias);
 						introGoSound = FlxG.sound.play(Paths.sound('introGo' + introSoundsSuffix), 0.6);
-						#if FLX_PITCH
 						if (introGoSound != null) introGoSound.pitch = playbackRate;
-						#end
 						tick = GO;
 						
 					case 4:
@@ -1320,7 +1306,7 @@ class PlayState extends MusicBeatState
 			opponentVocals.pause();
 
 		FlxG.sound.music.time = time;
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.play();
 
 		if (Conductor.songPosition <= vocals.length)
@@ -1329,12 +1315,10 @@ class PlayState extends MusicBeatState
 			@:privateAccess
 			if (opponentVocals._sound != null)
 				opponentVocals.time = time;
-			#if FLX_PITCH
 			vocals.pitch = playbackRate;
 			@:privateAccess
 			if (opponentVocals._sound != null)
 				opponentVocals.pitch = playbackRate;
-			#end
 		}
 		vocals.play();
 		@:privateAccess
@@ -1360,7 +1344,7 @@ class PlayState extends MusicBeatState
 
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.onComplete = () -> finishSong();
 		vocals.play();
 		@:privateAccess
@@ -1442,12 +1426,10 @@ class PlayState extends MusicBeatState
 		{
 		}
 
-		#if FLX_PITCH
 		vocals.pitch = playbackRate;
 		@:privateAccess
 		if (opponentVocals._sound != null)
 			opponentVocals.pitch = playbackRate;
-		#end
 		FlxG.sound.list.add(vocals);
 		@:privateAccess
 		if (opponentVocals._sound != null)
@@ -1828,7 +1810,7 @@ class PlayState extends MusicBeatState
 		//trace('resynced vocals at ' + Math.floor(Conductor.songPosition));
 
 		FlxG.sound.music.play();
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 
 		var checkVocals = @:privateAccess (opponentVocals._sound != null) ? [vocals, opponentVocals] : [vocals];
@@ -1837,7 +1819,7 @@ class PlayState extends MusicBeatState
 			if (FlxG.sound.music.time < vocals.length)
 			{
 				voc.time = FlxG.sound.music.time;
-				#if FLX_PITCH voc.pitch = playbackRate; #end
+				voc.pitch = playbackRate;
 				#if mobile
 				//FlxTween.tween(voc, {volume: 1}, 0.05, {ease: FlxEase.linear});
 				#end
@@ -2837,12 +2819,11 @@ class PlayState extends MusicBeatState
 		var ret:Dynamic = callOnScripts('onEndSong', null, true);
 		if (ret != LuaUtils.Function_Stop && !transitioning)
 		{
-			#if !switch
 			var percent:Float = ratingPercent;
 			if (Math.isNaN(percent))
 				percent = 0;
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
-			#end
+
 			playbackRate = 1;
 
 			if (chartingMode)
@@ -3464,9 +3445,8 @@ class PlayState extends MusicBeatState
 			daNote.noteType,
 			daNote.isSustainNote
 		];
-		var result:Dynamic = callOnLuas('noteMiss', args);
-		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
-			callOnHScript('noteMiss', [daNote]);
+		callOnLuas('noteMiss', args);
+		callOnHScript('noteMiss', [daNote]);
 	}
 
 	function noteMissPress(direction:Int = 1):Void // You pressed a key when there was no notes to press for this key
@@ -3533,10 +3513,8 @@ class PlayState extends MusicBeatState
 		if (note.mustPress)
 		{
 			missnoteSound = FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
-			#if FLX_PITCH
 			if (missnoteSound != null)
 				missnoteSound.pitch = playbackRate;
-			#end
 		}
 
 		if (instakillOnMiss)
@@ -3593,9 +3571,8 @@ class PlayState extends MusicBeatState
 			note.noteType,
 			note.isSustainNote
 		];
-		var result:Dynamic = callOnLuas('opponentNoteHitPre', args);
-		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
-			callOnHScript('opponentNoteHitPre', [note]);
+		callOnLuas('opponentNoteHitPre', args);
+		callOnHScript('opponentNoteHitPre', [note]);
 
 		camZooming = true;
 
@@ -3640,9 +3617,8 @@ class PlayState extends MusicBeatState
 			note.noteType,
 			note.isSustainNote
 		];
-		var result:Dynamic = callOnLuas('opponentNoteHit', args2);
-		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
-			callOnHScript('opponentNoteHit', [note]);
+		callOnLuas('opponentNoteHit', args2);
+		callOnHScript('opponentNoteHit', [note]);
 
 		spawnHoldSplashOnNote(note);
 
@@ -3676,19 +3652,16 @@ class PlayState extends MusicBeatState
 		var char:Character = (!characterPlayingAsDad) ? boyfriend : dad;
 
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
-		var result:Dynamic = callOnLuas('goodNoteHitPre', args);
-		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
-			callOnHScript('goodNoteHitPre', [note]);
+		callOnLuas('goodNoteHitPre', args);
+		callOnHScript('goodNoteHitPre', [note]);
 
 		note.wasGoodHit = true;
 
 		if (ClientPrefs.data.hitsoundVolume > 0 && !note.hitsoundDisabled)
 		{
 			hitsoundSound = FlxG.sound.play(Paths.sound(note.hitsound), ClientPrefs.data.hitsoundVolume);
-			#if FLX_PITCH
 			if (hitsoundSound != null)
 				hitsoundSound.pitch = playbackRate;
-			#end
 		}
 
 		if (note.hitCausesMiss)
@@ -3773,9 +3746,8 @@ class PlayState extends MusicBeatState
 			songScore += Rating.SUSTAIN_SCORE;
 
 		final args:Array<Dynamic> = [notes.members.indexOf(note), leData, leType, isSus];
-		var result:Dynamic = callOnLuas('goodNoteHit', args);
-		if (result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll)
-			callOnHScript('goodNoteHit', [note]);
+		callOnLuas('goodNoteHit', args);
+		callOnHScript('goodNoteHit', [note]);
 
 		if (!note.isSustainNote && !cpuControlled)
 			doScoreBop();
@@ -3854,9 +3826,7 @@ class PlayState extends MusicBeatState
 		FlxG.signals.preUpdate.remove(checkForResync);
 		#end
 
-		#if FLX_PITCH
 		FlxG.sound.music.pitch = 1;
-		#end
 
 		#if FEATURE_VIDEOS
 		if (videoCutscene != null)
@@ -3949,7 +3919,7 @@ class PlayState extends MusicBeatState
 	{
 		var char:Character = (!characterPlayingAsDad) ? boyfriend : dad;
 		var anim:String = char.getAnimationName();
-		if (char.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * char.singDuration && anim.startsWith('sing')
+		if (char.holdTimer > Conductor.stepCrochet * (0.0011 / FlxG.sound.music.pitch) * char.singDuration && anim.startsWith('sing')
 			&& !anim.endsWith('miss'))
 			char.dance();
 	}
@@ -4040,7 +4010,6 @@ class PlayState extends MusicBeatState
 		setOnScripts('ratingFC', ratingFC);
 	}
 
-	#if !flash
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
 
 	public function createRuntimeShader(name:String):FlxRuntimeShader
@@ -4048,7 +4017,6 @@ class PlayState extends MusicBeatState
 		if (!ClientPrefs.data.shaders)
 			return new FlxRuntimeShader();
 
-		#if !flash
 		if (!runtimeShaders.exists(name) && !initLuaShader(name))
 		{
 			FlxG.log.warn('Shader $name is missing!');
@@ -4057,10 +4025,6 @@ class PlayState extends MusicBeatState
 
 		var arr:Array<String> = runtimeShaders.get(name);
 		return new FlxRuntimeShader(arr[0], arr[1]);
-		#else
-		FlxG.log.warn("Platform unsupported for Runtime Shaders!");
-		return null;
-		#end
 	}
 
 	public function initLuaShader(name:String):Bool
@@ -4068,7 +4032,6 @@ class PlayState extends MusicBeatState
 		if (!ClientPrefs.data.shaders)
 			return false;
 
-		#if !flash
 		if (runtimeShaders.exists(name))
 		{
 			FlxG.log.warn('Shader $name was already initialized!');
@@ -4120,13 +4083,9 @@ class PlayState extends MusicBeatState
 		#else
 		FlxG.log.warn('Missing shader $name .frag AND .vert files!');
 		#end
-		#else
-		FlxG.log.warn('This platform doesn\'t support Runtime Shaders!');
-		#end
 
 		return false;
 	}
-	#end
 
 	public function changeNoteSkin(player:Bool, skin:String)
 	{

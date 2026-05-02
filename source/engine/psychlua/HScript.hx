@@ -115,9 +115,7 @@ class HScript extends SScript
 		set('NoteSplash', objects.NoteSplash);
 		set('SustainSplash', objects.SustainSplash);
 		set('CustomSubstate', CustomSubstate);
-		#if !flash
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
-		#end
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
 

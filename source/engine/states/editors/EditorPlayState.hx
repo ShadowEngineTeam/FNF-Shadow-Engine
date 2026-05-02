@@ -322,7 +322,7 @@ class EditorPlayState extends MusicBeatSubstate
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
 		FlxG.sound.music.time = startPos;
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.onComplete = finishSong;
 		vocals.volume = 1;
 		vocals.time = startPos;
@@ -376,11 +376,8 @@ class EditorPlayState extends MusicBeatSubstate
 
 		vocals.volume = 0;
 		opponentVocals.volume = 0;
-
-		#if FLX_PITCH
 		vocals.pitch = playbackRate;
 		opponentVocals.pitch = playbackRate;
-		#end
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
 
@@ -1137,18 +1134,18 @@ class EditorPlayState extends MusicBeatSubstate
 			return;
 
 		FlxG.sound.music.play();
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time;
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = Conductor.songPosition;
-			#if FLX_PITCH vocals.pitch = playbackRate; #end
+			vocals.pitch = playbackRate;
 		}
 
 		if (Conductor.songPosition <= opponentVocals.length)
 		{
 			opponentVocals.time = Conductor.songPosition;
-			#if FLX_PITCH opponentVocals.pitch = playbackRate; #end
+			opponentVocals.pitch = playbackRate;
 		}
 		vocals.play();
 		opponentVocals.play();

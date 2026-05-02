@@ -153,10 +153,8 @@ class SystemInfo extends FramerateCategory
 			if (flixel.FlxG.stage.context3D != null && flixel.FlxG.stage.context3D.gl != null)
 			{
 				gpuName = Std.string(flixel.FlxG.stage.context3D.gl.getParameter(flixel.FlxG.stage.context3D.gl.RENDERER)).split("/")[0].trim();
-				#if !flash
 				var size = FlxG.bitmap.maxTextureSize;
 				gpuMaxSize = size + "x" + size;
-				#end
 
 				if (openfl.display3D.Context3D.__glMemoryTotalAvailable != -1)
 				{

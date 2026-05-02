@@ -424,7 +424,6 @@ class NoteSplashDebugState extends MusicBeatState
 
 	function saveFile()
 	{
-		#if sys
 		var maxLen:Int = maxAnims * Note.colArray.length;
 		var curLen:Int = config.offsets.length;
 		while (curLen > maxLen)
@@ -444,9 +443,6 @@ class NoteSplashDebugState extends MusicBeatState
 		File.saveContent(path, strToSave);
 
 		// trace(strToSave);
-		#else
-		savedText.text = 'Can\'t save on this platform, too bad.';
-		#end
 	}
 
 	var maxAnims:Int = 0;

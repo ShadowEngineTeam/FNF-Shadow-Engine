@@ -414,9 +414,7 @@ class ChartingState extends MusicBeatState
 	var playSoundDad:ShadowCheckbox = null;
 	var UI_songTitle:ShadowTextInput;
 	var stageDropDown:ShadowDropdown;
-	#if FLX_PITCH
 	var sliderRate:ShadowSlider;
-	#end
 
 	var stepperBPM:ShadowStepper;
 	var stepperSpeed:ShadowStepper;
@@ -980,7 +978,6 @@ class ChartingState extends MusicBeatState
 			key++;
 		}
 
-		#if sys
 		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'custom_notetypes/');
 		for (folder in foldersToCheck)
 			for (file in FileSystem.readDirectory(folder))
@@ -1024,7 +1021,6 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
-		#end
 
 		var displayNameList:Array<String> = curNoteTypes.copy();
 		for (i in 1...displayNameList.length)
@@ -1441,14 +1437,12 @@ class ChartingState extends MusicBeatState
 		tab_group.add(waveformUseOppVoices);
 		#end
 
-		#if FLX_PITCH
 		tab_group.add(new ShadowLabel(pad, row3, "Playback Rate:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		sliderRate = new ShadowSlider(pad, row3 + labelOffset, 0.5, 3, 1, function(value:Float)
 		{
 			playbackSpeed = value;
 		}, 200, 2, true);
 		tab_group.add(sliderRate);
-		#end
 
 		check_warnings = new ShadowCheckbox(columnX(1), row4, "Ignore Warnings", FlxG.save.data.ignoreWarnings, function(checked:Bool)
 		{
@@ -1624,8 +1618,8 @@ class ChartingState extends MusicBeatState
 		if (controls.mobileC)
 		{
 			helpStr = "Up/Down - Change Conductor's strum time\nLeft/Right - Go to the previous/next section\n"
-				+ #if FLX_PITCH "G - Reset Song Playback Rate\n"
-				+ #end "Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
+				+ "G - Reset Song Playback Rate\n"
+				+ "Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
 				"C - Test your chart inside Chart Editor\nA - Play your chart\n" +
 				"Up/Down (On The Right) - Decrease/Increase Note Sustain Length\nX - Stop/Resume Song";
 		}
@@ -1633,9 +1627,9 @@ class ChartingState extends MusicBeatState
 		{
 			helpStr = "W/S or Mouse Wheel - Change Conductor's strum time\nA/D - Go to the previous/next section\n"
 				+ "Left/Right - Change Snap\nUp/Down - Change Conductor's Strum Time with Snapping\n"
-				+ #if FLX_PITCH "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n"
+				+ "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n"
 				+ "ALT + Left Bracket / Right Bracket - Reset Song Playback Rate\n"
-				+ #end "Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
+				+ "Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
 				"Esc - Test your chart inside Chart Editor\nEnter - Play your chart\n" + "Q/E - Decrease/Increase Note Sustain Length\nSpace - Stop/Resume song";
 		}
 
@@ -2390,7 +2384,6 @@ class ChartingState extends MusicBeatState
 			strumLineNotes.members[i].alpha = FlxG.sound.music.playing ? 1 : 0.35;
 		}
 
-		#if FLX_PITCH
 		// PLAYBACK SPEED CONTROLS
 		var holdingShift:Bool = FlxG.keys.pressed.SHIFT;
 		var holdingLB:Bool = FlxG.keys.pressed.LBRACKET;
@@ -2413,7 +2406,6 @@ class ChartingState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackSpeed;
 		vocals.pitch = playbackSpeed;
 		opponentVocals.pitch = playbackSpeed;
-		#end
 
 		bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
 			+ " / "
@@ -2687,7 +2679,7 @@ class ChartingState extends MusicBeatState
 	function waveformData(buffer:AudioBuffer, bytes:Bytes, time:Float, endTime:Float, multiply:Float = 1, ?array:Array<Array<Array<Float>>>,
 			?steps:Float):Array<Array<Array<Float>>>
 	{
-		#if (lime_cffi && !macro)
+		#if lime_openal
 		if (buffer == null || buffer.data == null)
 			return [[[0], [0]], [[0], [0]]];
 

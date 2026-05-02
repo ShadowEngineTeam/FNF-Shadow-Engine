@@ -36,7 +36,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		}
 		optionsArray.push(option);
 
-		#if FLX_PITCH
 		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
@@ -45,7 +44,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		option.displayFormat = '%vX';
 		option.decimals = 2;
 		optionsArray.push(option);
-		#end
 
 		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
 		option.scrollSpeed = 2.5;

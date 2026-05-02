@@ -1,7 +1,7 @@
 package objects;
 
 import flixel.addons.display.FlxPieDial;
-#if hxvlc
+#if FEATURE_VIDEOS
 import hxvlc.flixel.FlxVideoSprite;
 #end
 
@@ -55,7 +55,7 @@ class VideoSprite extends FlxSpriteGroup
 		videoSprite.bitmap.onFormatSetup.add(function()
 		{
 			/*
-				#if hxvlc
+				#if FEATURE_VIDEOS
 				var wd:Int = videoSprite.bitmap.formatWidth;
 				var hg:Int = videoSprite.bitmap.formatHeight;
 				trace('Video Resolution: ${wd}x${hg}');

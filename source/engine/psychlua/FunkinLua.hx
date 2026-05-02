@@ -9,9 +9,7 @@ import openfl.utils.Assets;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.addons.transition.FlxTransitionableState;
-#if !flash
 import flixel.addons.display.FlxRuntimeShader;
-#end
 import flixel.util.typeLimit.OneOfTwo;
 import cutscenes.DialogueBoxPsych;
 import objects.StrumNote;
@@ -117,12 +115,7 @@ class FunkinLua
 			set('healthGainMult', game.healthGain);
 			set('healthLossMult', game.healthLoss);
 
-			#if FLX_PITCH
 			set('playbackRate', game.playbackRate);
-			#else
-			set('playbackRate', 1);
-			#end
-
 			set('guitarHeroSustains', game.guitarHeroSustains);
 			set('instakillOnMiss', game.instakillOnMiss);
 			set('botPlay', game.cpuControlled);
@@ -1713,7 +1706,6 @@ class FunkinLua
 			}
 		});
 
-		#if FLX_PITCH
 		set("getSoundPitch", function(tag:String)
 		{
 			if (tag != null && tag.length > 0 && game.modchartSounds.exists(tag))
@@ -1738,7 +1730,6 @@ class FunkinLua
 				}
 			}
 		});
-		#end
 
 		// mod settings
 		#if FEATURE_MODS
@@ -2021,16 +2012,13 @@ class FunkinLua
 		#end
 	}
 
-	#if !flash
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
-	#end
 
 	public function initLuaShader(name:String)
 	{
 		if (!ClientPrefs.data.shaders)
 			return false;
 
-		#if !flash
 		if (runtimeShaders.exists(name))
 		{
 			var shaderData:Array<String> = runtimeShaders.get(name);
@@ -2082,9 +2070,6 @@ class FunkinLua
 		}
 
 		luaTrace('Missing shader $name .frag AND .vert files!', false, false, FlxColor.RED);
-		#else
-		luaTrace('This platform doesn\'t support Runtime Shaders!', false, false, FlxColor.RED);
-		#end
 		return false;
 	}
 
