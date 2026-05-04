@@ -5,6 +5,7 @@ import openfl.Assets;
 import openfl.utils.Promise;
 import lime.app.Future;
 import openfl.events.MouseEvent;
+import openfl.events.TouchEvent;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.Lib;
@@ -355,7 +356,7 @@ class FunkinPreloader extends FlxBasePreloader
 				touchHereSprite.buttonMode = true;
 				touchHereToPlay.alpha = 1.0;
 				removeChild(vfdBitmap);
-				touchHereSprite.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownTouchHereToPlay);
+				touchHereSprite.addEventListener(#if mobile TouchEvent.TOUCH_TAP #else MouseEvent.MOUSE_DOWN #end, mouseDownTouchHereToPlay);
 			}
 			return 1.0;
 		}
@@ -365,7 +366,7 @@ class FunkinPreloader extends FlxBasePreloader
 	}
 
 	#if TOUCH_HERE_TO_PLAY
-	function mouseDownTouchHereToPlay(e:MouseEvent):Void
+	function mouseDownTouchHereToPlay(_):Void
 	{
 		if (touchedHereToPlay)
 			return;
@@ -374,7 +375,7 @@ class FunkinPreloader extends FlxBasePreloader
 
 		haxe.Timer.delay(function():Void
 		{
-			touchHereSprite.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDownTouchHereToPlay);
+			touchHereSprite.removeEventListener(#if mobile TouchEvent.TOUCH_TAP #else MouseEvent.MOUSE_DOWN #end, mouseDownTouchHereToPlay);
 			immediatelyStartGame();
 		}, 1000);
 	}
