@@ -572,7 +572,7 @@ class CharacterEditorState extends MusicBeatState
 		var buttonGap:Int = ShadowStyle.SPACING_SM;
 
 		animationInputText = new ShadowTextInput(leftX, controlY1, leftW, "");
-		animationFrameLabelCheckBox = new ShadowCheckbox(rightX, controlY0 + checkboxOffset, "Frame Label (Textuer Atlas)");
+		animationFrameLabelCheckBox = new ShadowCheckbox(rightX, controlY0 + checkboxOffset, "Frame Label (Texture Atlas)");
 		animationNameInputText = new ShadowTextInput(leftX, controlY2, leftW, "");
 		animationIndicesInputText = new ShadowTextInput(leftX, controlY3, fullW, "");
 		animationFramerate = new ShadowStepper(leftX, controlY4, 1, 24, 0, 240, 0, null, 70);

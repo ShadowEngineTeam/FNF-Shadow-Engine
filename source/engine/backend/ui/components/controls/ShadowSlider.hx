@@ -212,11 +212,11 @@ class ShadowSlider extends FlxSpriteGroup
 		}
 
 		// Mouse wheel support
-		if (overSlider && FlxG.mouse.wheel != 0 && !inputBlocked)
+		if (overSlider && FlxG.mouse.deltaWheel.y != 0 && !inputBlocked)
 		{
 			var step:Float = (max - min) / 20; // 5% increments
 			var multiplier:Int = FlxG.keys.pressed.SHIFT ? 5 : 1;
-			var newValue:Float = _value + step * FlxG.mouse.wheel * multiplier;
+			var newValue:Float = _value + step * FlxG.mouse.deltaWheel.y * multiplier;
 			newValue = Math.max(min, Math.min(max, newValue));
 			if (newValue != _value)
 			{

@@ -507,8 +507,8 @@ class Paths
 		var animateFolder:String = getPath('images/$key', library);
 
 		#if FEATURE_MODS
-		var modFolder:String = modsImages(key);
-		if (FileSystem.exists(modFolder))
+		var modFolder:String = modFolders('images/' + key);
+		if (FileSystem.exists(modFolder) && FileSystem.isDirectory(modFolder))
 			return FlxAnimateFrames.fromAnimate(modFolder, settings);
 		#end
 

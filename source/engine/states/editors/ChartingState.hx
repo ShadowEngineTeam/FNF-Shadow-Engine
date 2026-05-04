@@ -2160,18 +2160,18 @@ class ChartingState extends MusicBeatState
 
 			if (!controls.mobileC)
 			{
-				if (FlxG.mouse.wheel != 0)
+				if (FlxG.mouse.deltaWheel.y != 0)
 				{
 					FlxG.sound.music.pause();
 					if (!mouseQuant)
-						FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.8);
+						FlxG.sound.music.time -= (FlxG.mouse.deltaWheel.y * Conductor.stepCrochet * 0.8);
 					else
 					{
 						var time:Float = FlxG.sound.music.time;
 						var beat:Float = curDecBeat;
 						var snap:Float = quantization / 4;
 						var increase:Float = 1 / snap;
-						if (FlxG.mouse.wheel > 0)
+						if (FlxG.mouse.deltaWheel.y > 0)
 						{
 							var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
 							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);

@@ -581,11 +581,11 @@ class ShadowDropdown extends FlxSpriteGroup
 
 		if (isOpen && isMouseOverList(cam))
 		{
-			var wheel:Int = FlxG.mouse.wheel;
+			var wheel:Int = Math.round(FlxG.mouse.deltaWheel.y);
 			var maxScroll:Int = Std.int(Math.max(0, options.length - Math.min(options.length, _maxVisible)));
 			if (wheel != 0 && maxScroll > 0)
 			{
-				_scrollIndex = Std.int(Math.max(0, Math.min(maxScroll, _scrollIndex - wheel)));
+				_scrollIndex = Math.round(FlxMath.bound(_scrollIndex - wheel, 0, maxScroll));
 				buildDropList();
 			}
 		}

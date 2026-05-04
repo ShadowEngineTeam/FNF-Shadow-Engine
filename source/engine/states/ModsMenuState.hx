@@ -444,8 +444,8 @@ class ModsMenuState extends MusicBeatState
 						changeSelectedMod(shiftMult);
 					else if (controls.UI_UP_P)
 						changeSelectedMod(-shiftMult);
-					else if (FlxG.mouse.wheel != 0)
-						changeSelectedMod(-FlxG.mouse.wheel * shiftMult, true);
+					else if (FlxG.mouse.deltaWheel.y != 0)
+						changeSelectedMod(-Math.round(FlxG.mouse.deltaWheel.y) * shiftMult, true);
 					else if (FlxG.keys.justPressed.HOME
 						|| FlxG.keys.justPressed.END
 						|| FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)
