@@ -193,6 +193,6 @@ class Framerate extends Sprite
 	{
 		if (scale == null)
 			scale = Math.min(FlxG.stage.window.width / FlxG.width, FlxG.stage.window.height / FlxG.height);
-		scaleX = scaleY = (scale < 1 ? scale : 1);
+		scaleX = scaleY = #if ios scale #else (scale < 1 ? scale : 1) #end;
 	}
 }
