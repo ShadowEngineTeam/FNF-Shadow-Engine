@@ -167,7 +167,6 @@ class Character extends FlxAnimate
 		{
 			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
 			{
-				trace('texture atlas');
 				spriteType = TEXTURE_ATLAS;
 				isAnimateAtlas = true;
 				isMultiAtlas = false;
@@ -175,7 +174,6 @@ class Character extends FlxAnimate
 			}
 			else
 			{
-				trace('normal sprite');
 				spriteType = SPRITE;
 				isMultiAtlas = isAnimateAtlas = false;
 				frames = Paths.getAtlas(json.image);
