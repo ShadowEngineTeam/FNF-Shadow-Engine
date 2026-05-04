@@ -1,22 +1,22 @@
 package objects;
 
-import flixel.FlxG;
-import flixel.system.frontEnds.SoundFrontEnd;
 import flixel.system.ui.FlxSoundTray;
+import flixel.system.FlxAssets.FlxSoundAsset;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 
 class CustomSoundTray extends FlxSoundTray
 {
-	var graphicScale:Float = 0.3;
+	var graphicScale:Float = 0.30;
 	var lerpYPos:Float = 0;
 	var alphaTarget:Float = 0;
-	var volumeMaxSound:String;
+
+	var volumeMaxSound:FlxSoundAsset;
 	var _lastVolume:Int = -1;
+	var _wasMuted:Bool = false;
 
 	var bg:Bitmap;
 	var backingBar:Bitmap;
-	var barBitmaps:Array<Bitmap> = [];
 	var imagesLoaded:Bool = false;
 
 	public function new()
@@ -26,23 +26,26 @@ class CustomSoundTray extends FlxSoundTray
 
 		bg = new Bitmap();
 		backingBar = new Bitmap();
-		
+
 		loadImages();
-		
+
 		y = -height;
 		visible = false;
-		screenCenter();
 
-		_lastVolume = Math.round(MathTools.logToLinear(FlxG.sound.volume) * 10);
+		volumeUpSound = Paths.sound("soundtray/Volup");
+		volumeDownSound = Paths.sound("soundtray/Voldown");
+		volumeMaxSound = Paths.sound("soundtray/VolMAX");
+
+		_lastVolume = Math.round(FlxG.sound.logToLinear(FlxG.sound.volume) * 10);
 	}
 
 	function loadImages():Void
 	{
 		if (imagesLoaded)
 			return;
-		
+
 		removeChildren();
-		
+
 		var bgPath:String = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
@@ -67,12 +70,11 @@ class CustomSoundTray extends FlxSoundTray
 		}
 
 		_bars = [];
-		barBitmaps = [];
-		
+
 		for (i in 1...11)
 		{
-			var barPath:String = getImagePath('soundtray/bars_$i');
-			
+			var barPath:String = getImagePath('soundtray/bars_' + i);
+
 			if (FileSystem.exists(barPath))
 			{
 				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(File.getBytes(barPath)));
@@ -83,16 +85,14 @@ class CustomSoundTray extends FlxSoundTray
 				bar.smoothing = true;
 				addChild(bar);
 				_bars.push(bar);
-				barBitmaps.push(bar);
 			}
 			else
 			{
 				var emptyBar:Bitmap = new Bitmap();
 				_bars.push(emptyBar);
-				barBitmaps.push(emptyBar);
 			}
 		}
-		
+
 		imagesLoaded = true;
 	}
 
@@ -107,91 +107,123 @@ class CustomSoundTray extends FlxSoundTray
 		return Paths.getPath('images/$key.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
 	}
 
-	function coolLerp(base:Float, target:Float, ratio:Float):Float
+	override public function update(ms:Float):Void
 	{
-		return base + (ratio * (FlxG.elapsed / (1 / 60))) * (target - base);
-	}
+		var elapsed = ms / 1000.0;
 
-	override function update(MS:Float):Void
-	{
-		y = coolLerp(y, lerpYPos, 0.1);
-		alpha = coolLerp(alpha, alphaTarget, 0.1);
-
-		var shouldHide = (FlxG.sound.muted == false && FlxG.sound.volume > 0);
+		var isMuted = (FlxG.sound.muted || FlxG.sound.volume == 0);
 
 		if (_timer > 0)
 		{
-			if (shouldHide)
-				_timer -= (MS / 1000);
-			alphaTarget = 1;
+			_timer -= elapsed;
+			if (_timer <= 0)
+			{
+				lerpYPos = -height - 10;
+				alphaTarget = 0;
+			}
 		}
-		else if (y >= -height)
-		{
-			lerpYPos = -height - 10;
-			alphaTarget = 0;
-		}
-
-		if (y <= -height)
+		else if (y <= -height)
 		{
 			visible = false;
 			active = false;
 		}
+
+		if (isMuted != _wasMuted)
+		{
+			if (isMuted)
+				showTray();
+			_wasMuted = isMuted;
+		}
+
+		y = smoothLerpPrecision(y, lerpYPos, elapsed, 0.768);
+		alpha = smoothLerpPrecision(alpha, alphaTarget, elapsed, 0.307);
+		screenCenter();
 	}
 
-	override public function show(up:Bool = false):Void
+	override function showIncrement():Void
 	{
-		var globalVolume:Int = Math.round(MathTools.logToLinear(FlxG.sound.volume) * 10);
+		moveTrayMakeVisible(true);
+		saveVolumePreferences();
+	}
+
+	override function showDecrement():Void
+	{
+		moveTrayMakeVisible(false);
+		saveVolumePreferences();
+	}
+
+	function moveTrayMakeVisible(up:Bool = false):Void
+	{
+		showTray();
 
 		if (!silent)
 		{
-			var soundKey:String = null;
+			var globalVolume:Int = Math.round(FlxG.sound.logToLinear(FlxG.sound.volume) * 10);
+			var sound:Null<FlxSoundAsset> = null;
+
 			if (up)
 			{
 				if (_lastVolume == 10 && globalVolume == 10)
-					soundKey = 'soundtray/VolMAX';
+					sound = volumeMaxSound;
 				else
-					soundKey = 'soundtray/Volup';
+					sound = volumeUpSound;
 			}
 			else
-				soundKey = 'soundtray/Voldown';
+				sound = volumeDownSound;
 
-			if (soundKey != null)
-			{
-				var sound = Paths.sound(soundKey, 'shared');
-				if (sound != null)
-					FlxG.sound.play(sound);
-			}
+			if (sound != null)
+				FlxG.sound.play(sound);
 		}
 
+		_lastVolume = Math.round(FlxG.sound.logToLinear(FlxG.sound.volume) * 10);
+	}
+
+	function showTray():Void
+	{
 		_timer = 1;
 		lerpYPos = 10;
 		visible = true;
 		active = true;
+		alphaTarget = 1;
 
-		if (FlxG.sound.muted || FlxG.sound.volume == 0)
-			globalVolume = 0;
+		updateBars();
+	}
 
-		_lastVolume = globalVolume;
-
-		FlxG.save.data.volume = FlxG.sound.volume;
-		FlxG.save.data.mute = FlxG.sound.muted;
+	function updateBars():Void
+	{
+		var globalVolume:Int = FlxG.sound.muted || FlxG.sound.volume == 0 ? 0 : Math.round(FlxG.sound.logToLinear(FlxG.sound.volume) * 10);
 
 		for (i in 0..._bars.length)
 			_bars[i].visible = i < globalVolume;
 	}
-}
 
-private class MathTools
-{
-	public static function linearToLog(x:Float, minValue:Float = 0.001):Float
+	function saveVolumePreferences():Void
 	{
-		x = Math.max(0, Math.min(1, x));
-		return Math.exp(Math.log(minValue) * (1 - x));
+		#if FLX_SAVE
+		if (FlxG.save.isBound)
+		{
+			FlxG.save.data.mute = FlxG.sound.muted;
+			FlxG.save.data.volume = FlxG.sound.volume;
+			FlxG.save.flush();
+		}
+		#end
 	}
 
-	public static function logToLinear(x:Float, minValue:Float = 0.001):Float
+	static function smoothLerpPrecision(base:Float, target:Float, deltaTime:Float, duration:Float, precision:Float = 1 / 100):Float
 	{
-		x = Math.max(minValue, Math.min(1, x));
-		return 1 - (Math.log(x) / Math.log(minValue));
+		function lerp(base:Float, target:Float, alpha:Float):Float
+		{
+			if (alpha == 0)
+				return base;
+			if (alpha == 1)
+				return target;
+			return base + alpha * (target - base);
+		}
+
+		if (deltaTime == 0)
+			return base;
+		if (base == target)
+			return target;
+		return lerp(target, base, Math.pow(precision, deltaTime / duration));
 	}
 }
