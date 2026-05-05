@@ -35,6 +35,7 @@ class Project extends HXProject
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
 	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
+	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -231,6 +232,7 @@ class Project extends HXProject
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
+		USE_OPENFL_FILESYSTEM.integrate(FEATURE_MODS.isDisabled() && !isMobile());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
