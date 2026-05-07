@@ -5,7 +5,6 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 
 #if cpp
-/*
 @:cppFileCode('
 #if defined(_WIN32)
   #include <windows.h>
@@ -16,7 +15,6 @@ import openfl.text.TextFormat;
   #include <stdio.h>
 #endif
 ')
-*/
 @:cppNamespaceCode('
 size_t MemoryCounter_obj::native_getMemory()
 {
