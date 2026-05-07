@@ -442,9 +442,6 @@ class ShadowInputText extends FlxText
 				selectAll();
 
 			case X if (commandPressed):
-				#if (js && html5)
-				FlxG.stage.window.textInputEnabled = true;
-				#end
 				if (hasSelection())
 				{
 					Clipboard.text = getSelectedText();
@@ -459,18 +456,12 @@ class ShadowInputText extends FlxText
 				}
 
 			case C if (commandPressed):
-				#if (js && html5)
-				FlxG.stage.window.textInputEnabled = true;
-				#end
 				if (hasSelection())
 					Clipboard.text = getSelectedText();
 				else
 					Clipboard.text = text;
 
 			case V if (commandPressed):
-				#if (js && html5)
-				FlxG.stage.window.textInputEnabled = true;
-				#end
 				var clipboardText:String = Clipboard.text;
 				if (clipboardText != null)
 					pasteClipboardText(clipboardText);
@@ -1361,16 +1352,16 @@ class ShadowInputText extends FlxText
 	{
 		if (newFocus)
 		{
+			if (_caretTimer == null)
+				_caretTimer = new FlxTimer();
+			else
+				_caretTimer.cancel();
+
+			_caretTimer.start(0.5, toggleCaret, 0);
+			caret.visible = true;
+
 			if (hasFocus != newFocus)
 			{
-				if (_caretTimer == null)
-					_caretTimer = new FlxTimer();
-				else
-					_caretTimer.cancel();
-
-				_caretTimer.start(0.5, toggleCaret, 0);
-				caret.visible = true;
-
 				var textLen:Int = (text != null) ? text.length : 0;
 				var moveCaretToEnd:Bool = true;
 
@@ -1387,9 +1378,8 @@ class ShadowInputText extends FlxText
 					updateSelectionSprite();
 				}
 
-				#if mobile
-				FlxG.stage.window.textInputEnabled = true;
-				#end
+				hasFocus = newFocus;
+				calcFrame();
 			}
 		}
 		else
@@ -1402,21 +1392,15 @@ class ShadowInputText extends FlxText
 			_selecting = false;
 			clearSelection();
 
-			#if mobile
-			FlxG.stage.window.textInputEnabled = false;
-			#end
+			if (hasFocus != newFocus)
+			{
+				hasFocus = newFocus;
+				calcFrame();
+			}
 		}
 
-		if (newFocus != hasFocus)
-		{
-			hasFocus = newFocus;
-			calcFrame();
-
-			#if (js && html5)
-			var window:lime.ui.Window = FlxG.stage.window;
-			@:privateAccess window.__backend.setTextInputEnabled(newFocus);
-			#end
-		}
+		var window:lime.ui.Window = FlxG.stage.window;
+		@:privateAccess window.__backend.setTextInputEnabled(newFocus);
 
 		return hasFocus;
 	}
