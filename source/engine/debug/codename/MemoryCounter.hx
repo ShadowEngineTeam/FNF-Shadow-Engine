@@ -16,26 +16,26 @@ import openfl.text.TextFormat;
 #endif
 ')
 @:cppNamespaceCode('
-size_t MemoryCounter_obj::native_getMemory()
+double MemoryCounter_obj::native_getMemory()
 {
 #if defined(_WIN32)
     PROCESS_MEMORY_COUNTERS_EX info;
     if (GetProcessMemoryInfo(GetCurrentProcess(),
                              (PROCESS_MEMORY_COUNTERS*)&info,
                              sizeof(info))) {
-        return (size_t)info.PrivateUsage;
+        return (double)info.PrivateUsage;
     }
-    return (size_t)0;
+    return (double)0;
 #elif defined(__APPLE__) && defined(__MACH__)
     struct task_vm_info vmInfo;
     mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
     if (task_info(mach_task_self(), TASK_VM_INFO,
                   (task_info_t)&vmInfo, &count) == KERN_SUCCESS) {
-        return (size_t)vmInfo.internal + (size_t)vmInfo.compressed;
+        return (double)vmInfo.internal + (double)vmInfo.compressed;
     }
-    return (size_t)0;
+    return (double)0;
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
-    size_t vmrss = 0, vmswap = 0;
+    double vmrss = 0, vmswap = 0;
     FILE *fp = fopen("/proc/self/status", "r");
     if (fp) {
         char line[256];
@@ -46,14 +46,14 @@ size_t MemoryCounter_obj::native_getMemory()
         fclose(fp);
         return (vmrss + vmswap) * 1024;
     }
-    return (size_t)0;
+    return (double)0;
 #else
-    return (size_t)0;
+    return (double)0;
 #endif
 }
 ')
 @:headerClassCode('
-    static size_t native_getMemory();
+    static double native_getMemory();
 ')
 #end
 class MemoryCounter extends Sprite
@@ -124,7 +124,7 @@ class MemoryCounter extends Sprite
 	#if cpp
 	@:noCompletion
 	@:native('debug::codename::MemoryCounter_obj::native_getMemory')
-	private static function __getMemory():cpp.SizeT
+	private static function __getMemory():Float
 		return 0;
 	#end
 
