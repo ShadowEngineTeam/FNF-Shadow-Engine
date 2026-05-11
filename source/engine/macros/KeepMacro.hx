@@ -52,6 +52,7 @@ class KeepMacro
 			"hxvlc.openfl",
 			"vlc",
 			#end
+			"psychlua",
 			// BASE HAXE
 			"DateTools",
 			"EReg",
