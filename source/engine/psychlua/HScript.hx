@@ -118,6 +118,8 @@ class HScript extends SScript
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
+		set('ScriptedState', ScriptedState);
+		set('ScriptedSubState', ScriptedSubState);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
