@@ -3,7 +3,6 @@ package psychlua;
 import flixel.FlxBasic;
 import objects.Character;
 import psychlua.LuaUtils;
-import psychlua.CustomSubstate;
 #if FEATURE_LUA
 import psychlua.FunkinLua;
 #end
@@ -114,7 +113,6 @@ class HScript extends SScript
 		set('Note', objects.Note);
 		set('NoteSplash', objects.NoteSplash);
 		set('SustainSplash', objects.SustainSplash);
-		set('CustomSubstate', CustomSubstate);
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
@@ -333,8 +331,6 @@ class HScript extends SScript
 		set('controls', Controls.instance);
 
 		set('buildTarget', LuaUtils.getBuildTarget());
-		set('customSubstate', CustomSubstate.instance);
-		set('customSubstateName', CustomSubstate.name);
 
 		set('Function_Stop', LuaUtils.Function_Stop);
 		set('Function_Continue', LuaUtils.Function_Continue);

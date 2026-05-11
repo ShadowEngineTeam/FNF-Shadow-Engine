@@ -434,11 +434,17 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		if (curStep % 4 == 0)
 			beatHit();
+
+		setOnScripts('curStep', curStep);
+		callOnScripts('onStepHit');
 	}
 
 	public function beatHit():Void
 	{
 		// do literally nothing dumbass
+		// OR NOT!!!! - Homura (2026) [yes I forgor]
+		setOnScripts('curBeat', curBeat);
+		callOnScripts('onBeatHit');
 	}
 
 	public function sectionHit():Void

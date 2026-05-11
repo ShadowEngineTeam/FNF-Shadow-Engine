@@ -943,9 +943,9 @@ class FunkinLua
 				}
 				else
 				{
-					var groupOrArray:Dynamic = CustomSubstate.instance != null ? CustomSubstate.instance : LuaUtils.getTargetInstance();
+					var inst:Dynamic = LuaUtils.getTargetInstance();
 					leObj.zIndex = position;
-					groupOrArray.refresh();
+					inst.refresh();
 				}
 				return;
 			}
@@ -1759,10 +1759,10 @@ class FunkinLua
 
 		#if FEATURE_DISCORD_RPC DiscordClient.addLuaCallbacks(this); #end
 		#if FEATURE_HSCRIPT HScript.implement(this); #end
+		ScriptedState.implement(this);
 		ReflectionFunctions.implement(this);
 		TextFunctions.implement(this);
 		ExtraFunctions.implement(this);
-		CustomSubstate.implement(this);
 		ShaderFunctions.implement(this);
 		DeprecatedFunctions.implement(this);
 		MobileFunctions.implement(this);
@@ -2078,7 +2078,7 @@ class FunkinLua
 	{
 		final s = FlxG.state;
 
-		if (Std.isOfType(s, CustomSubstate) || Std.isOfType(s.subState, CustomSubstate))
+		if (Std.isOfType(s, ScriptedSubState) || Std.isOfType(s.subState, ScriptedSubState))
 			return lastMusicState;
 
 		if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
