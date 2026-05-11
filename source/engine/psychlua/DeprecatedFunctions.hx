@@ -130,15 +130,15 @@ class DeprecatedFunctions
 			FunkinLua.luaTrace("getPropertyLuaSprite is deprecated! Use getProperty instead", false, true);
 			if (FunkinLua.getCurrentMusicState().modchartSprites.exists(tag))
 			{
-				var variable:Array<String> = variable.split('.');
-				if (variable.length > 1)
+				var killMe:Array<String> = variable.split('.');
+				if (killMe.length > 1)
 				{
-					var modchartSpriteVal:Dynamic = Reflect.getProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), variable[0]);
-					for (i in 1...variable.length - 1)
+					var coverMeInPiss:Dynamic = Reflect.getProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), killMe[0]);
+					for (i in 1...killMe.length - 1)
 					{
-						modchartSpriteVal = Reflect.getProperty(modchartSpriteVal, variable[i]);
+						coverMeInPiss = Reflect.getProperty(coverMeInPiss, killMe[i]);
 					}
-					return Reflect.getProperty(modchartSpriteVal, variable[variable.length - 1]);
+					return Reflect.getProperty(coverMeInPiss, killMe[killMe.length - 1]);
 				}
 				return Reflect.getProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), variable);
 			}
@@ -149,15 +149,15 @@ class DeprecatedFunctions
 			FunkinLua.luaTrace("setPropertyLuaSprite is deprecated! Use setProperty instead", false, true);
 			if (FunkinLua.getCurrentMusicState().modchartSprites.exists(tag))
 			{
-				var variable:Array<String> = variable.split('.');
-				if (variable.length > 1)
+				var killMe:Array<String> = variable.split('.');
+				if (killMe.length > 1)
 				{
-					var modchartSpriteVal:Dynamic = Reflect.getProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), variable[0]);
-					for (i in 1...variable.length - 1)
+					var coverMeInPiss:Dynamic = Reflect.getProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), killMe[0]);
+					for (i in 1...killMe.length - 1)
 					{
-						modchartSpriteVal = Reflect.getProperty(modchartSpriteVal, variable[i]);
+						coverMeInPiss = Reflect.getProperty(coverMeInPiss, killMe[i]);
 					}
-					Reflect.setProperty(modchartSpriteVal, variable[variable.length - 1], value);
+					Reflect.setProperty(coverMeInPiss, killMe[killMe.length - 1], value);
 					return true;
 				}
 				Reflect.setProperty(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), variable, value);
