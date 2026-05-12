@@ -9,6 +9,8 @@ import openfl.text.TextFormat;
 #if defined(_WIN32)
   #include <windows.h>
   #include <psapi.h>
+  #include <winternl.h>
+  #pragma comment(lib, "ntdll.lib")
 #elif defined(__APPLE__) && defined(__MACH__)
   #include <mach/mach.h>
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
@@ -16,39 +18,75 @@ import openfl.text.TextFormat;
 #endif
 ')
 @:cppNamespaceCode('
+// https://github.com/winsiderss/systeminformer/blob/v3.2.25011.2103/SystemInformer/procprv.c
+#if defined(_WIN32)
+typedef struct _VM_COUNTERS_EX {
+    SIZE_T PeakVirtualSize;
+    SIZE_T VirtualSize;
+    ULONG  PageFaultCount;
+    SIZE_T PeakWorkingSetSize;
+    SIZE_T WorkingSetSize;
+    SIZE_T QuotaPeakPagedPoolUsage;
+    SIZE_T QuotaPagedPoolUsage;
+    SIZE_T QuotaPeakNonPagedPoolUsage;
+    SIZE_T QuotaNonPagedPoolUsage;
+    SIZE_T PagefileUsage;
+    SIZE_T PeakPagefileUsage;
+    SIZE_T PrivateUsage;
+} VM_COUNTERS_EX_LOCAL;
+static bool isRunningUnderWine()
+{
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    if (!ntdll) return false;
+    return GetProcAddress(ntdll, "wine_get_version") != nullptr;
+}
+#endif
 double MemoryCounter_obj::native_getMemory()
 {
 #if defined(_WIN32)
-    PROCESS_MEMORY_COUNTERS_EX info;
-    if (GetProcessMemoryInfo(GetCurrentProcess(),
-                             (PROCESS_MEMORY_COUNTERS*)&info,
-                             sizeof(info))) {
-        return (double)info.PrivateUsage;
-    }
-    return (double)0;
+	// https://github.com/winsiderss/systeminformer/blob/v3.2.25011.2103/SystemInformer/procprv.c
+    VM_COUNTERS_EX_LOCAL counters = {0};
+    NTSTATUS status = NtQueryInformationProcess(
+        GetCurrentProcess(),
+        (PROCESSINFOCLASS)3, // ProcessVmCounters
+        &counters,
+        sizeof(counters),
+        NULL
+    );
+    if (NT_SUCCESS(status))
+        return isRunningUnderWine() ? (double)counters.PagefileUsage : (double)counters.PrivateUsage;
+    return 0.0;
 #elif defined(__APPLE__) && defined(__MACH__)
-    struct task_vm_info vmInfo;
+    struct task_vm_info vmInfo = {0};
     mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
-    if (task_info(mach_task_self(), TASK_VM_INFO,
-                  (task_info_t)&vmInfo, &count) == KERN_SUCCESS) {
-        return (double)vmInfo.internal + (double)vmInfo.compressed;
-    }
-    return (double)0;
+    kern_return_t kr = task_info(mach_task_self(), TASK_VM_INFO,
+                                 (task_info_t)&vmInfo, &count);
+    if (kr != KERN_SUCCESS)
+        return 0.0;
+    const mach_msg_type_number_t kMinCount =
+        (mach_msg_type_number_t)(
+            (offsetof(task_vm_info_data_t, compressed) + sizeof(vmInfo.compressed))
+            / sizeof(natural_t));
+    if (count >= kMinCount)
+        return (double)(vmInfo.resident_size + vmInfo.compressed);
+    return (double)vmInfo.resident_size;
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
-    size_t vmrss = 0, vmswap = 0;
     FILE *fp = fopen("/proc/self/status", "r");
-    if (fp) {
-        char line[256];
-        while (fgets(line, sizeof(line), fp)) {
-            if (sscanf(line, "VmRSS: %zu kB", &vmrss) == 1) continue;
-            if (sscanf(line, "VmSwap: %zu kB", &vmswap) == 1) continue;
-        }
-        fclose(fp);
-        return (double)(vmrss + vmswap) * 1024.0;
+    if (!fp)
+		return 0.0;
+    char line[256];
+    unsigned long vmpriv = 0, vmrss = 0, vmswap = 0;
+    while (fgets(line, sizeof(line), fp)) {
+        sscanf(line, "VmPrivate: %lu kB", &vmpriv);
+        sscanf(line, "VmRSS: %lu kB",     &vmrss);
+        sscanf(line, "VmSwap: %lu kB",    &vmswap);
     }
-    return (double)0;
+    fclose(fp);
+    if (vmpriv > 0)
+        return (double)vmpriv * 1024.0;
+    return (double)(vmrss + vmswap) * 1024.0;
 #else
-    return (double)0;
+    return 0.0;
 #endif
 }
 ')
