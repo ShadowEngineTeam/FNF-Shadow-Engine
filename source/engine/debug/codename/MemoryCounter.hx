@@ -35,7 +35,7 @@ double MemoryCounter_obj::native_getMemory()
     }
     return (double)0;
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
-    double vmrss = 0, vmswap = 0;
+    size_t vmrss = 0, vmswap = 0;
     FILE *fp = fopen("/proc/self/status", "r");
     if (fp) {
         char line[256];
@@ -44,7 +44,7 @@ double MemoryCounter_obj::native_getMemory()
             if (sscanf(line, "VmSwap: %zu kB", &vmswap) == 1) continue;
         }
         fclose(fp);
-        return (vmrss + vmswap) * 1024;
+        return (double)(vmrss + vmswap) * 1024.0;
     }
     return (double)0;
 #else
