@@ -35,7 +35,6 @@ class SystemInfo extends FramerateCategory
 	public static var totalMem:String = "Unknown";
 	public static var totalSwapMem:String = "Unknown";
 	public static var memType:String = "Unknown";
-	public static var gpuMaxSize:String = "Unknown";
 
 	static var __formattedSysText:String = "";
 
@@ -153,8 +152,6 @@ class SystemInfo extends FramerateCategory
 			if (flixel.FlxG.stage.context3D != null && flixel.FlxG.stage.context3D.gl != null)
 			{
 				gpuName = Std.string(flixel.FlxG.stage.context3D.gl.getParameter(flixel.FlxG.stage.context3D.gl.RENDERER)).split("/")[0].trim();
-				var size = #if FLX_OPENGL_AVAILABLE FlxG.bitmap.maxTextureSize #else 0 #end;
-				gpuMaxSize = size + "x" + size;
 
 				if (openfl.display3D.Context3D.__glMemoryTotalAvailable != -1)
 				{
@@ -212,8 +209,6 @@ class SystemInfo extends FramerateCategory
 			if (vramKnown)
 				__formattedSysText += 'VRAM: $vRAM'; // 1000 bytes of vram (apus)
 		}
-		if (gpuMaxSize != "Unknown")
-			__formattedSysText += '\nMax Bitmap Size: $gpuMaxSize';
 		if (totalMem != "Unknown" && memType != "Unknown")
 			__formattedSysText += '\nTotal MEM: $totalMem $memType ${totalSwapMem != "Unknown" ? '+ $totalSwapMem SWAP' : ""}';
 	}
