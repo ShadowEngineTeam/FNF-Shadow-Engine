@@ -106,6 +106,20 @@ class Convert
 				ret = convertTable(l, idx);
 			case type if (type == Lua.TFUNCTION):
 				ret = new LuaFunction(cpp.Pointer.fromRaw(l), Lua.ref(l, Lua.REGISTRYINDEX));
+			case type if (type == Lua.TINTEGER):
+				var isInt:Int = 0;
+				var isIntPtr = cpp.Pointer.addressOf(isInt);
+				ret = Lua.tointeger64(l, idx, isIntPtr.raw);
+			case type if (type == Lua.TVECTOR):
+				// lua_tovector returns const float* so fuck you
+				var x:Float = 0, y:Float = 0, z:Float = 0, w:Float = 0;
+				untyped __cpp__("if (lua_type({0},{1}) == LUA_TVECTOR) {{ const float* _v = lua_tovector({0},{1}); {2} = _v[0]; {3} = _v[1]; {4} = _v[2]; {5} = _v[3]; }}", l, idx, x, y, z, w);
+				ret = [x, y, z, w];
+			case type if (type == Lua.TBUFFER):
+				var size:cpp.SizeT = 0;
+				var sizePtr = cpp.Pointer.addressOf(size);
+				var bufPtr:cpp.RawPointer<cpp.Void> = Lua.tobuffer(l, idx, sizePtr.raw);
+				ret = bufPtr != null ? cpp.Pointer.fromRaw(bufPtr) : null;
 			case type if (type == Lua.TUSERDATA || type == Lua.TLIGHTUSERDATA):
 				ret = cpp.Pointer.fromRaw(Lua.touserdata(l, idx));
 			case type if (type == Lua.TNIL):

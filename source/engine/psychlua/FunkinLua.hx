@@ -66,6 +66,11 @@ class FunkinLua
 
 		// LuaL.dostring(lua, CLENSE);
 
+		// Luau performance tweaks
+		Luau.enableCodegen(1);
+		Luau.bytecodeCacheSetCapacity(256);
+		Luau.setCompileOptions(2, 1, 0);
+
 		this.scriptName = scriptName.trim();
 		game.luaArray.push(this);
 
@@ -1772,18 +1777,21 @@ class FunkinLua
 		try
 		{
 			var isString:Bool = !FileSystem.exists(scriptName);
-			var result:Dynamic = null;
+			var status:Int = 0;
 			if (!isString)
-				result = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
+				status = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
 			else
-				result = LuaL.dostring(lua, scriptName);
+				status = LuaL.dostring(lua, scriptName);
 
-			var resultStr:String = Lua.tostring(lua, result);
-			if (resultStr != null && result != 0)
+			if (status != 0)
 			{
-				trace(resultStr);
-				CoolUtil.showPopUp(resultStr, 'Error on lua script!');
-				luaTrace('$scriptName\n$resultStr', true, false, FlxColor.RED);
+				var errorMsg:String = Lua.tostring(lua, -1);
+				Lua.pop(lua, 1);
+				if (errorMsg == null)
+					errorMsg = getErrorMessage(status);
+				trace(errorMsg);
+				CoolUtil.showPopUp(errorMsg, 'Error on lua script!');
+				luaTrace('$scriptName\n$errorMsg', true, false, FlxColor.RED);
 				lua = null;
 				return;
 			}
@@ -1837,8 +1845,19 @@ class FunkinLua
 			// Checks if it's not successful, then show a error.
 			if (status != Lua.OK)
 			{
-				var error:String = getErrorMessage(status);
-				luaTrace("ERROR (" + func + "): " + error, false, false, FlxColor.RED);
+				var errorStr:String;
+				var error:String = Lua.tostring(lua, -1);
+				if (error != null)
+				{
+					LuaL.traceback(lua, lua, error, 2);
+					errorStr = Lua.tostring(lua, -1);
+					Lua.pop(lua, 2);
+				}
+				else
+				{
+					errorStr = getErrorMessage(status);
+				}
+				luaTrace("ERROR (" + func + "): " + errorStr, false, false, FlxColor.RED);
 				return LuaUtils.Function_Continue;
 			}
 
@@ -1942,16 +1961,10 @@ class FunkinLua
 		if (lua == null)
 			return false;
 
-		var result:String = null;
 		Lua.getglobal(lua, variable);
-		result = Convert.fromLua(lua, -1);
+		final result:Bool = Lua.toboolean(lua, -1) == 1;
 		Lua.pop(lua, 1);
-
-		if (result == null)
-		{
-			return false;
-		}
-		return (result == 'true');
+		return result;
 		#else
 		return false;
 		#end
