@@ -160,6 +160,19 @@ class HScript extends SScript
 			}
 			return LuaUtils.getModSetting(saveTag, modName);
 		});
+		set('setModSetting', function(saveTag:String, value:Dynamic, ?modName:String = null)
+		{
+			if (modName == null)
+			{
+				if (this.modFolder == null)
+				{
+					FunkinLua.getCurrentMusicState().addTextToDebug('setModSetting: Argument #3 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					return null;
+				}
+				modName = this.modFolder;
+			}
+			return LuaUtils.setModSetting(saveTag, value, modName);
+		});
 
 		// Keyboard & Gamepads
 		set('keyboardJustPressed', function(name:String) return Reflect.getProperty(FlxG.keys.justPressed, name));

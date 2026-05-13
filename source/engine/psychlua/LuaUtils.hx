@@ -191,6 +191,24 @@ class LuaUtils
 		return null;
 	}
 
+	public static function setModSetting(saveTag:String, value:Dynamic, ?modName:String = null)
+	{
+		#if FEATURE_MODS
+		if (FlxG.save.data.modSettings == null)
+			FlxG.save.data.modSettings = new Map<String, Dynamic>();
+
+		var settings:Map<String, Dynamic> = FlxG.save.data.modSettings.get(modName);
+		if (settings == null)
+			settings = new Map<String, Dynamic>();
+
+		settings.set(saveTag, value);
+		FlxG.save.data.modSettings.set(modName, settings);
+		FlxG.save.flush();
+		return value;
+		#end
+		return null;
+	}
+
 	public static function isMap(variable:Dynamic)
 	{
 		/*switch(Type.typeof(variable)){
