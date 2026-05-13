@@ -43,10 +43,10 @@
       "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
-      "name": "hxluajit",
+      "name": "hxluau",
       "type": "git",
-      "ref": "015ca428e5dcc8e4f9ecea8a1be5958cf9cea7b1",
-      "url": "https://github.com/ShadowEngineTeam/hxluajit"
+      "ref": "4f1e2d917bbbc95b80186c6dbf96bae5cfdcd77c",
+      "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
       "name": "hxgamemode",
