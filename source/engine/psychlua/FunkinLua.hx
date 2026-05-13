@@ -1751,6 +1751,19 @@ class FunkinLua
 			}
 			return LuaUtils.getModSetting(saveTag, modName);
 		});
+		addLocalCallback("setModSetting", function(saveTag:String, value:Dynamic, ?modName:String = null)
+		{
+			if (modName == null)
+			{
+				if (this.modFolder == null)
+				{
+					FunkinLua.luaTrace('setModSetting: Argument #3 is null and script is not inside a packed Mod folder!', false, false, FlxColor.RED);
+					return null;
+				}
+				modName = this.modFolder;
+			}
+			return LuaUtils.setModSetting(saveTag, value, modName);
+		});
 		#end
 
 		set("debugPrint", function(text:Dynamic = '', color:String = 'WHITE') FunkinLua.getCurrentMusicState().addTextToDebug(text, CoolUtil.colorFromString(color)));
