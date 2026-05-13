@@ -397,7 +397,7 @@ class Project extends HXProject
 		includeHaxelib("flixel-animate");
 
 		if (FEATURE_LUA.isEnabled())
-			includeHaxelib("hxluajit");
+			includeHaxelib("hxluau");
 		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
 		if (FEATURE_VIDEOS.isEnabled())

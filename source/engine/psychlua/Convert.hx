@@ -3,7 +3,7 @@ package psychlua;
 #if FEATURE_LUA
 import haxe.Constraints.IMap;
 import psychlua.FunkinLua.State;
-import hxluajit.Types;
+import hxluau.Types;
 
 /**
  * Some borrowed code from hxluajit-wrapper.
@@ -20,7 +20,7 @@ class Convert
 			callbacks.set(name, func);
 
 		Lua.pushstring(l, name);
-		Lua.pushcclosure(l, cpp.Callable.fromStaticFunction(handleCallback), 1);
+		Lua.pushcclosure(l, cpp.Callable.fromStaticFunction(handleCallback), name, 1);
 		Lua.setglobal(l, name);
 	}
 
@@ -105,7 +105,7 @@ class Convert
 			case type if (type == Lua.TTABLE):
 				ret = convertTable(l, idx);
 			case type if (type == Lua.TFUNCTION):
-				ret = new LuaFunction(cpp.Pointer.fromRaw(l), LuaL.ref(l, Lua.REGISTRYINDEX));
+				ret = new LuaFunction(cpp.Pointer.fromRaw(l), Lua.ref(l, Lua.REGISTRYINDEX));
 			case type if (type == Lua.TUSERDATA || type == Lua.TLIGHTUSERDATA):
 				ret = cpp.Pointer.fromRaw(Lua.touserdata(l, idx));
 			case type if (type == Lua.TNIL):

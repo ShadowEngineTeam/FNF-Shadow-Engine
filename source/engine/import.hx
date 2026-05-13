@@ -6,8 +6,8 @@ import backend.Discord;
 import haxe.Json;
 // Psych
 #if FEATURE_LUA
-import hxluajit.*;
-import hxluajit.Types;
+import hxluau.*;
+import hxluau.Types;
 import psychlua.*;
 #else
 import psychlua.LuaUtils;
