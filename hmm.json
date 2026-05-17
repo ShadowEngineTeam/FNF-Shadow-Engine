@@ -3,13 +3,13 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "8274836456bb037fc038a545178d509ddeb6c33e",
+      "ref": "2117ad5e6d44915dc9de8d6f8f089ce74ad4a27a",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-	  "ref": "bd1a0223ef3a9d494b40b1e111cbd044a34dc947",
+      "ref": "ecb50639f4b63ba062eba5927dd98d72244b17ed",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "ee3b507af828a4d03e80b36375bff5d702df71a6",
+      "ref": "48c7120b7c373556dcdaca57b6d641f9115b0fe9",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
@@ -43,10 +43,10 @@
       "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
-      "name": "hxluajit",
+      "name": "hxluau",
       "type": "git",
-      "ref": "015ca428e5dcc8e4f9ecea8a1be5958cf9cea7b1",
-      "url": "https://github.com/ShadowEngineTeam/hxluajit"
+      "ref": "526107c4aa1397f26dbcedbfd34fb8d392b28695",
+      "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
       "name": "hxgamemode",

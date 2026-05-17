@@ -7,6 +7,7 @@
 - Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) with [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
 - Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) with [`hxvlc`](https://github.com/ShadowEngineTeam/hxvlc) for better customizability in video cutscenes
 - Replaced [`SScript`](https://github.com/ShadowEngineTeam/SScript) with [`ShadowScript`](https://github.com/ShadowEngineTeam/SScript) for better compatibility in HScripting
+- Replaced [`linc_luajit`](https://github.com/ShadowEngineTeam/linc_luajit) with [`hxluau`](https://github.com/ShadowEngineTeam/hxluau) for better performance and compatibility in Lua scripting (we are so roblox)
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
