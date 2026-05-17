@@ -61,8 +61,8 @@ class FunkinLua
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
 
-		// trace('Lua version: ' + Lua.version());
-		// trace("LuaJIT version: " + Lua.versionJIT());
+		// trace('Luau version: ' + Lua.VERSION);
+		// trace("Luau release: " + Lua.RELEASE);
 
 		// LuaL.dostring(lua, CLENSE);
 
@@ -1798,7 +1798,8 @@ class FunkinLua
 
 			if (status != 0)
 			{
-				var errorMsg:String = Lua.tostring(lua, -1);
+				final rawMsg = Lua.tostring(lua, -1);
+				var errorMsg:String = rawMsg != null ? rawMsg.toString() : getErrorMessage(status);
 				Lua.pop(lua, 1);
 				if (errorMsg == null)
 					errorMsg = getErrorMessage(status);
@@ -1859,11 +1860,13 @@ class FunkinLua
 			if (status != Lua.OK)
 			{
 				var errorStr:String;
-				var error:String = Lua.tostring(lua, -1);
+				final rawErr = Lua.tostring(lua, -1);
+				var error:String = rawErr != null ? rawErr.toString() : null;
 				if (error != null)
 				{
 					LuaL.traceback(lua, lua, error, 2);
-					errorStr = Lua.tostring(lua, -1);
+					final rawStr = Lua.tostring(lua, -1);
+					errorStr = rawStr != null ? rawStr.toString() : getErrorMessage(status);
 					Lua.pop(lua, 2);
 				}
 				else
@@ -2005,7 +2008,8 @@ class FunkinLua
 	public function getErrorMessage(status:Int):String
 	{
 		#if FEATURE_LUA
-		var v:String = Lua.tostring(lua, -1);
+		final rawV = Lua.tostring(lua, -1);
+		var v:String = rawV != null ? rawV.toString() : null;
 		Lua.pop(lua, 1);
 
 		if (v != null)

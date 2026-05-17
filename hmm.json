@@ -3,13 +3,13 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "7856b4f925df25f99623a815f78289de4c6eccdc",
+      "ref": "2117ad5e6d44915dc9de8d6f8f089ce74ad4a27a",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "bd1a0223ef3a9d494b40b1e111cbd044a34dc947",
+      "ref": "ecb50639f4b63ba062eba5927dd98d72244b17ed",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "ee3b507af828a4d03e80b36375bff5d702df71a6",
+      "ref": "48c7120b7c373556dcdaca57b6d641f9115b0fe9",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
@@ -45,7 +45,7 @@
     {
       "name": "hxluau",
       "type": "git",
-      "ref": "9aef666a2adf0a676c98334b7404983b83ad2ee2",
+      "ref": "526107c4aa1397f26dbcedbfd34fb8d392b28695",
       "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
