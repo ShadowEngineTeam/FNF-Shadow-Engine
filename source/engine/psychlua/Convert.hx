@@ -95,7 +95,7 @@ class Convert
 			case TNull:
 				Lua.pushnil(l);
 			default:
-				trace('toLua: ${Type.typeof(v)}');
+				//trace('toLua: ${Type.typeof(v)}');
 				Lua.pushnil(l);
 				return false;
 		}
@@ -138,7 +138,7 @@ class Convert
 			case type if (type == Lua.TNIL):
 				ret = null;
 			default:
-				trace('fromLua: ${Lua.type(l, idx)}');
+				//trace('fromLua: ${Lua.type(l, idx)}');
 				ret = null;
 		}
 
