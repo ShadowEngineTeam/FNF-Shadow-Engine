@@ -188,6 +188,11 @@ class Paths
 		return getPath('$key.lua', TEXT, library);
 	}
 
+	inline public static function luau(key:String, ?library:String):String
+	{
+		return getPath('$key.luau', TEXT, library);
+	}
+
 	#if FEATURE_VIDEOS
 	public static function video(key:String):String
 	{

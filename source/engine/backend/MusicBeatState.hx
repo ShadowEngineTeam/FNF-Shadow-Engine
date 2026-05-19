@@ -34,6 +34,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	#if FEATURE_LUA
 	public var luaArray:Array<FunkinLua> = [];
+	public final luaExtensions:Array<String> = ['lua', 'luau'];
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
@@ -323,7 +324,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		#end
 
 		#if FEATURE_LUA
-		startLuasNamed('statescripts/' + currentClassName + '.lua');
+		startLuasNamed('statescripts/' + currentClassName);
 		#end
 		#if FEATURE_HSCRIPT
 		startHScriptsNamed('statescripts/' + currentClassName);
@@ -609,23 +610,44 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	#if FEATURE_LUA
 	public function startLuasNamed(luaFile:String)
 	{
-		var luaToLoad:String = '';
-		#if FEATURE_MODS
-		luaToLoad = Paths.modFolders(luaFile);
-		if (!FileSystem.exists(luaToLoad))
-		#end
-		luaToLoad = Paths.getSharedPath(luaFile);
-
-		if (FileSystem.exists(luaToLoad))
+		function doFile(file:String):Bool
 		{
-			for (script in luaArray)
-				if (script.scriptName == luaToLoad)
-					return false;
+			if (!luaExtensions.contains(Path.extension(file)))
+				return false;
 
-			new FunkinLua(luaToLoad);
-			return true;
+			var luaToLoad:String = file;
+			if (!FileSystem.exists(luaToLoad))
+			{
+				#if FEATURE_MODS
+				luaToLoad = Paths.modFolders(file);
+				if (!FileSystem.exists(luaToLoad))
+				#end
+					luaToLoad = Paths.getSharedPath(file);
+			}
+
+			if (FileSystem.exists(luaToLoad))
+			{
+				for (script in luaArray)
+					if (script.scriptName == luaToLoad)
+						return false;
+
+				new FunkinLua(luaToLoad);
+				return true;
+			}
+			else
+				return false;
 		}
-		return false;
+
+		var luaFileExt:String = Path.extension(luaFile);
+		if (luaFileExt != null && luaFileExt.length > 0 && luaExtensions.contains(luaFileExt))
+			return doFile(luaFile);
+
+		var loadedScripts:Bool = false;
+		for (ext in luaExtensions)
+			if (doFile(Path.withExtension(luaFile, ext)))
+				loadedScripts = true;
+
+		return loadedScripts;
 	}
 	#end
 

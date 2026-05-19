@@ -22,7 +22,7 @@ class ScriptedSubState extends MusicBeatSubstate
 			scriptBase = scriptBase.substr(0, scriptBase.length - ext.length - 1);
 
 		#if FEATURE_LUA
-		startLuasNamed(scriptBase + '.lua');
+		startLuasNamed(scriptBase);
 		#end
 
 		#if FEATURE_HSCRIPT

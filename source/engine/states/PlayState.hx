@@ -421,8 +421,7 @@ class PlayState extends MusicBeatState
 			for (file in FileSystem.readDirectory(folder))
 			{
 				#if FEATURE_LUA
-				if (file.toLowerCase().endsWith('.lua'))
-					new FunkinLua(folder + file);
+				startLuasNamed(folder + file);
 				#end
 
 				#if FEATURE_HSCRIPT
@@ -434,7 +433,7 @@ class PlayState extends MusicBeatState
 
 		// STAGE SCRIPTS
 		#if FEATURE_LUA
-		startLuasNamed('stages/' + curStage + '.lua');
+		startLuasNamed('stages/' + curStage);
 		#end
 
 		#if FEATURE_HSCRIPT
@@ -598,9 +597,9 @@ class PlayState extends MusicBeatState
 
 		#if FEATURE_LUA
 		for (notetype in noteTypes)
-			startLuasNamed('custom_notetypes/' + notetype + '.lua');
+			startLuasNamed('custom_notetypes/' + notetype);
 		for (event in eventsPushed)
-			startLuasNamed('custom_events/' + event + '.lua');
+			startLuasNamed('custom_events/' + event);
 		#end
 
 		#if FEATURE_HSCRIPT
@@ -626,8 +625,7 @@ class PlayState extends MusicBeatState
 			for (file in FileSystem.readDirectory(folder))
 			{
 				#if FEATURE_LUA
-				if (file.toLowerCase().endsWith('.lua'))
-					new FunkinLua(folder + file);
+				startLuasNamed(folder + file);
 				#end
 
 				#if FEATURE_HSCRIPT
@@ -782,38 +780,43 @@ class PlayState extends MusicBeatState
 
 	function startCharacterScripts(name:String)
 	{
-		// Lua
 		var doPush:Bool = false;
+		// Lua
 		#if FEATURE_LUA
-		var luaFile:String = 'characters/$name.lua';
+		var baseLuaPath:String = 'characters/$name';
+		for (ext in luaExtensions)
+		{
+			var candidate:String = baseLuaPath + '.' + ext;
+			var luaFile:String = '';
 
-		#if FEATURE_MODS
-		var modPath:String = Paths.modFolders(luaFile);
-		if (FileSystem.exists(modPath))
-		{
-			luaFile = modPath;
-			doPush = true;
-		}
-		else
-		#end
-		{
-			luaFile = Paths.getSharedPath(luaFile);
-			if (FileSystem.exists(luaFile))
-				doPush = true;
-		}
-
-		if (doPush)
-		{
-			for (script in luaArray)
+			#if FEATURE_MODS
+			var modPath:String = Paths.modFolders(candidate);
+			if (FileSystem.exists(modPath))
+				luaFile = modPath;
+			else
+			#end
 			{
-				if (script.scriptName == luaFile)
+				var sharedPath:String = Paths.getSharedPath(candidate);
+				if (FileSystem.exists(sharedPath))
+					luaFile = sharedPath;
+			}
+
+			if (luaFile.length > 0)
+			{
+				var alreadyRunning:Bool = false;
+				for (script in luaArray)
+					if (script.scriptName == luaFile)
+					{
+						alreadyRunning = true;
+						break;
+					}
+
+				if (!alreadyRunning)
 				{
-					doPush = false;
+					new FunkinLua(luaFile);
 					break;
 				}
 			}
-			if (doPush)
-				new FunkinLua(luaFile);
 		}
 		#end
 

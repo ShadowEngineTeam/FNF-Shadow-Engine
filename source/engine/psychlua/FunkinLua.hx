@@ -2002,6 +2002,19 @@ class FunkinLua
 		if (FileSystem.exists(sharedPath))
 			return sharedPath;
 
+		if (ext == '.lua')
+		{
+			var luauFile:String = scriptFile.substr(0, scriptFile.length - 4) + '.luau';
+			var sharedLuauPath:String = Paths.getSharedPath(luauFile);
+			#if FEATURE_MODS
+			var modLuauPath:String = Paths.modFolders(luauFile);
+			if (FileSystem.exists(modLuauPath))
+				return modLuauPath;
+			#end
+			if (FileSystem.exists(sharedLuauPath))
+				return sharedLuauPath;
+		}
+
 		return null;
 	}
 

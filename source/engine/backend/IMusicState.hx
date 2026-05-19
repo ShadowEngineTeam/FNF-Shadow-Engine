@@ -39,6 +39,7 @@ interface IMusicState
 
 	#if FEATURE_LUA
 	public var luaArray:Array<FunkinLua>;
+	public final luaExtensions:Array<String>;
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)

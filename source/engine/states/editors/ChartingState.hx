@@ -988,7 +988,7 @@ class ChartingState extends MusicBeatState
 				var isValid:Bool = false;
 
 				#if FEATURE_LUA
-				if (fileName.endsWith('.lua'))
+				if (fileName.endsWith('.lua') || fileName.endsWith('.luau'))
 					isValid = true;
 				#end
 
