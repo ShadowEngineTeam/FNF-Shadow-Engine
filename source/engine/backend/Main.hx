@@ -103,8 +103,10 @@ class Main extends Sprite
 		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash,
 			game.startFullscreen);
 
+		#if !html5
 		@:privateAccess
 		funkinGame._customSoundTray = objects.CustomSoundTray;
+		#end
 
 		addChild(funkinGame);
 
