@@ -96,7 +96,7 @@ class MobileFunctions
 				return FunkinLua.luaTrace('vibrate: No duration specified.');
 			else if (period == null)
 				period = 0;
-			return Haptic.vibrate(period, duration, amplitude);
+			return Haptic.vibrate(period, duration #if android, amplitude #end);
 		});
 
 		funk.set("addTouchPad", (DPadMode:String, ActionMode:String) ->
