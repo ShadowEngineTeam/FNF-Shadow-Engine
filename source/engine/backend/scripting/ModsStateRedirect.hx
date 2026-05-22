@@ -1,6 +1,7 @@
 package backend.scripting;
 
 import psychlua.ScriptedState;
+import psychlua.ScriptedSubState;
 
 class ModsStateRedirect
 {
@@ -68,13 +69,9 @@ class ModsStateRedirect
 		if (!loaded)
 			loadRedirects();
 
-		var className:String = Type.getClassName(Type.getClass(state));
+		var className:String = getClassName(state);
 		if (className == null)
 			return state;
-
-		var dotIndex:Int = className.lastIndexOf('.');
-		if (dotIndex >= 0)
-			className = className.substr(dotIndex + 1);
 
 		var redirectTarget:String = redirects.get(className);
 		if (redirectTarget != null && redirectTarget.length > 0)
@@ -84,5 +81,39 @@ class ModsStateRedirect
 		}
 
 		return state;
+	}
+
+	public static function redirectSubstate(subState:FlxSubState):FlxSubState
+	{
+		if (subState == null)
+			return null;
+		if (!loaded)
+			loadRedirects();
+
+		var className:String = getClassName(subState);
+		if (className == null)
+			return subState;
+
+		var redirectTarget:String = redirects.get(className);
+		if (redirectTarget != null && redirectTarget.length > 0)
+		{
+			// trace('Substate redirect: $className -> $redirectTarget');
+			return new ScriptedSubState(redirectTarget);
+		}
+
+		return subState;
+	}
+
+	static function getClassName(obj:Dynamic):Null<String>
+	{
+		var className:String = Type.getClassName(Type.getClass(obj));
+		if (className == null)
+			return null;
+
+		var dotIndex:Int = className.lastIndexOf('.');
+		if (dotIndex >= 0)
+			className = className.substr(dotIndex + 1);
+
+		return className;
 	}
 }

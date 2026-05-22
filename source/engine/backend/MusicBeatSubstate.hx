@@ -334,7 +334,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
-		super.openSubState(subState);
+		super.openSubState(backend.scripting.ModsStateRedirect.redirectSubstate(subState));
 	}
 
 	override function closeSubState()

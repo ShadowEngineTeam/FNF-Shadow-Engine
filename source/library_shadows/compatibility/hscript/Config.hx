@@ -1,6 +1,7 @@
 package hscript;
 
 class Config {
+	// Runs support for custom classes in these
 	public static final ALLOWED_CUSTOM_CLASSES = [
 		"flixel",
 		"flixel.addons",
@@ -31,6 +32,7 @@ class Config {
 		"macros",
 	];
 
+	// Runs support for abstract support in these
 	public static final ALLOWED_ABSTRACT_AND_ENUM = [
 		"flixel",
 		"flixel.util",
@@ -53,11 +55,15 @@ class Config {
 		"macros",
 	];
 
+	// Incase any of your files fail
+	// These are the module names
 	public static final DISALLOW_CUSTOM_CLASSES = [
 		"backend.Main",
 		"flixel.graphics.tile.FlxGraphicsShader",
 	];
 
+	// Incase any of your files fail
+	// These are the module names
 	public static final DISALLOW_ABSTRACT_AND_ENUM = [
 
 	];
