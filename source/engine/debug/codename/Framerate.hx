@@ -205,7 +205,7 @@ class Framerate extends Sprite
 			dragCat = null;
 		}
 
-		var shift = #if FLX_KEYBOARD FlxG.keys.pressed.SHIFT #else false #end;
+		var shift = #if mobile true #elseif FLX_KEYBOARD FlxG.keys.pressed.SHIFT #end;
 		if (!dragging && FlxG.mouse.justPressed && shift)
 		{
 			// System Info panels are independent objects; check them first (they draw separately).
