@@ -1,0 +1,88 @@
+package backend.scripting;
+
+import psychlua.ScriptedState;
+
+class ModsStateRedirect
+{
+	static var redirects:Map<String, String> = new Map<String, String>();
+	static var loaded:Bool = false;
+
+	public static function loadRedirects():Void
+	{
+		redirects = new Map<String, String>();
+		loaded = true;
+
+		#if FEATURE_MODS
+		for (mod in Mods.getGlobalMods())
+		{
+			var path:String = Paths.mods(mod + '/data/redirects.txt');
+			if (FileSystem.exists(path))
+				loadRedirectFile(path);
+		}
+
+		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
+		{
+			var path:String = Paths.mods(Mods.currentModDirectory + '/data/redirects.txt');
+			if (FileSystem.exists(path))
+				loadRedirectFile(path);
+		}
+		#end
+
+		var path:String = Paths.getSharedPath('data/redirects.txt');
+		if (FileSystem.exists(path))
+			loadRedirectFile(path);
+	}
+
+	static function loadRedirectFile(path:String):Void
+	{
+		try
+		{
+			var content:String = File.getContent(path);
+			var lines:Array<String> = content.split('\n');
+			for (line in lines)
+			{
+				line = line.trim();
+				if (line.length == 0 || line.startsWith('#'))
+					continue;
+
+				var parts:Array<String> = line.split(':');
+				if (parts.length >= 2)
+				{
+					var originalState:String = parts[0].trim();
+					var redirectState:String = parts[1].trim();
+					if (!redirects.exists(originalState))
+						redirects.set(originalState, redirectState);
+				}
+			}
+		}
+		catch (e:Dynamic)
+		{
+			trace('Failed to load redirects from $path: $e');
+		}
+	}
+
+	public static function redirect(state:FlxState):FlxState
+	{
+		if (state == null)
+			return null;
+		if (!loaded)
+			loadRedirects();
+
+		var className:String = Type.getClassName(Type.getClass(state));
+		if (className == null)
+			return state;
+
+		var dotIndex:Int = className.lastIndexOf('.');
+		if (dotIndex >= 0)
+			className = className.substr(dotIndex + 1);
+
+		var redirectTarget:String = redirects.get(className);
+		if (redirectTarget != null && redirectTarget.length > 0)
+		{
+			// trace('State redirect: $className -> $redirectTarget');
+			return new ScriptedState(redirectTarget);
+		}
+
+		return state;
+	}
+}

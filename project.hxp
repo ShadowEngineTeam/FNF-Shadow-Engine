@@ -263,8 +263,7 @@ class Project extends HXProject
 		{
 			setHaxedef("hscriptPos");
 			setHaxedef("HSCRIPT_ABSTRACT_SUPPORT");
-			// not adding as SE has own custom states support
-			//setHaxedef("CUSTOM_CLASSES");
+			setHaxedef("CUSTOM_CLASSES");
 		}
 
 		if (isAndroid() && !isDebug())

@@ -147,6 +147,10 @@ class Main extends Sprite
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
 
+		#if FEATURE_HSCRIPT
+		backend.scripting.ScriptSignalCalls.init();
+		#end
+
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
 		{
@@ -185,7 +189,7 @@ class Main extends Sprite
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
 			Paths.clearStoredMemory();
-			FlxG.switchState(new MainMenuState());
+			MusicBeatState.switchState(new MainMenuState());
 		}
 	}
 

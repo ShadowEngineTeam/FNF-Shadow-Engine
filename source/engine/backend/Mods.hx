@@ -258,5 +258,7 @@ class Mods
 		if (list != null && list[0] != null)
 			Mods.currentModDirectory = list[0];
 		#end
+
+		backend.scripting.ModsStateRedirect.loadRedirects();
 	}
 }

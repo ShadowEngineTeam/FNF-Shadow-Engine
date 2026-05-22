@@ -1,5 +1,6 @@
 package backend;
 
+import backend.scripting.*;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSave;
 import backend.rendering.PsychCamera;
@@ -466,6 +467,8 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public static function switchState(nextState:FlxState = null)
 	{
+		nextState = backend.scripting.ModsStateRedirect.redirect(nextState);
+
 		if (nextState == null)
 			nextState = FlxG.state;
 		if (nextState == FlxG.state)
