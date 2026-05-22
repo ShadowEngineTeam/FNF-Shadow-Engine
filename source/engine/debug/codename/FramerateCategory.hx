@@ -1,5 +1,6 @@
 package debug.codename;
 
+import flixel.math.FlxPoint;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
 import openfl.text.TextField;
@@ -15,7 +16,17 @@ class FramerateCategory extends Sprite
 	public var borderSprite:Bitmap;
 	public var headerSprite:Bitmap;
 
+	public var offset:FlxPoint = new FlxPoint();
+	public var dragged:Bool = false;
+
 	private var _text:String = "";
+
+	// Appear / disappear animation.
+	var visT:Float = 0; // alpha (eases both ways)
+	var slideT:Float = 1; // 0 = off-edge, 1 = at rest (only animates on appear)
+	var slideFromX:Float = 0;
+	var slideFromY:Float = 0;
+	var lastVisible:Bool = false;
 
 	public function new(title:String, text:String = "")
 	{
@@ -55,6 +66,26 @@ class FramerateCategory extends Sprite
 		this.title.text = title;
 		this.title.multiline = this.title.wordWrap = false;
 		this.text.multiline = true;
+	}
+
+	public function updateAnim(vis:Bool):Void
+	{
+		visT = CoolUtil.fpsLerp(visT, vis ? 1 : 0, 0.5);
+
+		if (vis && !lastVisible) // just appeared: slide in from nearest edge
+		{
+			slideT = 0;
+			var sf = Framerate.computeSlideFrom(offset.x, offset.y, width, height);
+			slideFromX = sf.x;
+			slideFromY = sf.y;
+		}
+		lastVisible = vis;
+		slideT = CoolUtil.fpsLerp(slideT, 1, 0.5);
+
+		alpha = visT;
+		visible = visT > 0.05;
+		x = offset.x + slideFromX * (1 - slideT);
+		y = offset.y + slideFromY * (1 - slideT);
 	}
 
 	public function reload() {}

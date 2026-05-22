@@ -8,6 +8,7 @@ import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import openfl.events.KeyboardEvent;
 import openfl.filters.DropShadowFilter;
+import openfl.geom.Point;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import flixel.util.FlxTimer;
@@ -40,8 +41,12 @@ class Framerate extends Sprite
 	 */
 	public static var debugMode:Int = 1;
 
-	public static var offset:FlxPoint = new FlxPoint();
+	public static var offset:FlxPoint = new FlxPoint(INSET, INSET);
 
+	// Hold to drag either object with the mouse.
+	public static var draggable:Bool = true;
+
+	public var board:Sprite;
 	public var panel:Sprite;
 	public var bgSprite:Bitmap;
 	public var borderSprite:Bitmap;
@@ -78,10 +83,58 @@ class Framerate extends Sprite
 	public static inline function panelShadow():DropShadowFilter
 		return new DropShadowFilter(6, 90, 0x000000, 0.45, 20, 20, 1, 2, false, false, false);
 
+	public static inline function screenW():Float
+	{
+		var s = (instance != null && instance.scaleX > 0) ? instance.scaleX : 1;
+		return FlxG.stage.stageWidth / s;
+	}
+
+	public static inline function screenH():Float
+	{
+		var s = (instance != null && instance.scaleY > 0) ? instance.scaleY : 1;
+		return FlxG.stage.stageHeight / s;
+	}
+
+	public static function computeSlideFrom(restX:Float, restY:Float, w:Float, h:Float):Point
+	{
+		var sw = screenW();
+		var sh = screenH();
+
+		var left = restX;
+		var right = sw - (restX + w);
+		var top = restY;
+		var bottom = sh - (restY + h);
+
+		var m = Math.min(Math.min(left, right), Math.min(top, bottom));
+		if (m == left)
+			return new Point(-(restX + w) - INSET, 0);
+		if (m == right)
+			return new Point((sw - restX) + INSET, 0);
+		if (m == top)
+			return new Point(0, -(restY + h) - INSET);
+		return new Point(0, (sh - restY) + INSET);
+	}
+
 	#if mobile
 	#if android public var presses:Int = 0; #end
 	public var sillyTimer:FlxTimer = new FlxTimer();
 	#end
+
+	var dragging:Bool = false;
+	var dragBoard:Bool = false;
+	var dragCat:FramerateCategory = null;
+	var dragStartLocal:Point = new Point();
+	var dragStartOffset:FlxPoint = new FlxPoint();
+
+	var boardW:Float = 0;
+	var boardH:Float = 0;
+
+	// Board appear/disappear animation.
+	var boardVisT:Float = 0; // alpha (eases both ways)
+	var boardSlideT:Float = 1; // 0 = off-edge, 1 = at rest (only animates on appear)
+	var boardSlideFromX:Float = 0;
+	var boardSlideFromY:Float = 0;
+	var boardLastVisible:Bool = false;
 
 	public function new()
 	{
@@ -93,8 +146,7 @@ class Framerate extends Sprite
 
 		isLoaded = true;
 
-		x = INSET;
-		y = INSET;
+		x = y = 0;
 
 		FlxG.signals.gameResized.add(function(w, h)
 		{
@@ -113,24 +165,89 @@ class Framerate extends Sprite
 			}
 		});
 
+		board = new Sprite();
+		addChild(board);
+
 		// Panel chrome lives in an unscaled container so the drop shadow's blur
 		// isn't multiplied by the background bitmap's scale.
 		panel = new Sprite();
 		panel.filters = [panelShadow()];
-		addChild(panel);
+		board.addChild(panel);
 
 		bgSprite = new Bitmap(__bitmap);
-		bgSprite.alpha = 0;
+		bgSprite.alpha = 0.82;
 		panel.addChild(bgSprite);
 
 		borderSprite = new Bitmap(__accentBitmap);
-		borderSprite.alpha = 0;
+		borderSprite.alpha = 1;
 		panel.addChild(borderSprite);
 
-		__addToList(fpsCounter = new FramerateCounter());
-		__addToList(memoryCounter = new MemoryCounter());
+		board.addChild(fpsCounter = new FramerateCounter());
+		board.addChild(memoryCounter = new MemoryCounter());
+
 		__addCategory(new SystemInfo());
 	}
+
+	private function updateDrag():Void
+	{
+		if (!draggable)
+		{
+			dragging = false;
+			return;
+		}
+
+		var m = globalToLocal(new Point(FlxG.stage.mouseX, FlxG.stage.mouseY));
+
+		if (FlxG.mouse.justReleased)
+		{
+			dragging = false;
+			dragBoard = false;
+			dragCat = null;
+		}
+
+		var shift = #if FLX_KEYBOARD FlxG.keys.pressed.SHIFT #else false #end;
+		if (!dragging && FlxG.mouse.justPressed && shift)
+		{
+			// System Info panels are independent objects; check them first (they draw separately).
+			if (debugMode > 1)
+			{
+				for (c in categories)
+				{
+					if (c.visible && hitTest(m, c.x, c.y, c.width, c.height))
+					{
+						dragging = true;
+						dragCat = c;
+						dragStartOffset.set(c.offset.x, c.offset.y);
+						dragStartLocal.setTo(m.x, m.y);
+						break;
+					}
+				}
+			}
+			if (!dragging && debugMode > 0 && board.visible && hitTest(m, board.x - PAD_X, board.y - PAD_Y, boardW, boardH))
+			{
+				dragging = true;
+				dragBoard = true;
+				dragStartOffset.set(offset.x, offset.y);
+				dragStartLocal.setTo(m.x, m.y);
+			}
+		}
+
+		if (dragging && FlxG.mouse.pressed)
+		{
+			var nx = dragStartOffset.x + (m.x - dragStartLocal.x);
+			var ny = dragStartOffset.y + (m.y - dragStartLocal.y);
+			if (dragBoard)
+				offset.set(nx, ny);
+			else if (dragCat != null)
+			{
+				dragCat.offset.set(nx, ny);
+				dragCat.dragged = true;
+			}
+		}
+	}
+
+	private inline function hitTest(p:Point, x:Float, y:Float, w:Float, h:Float):Bool
+		return p.x >= x && p.x <= x + w && p.y >= y && p.y <= y + h;
 
 	public function reload()
 	{
@@ -143,28 +260,13 @@ class Framerate extends Sprite
 	private function __addCategory(category:FramerateCategory)
 	{
 		categories.push(category);
-		__addToList(category);
+		addChild(category);
 	}
-
-	private var __lastAddedSprite:DisplayObject = null;
-
-	private function __addToList(spr:DisplayObject)
-	{
-		spr.x = 0;
-		spr.y = __lastAddedSprite != null ? (__lastAddedSprite.y + __lastAddedSprite.height) : 0;
-		// spr.y += offset.y;
-		__lastAddedSprite = spr;
-		addChild(spr);
-	}
-
-	var debugAlpha:Float = 0;
-	var boardAlpha:Float = 0;
 
 	public override function __enterFrame(t:Float)
 	{
-		alpha = CoolUtil.fpsLerp(alpha, debugMode > 0 ? 1 : 0, 0.5);
-		boardAlpha = CoolUtil.fpsLerp(boardAlpha, debugMode > 0 ? 1 : 0, 0.5);
-		debugAlpha = CoolUtil.fpsLerp(debugAlpha, debugMode > 1 ? 1 : 0, 0.5);
+		super.__enterFrame(t);
+
 		#if android
 		if (FlxG.android.justReleased.BACK)
 		{
@@ -182,13 +284,10 @@ class Framerate extends Sprite
 		for (camera in FlxG.cameras.list)
 		{
 			var pos = FlxG.mouse.getScreenPosition(camera);
-			if (pos.x >= FlxG.game.x + 10 + offset.x
+			if (pos.x >= FlxG.game.x + offset.x
 				&& pos.x <= FlxG.game.x + offset.x + 80
-				&& pos.y >= FlxG.game.y + 2 + offset.y
-				&& pos.y <= FlxG.game.y
-					+ 2
-					+ offset.y
-					+ 60)
+				&& pos.y >= FlxG.game.y + offset.y
+				&& pos.y <= FlxG.game.y + offset.y + 60)
 			{
 				if (FlxG.mouse.justPressed)
 					sillyTimer.start(0.4, (tmr:FlxTimer) -> debugMode = (debugMode + 1) % 3);
@@ -201,51 +300,62 @@ class Framerate extends Sprite
 		}
 		#end
 
-		if (alpha < 0.05)
-			return;
-		super.__enterFrame(t);
+		// Drag uses last frame's board metrics, so resolve it before relaying out.
+		updateDrag();
 
-		x = INSET + offset.x;
-		y = INSET + offset.y;
+		// --- Board layout & metrics ---
+		fpsCounter.x = fpsCounter.y = 0;
+		memoryCounter.x = 0;
+		memoryCounter.y = fpsCounter.height;
 
-		// Content metrics (the floating text block).
 		var contentW = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width);
 		var contentH = memoryCounter.y + memoryCounter.height;
+		boardW = contentW + PAD_X * 2;
+		boardH = contentH + PAD_Y * 2;
 
-		// Panel wraps the content with padding; left edge sits PAD_X left of the text.
-		var panelW = contentW + PAD_X * 2;
-		var panelH = contentH + PAD_Y * 2;
+		// --- Board appear / disappear ---
+		var boardVisible = debugMode > 0;
+		boardVisT = CoolUtil.fpsLerp(boardVisT, boardVisible ? 1 : 0, 0.5);
 
-		// Slide the board in from / out past the left edge as it appears / disappears.
-		var boardSlide = FlxMath.lerp(-(panelW + INSET) - offset.x, 0, boardAlpha);
-		panel.x = fpsCounter.x = memoryCounter.x = boardSlide;
+		if (boardVisible && !boardLastVisible) // just appeared: slide in from nearest edge
+		{
+			boardSlideT = 0;
+			var sf = computeSlideFrom(offset.x, offset.y, boardW, boardH);
+			boardSlideFromX = sf.x;
+			boardSlideFromY = sf.y;
+		}
+		boardLastVisible = boardVisible;
+		boardSlideT = CoolUtil.fpsLerp(boardSlideT, 1, 0.5);
 
-		panel.visible = boardAlpha > 0.05;
-		bgSprite.alpha = boardAlpha * 0.82;
+		board.alpha = boardVisT;
+		board.visible = boardVisT > 0.05;
+		// Disappearing keeps the rest position (boardSlideT stays ~1, so the slide term is ~0)
+		// and only fades via alpha; appearing rides the slide term in from the edge.
+		board.x = offset.x + boardSlideFromX * (1 - boardSlideT);
+		board.y = offset.y + boardSlideFromY * (1 - boardSlideT);
+
+		// Panel chrome (local to the board container).
 		bgSprite.x = -PAD_X;
 		bgSprite.y = -PAD_Y;
-		bgSprite.scaleX = panelW;
-		bgSprite.scaleY = panelH;
+		bgSprite.scaleX = boardW;
+		bgSprite.scaleY = boardH;
 
-		borderSprite.alpha = boardAlpha;
 		borderSprite.x = -PAD_X;
 		borderSprite.y = -PAD_Y;
 		borderSprite.scaleX = 2;
-		borderSprite.scaleY = panelH;
+		borderSprite.scaleY = boardH;
 
 		var selectable = debugMode >= 2;
-		{
-			memoryCounter.memLabel.selectable = memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
-		}
+		memoryCounter.memLabel.selectable = memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
 
-		var y:Float = (contentH + PAD_Y) + 8;
+		var stackY = offset.y + boardH + 8;
 		for (c in categories)
 		{
+			if (!c.dragged) // until dragged, sit stacked under the board
+				c.offset.set(offset.x, stackY);
 			c.title.selectable = c.text.selectable = selectable;
-			c.alpha = debugAlpha;
-			c.x = FlxMath.lerp(-c.width - offset.x, -PAD_X, debugAlpha);
-			c.y = y;
-			y = c.y + c.height + 8;
+			c.updateAnim(debugMode > 1);
+			stackY = c.offset.y + c.height + 8;
 		}
 	}
 
