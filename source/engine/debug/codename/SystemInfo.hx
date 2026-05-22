@@ -187,30 +187,38 @@ class SystemInfo extends FramerateCategory
 		formatSysInfo();
 	}
 
+	static inline function row(key:String, value:String):String
+		return '<font color="#8A7E72">$key </font><font color="#E8E2D6">$value</font>';
+
 	static function formatSysInfo()
 	{
-		__formattedSysText = #if android 'Device: ${Build.BRAND.charAt(0).toUpperCase() + Build.BRAND.substring(1)} ${Build.MODEL} (${Build.BOARD})\n' #else "" #end;
+		var lines:Array<String> = [];
+
+		#if android
+		lines.push(row("Device:", '${Build.BRAND.charAt(0).toUpperCase() + Build.BRAND.substring(1)} ${Build.MODEL} (${Build.BOARD})'));
+		#end
 		if (osInfo != "Unknown")
-			__formattedSysText += 'System: $osInfo';
+			lines.push(row("System:", osInfo));
 		if (cpuName != "Unknown")
-			__formattedSysText += '\nCPU: $cpuName ${getCPUArch()}';
-		if (gpuName != cpuName || vRAM != "Unknown")
+			lines.push(row("CPU:", '$cpuName ${getCPUArch()}'));
+
+		var gpuNameKnown = gpuName != "Unknown" && gpuName != cpuName;
+		var vramKnown = vRAM != "Unknown";
+		if (gpuNameKnown || vramKnown)
 		{
-			var gpuNameKnown = gpuName != "Unknown" && gpuName != cpuName;
-			var vramKnown = vRAM != "Unknown";
-
-			if (gpuNameKnown || vramKnown)
-				__formattedSysText += "\n";
-
+			var gpuVal = "";
 			if (gpuNameKnown)
-				__formattedSysText += 'GPU: $gpuName';
+				gpuVal += gpuName;
 			if (gpuNameKnown && vramKnown)
-				__formattedSysText += " | ";
+				gpuVal += " | ";
 			if (vramKnown)
-				__formattedSysText += 'VRAM: $vRAM'; // 1000 bytes of vram (apus)
+				gpuVal += 'VRAM: $vRAM'; // 1000 bytes of vram (apus)
+			lines.push(row("GPU:", gpuVal));
 		}
 		if (totalMem != "Unknown" && memType != "Unknown")
-			__formattedSysText += '\nTotal MEM: $totalMem $memType ${totalSwapMem != "Unknown" ? '+ $totalSwapMem SWAP' : ""}';
+			lines.push(row("Total MEM:", '$totalMem $memType ${totalSwapMem != "Unknown" ? '+ $totalSwapMem SWAP' : ""}'));
+
+		__formattedSysText = lines.join("\n");
 	}
 
 	static function getSizeString(size:Float):String
@@ -241,7 +249,7 @@ class SystemInfo extends FramerateCategory
 		//_text += '${__formattedSysText == "" ? "" : "\n"}Garbage Collector: ${MemoryUtil.disableCount ? "OFF" : "ON"} (${MemoryUtil.disableCount})';
 		#end
 
-		this.text.text = _text;
+		this.text.htmlText = _text;
 		super.__enterFrame(t);
 	}
 

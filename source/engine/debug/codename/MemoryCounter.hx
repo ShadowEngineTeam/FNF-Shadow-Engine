@@ -96,6 +96,7 @@ double MemoryCounter_obj::native_getMemory()
 #end
 class MemoryCounter extends Sprite
 {
+	public var memLabel:TextField;
 	public var memoryText:TextField;
 	public var memoryPeakText:TextField;
 
@@ -106,21 +107,27 @@ class MemoryCounter extends Sprite
 	{
 		super();
 
+		memLabel = new TextField();
 		memoryText = new TextField();
 		memoryPeakText = new TextField();
 
-		for (label in [memoryText, memoryPeakText])
+		for (label in [memLabel, memoryText, memoryPeakText])
 		{
 			label.autoSize = LEFT;
 			label.x = 0;
 			label.y = 0;
 			label.text = "MEM";
 			label.multiline = label.wordWrap = false;
-			label.defaultTextFormat = new TextFormat(Framerate.fontName, 12, -1);
 			label.selectable = false;
 			addChild(label);
 		}
-		memoryPeakText.alpha = 0.5;
+
+		memLabel.defaultTextFormat = new TextFormat(Framerate.fontName, 13, Framerate.COLOR_FG);
+		memoryText.defaultTextFormat = new TextFormat(Framerate.fontName, 13, Framerate.COLOR_FG, true);
+		memoryPeakText.defaultTextFormat = new TextFormat(Framerate.fontName, 13, Framerate.COLOR_DIM);
+
+		refreshText(0, 0);
+		updateLabelPosition();
 	}
 
 	public function reload() {}
@@ -167,11 +174,15 @@ class MemoryCounter extends Sprite
 	#end
 
 	private inline function updateLabelPosition():Void
+	{
+		memoryText.x = memLabel.x + memLabel.width;
 		memoryPeakText.x = memoryText.x + memoryText.width;
+	}
 
 	private inline function refreshText(mem:Float, peak:Float):Void
 	{
-		memoryText.text = (Framerate.debugMode == 2 ? "MEM: " : "") + CoolUtil.getSizeString(mem);
+		memLabel.text = "MEM: ";
+		memoryText.text = CoolUtil.getSizeString(mem);
 		memoryPeakText.text = ' / ${CoolUtil.getSizeString(peak)}';
 	}
 }

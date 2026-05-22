@@ -29,12 +29,20 @@ class FramerateCounter extends Sprite
 			label.autoSize = LEFT;
 			label.x = 0;
 			label.y = 0;
-			label.text = "FPS";
 			label.multiline = label.wordWrap = false;
-			label.defaultTextFormat = new TextFormat(Framerate.fontName, label == fpsNum ? 18 : 12, -1);
 			label.selectable = false;
 			addChild(label);
 		}
+
+		fpsNum.text = "0";
+		fpsNum.defaultTextFormat = new TextFormat(Framerate.fontName, 18, Framerate.COLOR_FG, true);
+		fpsNum.setTextFormat(fpsNum.defaultTextFormat);
+
+		fpsLabel.text = "FPS";
+		var labelFmt = new TextFormat(Framerate.fontName, 11, Framerate.COLOR_DIM, false);
+		labelFmt.letterSpacing = 1.5; // ~.14em at 11px
+		fpsLabel.defaultTextFormat = labelFmt;
+		fpsLabel.setTextFormat(labelFmt);
 	}
 
 	public function reload()
@@ -71,7 +79,7 @@ class FramerateCounter extends Sprite
 
 	private inline function updateLabelPosition():Void
 	{
-		fpsLabel.x = fpsNum.x + fpsNum.width;
-		fpsLabel.y = (fpsNum.y + fpsNum.height) - fpsLabel.height;
+		fpsLabel.x = fpsNum.x + fpsNum.width + 4;
+		fpsLabel.y = (fpsNum.y + fpsNum.height) - fpsLabel.height - 2;
 	}
 }

@@ -7,6 +7,7 @@ import openfl.display.BitmapData;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import openfl.events.KeyboardEvent;
+import openfl.filters.DropShadowFilter;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import flixel.util.FlxTimer;
@@ -22,16 +23,28 @@ class Framerate extends Sprite
 
 	public static var fontName:String = #if windows '${Sys.getEnv("windir")}\\Fonts\\consola.ttf' #else "_typewriter" #end;
 
+	public static inline var COLOR_FG:Int = 0xE8E2D6; // foreground
+	public static inline var COLOR_DIM:Int = 0x8A7E72; // dim text
+	public static inline var COLOR_ACCENT:Int = 0xE23A4A; // red accent / bad
+	public static inline var COLOR_WARN:Int = 0xF0A04B; // warn
+	public static inline var COLOR_PANEL:Int = 0x160E12; // panel background
+
+	public static inline var PAD_X:Float = 12;
+	public static inline var PAD_Y:Float = 6;
+	public static inline var INSET:Float = 14;
+
 	/**
-	 * 0: FPS INVISIBLE
-	 * 1: FPS VISIBLE
-	 * 2: FPS & DEBUG INFO VISIBLE
+	 * 0: INVISIBLE
+	 * 1: BOARD      (text wrapped in a panel)
+	 * 2: BOARD + SYSTEM INFO
 	 */
 	public static var debugMode:Int = 1;
 
 	public static var offset:FlxPoint = new FlxPoint();
 
+	public var panel:Sprite;
 	public var bgSprite:Bitmap;
+	public var borderSprite:Bitmap;
 
 	public var categories:Array<FramerateCategory> = [];
 
@@ -40,9 +53,30 @@ class Framerate extends Sprite
 	private static function get___bitmap():BitmapData
 	{
 		if (__bitmap == null)
-			__bitmap = new BitmapData(1, 1, 0xFF000000);
+			__bitmap = new BitmapData(1, 1, 0xFF000000 | COLOR_PANEL);
 		return __bitmap;
 	}
+
+	@:isVar public static var __accentBitmap(get, null):BitmapData = null;
+
+	private static function get___accentBitmap():BitmapData
+	{
+		if (__accentBitmap == null)
+			__accentBitmap = new BitmapData(1, 1, 0xFF000000 | COLOR_ACCENT);
+		return __accentBitmap;
+	}
+
+	@:isVar public static var __darkBitmap(get, null):BitmapData = null;
+
+	private static function get___darkBitmap():BitmapData
+	{
+		if (__darkBitmap == null)
+			__darkBitmap = new BitmapData(1, 1, 0xFF000000);
+		return __darkBitmap;
+	}
+
+	public static inline function panelShadow():DropShadowFilter
+		return new DropShadowFilter(6, 90, 0x000000, 0.45, 20, 20, 1, 2, false, false, false);
 
 	#if mobile
 	#if android public var presses:Int = 0; #end
@@ -55,12 +89,12 @@ class Framerate extends Sprite
 		if (instance != null)
 			throw "Cannot create another instance";
 		instance = this;
-		textFormat = new TextFormat(fontName, 12, -1);
+		textFormat = new TextFormat(fontName, 13, COLOR_FG);
 
 		isLoaded = true;
 
-		x = 10;
-		y = 2;
+		x = INSET;
+		y = INSET;
 
 		FlxG.signals.gameResized.add(function(w, h)
 		{
@@ -79,12 +113,19 @@ class Framerate extends Sprite
 			}
 		});
 
-		if (__bitmap == null)
-			__bitmap = new BitmapData(1, 1, 0xFF000000);
+		// Panel chrome lives in an unscaled container so the drop shadow's blur
+		// isn't multiplied by the background bitmap's scale.
+		panel = new Sprite();
+		panel.filters = [panelShadow()];
+		addChild(panel);
 
 		bgSprite = new Bitmap(__bitmap);
 		bgSprite.alpha = 0;
-		addChild(bgSprite);
+		panel.addChild(bgSprite);
+
+		borderSprite = new Bitmap(__accentBitmap);
+		borderSprite.alpha = 0;
+		panel.addChild(borderSprite);
 
 		__addToList(fpsCounter = new FramerateCounter());
 		__addToList(memoryCounter = new MemoryCounter());
@@ -110,17 +151,19 @@ class Framerate extends Sprite
 	private function __addToList(spr:DisplayObject)
 	{
 		spr.x = 0;
-		spr.y = __lastAddedSprite != null ? (__lastAddedSprite.y + __lastAddedSprite.height) : 4;
+		spr.y = __lastAddedSprite != null ? (__lastAddedSprite.y + __lastAddedSprite.height) : 0;
 		// spr.y += offset.y;
 		__lastAddedSprite = spr;
 		addChild(spr);
 	}
 
 	var debugAlpha:Float = 0;
+	var boardAlpha:Float = 0;
 
 	public override function __enterFrame(t:Float)
 	{
 		alpha = CoolUtil.fpsLerp(alpha, debugMode > 0 ? 1 : 0, 0.5);
+		boardAlpha = CoolUtil.fpsLerp(boardAlpha, debugMode > 0 ? 1 : 0, 0.5);
 		debugAlpha = CoolUtil.fpsLerp(debugAlpha, debugMode > 1 ? 1 : 0, 0.5);
 		#if android
 		if (FlxG.android.justReleased.BACK)
@@ -161,31 +204,48 @@ class Framerate extends Sprite
 		if (alpha < 0.05)
 			return;
 		super.__enterFrame(t);
-		bgSprite.alpha = debugAlpha * 0.5;
 
-		x = 10 + offset.x;
-		y = 2 + offset.y;
+		x = INSET + offset.x;
+		y = INSET + offset.y;
 
-		var width = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width) + (x * 2);
-		var height = memoryCounter.y + memoryCounter.height;
-		bgSprite.x = -x;
-		bgSprite.y = offset.x;
-		bgSprite.scaleX = width;
-		bgSprite.scaleY = height;
+		// Content metrics (the floating text block).
+		var contentW = MathUtil.maxSmart(fpsCounter.width, memoryCounter.width);
+		var contentH = memoryCounter.y + memoryCounter.height;
 
-		var selectable = debugMode == 2; // idk i tried to make it more readable:sob: - Nex
+		// Panel wraps the content with padding; left edge sits PAD_X left of the text.
+		var panelW = contentW + PAD_X * 2;
+		var panelH = contentH + PAD_Y * 2;
+
+		// Slide the board in from / out past the left edge as it appears / disappears.
+		var boardSlide = FlxMath.lerp(-(panelW + INSET) - offset.x, 0, boardAlpha);
+		panel.x = fpsCounter.x = memoryCounter.x = boardSlide;
+
+		panel.visible = boardAlpha > 0.05;
+		bgSprite.alpha = boardAlpha * 0.82;
+		bgSprite.x = -PAD_X;
+		bgSprite.y = -PAD_Y;
+		bgSprite.scaleX = panelW;
+		bgSprite.scaleY = panelH;
+
+		borderSprite.alpha = boardAlpha;
+		borderSprite.x = -PAD_X;
+		borderSprite.y = -PAD_Y;
+		borderSprite.scaleX = 2;
+		borderSprite.scaleY = panelH;
+
+		var selectable = debugMode >= 2;
 		{
-			memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
+			memoryCounter.memLabel.selectable = memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
 		}
 
-		var y:Float = height + 4;
+		var y:Float = (contentH + PAD_Y) + 8;
 		for (c in categories)
 		{
 			c.title.selectable = c.text.selectable = selectable;
 			c.alpha = debugAlpha;
-			c.x = FlxMath.lerp(-c.width - offset.x, 0, debugAlpha);
+			c.x = FlxMath.lerp(-c.width - offset.x, -PAD_X, debugAlpha);
 			c.y = y;
-			y = c.y + c.height + 4;
+			y = c.y + c.height + 8;
 		}
 	}
 
