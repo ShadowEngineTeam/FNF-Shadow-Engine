@@ -46,11 +46,12 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
+	@:deprecated("`MusicBeatState.controls` is deprecated. Use `Funkin.controls` instead.")
 	public var controls(get, never):Controls;
 
 	private function get_controls()
 	{
-		return Controls.instance;
+		return Funkin.controls;
 	}
 
 	#if FEATURE_MOBILE_CONTROLS
@@ -340,14 +341,14 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 	override function openSubState(subState:FlxSubState)
 	{
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
-		super.openSubState(backend.scripting.ModsStateRedirect.redirectSubstate(subState));
+		super.openSubState(subState);
 	}
 
 	override function closeSubState()
 	{
-		controls.isInSubstate = false;
+		Funkin.controls.isInSubstate = false;
 		callOnScripts('onCloseSubState');
 		super.closeSubState();
 	}
@@ -373,8 +374,8 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		updateCurStep();
 		updateBeat();
 
-		if (controls.isInSubstate)
-			controls.isInSubstate = false;
+		if (Funkin.controls.isInSubstate)
+			Funkin.controls.isInSubstate = false;
 
 		if (oldStep != curStep)
 		{
@@ -460,45 +461,22 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		curStep = lastChange.stepTime + Math.floor(shit);
 	}
 
+	@:deprecated("`MusicBeatState.switchState` is deprecated. Use `Funkin.switchState` instead.")
 	public static function switchState(nextState:FlxState = null)
 	{
-		nextState = backend.scripting.ModsStateRedirect.redirect(nextState);
-
-		if (nextState == null)
-			nextState = FlxG.state;
-		if (nextState == FlxG.state)
-		{
-			resetState();
-			return;
-		}
-
-		if (FlxTransitionableState.skipNextTransIn)
-			FlxG.switchState(nextState);
-		else
-			startTransition(nextState);
-		FlxTransitionableState.skipNextTransIn = false;
+		Funkin.switchState(Type.getClass(nextState));
 	}
 
+	@:deprecated("`MusicBeatState.resetState` is deprecated. Use `Funkin.resetState` instead.")
 	public static function resetState()
 	{
-		if (FlxTransitionableState.skipNextTransIn)
-			FlxG.resetState();
-		else
-			startTransition();
-		FlxTransitionableState.skipNextTransIn = false;
+		Funkin.resetState();
 	}
 
-	// Custom made Trans in
+	@:deprecated("`MusicBeatState.startTransition` is deprecated. Use `Funkin.startTransition` instead.")
 	public static function startTransition(nextState:FlxState = null)
 	{
-		if (nextState == null)
-			nextState = FlxG.state;
-
-		FlxG.state.openSubState(new CustomFadeTransition(0.6, false));
-		if (nextState == FlxG.state)
-			CustomFadeTransition.finishCallback = function() FlxG.resetState();
-		else
-			CustomFadeTransition.finishCallback = function() FlxG.switchState(nextState);
+		Funkin.startTransition(nextState);
 	}
 
 	public static function getState():MusicBeatState

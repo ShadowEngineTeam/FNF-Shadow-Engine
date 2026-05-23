@@ -189,7 +189,7 @@ class Main extends Sprite
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
 			Paths.clearStoredMemory();
-			MusicBeatState.switchState(new MainMenuState());
+			Funkin.switchState(MainMenuState);
 		}
 	}
 

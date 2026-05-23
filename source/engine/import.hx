@@ -41,6 +41,7 @@ import android.os.Build.VERSION as AndroidVersion;
 import android.os.Build.VERSION_CODES as AndroidVersionCode;
 //import android.os.BatteryManager as AndroidBatteryManager;
 #end
+import backend.Funkin;
 import backend.Paths;
 import backend.Controls;
 import backend.CoolUtil;

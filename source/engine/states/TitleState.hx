@@ -104,10 +104,10 @@ class TitleState extends MusicBeatState
 		FlxG.mouse.visible = false;
 		if (FlxG.save.data.flashing == null && !FlashingState.leftState)
 		{
-			controls.isInSubstate = false; // idfk what's wrong
+			Funkin.controls.isInSubstate = false; // idfk what's wrong
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
-			MusicBeatState.switchState(new FlashingState());
+			Funkin.switchState(FlashingState);
 		}
 		else
 		{
@@ -274,7 +274,7 @@ class TitleState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;
+		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || Funkin.controls.ACCEPT;
 
 		#if FEATURE_MOBILE_CONTROLS
 		for (touch in FlxG.touches.list)
@@ -334,7 +334,7 @@ class TitleState extends MusicBeatState
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
-					MusicBeatState.switchState(new MainMenuState());
+					Funkin.switchState(MainMenuState);
 					closedState = true;
 				});
 				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
@@ -348,9 +348,9 @@ class TitleState extends MusicBeatState
 
 		if (swagShader != null)
 		{
-			if (controls.UI_LEFT)
+			if (Funkin.controls.UI_LEFT)
 				swagShader.hue -= elapsed * 0.1;
-			if (controls.UI_RIGHT)
+			if (Funkin.controls.UI_RIGHT)
 				swagShader.hue += elapsed * 0.1;
 		}
 

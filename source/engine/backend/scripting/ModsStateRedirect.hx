@@ -62,7 +62,7 @@ class ModsStateRedirect
 		}
 	}
 
-	public static function redirect(state:FlxState):FlxState
+	public static function redirect(state:Class<FlxState>, arguments:Array<Dynamic>):FlxState
 	{
 		if (state == null)
 			return null;
@@ -71,19 +71,19 @@ class ModsStateRedirect
 
 		var className:String = getClassName(state);
 		if (className == null)
-			return state;
+			return Type.createInstance(state, arguments);
 
 		var redirectTarget:String = redirects.get(className);
 		if (redirectTarget != null && redirectTarget.length > 0)
 		{
 			// trace('State redirect: $className -> $redirectTarget');
-			return new ScriptedState(redirectTarget);
+			return new ScriptedState(redirectTarget, arguments);
 		}
 
-		return state;
+		return Type.createInstance(state, arguments);
 	}
 
-	public static function redirectSubstate(subState:FlxSubState):FlxSubState
+	public static function redirectSubstate(subState:Class<FlxSubState>, arguments:Array<Dynamic>):FlxSubState
 	{
 		if (subState == null)
 			return null;
@@ -92,21 +92,21 @@ class ModsStateRedirect
 
 		var className:String = getClassName(subState);
 		if (className == null)
-			return subState;
+			return Type.createInstance(subState, arguments);
 
 		var redirectTarget:String = redirects.get(className);
 		if (redirectTarget != null && redirectTarget.length > 0)
 		{
 			// trace('Substate redirect: $className -> $redirectTarget');
-			return new ScriptedSubState(redirectTarget);
+			return new ScriptedSubState(redirectTarget, arguments);
 		}
 
-		return subState;
+		return Type.createInstance(subState, arguments);
 	}
 
-	static function getClassName(obj:Dynamic):Null<String>
+	static function getClassName(obj:Class<Dynamic>):Null<String>
 	{
-		var className:String = Type.getClassName(Type.getClass(obj));
+		var className:String = Type.getClassName(obj);
 		if (className == null)
 			return null;
 

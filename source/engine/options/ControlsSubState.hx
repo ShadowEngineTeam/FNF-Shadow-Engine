@@ -66,7 +66,7 @@ class ControlsSubState extends MusicBeatSubstate
 	{
 		super();
 
-		onKeyboardMode = !controls.controllerMode;
+		onKeyboardMode = !Funkin.controls.controllerMode;
 
 		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Controls Menu", null);
@@ -109,7 +109,7 @@ class ControlsSubState extends MusicBeatSubstate
 		controllerSpr.animation.play(onKeyboardMode ? 'keyboard' : 'gamepad');
 		add(controllerSpr);
 
-		var text:Alphabet = new Alphabet(60, 90, controls.controllerMode ? '${InputFormatter.getGamepadName(LEFT_SHOULDER).toUpperCase()}/${InputFormatter.getGamepadName(RIGHT_SHOULDER).toUpperCase()}' : controls.mobileC ? 'C' : 'CTRL', false);
+		var text:Alphabet = new Alphabet(60, 90, Funkin.controls.controllerMode ? '${InputFormatter.getGamepadName(LEFT_SHOULDER).toUpperCase()}/${InputFormatter.getGamepadName(RIGHT_SHOULDER).toUpperCase()}' : Funkin.controls.mobileC ? 'C' : 'CTRL', false);
 		text.alignment = CENTERED;
 		text.setScale(0.4);
 		add(text);
@@ -331,7 +331,7 @@ class ControlsSubState extends MusicBeatSubstate
 					bindingText.alignment = CENTERED;
 					add(bindingText);
 
-					bindingText2 = new Alphabet(FlxG.width / 2, 340, (controls.mobileC) ? "Hold B to Cancel\nHold C to Delete" : "Hold ESC to Cancel\nHold Backspace to Delete", true);
+					bindingText2 = new Alphabet(FlxG.width / 2, 340, (Funkin.controls.mobileC) ? "Hold B to Cancel\nHold C to Delete" : "Hold ESC to Cancel\nHold Backspace to Delete", true);
 					bindingText2.alignment = CENTERED;
 					add(bindingText2);
 

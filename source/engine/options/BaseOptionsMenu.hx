@@ -138,16 +138,16 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			return;
 		}
 
-		if (controls.UI_UP_P)
+		if (Funkin.controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (Funkin.controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			ClientPrefs.saveSettings();
 			close();
@@ -158,7 +158,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		{
 			if (curOption.type == 'bool')
 			{
-				if (controls.ACCEPT)
+				if (Funkin.controls.ACCEPT)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 					curOption.setValue((curOption.getValue() == true) ? false : true);
@@ -170,7 +170,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			{
 				if (curOption.type == 'keybind')
 				{
-					if (controls.ACCEPT)
+					if (Funkin.controls.ACCEPT)
 					{
 						bindingBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
 						bindingBlack.scale.set(FlxG.width, FlxG.height);
@@ -185,7 +185,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 						var funnyText:String;
 
-						if (controls.mobileC)
+						if (Funkin.controls.mobileC)
 						{
 							funnyText = "Hold B to Cancel\nHold C to Delete";
 						}
@@ -204,16 +204,16 @@ class BaseOptionsMenu extends MusicBeatSubstate
 						FlxG.sound.play(Paths.sound('scrollMenu'));
 					}
 				}
-				else if (controls.UI_LEFT || controls.UI_RIGHT)
+				else if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 				{
-					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
+					var pressed = (Funkin.controls.UI_LEFT_P || Funkin.controls.UI_RIGHT_P);
 					if (holdTime > 0.5 || pressed)
 					{
 						if (pressed)
 						{
 							var add:Dynamic = null;
 							if (curOption.type != 'string')
-								add = controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
+								add = Funkin.controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
 
 							switch (curOption.type)
 							{
@@ -237,7 +237,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 								case 'string':
 									var num:Int = curOption.curOption; // lol
-									if (controls.UI_LEFT_P)
+									if (Funkin.controls.UI_LEFT_P)
 										--num;
 									else
 										num++;
@@ -257,7 +257,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 						}
 						else if (curOption.type != 'string')
 						{
-							holdValue += curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1);
+							holdValue += curOption.scrollSpeed * elapsed * (Funkin.controls.UI_LEFT ? -1 : 1);
 							if (holdValue < curOption.minValue)
 								holdValue = curOption.minValue;
 							else if (holdValue > curOption.maxValue)
@@ -279,7 +279,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					if (curOption.type != 'string')
 						holdTime += elapsed;
 				}
-				else if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
+				else if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 				{
 					if (holdTime > 0.5)
 						FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -287,7 +287,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				}
 			}
 
-			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
+			if (Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				var leOption:Option = optionsArray[curSelected];
 				if (leOption.type != 'keybind')
@@ -333,11 +333,11 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			holdingEsc += elapsed;
 			if (holdingEsc > 0.5)
 			{
-				if (!controls.controllerMode)
+				if (!Funkin.controls.controllerMode)
 					curOption.keys.keyboard = NONE;
 				else
 					curOption.keys.gamepad = NONE;
-				updateBind(!controls.controllerMode ? InputFormatter.getKeyName(NONE) : InputFormatter.getGamepadName(NONE));
+				updateBind(!Funkin.controls.controllerMode ? InputFormatter.getKeyName(NONE) : InputFormatter.getGamepadName(NONE));
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				closeBinding();
 			}
@@ -346,7 +346,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		{
 			holdingEsc = 0;
 			var changed:Bool = false;
-			if (!controls.controllerMode)
+			if (!Funkin.controls.controllerMode)
 			{
 				if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY)
 				{
@@ -406,7 +406,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			if (changed)
 			{
 				var key:String = null;
-				if (!controls.controllerMode)
+				if (!Funkin.controls.controllerMode)
 				{
 					if (curOption.keys.keyboard == null)
 						curOption.keys.keyboard = 'NONE';
@@ -439,7 +439,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			if (text == null)
 				text = 'NONE';
 
-			if (!controls.controllerMode)
+			if (!Funkin.controls.controllerMode)
 				text = InputFormatter.getKeyName(FlxKey.fromString(text));
 			else
 				text = InputFormatter.getGamepadName(FlxGamepadInputID.fromString(text));
@@ -463,7 +463,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 	function playstationCheck(alpha:Alphabet)
 	{
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 			return;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.firstActive;

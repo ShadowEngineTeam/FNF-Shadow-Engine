@@ -79,7 +79,7 @@ class NoteSplashDebugState extends MusicBeatState
 			splashes.add(splash);
 		}
 
-		var tipText:FlxText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${controls.mobileC ? "F" : "F1"} for Help', 16);
+		var tipText:FlxText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${Funkin.controls.mobileC ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
 		tipText.scrollFactor.set();
 		add(tipText);
@@ -257,9 +257,9 @@ class NoteSplashDebugState extends MusicBeatState
 		}
 
 		var notTyping:Bool = !nameInputText.hasFocus() && !imageInputText.hasFocus();
-		if (controls.BACK && notTyping)
+		if (Funkin.controls.BACK && notTyping)
 		{
-			MusicBeatState.switchState(new MasterEditorMenu());
+			Funkin.switchState(MasterEditorMenu);
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			FlxG.mouse.visible = false;
 		}
@@ -338,7 +338,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 		{
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				savedText.text = 'Press A again to save.';
 			}
@@ -492,7 +492,7 @@ class NoteSplashDebugState extends MusicBeatState
 				curAnim = 1;
 			else if (curAnim < 1)
 				curAnim = maxAnims;
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				curAnimText.text = 'Current Animation: $curAnim / $maxAnims\n(Press Top UP/DOWN to change)';
 				curFrameText.text = 'Force Frame Disabled\n(Press X/E to change)';
@@ -580,7 +580,7 @@ class NoteSplashDebugState extends MusicBeatState
 		UI_help.add(titleText);
 
 		var helpContent:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			helpContent = "Y - Reset/Play animation\n" + "A (twice) - Save to loaded Note Splash PNG's folder\n" + "Top LEFT/RIGHT - Change selected note\n"
 				+ "Arrow Keys - Change offset\n" + "W/S - Change animation\n" + "X/E - Change frame\n" + "C/V - Copy & Paste offsets\n"
@@ -603,7 +603,7 @@ class NoteSplashDebugState extends MusicBeatState
 		contentText.scrollFactor.set();
 		UI_help.add(contentText);
 
-		var closeText:FlxText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close');
+		var closeText:FlxText = new FlxText(0, panelHeight - 40, panelWidth, 'Press ${Funkin.controls.mobileC ? "F" : "ESC or F1"} to close');
 		closeText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY, CENTER);
 		closeText.scrollFactor.set();
 		UI_help.add(closeText);

@@ -1856,7 +1856,7 @@ class PlayState extends MusicBeatState
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
-		if ((controls.PAUSE #if android || FlxG.android.justReleased.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonP.justPressed #end)
+		if ((Funkin.controls.PAUSE #if android || FlxG.android.justReleased.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonP.justPressed #end)
 			&& (startedCountdown && canPause))
 		{
 			var ret:Dynamic = callOnScripts('onPause', null, true);
@@ -1868,9 +1868,9 @@ class PlayState extends MusicBeatState
 
 		if (!endingSong && !inCutscene && allowDebugKeys)
 		{
-			if (controls.justPressed('debug_1'))
+			if (Funkin.controls.justPressed('debug_1'))
 				openChartEditor();
-			else if (controls.justPressed('debug_2'))
+			else if (Funkin.controls.justPressed('debug_2'))
 				openCharacterEditor();
 		}
 
@@ -1930,7 +1930,7 @@ class PlayState extends MusicBeatState
 		FlxG.watch.addQuick("stepShit", curStep);
 
 		// RESET = Quick Game Over Screen
-		if (!ClientPrefs.data.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
+		if (!ClientPrefs.data.noReset && Funkin.controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
 		{
 			health = 0;
 			trace("Pressed RESET key, go kaboom");
@@ -2193,7 +2193,7 @@ class PlayState extends MusicBeatState
 		DiscordClient.resetClientID();
 		#end
 
-		MusicBeatState.switchState(new ChartingState());
+		Funkin.switchState(ChartingState);
 	}
 
 	public function openCharacterEditor()
@@ -2848,7 +2848,7 @@ class PlayState extends MusicBeatState
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 
-					MusicBeatState.switchState(new StoryMenuState());
+					Funkin.switchState(StoryMenuState);
 
 					if (!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay'))
 					{
@@ -2884,7 +2884,7 @@ class PlayState extends MusicBeatState
 				Mods.loadTopMod();
 				#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 
-				MusicBeatState.switchState(new FreeplayState());
+				Funkin.switchState(FreeplayState);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				changedDifficulty = false;
 			}
@@ -3195,7 +3195,7 @@ class PlayState extends MusicBeatState
 		var eventKey:FlxKey = event.keyCode;
 		var key:Int = getKeyFromEvent(keysArray, eventKey);
 
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 		{
 			#if debug
 			// Prevents crash specifically on debug without needing to try catch shit
@@ -3280,7 +3280,7 @@ class PlayState extends MusicBeatState
 	{
 		var eventKey:FlxKey = event.keyCode;
 		var key:Int = getKeyFromEvent(keysArray, eventKey);
-		if (!controls.controllerMode && key > -1)
+		if (!Funkin.controls.controllerMode && key > -1)
 			keyReleased(key);
 	}
 
@@ -3353,9 +3353,9 @@ class PlayState extends MusicBeatState
 		var releaseArray:Array<Bool> = [];
 		for (key in keysArray)
 		{
-			holdArray.push(controls.pressed(key));
-			pressArray.push(controls.justPressed(key));
-			releaseArray.push(controls.justReleased(key));
+			holdArray.push(Funkin.controls.pressed(key));
+			pressArray.push(Funkin.controls.justPressed(key));
+			releaseArray.push(Funkin.controls.justReleased(key));
 		}
 
 		for (i in 0...pressArray.length)
@@ -3363,7 +3363,7 @@ class PlayState extends MusicBeatState
 				anas[i] = new Ana(Conductor.songPosition, null, false, "miss", i);
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && pressArray.contains(true))
+		if (Funkin.controls.controllerMode && pressArray.contains(true))
 			for (i in 0...pressArray.length)
 				if (pressArray[i] && strumsBlocked[i] != true)
 					keyPressed(i);
@@ -3411,7 +3411,7 @@ class PlayState extends MusicBeatState
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if ((controls.controllerMode || strumsBlocked.contains(true)) && releaseArray.contains(true))
+		if ((Funkin.controls.controllerMode || strumsBlocked.contains(true)) && releaseArray.contains(true))
 			for (i in 0...releaseArray.length)
 				if (releaseArray[i] || strumsBlocked[i] == true)
 					keyReleased(i);

@@ -93,19 +93,19 @@ class ResetScoreSubState extends MusicBeatSubstate
 		if (week == -1)
 			icon.alpha += elapsed * 2.5;
 
-		if (controls.UI_LEFT_P || controls.UI_RIGHT_P)
+		if (Funkin.controls.UI_LEFT_P || Funkin.controls.UI_RIGHT_P)
 		{
 			FlxG.sound.play(Paths.sound('scrollMenu'), 1);
 			onYes = !onYes;
 			updateOptions();
 		}
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			FlxG.sound.play(Paths.sound('cancelMenu'), 1);
 			ClientPrefs.saveSettings();
 			close();
 		}
-		else if (controls.ACCEPT)
+		else if (Funkin.controls.ACCEPT)
 		{
 			if (onYes)
 			{

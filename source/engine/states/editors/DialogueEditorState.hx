@@ -64,7 +64,7 @@ class DialogueEditorState extends MusicBeatState
 
 		var lineTxt:String;
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			lineTxt = "Press A to remove the current dialogue line, Press X to add another line after the current one.";
 		}
@@ -287,7 +287,7 @@ class DialogueEditorState extends MusicBeatState
 
 		if (character.animation.curAnim != null && character.jsonFile.animations != null)
 		{
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				animText.text = 'Animation: '
 					+ character.jsonFile.animations[curAnim].anim
@@ -443,7 +443,7 @@ class DialogueEditorState extends MusicBeatState
 						character.playAnim(animToPlay, daText.finishedText);
 						dialogueFile.dialogue[curSelected].expression = animToPlay;
 					}
-					if (controls.mobileC)
+					if (Funkin.controls.mobileC)
 					{
 						animText.text = 'Animation: ' + animToPlay + ' (' + (curAnim + 1) + ' / ' + character.jsonFile.animations.length
 							+ ') - Press UP or DOWN to scroll';
@@ -520,7 +520,7 @@ class DialogueEditorState extends MusicBeatState
 				}
 			}
 			character.playAnim(character.jsonFile.animations[curAnim].anim, daText.finishedText);
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				animText.text = 'Animation: '
 					+ character.jsonFile.animations[curAnim].anim
@@ -547,7 +547,7 @@ class DialogueEditorState extends MusicBeatState
 		}
 		characterAnimSpeed();
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			selectedText.text = 'Line: (' + (curSelected + 1) + ' / ' + dialogueFile.dialogue.length + ') - Press LEFT or RIGHT to scroll';
 		}

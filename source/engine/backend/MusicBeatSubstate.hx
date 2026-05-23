@@ -48,10 +48,13 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
+	@:deprecated("`MusicBeatSubState.controls` is deprecated. Use `Funkin.controls` instead.")
 	public var controls(get, never):Controls;
 
-	private function get_controls():Controls
-		return Controls.instance;
+	private function get_controls()
+	{
+		return Funkin.controls;
+	}
 
 	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
@@ -261,7 +264,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	override function destroy()
 	{
-		controls.isInSubstate = false;
+		Funkin.controls.isInSubstate = false;
 		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		removeLuaTouchPad();
@@ -304,7 +307,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			.replace('substates.', '')
 			.replace('.', '/');
 		#end
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 		callOnScripts('onNew');
 		super();
 		callOnScripts('onNewPost');
@@ -327,9 +330,9 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	override function openSubState(subState:FlxSubState)
 	{
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
-		super.openSubState(backend.scripting.ModsStateRedirect.redirectSubstate(subState));
+		super.openSubState(subState);
 	}
 
 	override function closeSubState()
@@ -348,8 +351,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		updateCurStep();
 		updateBeat();
 
-		if (!controls.isInSubstate)
-			controls.isInSubstate = true;
+		if (!Funkin.controls.isInSubstate)
+			Funkin.controls.isInSubstate = true;
 
 		if (oldStep != curStep)
 		{

@@ -82,14 +82,14 @@ class OptionsState extends MusicBeatState
 		var tipY:Int = FlxG.height - #if android 40 #else 24 #end;
 
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileKey:String = controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
+		var mobileKey:String = Funkin.controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
 		var mobileText:String = 'Press ${mobileKey} to Go Mobile Controls Menu';
 		#else
 		var mobileText:String = '';
 		#end
 
 		#if android
-		var dataKey:String = controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
+		var dataKey:String = Funkin.controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
 		var dataText:String = '\nPress ${dataKey} to Open DATA Folder';
 		#else
 		var dataText:String = '';
@@ -165,11 +165,11 @@ class OptionsState extends MusicBeatState
 
 		if (!exiting)
 		{
-			if (controls.UI_UP_P)
+			if (Funkin.controls.UI_UP_P)
 			{
 				changeSelection(-1);
 			}
-			if (controls.UI_DOWN_P)
+			if (Funkin.controls.UI_DOWN_P)
 			{
 				changeSelection(1);
 			}
@@ -187,7 +187,7 @@ class OptionsState extends MusicBeatState
 				android.Tools.openDataFolder();
 			#end
 
-			if (controls.BACK)
+			if (Funkin.controls.BACK)
 			{
 				exiting = true;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
@@ -198,9 +198,9 @@ class OptionsState extends MusicBeatState
 					FlxG.sound.music.volume = 0;
 				}
 				else
-					MusicBeatState.switchState(new MainMenuState());
+					Funkin.switchState(MainMenuState);
 			}
-			else if (controls.ACCEPT)
+			else if (Funkin.controls.ACCEPT)
 				openSelectedSubstate(options[curSelected]);
 		}
 	}

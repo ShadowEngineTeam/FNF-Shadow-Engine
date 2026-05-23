@@ -213,25 +213,25 @@ class NoteOffsetState extends MusicBeatState
 		}
 
 		if (FlxG.gamepads.anyJustPressed(ANY))
-			controls.controllerMode = true;
+			Funkin.controls.controllerMode = true;
 		else if (FlxG.mouse.justPressed)
-			controls.controllerMode = false;
+			Funkin.controls.controllerMode = false;
 
-		if (controls.controllerMode != _lastControllerMode)
+		if (Funkin.controls.controllerMode != _lastControllerMode)
 		{
 			// trace('changed controller mode');
-			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
+			FlxG.mouse.visible = !Funkin.controls.controllerMode;
+			controllerPointer.visible = Funkin.controls.controllerMode;
 
 			// changed to controller mid state
-			if (controls.controllerMode)
+			if (Funkin.controls.controllerMode)
 			{
 				var mousePos = FlxG.mouse.getViewPosition(camHUD);
 				controllerPointer.x = mousePos.x;
 				controllerPointer.y = mousePos.y;
 			}
 			updateMode();
-			_lastControllerMode = controls.controllerMode;
+			_lastControllerMode = Funkin.controls.controllerMode;
 		}
 
 		if (onComboMenu)
@@ -239,7 +239,7 @@ class NoteOffsetState extends MusicBeatState
 			if (FlxG.keys.justPressed.ANY || FlxG.gamepads.anyJustPressed(ANY))
 			{
 				var controlArray:Array<Bool> = null;
-				if (!controls.controllerMode)
+				if (!Funkin.controls.controllerMode)
 				{
 					controlArray = [
 						FlxG.keys.justPressed.LEFT,
@@ -305,7 +305,7 @@ class NoteOffsetState extends MusicBeatState
 			var analogMoved:Bool = false;
 			var gamepadPressed:Bool = false;
 			var gamepadReleased:Bool = false;
-			if (controls.controllerMode)
+			if (Funkin.controls.controllerMode)
 			{
 				for (gamepad in FlxG.gamepads.getActiveGamepads())
 				{
@@ -317,15 +317,15 @@ class NoteOffsetState extends MusicBeatState
 				}
 				controllerPointer.x = Math.max(0, Math.min(FlxG.width, controllerPointer.x + analogX * 1000 * elapsed));
 				controllerPointer.y = Math.max(0, Math.min(FlxG.height, controllerPointer.y + analogY * 1000 * elapsed));
-				gamepadPressed = !FlxG.gamepads.anyJustPressed(START) && controls.ACCEPT;
-				gamepadReleased = !FlxG.gamepads.anyJustReleased(START) && controls.justReleased('accept');
+				gamepadPressed = !FlxG.gamepads.anyJustPressed(START) && Funkin.controls.ACCEPT;
+				gamepadReleased = !FlxG.gamepads.anyJustReleased(START) && Funkin.controls.justReleased('accept');
 			}
 
 			// probably there's a better way to do this but, oh well.
 			if (FlxG.mouse.justPressed || gamepadPressed)
 			{
 				holdingObjectType = null;
-				if (!controls.controllerMode)
+				if (!Funkin.controls.controllerMode)
 					FlxG.mouse.getViewPosition(camHUD, startMousePos);
 				else
 					controllerPointer.getScreenPosition(startMousePos, camHUD);
@@ -362,7 +362,7 @@ class NoteOffsetState extends MusicBeatState
 				if (FlxG.mouse.justMoved || analogMoved)
 				{
 					var mousePos:FlxPoint = null;
-					if (!controls.controllerMode)
+					if (!Funkin.controls.controllerMode)
 						mousePos = FlxG.mouse.getViewPosition(camHUD);
 					else
 						mousePos = controllerPointer.getScreenPosition(camHUD);
@@ -374,7 +374,7 @@ class NoteOffsetState extends MusicBeatState
 				}
 			}
 
-			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
+			if (Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				for (i in 0...ClientPrefs.data.comboOffset.length)
 				{
@@ -385,26 +385,26 @@ class NoteOffsetState extends MusicBeatState
 		}
 		else
 		{
-			if (controls.UI_LEFT_P)
+			if (Funkin.controls.UI_LEFT_P)
 			{
 				barPercent = Math.max(delayMin, Math.min(ClientPrefs.data.noteOffset - 1, delayMax));
 				updateNoteDelay();
 			}
-			else if (controls.UI_RIGHT_P)
+			else if (Funkin.controls.UI_RIGHT_P)
 			{
 				barPercent = Math.max(delayMin, Math.min(ClientPrefs.data.noteOffset + 1, delayMax));
 				updateNoteDelay();
 			}
 
 			var mult:Int = 1;
-			if (controls.UI_LEFT || controls.UI_RIGHT)
+			if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 			{
 				holdTime += elapsed;
-				if (controls.UI_LEFT)
+				if (Funkin.controls.UI_LEFT)
 					mult = -1;
 			}
 
-			if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
+			if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 				holdTime = 0;
 
 			if (holdTime > 0.5)
@@ -414,7 +414,7 @@ class NoteOffsetState extends MusicBeatState
 				updateNoteDelay();
 			}
 
-			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
+			if (Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				holdTime = 0;
 				barPercent = 0;
@@ -422,13 +422,13 @@ class NoteOffsetState extends MusicBeatState
 			}
 		}
 
-		if ((!controls.controllerMode && controls.ACCEPT) || (controls.controllerMode && FlxG.gamepads.anyJustPressed(START)))
+		if ((!Funkin.controls.controllerMode && Funkin.controls.ACCEPT) || (Funkin.controls.controllerMode && FlxG.gamepads.anyJustPressed(START)))
 		{
 			onComboMenu = !onComboMenu;
 			updateMode();
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			if (zoomTween != null)
 				zoomTween.cancel();
@@ -571,8 +571,8 @@ class NoteOffsetState extends MusicBeatState
 		FlxG.mouse.visible = false;
 		if (onComboMenu)
 		{
-			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
+			FlxG.mouse.visible = !Funkin.controls.controllerMode;
+			controllerPointer.visible = Funkin.controls.controllerMode;
 		}
 
 		var str:String;
@@ -582,13 +582,13 @@ class NoteOffsetState extends MusicBeatState
 		else
 			str = 'Note/Beat Delay';
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			str2 = '(Press A to Switch)';
 		}
 		else
 		{
-			if (!controls.controllerMode)
+			if (!Funkin.controls.controllerMode)
 				str2 = '(Press Accept to Switch)';
 			else
 				str2 = '(Press Start to Switch)';

@@ -84,7 +84,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		box.updateHitbox();
 		hudGroup.add(box);
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			TIP_TEXT_MAIN = '\nX - Reset Camera
 				\nY - Toggle Speech Bubble
