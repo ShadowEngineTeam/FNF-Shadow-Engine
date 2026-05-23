@@ -113,6 +113,7 @@ class SScript
 		catch (e:Dynamic)
 		{
 			lastReportedTime = -1;
+			parsingException = SScriptException.fromDynamic(e);
 			if (debugTraces)
 				trace('SScript constructor error: $e');
 		}
@@ -160,7 +161,7 @@ class SScript
 			}
 			catch (e:Dynamic)
 			{
-				parsingException = e;
+				parsingException = SScriptException.fromDynamic(e);
 				returnValue = null;
 				if (traces)
 					trace('SScript execute error: $e');
@@ -425,7 +426,7 @@ class SScript
 			catch (e)
 			{
 				caller = oldCaller;
-				caller.exceptions.insert(0, new SScriptException(e));
+				caller.exceptions.insert(0, SScriptException.fromDynamic(e));
 			}
 		}
 		lastReportedCallTime = Timer.stamp() - time;
@@ -611,7 +612,7 @@ class SScript
 			catch (e:Dynamic)
 			{
 				script = "";
-				parsingException = e;
+				parsingException = SScriptException.fromDynamic(e);
 				returnValue = null;
 				if (traces)
 				{
@@ -624,6 +625,7 @@ class SScript
 		catch (e:Dynamic)
 		{
 			lastReportedTime = -1;
+			parsingException = SScriptException.fromDynamic(e);
 			if (traces)
 			{
 				trace('SScript doString fatal error: $e');
@@ -769,6 +771,13 @@ abstract SScriptException(Exception)
 	public static function fromException(exception:Exception):SScriptException
 		return new SScriptException(exception);
 
+	public static function fromDynamic(e:Dynamic):SScriptException
+	{
+		if (Std.isOfType(e, Exception))
+			return new SScriptException(cast e);
+		return new SScriptException(new Exception(Std.string(e)));
+	}
+
 	@:to
 	public function toString():String
 		return message;
@@ -777,7 +786,7 @@ abstract SScriptException(Exception)
 		return this.details();
 
 	function get_message():String
-		return this.message;
+		return Std.string(this);
 
 	public function toException():Exception
 		return this;

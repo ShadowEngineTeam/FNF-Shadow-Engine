@@ -316,12 +316,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			initPsychCamera();
 
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
-		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		luaDebugCam = new ShadowCamera();
-		luaDebugCam.bgColor.alpha = 0;
-		FlxG.cameras.add(luaDebugCam, false);
-		luaDebugGroup.cameras = [luaDebugCam];
-		add(luaDebugGroup);
+		ensureDebugGroup();
 		#end
 
 		#if FEATURE_LUA
@@ -572,10 +567,22 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	}
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
+	function ensureDebugGroup():Void
+	{
+		if (luaDebugGroup != null)
+			return;
+
+		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		luaDebugCam = new ShadowCamera();
+		luaDebugCam.bgColor.alpha = 0;
+		FlxG.cameras.add(luaDebugCam, false);
+		luaDebugGroup.cameras = [luaDebugCam];
+		add(luaDebugGroup);
+	}
+
 	public function addTextToDebug(text:String, color:FlxColor)
 	{
-		if (luaDebugGroup == null)
-			return #if sys Sys.println(text) #else trace(text) #end;
+		ensureDebugGroup();
 
 		var newText:psychlua.DebugLuaText = luaDebugGroup.recycle(psychlua.DebugLuaText);
 		newText.text = text;
