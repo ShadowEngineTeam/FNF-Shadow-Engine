@@ -18,17 +18,21 @@ class Paths
 {
 	public static final IMAGE_EXT:String = "png";
 	#if USING_GPU_TEXTURES
-	public static final GPU_IMAGE_EXT:String = #if ASTC "astc" #elseif BC "dds" #else IMAGE_EXT #end;
+	public static final GPU_IMAGE_EXTS:Array<String> = [#if desktop 'dds', 'astc' #else 'astc', 'dds' #end];
 	#end
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
+	public static final SOUND_EXTS:Array<String> = ['ogg', 'opus', 'mp3', 'flac', 'wav'];
 	public static var LOADOLD:Bool = false;
 
 	public static final dumpExclusions:Array<String> = [
 		'assets/shared/images/touchpad/bg.$IMAGE_EXT',
 		#if USING_GPU_TEXTURES
-		'assets/shared/images/touchpad/bg.$GPU_IMAGE_EXT',
+		#if BC
+		'assets/shared/images/touchpad/bg.dds',
+		#elseif ASTC
+		'assets/shared/images/touchpad/bg.astc',
 		#end
 		'assets/shared/images/ui/cursor.png',
 		'assets/shared/images/ui/cursorCross.png',
@@ -110,8 +114,15 @@ class Paths
 	public static function getPath(file:String, ?type:AssetType = TEXT, ?library:Null<String> = null, ?modsAllowed:Bool = false):String
 	{
 		#if USING_GPU_TEXTURES
-		if (file.endsWith(IMAGE_EXT) && FileSystem.exists(haxe.io.Path.withoutExtension(file) + '.$GPU_IMAGE_EXT'))
-			file = haxe.io.Path.withoutExtension(file) + '.$GPU_IMAGE_EXT';
+		for (ext in GPU_IMAGE_EXTS)
+		{
+			var gpuPath:String = haxe.io.Path.withoutExtension(file) + '.$ext';
+			if (file.endsWith(IMAGE_EXT) && FileSystem.exists(gpuPath))
+			{
+				file = gpuPath;
+				break;
+			}
+		}
 		#end
 
 		#if FEATURE_MODS
@@ -233,22 +244,29 @@ class Paths
 			#if USING_GPU_TEXTURES
 			if (modKey.endsWith(IMAGE_EXT))
 			{
-				modKey = haxe.io.Path.withoutExtension(modKey) + '.$GPU_IMAGE_EXT';
+				for (ext in GPU_IMAGE_EXTS)
+				{
+					var gpuModKey:String = haxe.io.Path.withoutExtension(modKey) + '.$ext';
 
-				for (mod in Mods.getGlobalMods())
-					if (FileSystem.exists(mods('$mod/$modKey')))
+					for (mod in Mods.getGlobalMods())
+						if (FileSystem.exists(mods('$mod/$gpuModKey')))
+							return true;
+
+					if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + gpuModKey)) || FileSystem.exists(mods(gpuModKey)))
 						return true;
-
-				if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + modKey)) || FileSystem.exists(mods(modKey)))
-					return true;
+				}
 			}
 			#end
 		}
 		#end
 
 		#if USING_GPU_TEXTURES
-		if (path.endsWith(IMAGE_EXT) && FileSystem.exists(haxe.io.Path.withoutExtension(path) + '.$GPU_IMAGE_EXT'))
-			return true;
+		if (path.endsWith(IMAGE_EXT))
+		{
+			for (ext in GPU_IMAGE_EXTS)
+				if (FileSystem.exists(haxe.io.Path.withoutExtension(path) + '.$ext'))
+					return true;
+		}
 		#end
 
 		return FileSystem.exists(path);
@@ -262,6 +280,16 @@ class Paths
 			default: BINARY;
 		}
 	}
+
+	#if USING_GPU_TEXTURES
+	public static function isGpuImageExt(file:String):Bool
+	{
+		for (ext in GPU_IMAGE_EXTS)
+			if (file.endsWith('.$ext'))
+				return true;
+		return false;
+	}
+	#end
 
 	public static function image(key:String, ?library:String = null):FlxGraphic
 	{
@@ -283,7 +311,12 @@ class Paths
 		else
 		#end
 		{
-			for (ext in [#if USING_GPU_TEXTURES GPU_IMAGE_EXT, #end IMAGE_EXT])
+			var exts:Array<String> = [];
+			#if USING_GPU_TEXTURES
+			for (e in GPU_IMAGE_EXTS) exts.push(e);
+			#end
+			exts.push(IMAGE_EXT);
+			for (ext in exts)
 			{
 				file = getPath('images/$key.$ext', getImageAssetType(ext), library);
 				if (currentTrackedAssets.exists(file))
@@ -412,24 +445,31 @@ class Paths
 		}
 		#end
 
-		// I hate this so god damn much
-		var gottenPath:String = '$key.ogg';
-		if (path != null)
-			gottenPath = '$path/$gottenPath';
-		gottenPath = getPath(gottenPath, SOUND, library);
-		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
-
-		if (!currentTrackedSounds.exists(gottenPath))
+		for (ext in SOUND_EXTS)
 		{
-			var retKey:String = (path != null) ? '$path/$key' : key;
-			retKey = getPath('$retKey.ogg', SOUND, library);
-			if (FileSystem.exists(retKey))
-				currentTrackedSounds.set(gottenPath, #if html5 openfl.Assets.getSound(retKey) #else Sound.fromBytes(File.getBytes(retKey)) #end);
+			var gottenPath:String = '$key.$ext';
+			if (path != null)
+				gottenPath = '$path/$gottenPath';
+			gottenPath = getPath(gottenPath, SOUND, library);
+			gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
+
+			if (!currentTrackedSounds.exists(gottenPath))
+			{
+				var retKey:String = (path != null) ? '$path/$key' : key;
+				retKey = getPath('$retKey.$ext', SOUND, library);
+				if (FileSystem.exists(retKey))
+					currentTrackedSounds.set(gottenPath, #if html5 openfl.Assets.getSound(retKey) #else Sound.fromBytes(File.getBytes(retKey)) #end);
+			}
+
+			if (currentTrackedSounds.exists(gottenPath))
+			{
+				if (!localTrackedAssets.contains(gottenPath))
+					localTrackedAssets.push(gottenPath);
+				return currentTrackedSounds.get(gottenPath);
+			}
 		}
 
-		if (!localTrackedAssets.contains(gottenPath))
-			localTrackedAssets.push(gottenPath);
-		return currentTrackedSounds.get(gottenPath);
+		return null;
 	}
 
 	public static function getAtlas(key:String, ?library:String = null):FlxAtlasFrames
@@ -552,17 +592,26 @@ class Paths
 	}
 	#end
 
-	inline public static function modsSounds(path:String, key:String):String
+	public static function modsSounds(path:String, key:String):String
 	{
+		for (ext in SOUND_EXTS)
+		{
+			var file:String = modFolders(path + '/' + key + '.' + ext);
+			if (FileSystem.exists(file))
+				return file;
+		}
 		return modFolders(path + '/' + key + '.ogg');
 	}
 
-	inline public static function modsImages(key:String):String
+	public static function modsImages(key:String):String
 	{
 		#if USING_GPU_TEXTURES
-		var gpuFile:String = modFolders('images/' + key + '.${GPU_IMAGE_EXT}');
-		if (FileSystem.exists(gpuFile))
-			return gpuFile;
+		for (ext in GPU_IMAGE_EXTS)
+		{
+			var gpuFile:String = modFolders('images/' + key + '.$ext');
+			if (FileSystem.exists(gpuFile))
+				return gpuFile;
+		}
 		#end
 
 		return modFolders('images/' + key + '.${IMAGE_EXT}');

@@ -267,18 +267,18 @@ class LoadingState extends MusicBeatState
 
 	public static function clearInvalids()
 	{
-		clearInvalidFrom(imagesToPrepare, 'images', '.png', IMAGE); // leaving this as is
-		// clearInvalidFrom(imagesToPrepare, 'images', '.${Paths.IMAGE_EXT}', Paths.IMAGE_ASSETTYPE);
-		clearInvalidFrom(soundsToPrepare, 'sounds', '.ogg', SOUND);
-		clearInvalidFrom(musicToPrepare, 'music', ' .ogg', SOUND);
-		clearInvalidFrom(songsToPrepare, 'songs', '.ogg', SOUND);
+		clearInvalidFrom(imagesToPrepare, 'images', ['.png'], IMAGE); // leaving this as is
+		// clearInvalidFrom(imagesToPrepare, 'images', ['.${Paths.IMAGE_EXT}'], Paths.IMAGE_ASSETTYPE);
+		clearInvalidFrom(soundsToPrepare, 'sounds', Paths.SOUND_EXTS, SOUND);
+		clearInvalidFrom(musicToPrepare, 'music', Paths.SOUND_EXTS, SOUND);
+		clearInvalidFrom(songsToPrepare, 'songs', Paths.SOUND_EXTS, SOUND);
 
 		for (arr in [imagesToPrepare, soundsToPrepare, musicToPrepare, songsToPrepare])
 			while (arr.contains(null))
 				arr.remove(null);
 	}
 
-	static function clearInvalidFrom(arr:Array<String>, prefix:String, ext:String, type:AssetType, ?library:String = null)
+	static function clearInvalidFrom(arr:Array<String>, prefix:String, exts:Array<String>, type:AssetType, ?library:String = null)
 	{
 		for (i in 0...arr.length)
 		{
@@ -287,8 +287,12 @@ class LoadingState extends MusicBeatState
 			{
 				for (subfolder in Mods.directoriesWithFile(Paths.getSharedPath(), '$prefix/$folder'))
 					for (file in FileSystem.readDirectory(subfolder))
-						if (file.endsWith(ext))
-							arr.push(folder + file.substr(0, file.length - ext.length));
+						for (ext in exts)
+							if (file.endsWith(ext))
+							{
+								arr.push(folder + file.substr(0, file.length - ext.length));
+								break;
+							}
 
 				// trace('Folder detected! ' + folder);
 			}
@@ -298,14 +302,21 @@ class LoadingState extends MusicBeatState
 		while (i < arr.length)
 		{
 			var member:String = arr[i];
-			var myKey = '$prefix/$member$ext';
+			var valid:Bool = false;
+			for (ext in exts)
+			{
+				var myKey = '$prefix/$member$ext';
+				if (Paths.fileExists(myKey, type, false, library))
+				{
+					valid = true;
+					break;
+				}
+			}
 
-			// trace('attempting on $prefix: $myKey');
-			var doTrace:Bool = false;
-			if (member.endsWith('/') || (!Paths.fileExists(myKey, type, false, library) && (doTrace = true)))
+			if (member.endsWith('/') || !valid)
 			{
 				arr.remove(member);
-				if (doTrace)
+				if (!member.endsWith('/'))
 					trace('Removed invalid $prefix: $member');
 			}
 			else
@@ -384,7 +395,7 @@ class LoadingState extends MusicBeatState
 					loaded++;
 					continue;
 				}
-				else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
+				else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 					bitmap = BitmapData.fromBytes(File.getBytes(file));
 				else
 				#end
@@ -395,7 +406,7 @@ class LoadingState extends MusicBeatState
 						loaded++;
 						continue;
 					}
-					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					{
@@ -451,7 +462,7 @@ class LoadingState extends MusicBeatState
 						#end
 						return;
 					}
-					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					#end
@@ -469,7 +480,7 @@ class LoadingState extends MusicBeatState
 							#end
 							return;
 						}
-						else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !file.endsWith(Paths.GPU_IMAGE_EXT) #end)
+						else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 							bitmap = BitmapData.fromBytes(File.getBytes(file));
 						else
 						{
