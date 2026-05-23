@@ -34,6 +34,7 @@ class Paths
 		#elseif ASTC
 		'assets/shared/images/touchpad/bg.astc',
 		#end
+		#end
 		'assets/shared/images/ui/cursor.png',
 		'assets/shared/images/ui/cursorCross.png',
 		'assets/shared/music/freakyMenu.ogg'
@@ -240,7 +241,7 @@ class Paths
 
 			if (FileSystem.exists(mods(Mods.currentModDirectory + '/' + modKey)) || FileSystem.exists(mods(modKey)))
 				return true;
-			
+
 			#if USING_GPU_TEXTURES
 			if (modKey.endsWith(IMAGE_EXT))
 			{
@@ -340,7 +341,7 @@ class Paths
 		}
 
 		trace('Failed to load image: $file');
-		
+
 		if (currentTrackedAssets.exists('__flixel_logo'))
 		{
 			if (!localTrackedAssets.contains('__flixel_logo'))
