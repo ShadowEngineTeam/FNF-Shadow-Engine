@@ -5,6 +5,7 @@ import backend.StageData;
 import flixel.addons.transition.FlxTransitionableState;
 import mobile.substates.MobileControlSelectSubState;
 import backend.ui.ShadowStyle;
+import options.*;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -43,19 +44,19 @@ class OptionsState extends MusicBeatState
 		{
 			case 'Note Colors':
 				if (ClientPrefs.data.disableRGBNotes)
-					openSubState(new options.NotesSubStateOld());
+					openSubState(new NotesSubStateOld());
 				else
-					openSubState(new options.NotesSubState());
+					openSubState(new NotesSubState());
 			case 'Controls':
-				openSubState(new options.ControlsSubState());
+				openSubState(new ControlsSubState());
 			case 'Graphics':
-				openSubState(new options.GraphicsSettingsSubState());
+				openSubState(new GraphicsSettingsSubState());
 			case 'Visuals and UI':
-				openSubState(new options.VisualsUISubState());
+				openSubState(new VisualsUISubState());
 			case 'Gameplay':
-				openSubState(new options.GameplaySettingsSubState());
+				openSubState(new GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
-				MusicBeatState.switchState(new options.NoteOffsetState());
+				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
 			case 'Mobile Options':
 				openSubState(new mobile.options.MobileOptionsSubState());
@@ -194,7 +195,7 @@ class OptionsState extends MusicBeatState
 				if (onPlayState)
 				{
 					StageData.loadDirectory(PlayState.SONG);
-					LoadingState.loadAndSwitchState(new PlayState());
+					LoadingState.loadAndSwitchState(PlayState);
 					FlxG.sound.music.volume = 0;
 				}
 				else

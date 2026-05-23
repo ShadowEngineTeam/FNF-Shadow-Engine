@@ -1370,7 +1370,7 @@ class CharacterEditorState extends MusicBeatState
 			FlxG.mouse.visible = false;
 			if (!_goToPlayState)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 			else

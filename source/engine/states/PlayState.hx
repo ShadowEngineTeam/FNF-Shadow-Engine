@@ -2204,7 +2204,7 @@ class PlayState extends MusicBeatState
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 		#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
-		MusicBeatState.switchState(new CharacterEditorState(SONG.player2));
+		Funkin.switchState(CharacterEditorState, [SONG.player2]);
 	}
 
 	public var isDead:Bool = false; // Don't mess with this on Lua!!!
@@ -2247,7 +2247,7 @@ class PlayState extends MusicBeatState
 
 				openSubState(new GameOverSubstate());
 
-				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+				// Funkin.switchState(GameOverState, [boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y]);
 
 				#if FEATURE_DISCORD_RPC
 				// Game Over doesn't get his its variable because it's only used here
@@ -2875,7 +2875,7 @@ class PlayState extends MusicBeatState
 					FlxG.sound.music.stop();
 
 					LoadingState.prepareToSong();
-					LoadingState.loadAndSwitchState(new PlayState(), false, false);
+					LoadingState.loadAndSwitchState(PlayState, false, false);
 				}
 			}
 			else

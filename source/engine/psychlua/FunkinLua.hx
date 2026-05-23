@@ -356,7 +356,7 @@ class FunkinLua
 					FlxTransitionableState.skipNextTransOut = true;
 				}
 
-				MusicBeatState.switchState(new states.FreeplayState());
+				Funkin.switchState(states.FreeplayState);
 
 				#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 
@@ -855,7 +855,7 @@ class FunkinLua
 			PlayState.SONG = Song.loadFromJson(poop, name);
 			PlayState.storyDifficulty = difficultyNum;
 			game.persistentUpdate = false;
-			LoadingState.loadAndSwitchState(new PlayState());
+			LoadingState.loadAndSwitchState(PlayState);
 
 			FlxG.sound.music.pause();
 			FlxG.sound.music.volume = 0;

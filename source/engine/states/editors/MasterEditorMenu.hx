@@ -110,17 +110,17 @@ class MasterEditorMenu extends MusicBeatState
 			switch (options[curSelected])
 			{
 				case 'Chart Editor': // felt it would be cool maybe
-					LoadingState.loadAndSwitchState(new ChartingState(), false);
+					LoadingState.loadAndSwitchState(ChartingState, false);
 				case 'Character Editor':
-					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
+					LoadingState.loadAndSwitchState(CharacterEditorState, [Character.DEFAULT_CHARACTER, false]);
 				case 'Week Editor':
 					Funkin.switchState(WeekEditorState);
 				case 'Menu Character Editor':
 					Funkin.switchState(MenuCharacterEditorState);
 				case 'Dialogue Editor':
-					LoadingState.loadAndSwitchState(new DialogueEditorState(), false);
+					LoadingState.loadAndSwitchState(DialogueEditorState, false);
 				case 'Dialogue Portrait Editor':
-					LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), false);
+					LoadingState.loadAndSwitchState(DialogueCharacterEditorState, false);
 				case 'Note Splash Debug':
 					Funkin.switchState(NoteSplashDebugState);
 			}

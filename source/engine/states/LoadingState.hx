@@ -26,19 +26,24 @@ class LoadingState extends MusicBeatState
 	static var loadedMutex:Mutex = new Mutex();
 	#end
 
-	function new(target:FlxState, stopMusic:Bool)
+	function new(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic:Bool)
 	{
 		this.target = target;
+		this.args = args;
 		this.stopMusic = stopMusic;
 		startThreads();
 
 		super();
 	}
 
-	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, intrusive:Bool = true)
-		MusicBeatState.switchState(getNextState(target, stopMusic, intrusive));
+	inline static public function loadAndSwitchState(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic = false, intrusive:Bool = true)
+	{
+		var loading = getNextState(target, args, stopMusic, intrusive);
+		Funkin.switchState(loading.state, loading.args);
+	}
 
-	var target:FlxState = null;
+	var target:Class<FlxState> = null;
+	var args:Array<Dynamic> = null;
 	var stopMusic:Bool = false;
 	var dontUpdate:Bool = false;
 
@@ -128,7 +133,7 @@ class LoadingState extends MusicBeatState
 
 		FlxG.camera.visible = false;
 		// FlxTransitionableState.skipNextTransIn = true;
-		MusicBeatState.switchState(target);
+		Funkin.switchState(target, args);
 		transitioning = true;
 		finishedLoading = true;
 	}
@@ -146,7 +151,7 @@ class LoadingState extends MusicBeatState
 		return (loaded == loadMax);
 	}
 
-	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
+	static function getNextState(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic = false, intrusive:Bool = true):{state:Class<FlxState>, args:Array<Dynamic>}
 	{
 		var directory:String = 'shared';
 		var weekDir:String = StageData.forceNextDirectory;
@@ -162,7 +167,7 @@ class LoadingState extends MusicBeatState
 			if (intrusive)
 			{
 				if (imagesToPrepare.length > 0 || soundsToPrepare.length > 0 || musicToPrepare.length > 0 || songsToPrepare.length > 0)
-					return new LoadingState(target, stopMusic);
+					return {state: LoadingState, args: [target, args, stopMusic]};
 			}
 			else
 				doPrecache = true;
@@ -188,7 +193,7 @@ class LoadingState extends MusicBeatState
 					#if sys Sys.sleep(0.01); #else haxe.Timer.delay(() -> {}, 10); #end
 			}
 		}
-		return target;
+		return {state: target, args: args};
 	}
 
 	static var imagesToPrepare:Array<String> = [];
