@@ -111,7 +111,7 @@ class Main extends Sprite
 		addChild(funkinGame);
 
 		@:privateAccess
-		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer));
+		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
 		debug.codename.SystemInfo.init();
 
 		Lib.current.stage.align = "tl";
