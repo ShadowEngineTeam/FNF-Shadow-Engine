@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "f76515f803557a27c2224037fa5bafed90a20e2b",
+      "ref": "0eb0a03d56f23b3214768b099d0d78dbf9a23711",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -33,7 +33,7 @@
     {
       "name": "SScript",
       "type": "git",
-      "ref": "d4e532889a2ba94fb3989fdbaa5ab52395b5f214",
+      "ref": "e48028a1239d1533013b3fa62a8c7420d84ebee0",
       "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
