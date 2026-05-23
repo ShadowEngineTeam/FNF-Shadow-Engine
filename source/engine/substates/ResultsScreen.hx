@@ -195,7 +195,7 @@ class ResultsScreen extends MusicBeatSubstate
 			FlxG.sound.music.volume = 0;
 			PlayState.instance.vocals.volume = 0;
 
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}
 
 		super.update(elapsed);

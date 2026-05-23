@@ -619,7 +619,7 @@ class ChartingState extends MusicBeatState
 		var loadAutosaveBtn:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row5, "Load Auto", function()
 		{
 			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}, 70);
 		tab_group.add(loadAutosaveBtn);
 
@@ -3518,7 +3518,7 @@ class ChartingState extends MusicBeatState
 			}
 			else
 				PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}
 		catch (e)
 		{

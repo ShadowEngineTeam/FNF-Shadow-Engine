@@ -95,7 +95,7 @@ class MusicPlayer extends FlxGroup
 
 		positionSong();
 
-		if (instance.controls.UI_LEFT_P)
+		if (Funkin.controls.UI_LEFT_P)
 		{
 			if (playing)
 				wasPlaying = true;
@@ -112,7 +112,7 @@ class MusicPlayer extends FlxGroup
 			if (FreeplayState.vocals != null)
 				FreeplayState.vocals.time = curTime;
 		}
-		if (instance.controls.UI_RIGHT_P)
+		if (Funkin.controls.UI_RIGHT_P)
 		{
 			if (playing)
 				wasPlaying = true;
@@ -132,12 +132,12 @@ class MusicPlayer extends FlxGroup
 
 		updateTimeTxt();
 
-		if (instance.controls.UI_LEFT || instance.controls.UI_RIGHT)
+		if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 		{
 			instance.holdTime += elapsed;
 			if (instance.holdTime > 0.5)
 			{
-				curTime += 40000 * elapsed * (instance.controls.UI_LEFT ? -1 : 1);
+				curTime += 40000 * elapsed * (Funkin.controls.UI_LEFT ? -1 : 1);
 			}
 
 			var difference:Float = Math.abs(curTime - FlxG.sound.music.time);
@@ -153,7 +153,7 @@ class MusicPlayer extends FlxGroup
 			updateTimeTxt();
 		}
 
-		if (instance.controls.UI_LEFT_R || instance.controls.UI_RIGHT_R)
+		if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 		{
 			FlxG.sound.music.time = curTime;
 			if (FreeplayState.vocals != null)
@@ -167,24 +167,24 @@ class MusicPlayer extends FlxGroup
 
 			updateTimeTxt();
 		}
-		if (instance.controls.UI_UP_P)
+		if (Funkin.controls.UI_UP_P)
 		{
 			holdPitchTime = 0;
 			playbackRate += 0.05;
 			setPlaybackRate();
 		}
-		else if (instance.controls.UI_DOWN_P)
+		else if (Funkin.controls.UI_DOWN_P)
 		{
 			holdPitchTime = 0;
 			playbackRate -= 0.05;
 			setPlaybackRate();
 		}
-		if (instance.controls.UI_DOWN || instance.controls.UI_UP)
+		if (Funkin.controls.UI_DOWN || Funkin.controls.UI_UP)
 		{
 			holdPitchTime += elapsed;
 			if (holdPitchTime > 0.6)
 			{
-				playbackRate += 0.05 * (instance.controls.UI_UP ? 1 : -1);
+				playbackRate += 0.05 * (Funkin.controls.UI_UP ? 1 : -1);
 				setPlaybackRate();
 			}
 		}
@@ -200,7 +200,7 @@ class MusicPlayer extends FlxGroup
 		}
 		updatePlaybackTxt();
 
-		if (#if FEATURE_MOBILE_CONTROLS instance.touchPad.buttonC.justPressed || #end instance.controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS Funkin.controls.touchPad.buttonC.justPressed || #end Funkin.controls.RESET)
 		{
 			playbackRate = 1;
 			setPlaybackRate();
@@ -250,10 +250,10 @@ class MusicPlayer extends FlxGroup
 
 		if (playingMusic)
 		{
-			if (instance.controls.mobileC)
-				instance.bottomText.text = 'Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to Pause / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(A).toUpperCase() : 'B'} to Exit / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset the Song';
+			if (Funkin.controls.mobileC)
+				instance.bottomText.text = 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to Pause / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(A).toUpperCase() : 'B'} to Exit / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset the Song';
 			else
-				instance.bottomText.text = 'Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to Pause / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(A).toUpperCase() : 'ESC'} to Exit / Press ${instance.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset the Song';
+				instance.bottomText.text = 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to Pause / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(A).toUpperCase() : 'ESC'} to Exit / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset the Song';
 			positionSong();
 
 			progressBar.setRange(0, FlxG.sound.music.length);
