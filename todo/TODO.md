@@ -1,4 +1,5 @@
 - Switch Game Res from 720p to 1080p(?)
+- Rewrite Paths
 - Add hxfmod
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Menus(?) and Wide Screen Support
