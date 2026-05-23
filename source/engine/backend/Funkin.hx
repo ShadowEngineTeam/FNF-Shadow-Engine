@@ -11,7 +11,6 @@ import haxe.io.Path;
  */
 class Funkin
 {
-
 	public static var controls(get, never):Controls;
 
     public static function switchState(nextState:Class<FlxState>, ?arguments:Array<Dynamic>):Void
