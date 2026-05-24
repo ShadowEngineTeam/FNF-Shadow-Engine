@@ -8,6 +8,7 @@ import sys.thread.Mutex;
 #else
 private typedef Thread = Dynamic;
 #end
+import Sys;
 
 final class ThreadUtil
 {
@@ -85,6 +86,57 @@ final class ThreadUtil
 		__threadMutex.release();
 	}
 	#end
+
+	/**
+	 * Checks an array of path-returning functions in parallel and returns the first non-null result.
+	 * On non-threaded targets, runs checks sequentially.
+	 * Each function should return a path string if the file exists, or null if not.
+	 */
+	public static function firstExisting(checks:Array<Void->Null<String>>):Null<String>
+	{
+		if (checks == null || checks.length == 0)
+			return null;
+		if (checks.length == 1)
+			return checks[0]();
+
+		#if (target.threaded)
+		var result:Null<String> = null;
+		var mutex = new Mutex();
+		var remaining = checks.length;
+
+		for (check in checks)
+		{
+			var c = check;
+			Thread.create(() ->
+			{
+				var r = c();
+				if (r != null)
+				{
+					mutex.acquire();
+					if (result == null)
+						result = r;
+					mutex.release();
+				}
+				mutex.acquire();
+				remaining--;
+				mutex.release();
+			});
+		}
+
+		while (result == null && remaining > 0)
+			Sys.sleep(0.001);
+
+		return result;
+		#else
+		for (check in checks)
+		{
+			var r = check();
+			if (r != null)
+				return r;
+		}
+		return null;
+		#end
+	}
 
 	public static function execAsync(func:Void->Void)
 	{

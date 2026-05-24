@@ -194,6 +194,7 @@ class Main extends Sprite
 		if (event.shiftKey && event.keyCode == FlxKey.F5)
 		{
 			// SHADOW TODO: maybe do some real hot reloading in the future...
+			Paths.clearDirCache();
 			FlxG.resetState();
 		}
 	}

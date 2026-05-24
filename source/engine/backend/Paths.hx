@@ -16,6 +16,35 @@ import animate.FlxAnimateFrames;
 
 class Paths
 {
+	static var dirListings:Map<String, Array<String>> = [];
+
+	public static function clearDirCache()
+	{
+		dirListings = [];
+	}
+
+	static function getDirListing(dir:String):Array<String>
+	{
+		var listing = dirListings.get(dir);
+		if (listing != null) return listing;
+
+		try
+		{
+			listing = FileSystem.readDirectory(dir);
+		}
+		catch (e:Dynamic)
+		{
+			listing = [];
+		}
+		dirListings.set(dir, listing);
+		return listing;
+	}
+
+	static function fileExistsInDir(dir:String, file:String):Bool
+	{
+		return getDirListing(dir).contains(file);
+	}
+
 	public static final IMAGE_EXT:String = "png";
 	#if USING_GPU_TEXTURES
 	public static final GPU_IMAGE_EXTS:Array<String> = [#if desktop 'dds', 'astc' #else 'astc', 'dds' #end];
@@ -597,9 +626,8 @@ class Paths
 	{
 		for (ext in SOUND_EXTS)
 		{
-			var file:String = modFolders(path + '/' + key + '.' + ext);
-			if (FileSystem.exists(file))
-				return file;
+			var found = findInModDirs(path + '/' + key + '.' + ext);
+			if (found != null) return found;
 		}
 		return modFolders(path + '/' + key + '.ogg');
 	}
@@ -609,9 +637,8 @@ class Paths
 		#if USING_GPU_TEXTURES
 		for (ext in GPU_IMAGE_EXTS)
 		{
-			var gpuFile:String = modFolders('images/' + key + '.$ext');
-			if (FileSystem.exists(gpuFile))
-				return gpuFile;
+			var found = findInModDirs('images/' + key + '.$ext');
+			if (found != null) return found;
 		}
 		#end
 
@@ -633,23 +660,33 @@ class Paths
 		return modFolders('images/' + key + '.json');
 	}
 
-	public static function modFolders(key:String):String
+	static function findInModDirs(key:String):Null<String>
 	{
+		var dirPart = haxe.io.Path.directory(key);
+		var filePart = haxe.io.Path.withoutDirectory(key);
+
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 		{
-			var fileToCheck:String = mods(Mods.currentModDirectory + '/' + key);
-			if (FileSystem.exists(fileToCheck))
-				return fileToCheck;
+			var dir = mods(Mods.currentModDirectory + '/' + dirPart);
+			if (fileExistsInDir(dir, filePart))
+				return '$dir/$filePart';
 		}
-
 		for (mod in Mods.getGlobalMods())
 		{
-			var fileToCheck:String = mods(mod + '/' + key);
-			if (FileSystem.exists(fileToCheck))
-				return fileToCheck;
+			var dir = mods(mod + '/' + dirPart);
+			if (fileExistsInDir(dir, filePart))
+				return '$dir/$filePart';
 		}
+		var baseDir = mods() + dirPart;
+		if (fileExistsInDir(baseDir, filePart))
+			return '$baseDir/$filePart';
+		return null;
+	}
 
-		return #if mobile Sys.getCwd() + #end 'mods/' + key;
+	public static function modFolders(key:String):String
+	{
+		var found = findInModDirs(key);
+		return found != null ? found : #if mobile Sys.getCwd() + #end 'mods/' + key;
 	}
 	#end
 }

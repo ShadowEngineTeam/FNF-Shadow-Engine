@@ -38,6 +38,7 @@ class Mods
 	inline public static function pushGlobalMods() // prob a better way to do this but idc
 	{
 		globalMods = [];
+		Paths.clearDirCache();
 		for (mod in parseList().enabled)
 		{
 			var pack:Dynamic = getPack(mod);
