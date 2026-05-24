@@ -16,7 +16,7 @@ import psychlua.ModchartSprite;
 import psychlua.HScript;
 #end
 #if FEATURE_HSCRIPT
-import tea.SScript;
+import hscript.SScript;
 #end
 // Mobile Controls
 #if FEATURE_MOBILE_CONTROLS

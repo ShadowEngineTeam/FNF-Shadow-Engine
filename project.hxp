@@ -242,7 +242,6 @@ class Project extends HXProject
 			setHaxedef("FLX_NO_DEBUG");
 
 		setHaxedef("message.reporting", "pretty");
-		setHaxedef("no-deprecation-warnings");
 		setHaxedef("lime_disable_assets_version");
 		setHaxedef("openfl_dpi_aware");
 		setHaxedef("openfl_pool_events");

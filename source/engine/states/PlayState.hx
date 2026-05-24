@@ -1713,6 +1713,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	@:haxe.warning("-WDeprecated")
 	override function openSubState(SubState:FlxSubState)
 	{
 		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));

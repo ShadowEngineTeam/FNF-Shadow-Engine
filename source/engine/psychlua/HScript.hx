@@ -5,7 +5,8 @@ import psychlua.LuaUtils;
 import psychlua.FunkinLua;
 #end
 #if FEATURE_HSCRIPT
-import tea.SScript;
+import hscript.SScript;
+import hscript.SScript.FunctionCall;
 
 class HScript extends SScript
 {
@@ -400,7 +401,7 @@ class HScript extends SScript
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):TeaCall
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -436,7 +437,7 @@ class HScript extends SScript
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):TeaCall
+	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -451,7 +452,7 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				final retVal:FunctionCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)

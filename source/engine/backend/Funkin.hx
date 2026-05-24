@@ -13,6 +13,7 @@ class Funkin
 {
 	public static var controls(get, never):Controls;
 
+	@:haxe.warning("-WDeprecated")
     public static function switchState(nextState:Class<FlxState>, ?arguments:Array<Dynamic>):Void
 	{
 		if (nextState == null)
@@ -54,6 +55,7 @@ class Funkin
 		FlxTransitionableState.skipNextTransIn = false;
 	}
 
+	@:haxe.warning("-WDeprecated")
 	public static function startTransition(nextState:FlxState = null)
 	{
 		if (nextState == null)
