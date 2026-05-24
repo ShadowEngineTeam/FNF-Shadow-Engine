@@ -609,10 +609,10 @@ class ChartingState extends MusicBeatState
 		var row5:Int = row4 + rowStep;
 		var reloadSongJson:ShadowButton = new ShadowButton(pad, row5, "Reload JSON", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				loadJson(_song.song.toLowerCase());
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(reloadSongJson);
 
@@ -658,20 +658,20 @@ class ChartingState extends MusicBeatState
 
 		var clear_events:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row6, "Clear Events", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings));
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_events);
 
 		var clear_notes:ShadowButton = new ShadowButton(pad + (buttonWidth + buttonGap) * 2, row6, "Clear Notes", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				for (sec in 0..._song.notes.length)
 				{
 					_song.notes[sec].sectionNotes = [];
 				}
 				updateGrid();
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_notes);
 
@@ -2053,7 +2053,7 @@ class ChartingState extends MusicBeatState
 				#if FEATURE_MOBILE_CONTROLS
 				touchPad.alpha = 0;
 				#end
-				openSubState(new states.editors.EditorPlayState(playbackSpeed));
+				switchSubState(states.editors.EditorPlayState, [playbackSpeed]);
 			}
 			else if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 			{

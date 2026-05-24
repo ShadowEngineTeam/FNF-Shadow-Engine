@@ -62,7 +62,7 @@ class ModsStateRedirect
 		}
 	}
 
-	public static function redirect(state:Class<FlxState>, arguments:Array<Dynamic>):FlxState
+	public static function redirectState(state:Class<FlxState>, arguments:Array<Dynamic>):FlxState
 	{
 		if (state == null)
 			return null;

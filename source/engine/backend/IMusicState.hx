@@ -82,6 +82,7 @@ interface IMusicState
 	#end
 
 	public function openSubState(subState:FlxSubState):Void;
+	public function switchSubState(subState:Class<FlxSubState>, ?args:Array<Dynamic>):Void;
 	public function closeSubState():Void;
 
 	private function updateSection():Void;

@@ -328,11 +328,16 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		callOnScripts('onCreatePost');
 	}
 
+	@:deprecated("`MusicBeatSubstate.openSubState` is deprecated. Use `Funkin.switchSubState` or `MusicBeatSubstate.switchSubState` instead.")
 	override function openSubState(subState:FlxSubState)
 	{
-		Funkin.controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
+	}
+
+	public function switchSubState(subState:Class<FlxSubState>, ?args:Array<Dynamic>):Void
+	{
+		Funkin.switchSubState(this, subState, args);
 	}
 
 	override function closeSubState()

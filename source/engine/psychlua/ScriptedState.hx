@@ -41,13 +41,13 @@ class ScriptedState extends MusicBeatState
 	{
 		funk.set("switchScriptedState", function(state:String, args:Array<Dynamic>)
 		{
-			FlxG.switchState(new ScriptedState(state, args));
+			Funkin.switchState(ScriptedState, [state, args]);
 		});
 
 		funk.set("openScriptedSubState", function(substate:String, args:Array<Dynamic>)
 		{
 			if (FunkinLua.getCurrentMusicState() != null)
-				FunkinLua.getCurrentMusicState().openSubState(new ScriptedSubState(substate, args));
+				FunkinLua.getCurrentMusicState().switchSubState(ScriptedSubState, [substate, args]);
 		});
 
 		funk.set("closeScriptedSubState", function()

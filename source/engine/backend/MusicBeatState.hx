@@ -333,17 +333,22 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 
 		if (!skip)
 		{
-			openSubState(new CustomFadeTransition(0.6, true));
+			switchSubState(CustomFadeTransition, [0.6, true]);
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
 	}
 
+	@:deprecated("`MusicBeatState.openSubState` is deprecated. Use `Funkin.switchSubState` or `MusicBeatState.switchSubState` instead.")
 	override function openSubState(subState:FlxSubState)
 	{
-		Funkin.controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
+	}
+
+	public function switchSubState(subState:Class<FlxSubState>, ?args:Array<Dynamic>):Void
+	{
+		Funkin.switchSubState(this, subState, args);
 	}
 
 	override function closeSubState()

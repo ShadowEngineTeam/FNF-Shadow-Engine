@@ -265,7 +265,7 @@ class ModsMenuState extends MusicBeatState
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			if (curMod != null && curMod.settings != null && curMod.settings.length > 0)
 			{
-				openSubState(new ModSettingsSubState(curMod.settings, curMod.folder, curMod.name));
+				switchSubState(ModSettingsSubState, [curMod.settings, curMod.folder, curMod.name]);
 			}
 		}, 54, 54);
 

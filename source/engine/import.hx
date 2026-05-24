@@ -97,5 +97,6 @@ import backend.ui.components.text.ShadowTextInput;
 import backend.ui.components.layout.ShadowPanel;
 import backend.ui.components.layout.ShadowTabMenu;
 
+using backend.Funkin;
 using StringTools;
 #end

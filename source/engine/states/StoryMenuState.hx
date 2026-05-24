@@ -240,7 +240,7 @@ class StoryMenuState extends MusicBeatState
 			if (FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end)
 			{
 				persistentUpdate = false;
-				openSubState(new GameplayChangersSubstate());
+				switchSubState(GameplayChangersSubstate);
 				#if FEATURE_MOBILE_CONTROLS
 				removeTouchPad();
 				#end
@@ -248,7 +248,7 @@ class StoryMenuState extends MusicBeatState
 			else if (Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end)
 			{
 				persistentUpdate = false;
-				openSubState(new ResetScoreSubState('', curDifficulty, '', curWeek));
+				switchSubState(ResetScoreSubState, ['', curDifficulty, '', curWeek]);
 				#if FEATURE_MOBILE_CONTROLS
 				removeTouchPad();
 				#end

@@ -44,17 +44,17 @@ class OptionsState extends MusicBeatState
 		{
 			case 'Note Colors':
 				if (ClientPrefs.data.disableRGBNotes)
-					openSubState(new NotesSubStateOld());
+					switchSubState(NotesSubStateOld);
 				else
-					openSubState(new NotesSubState());
+					switchSubState(NotesSubState);
 			case 'Controls':
-				openSubState(new ControlsSubState());
+				switchSubState(ControlsSubState);
 			case 'Graphics':
-				openSubState(new GraphicsSettingsSubState());
+				switchSubState(GraphicsSettingsSubState);
 			case 'Visuals and UI':
-				openSubState(new VisualsUISubState());
+				switchSubState(VisualsUISubState);
 			case 'Gameplay':
-				openSubState(new GameplaySettingsSubState());
+				switchSubState(GameplaySettingsSubState);
 			case 'Adjust Delay and Combo':
 				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
@@ -179,7 +179,7 @@ class OptionsState extends MusicBeatState
 			if ((#if android touchPad.buttonX.justPressed #else touchPad.buttonC.justPressed #end || FlxG.keys.justPressed.CONTROL))
 			{
 				persistentUpdate = false;
-				openSubState(new MobileControlSelectSubState());
+				switchSubState(MobileControlSelectSubState);
 			}
 			#end
 

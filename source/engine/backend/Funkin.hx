@@ -21,7 +21,7 @@ class Funkin
 			return;
 		}
 
-		var nextStateInstance:FlxState = backend.scripting.ModsStateRedirect.redirect(nextState, arguments ?? []);
+		var nextStateInstance:FlxState = backend.scripting.ModsStateRedirect.redirectState(nextState, arguments ?? []);
 
 		if (nextStateInstance == FlxG.state)
 		{
@@ -35,6 +35,15 @@ class Funkin
 			startTransition(nextStateInstance);
 		FlxTransitionableState.skipNextTransIn = false;
 	}
+
+	public static function switchSubState(state:FlxState, substate:Class<FlxSubState>, ?arguments:Array<Dynamic>):Void
+	{
+		Funkin.controls.isInSubstate = true;
+
+		var substateInstance:FlxSubState = backend.scripting.ModsStateRedirect.redirectSubstate(substate, arguments ?? []);
+
+		state.openSubState(substateInstance);
+    }
 
 	public static function resetState()
 	{
@@ -53,7 +62,7 @@ class Funkin
 			return;
 		}
 
-		FlxG.state.openSubState(new CustomFadeTransition(0.6, false));
+		FlxG.state.switchSubState(CustomFadeTransition, [0.6, false]);
 		if (nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else

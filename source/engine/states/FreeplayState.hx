@@ -339,7 +339,7 @@ class FreeplayState extends MusicBeatState
 		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK)) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
+			switchSubState(GameplayChangersSubstate);
 			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end
@@ -444,7 +444,7 @@ class FreeplayState extends MusicBeatState
 		else if ((Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
+			switchSubState(ResetScoreSubState, [songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter]);
 			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end

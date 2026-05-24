@@ -2171,7 +2171,7 @@ class PlayState extends MusicBeatState
 					note.resetAnim = 0;
 				}
 		}
-		openSubState(new PauseSubState());
+		switchSubState(PauseSubState);
 
 		#if FEATURE_DISCORD_RPC
 		if (autoUpdateRPC)
@@ -2245,7 +2245,7 @@ class PlayState extends MusicBeatState
 				modchartTweens.clear();
 				#end
 
-				openSubState(new GameOverSubstate());
+				switchSubState(GameOverSubstate);
 
 				// Funkin.switchState(GameOverState, [boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y]);
 
@@ -2760,7 +2760,7 @@ class PlayState extends MusicBeatState
 			persistentUpdate = false;
 			persistentDraw = true;
 			paused = true;
-			openSubState(new ResultsScreen());
+			switchSubState(ResultsScreen);
 			// endCallback();
 		}
 		else
@@ -2770,7 +2770,7 @@ class PlayState extends MusicBeatState
 				persistentUpdate = false;
 				persistentDraw = true;
 				paused = true;
-				openSubState(new ResultsScreen());
+				switchSubState(ResultsScreen);
 				// endCallback();
 			});
 		}
