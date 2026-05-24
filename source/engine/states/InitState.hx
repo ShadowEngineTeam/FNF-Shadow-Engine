@@ -3,61 +3,84 @@ package states;
 import backend.Highscore;
 import backend.ui.ShadowStyle;
 import flixel.addons.transition.FlxTransitionableState;
+import lime.system.System as LimeSystem;
 
-class InitState extends MusicBeatState
+#if native
+import lime.ui.WindowVSyncMode;
+#end
+
+
+class InitState extends FlxState
 {
 	override public function create():Void
 	{
-		Paths.clearStoredMemory();
-
+		super.create();
+		
+		FlxG.mouse.visible = false;
 		FlxTransitionableState.skipNextTransIn = true;
 		FlxTransitionableState.skipNextTransOut = true;
 
-		#if FEATURE_LUA
+		Paths.clearStoredMemory();
+
+		#if FEATURE_VIDEOS
+		hxvlc.util.Handle.init();
+		#end
+
+		#if FEATURE_MODS
 		Mods.pushGlobalMods();
 		#end
+
 		Mods.loadTopMod();
+
+		#if FEATURE_HSCRIPT
+		backend.scripting.ScriptSignalCalls.init();
+		#end
+
+		#if FEATURE_DISCORD_RPC
+		DiscordClient.prepare();
+		#end
 
 		FlxG.fixedTimestep = false;
 		FlxG.game.focusLostFramerate = 60;
 		FlxG.keys.preventDefaultKeys = [TAB];
-
-		super.create();
-
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
-		ClientPrefs.loadPrefs();
-		ShadowStyle.applySavedTheme();
-
-		Highscore.load();
-
-		if (FlxG.save.data != null && FlxG.save.data.fullscreen)
+		if (FlxG.save.data?.fullscreen)
 			FlxG.fullscreen = FlxG.save.data.fullscreen;
 
-		persistentUpdate = true;
-		persistentDraw = true;
+		if (FlxG.save.data?.weekCompleted != null)
+			StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
+
+		Controls.instance = new Controls();
+		ClientPrefs.loadPrefs();
+		ClientPrefs.loadDefaultKeys();
+		Highscore.load();
+		ShadowStyle.applySavedTheme();
 
 		#if FEATURE_MOBILE_CONTROLS
 		MobileData.init();
 		#end
 
-		if (FlxG.save.data.weekCompleted != null)
-			StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
+		#if mobile
+		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
+		#end
 
-		FlxG.mouse.visible = false;
+		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
+		FlxG.game.soundTray.active = true;
+		FlxG.inputs.resetOnStateSwitch = false;
+
+		#if android
+		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
+		#end
+
+		#if native
+		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
+		#end
+
 
 		TitleState.showIntro = true;
-
-		FlxTransitionableState.skipNextTransIn = true;
-		if (FlxG.save.data.flashing == null && !FlashingState.leftState)
-		{
-			Funkin.controls.isInSubstate = false; // idfk what's wrong
-			FlxTransitionableState.skipNextTransOut = true;
-			Funkin.switchState(FlashingState);
-		}
-		else
-		{
-			Funkin.switchState(TitleState);
-		}
+		var nextState:Class<FlxState> = FlxG.save.data.flashing == null && !FlashingState.leftState ? FlashingState : TitleState;
+		Funkin.controls.isInSubstate = false;
+		Funkin.switchState(nextState);
 	}
 }

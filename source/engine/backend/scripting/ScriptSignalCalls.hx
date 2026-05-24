@@ -55,14 +55,14 @@ class ScriptSignalCalls
 			args = [];
 
 		var curState = FlxG.state;
-		if (curState != null)
+		if (curState != null && (Std.isOfType(curState, MusicBeatState) || Std.isOfType(curState, MusicBeatSubstate)))
 		{
 			var musicState:IMusicState = cast(curState, IMusicState);
 			if (musicState != null)
 				musicState.callOnScripts(funcToCall, args);
 
 			var subState = curState.subState;
-			if (subState != null)
+			if (subState != null && Std.isOfType(subState, MusicBeatSubstate))
 			{
 				var musicSubState:IMusicState = cast(subState, IMusicState);
 				if (musicSubState != null)

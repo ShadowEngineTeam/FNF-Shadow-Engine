@@ -1,23 +1,15 @@
 package backend;
 
 import flixel.addons.transition.FlxTransitionableState;
-import states.MainMenuState;
 import flixel.input.keyboard.FlxKey;
 import debug.codename.Framerate;
-import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
 import haxe.io.Path;
-import openfl.Assets;
-import openfl.system.System;
 import openfl.Lib;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 import lime.system.System as LimeSystem;
-import lime.app.Application;
-#if native
-import lime.ui.WindowVSyncMode;
-#end
 import states.InitState;
 import openfl.events.KeyboardEvent;
 
@@ -76,9 +68,9 @@ class Main extends Sprite
 		}
 
 		#if android
-		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt"))
+		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt"))
 		{
-			File.saveContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt", 'false');
+			File.saveContent(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt", 'false');
 			Sys.setCwd(StorageUtil.getStorageDirectory());
 		}
 		#end
@@ -90,13 +82,6 @@ class Main extends Sprite
 	{
 		if (game.zoom == -1.0)
 			game.zoom = 1.0;
-
-		#if FEATURE_VIDEOS
-		hxvlc.util.Handle.init();
-		#end
-
-		Controls.instance = new Controls();
-		ClientPrefs.loadDefaultKeys();
 
 		untyped FlxG.cameras = new backend.rendering.ShadowCameraFrontEnd();
 
@@ -128,29 +113,6 @@ class Main extends Sprite
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, hotReload);
 		#end
 
-		#if FEATURE_DISCORD_RPC
-		DiscordClient.prepare();
-		#end
-
-		#if mobile
-		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
-		#end
-
-		// V-Slice things smh
-		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
-		FlxG.game.soundTray.active = true;
-		FlxG.inputs.resetOnStateSwitch = false;
-		#if android
-		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
-		#end
-		#if native
-		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
-		#end
-
-		#if FEATURE_HSCRIPT
-		backend.scripting.ScriptSignalCalls.init();
-		#end
-
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
 		{
@@ -179,7 +141,7 @@ class Main extends Sprite
 
 	function toggleFullScreen(event:KeyboardEvent):Void
 	{
-		if (Controls.instance.justReleased('fullscreen'))
+		if (Controls.instance?.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;
 	}
 
@@ -189,7 +151,7 @@ class Main extends Sprite
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
 			Paths.clearStoredMemory();
-			Funkin.switchState(MainMenuState);
+			Funkin.switchState(states.MainMenuState);
 		}
 	}
 

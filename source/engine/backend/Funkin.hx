@@ -39,7 +39,8 @@ class Funkin
 
 	public static function switchSubState(state:FlxState, substate:Class<FlxSubState>, ?arguments:Array<Dynamic>):Void
 	{
-		Funkin.controls.isInSubstate = true;
+		if (Funkin.controls != null)
+			Funkin.controls.isInSubstate = true;
 
 		var substateInstance:FlxSubState = backend.scripting.ModsStateRedirect.redirectSubstate(substate, arguments ?? []);
 
