@@ -18,7 +18,7 @@ import lime.app.Application;
 #if native
 import lime.ui.WindowVSyncMode;
 #end
-import states.TitleState;
+import states.InitState;
 import openfl.events.KeyboardEvent;
 
 class Main extends Sprite
@@ -26,7 +26,7 @@ class Main extends Sprite
 	public static final game = {
 		width: 1280, // game width
 		height: 720, // game height
-		initialState: TitleState, // initial game state
+		initialState: InitState, // initial game state
 		zoom: -1.0, // game state bounds
 		framerate: 60, // default framerate
 		skipSplash: true, // if the flixel splash screen should be skipped

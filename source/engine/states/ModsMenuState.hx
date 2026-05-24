@@ -364,9 +364,7 @@ class ModsMenuState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if (waitingToRestart)
 			{
-				// Funkin.switchState(TitleState);
-				TitleState.initialized = false;
-				TitleState.closedState = false;
+				TitleState.showIntro = true;
 				FlxG.sound.music.fadeOut(0.3);
 				if (FreeplayState.vocals != null)
 				{
