@@ -16,7 +16,7 @@ import psychlua.ModchartSprite;
 import psychlua.HScript;
 #end
 #if FEATURE_HSCRIPT
-import tea.SScript;
+import hscript.SScript;
 #end
 // Mobile Controls
 #if FEATURE_MOBILE_CONTROLS
@@ -41,6 +41,7 @@ import android.os.Build.VERSION as AndroidVersion;
 import android.os.Build.VERSION_CODES as AndroidVersionCode;
 //import android.os.BatteryManager as AndroidBatteryManager;
 #end
+import backend.Funkin;
 import backend.Paths;
 import backend.Controls;
 import backend.CoolUtil;
@@ -96,5 +97,6 @@ import backend.ui.components.text.ShadowTextInput;
 import backend.ui.components.layout.ShadowPanel;
 import backend.ui.components.layout.ShadowTabMenu;
 
+using backend.Funkin;
 using StringTools;
 #end

@@ -92,7 +92,7 @@ class ResultsScreen extends MusicBeatSubstate
 		add(comboText);
 
 		contText = new FlxText(FlxG.width - 800, FlxG.height + 50, 0,
-			'Press ${controls.mobileC ? 'A' : 'ENTER'} to continue or ${controls.mobileC ? 'B' : 'RESET'} to Restart Song.');
+			'Press ${Funkin.controls.mobileC ? 'A' : 'ENTER'} to continue or ${Funkin.controls.mobileC ? 'B' : 'RESET'} to Restart Song.');
 		contText.setFormat(Paths.font("Comfortaa-Bold.ttf"), 28, FlxColor.WHITE);
 		contText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 		contText.scrollFactor.set();
@@ -182,20 +182,20 @@ class ResultsScreen extends MusicBeatSubstate
 			if (music.volume < 0.5)
 				music.volume += 0.01 * elapsed;
 
-		if (controls.ACCEPT)
+		if (Funkin.controls.ACCEPT)
 		{
 			music.stop();
 			PlayState.instance.endCallback();
 		}
 
-		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end Funkin.controls.RESET)
 		{
 			PlayState.instance.paused = true; // For lua
 			music.stop();
 			FlxG.sound.music.volume = 0;
 			PlayState.instance.vocals.volume = 0;
 
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}
 
 		super.update(elapsed);

@@ -17,8 +17,8 @@ class FlashingState extends MusicBeatState
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
 
-		final buttonBack:String = controls.mobileC ? 'B' : 'ESCAPE';
-		final buttonAccept:String = controls.mobileC ? 'A' : 'ENTER';
+		final buttonBack:String = Funkin.controls.mobileC ? 'B' : 'ESCAPE';
+		final buttonAccept:String = Funkin.controls.mobileC ? 'A' : 'ENTER';
 
 		warnText = new FlxText(0, 0, FlxG.width, 'Hey, watch out!\n
 			This Engine contains some flashing lights!\n
@@ -38,8 +38,8 @@ class FlashingState extends MusicBeatState
 	{
 		if (!leftState)
 		{
-			var back:Bool = controls.BACK;
-			if (controls.ACCEPT || back)
+			var back:Bool = Funkin.controls.BACK;
+			if (Funkin.controls.ACCEPT || back)
 			{
 				leftState = true;
 				FlxTransitionableState.skipNextTransIn = true;
@@ -53,7 +53,7 @@ class FlashingState extends MusicBeatState
 					{
 						new FlxTimer().start(0.5, function(tmr:FlxTimer)
 						{
-							MusicBeatState.switchState(new TitleState());
+							Funkin.switchState(TitleState);
 						});
 					});
 				}
@@ -65,7 +65,7 @@ class FlashingState extends MusicBeatState
 					FlxTween.tween(warnText, {alpha: 0}, 1, {
 						onComplete: function(twn:FlxTween)
 						{
-							MusicBeatState.switchState(new TitleState());
+							Funkin.switchState(TitleState);
 						}
 					});
 				}

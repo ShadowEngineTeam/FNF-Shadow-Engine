@@ -5,6 +5,7 @@ import backend.StageData;
 import flixel.addons.transition.FlxTransitionableState;
 import mobile.substates.MobileControlSelectSubState;
 import backend.ui.ShadowStyle;
+import options.*;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -43,19 +44,19 @@ class OptionsState extends MusicBeatState
 		{
 			case 'Note Colors':
 				if (ClientPrefs.data.disableRGBNotes)
-					openSubState(new options.NotesSubStateOld());
+					switchSubState(NotesSubStateOld);
 				else
-					openSubState(new options.NotesSubState());
+					switchSubState(NotesSubState);
 			case 'Controls':
-				openSubState(new options.ControlsSubState());
+				switchSubState(ControlsSubState);
 			case 'Graphics':
-				openSubState(new options.GraphicsSettingsSubState());
+				switchSubState(GraphicsSettingsSubState);
 			case 'Visuals and UI':
-				openSubState(new options.VisualsUISubState());
+				switchSubState(VisualsUISubState);
 			case 'Gameplay':
-				openSubState(new options.GameplaySettingsSubState());
+				switchSubState(GameplaySettingsSubState);
 			case 'Adjust Delay and Combo':
-				MusicBeatState.switchState(new options.NoteOffsetState());
+				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
 			case 'Mobile Options':
 				openSubState(new mobile.options.MobileOptionsSubState());
@@ -82,14 +83,14 @@ class OptionsState extends MusicBeatState
 		var tipY:Int = FlxG.height - #if android 40 #else 24 #end;
 
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileKey:String = controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
+		var mobileKey:String = Funkin.controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
 		var mobileText:String = 'Press ${mobileKey} to Go Mobile Controls Menu';
 		#else
 		var mobileText:String = '';
 		#end
 
 		#if android
-		var dataKey:String = controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
+		var dataKey:String = Funkin.controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
 		var dataText:String = '\nPress ${dataKey} to Open DATA Folder';
 		#else
 		var dataText:String = '';
@@ -165,11 +166,11 @@ class OptionsState extends MusicBeatState
 
 		if (!exiting)
 		{
-			if (controls.UI_UP_P)
+			if (Funkin.controls.UI_UP_P)
 			{
 				changeSelection(-1);
 			}
-			if (controls.UI_DOWN_P)
+			if (Funkin.controls.UI_DOWN_P)
 			{
 				changeSelection(1);
 			}
@@ -178,7 +179,7 @@ class OptionsState extends MusicBeatState
 			if ((#if android touchPad.buttonX.justPressed #else touchPad.buttonC.justPressed #end || FlxG.keys.justPressed.CONTROL))
 			{
 				persistentUpdate = false;
-				openSubState(new MobileControlSelectSubState());
+				switchSubState(MobileControlSelectSubState);
 			}
 			#end
 
@@ -187,20 +188,20 @@ class OptionsState extends MusicBeatState
 				android.Tools.openDataFolder();
 			#end
 
-			if (controls.BACK)
+			if (Funkin.controls.BACK)
 			{
 				exiting = true;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				if (onPlayState)
 				{
 					StageData.loadDirectory(PlayState.SONG);
-					LoadingState.loadAndSwitchState(new PlayState());
+					LoadingState.loadAndSwitchState(PlayState);
 					FlxG.sound.music.volume = 0;
 				}
 				else
-					MusicBeatState.switchState(new MainMenuState());
+					Funkin.switchState(MainMenuState);
 			}
-			else if (controls.ACCEPT)
+			else if (Funkin.controls.ACCEPT)
 				openSelectedSubstate(options[curSelected]);
 		}
 	}

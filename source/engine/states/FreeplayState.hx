@@ -163,13 +163,13 @@ class FreeplayState extends MusicBeatState
 
 		var leText:String;
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
-			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.';
+			leText = 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.';
 		}
 		else
 		{
-			leText = 'Press ${controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
+			leText = 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
 		}
 		bottomString = leText;
 		var size:Int = 16;
@@ -269,25 +269,25 @@ class FreeplayState extends MusicBeatState
 					changeSelection();
 					holdTime = 0;
 				}
-				if (controls.UI_UP_P)
+				if (Funkin.controls.UI_UP_P)
 				{
 					changeSelection(-shiftMult);
 					holdTime = 0;
 				}
-				if (controls.UI_DOWN_P)
+				if (Funkin.controls.UI_DOWN_P)
 				{
 					changeSelection(shiftMult);
 					holdTime = 0;
 				}
 
-				if (controls.UI_DOWN || controls.UI_UP)
+				if (Funkin.controls.UI_DOWN || Funkin.controls.UI_UP)
 				{
 					var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
 					holdTime += elapsed;
 					var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
 
 					if (holdTime > 0.5 && checkNewHold - checkLastHold > 0)
-						changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
+						changeSelection((checkNewHold - checkLastHold) * (Funkin.controls.UI_UP ? -shiftMult : shiftMult));
 				}
 
 				if (FlxG.mouse.deltaWheel.y != 0)
@@ -297,19 +297,19 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 
-			if (controls.UI_LEFT_P)
+			if (Funkin.controls.UI_LEFT_P)
 			{
 				changeDiff(-1);
 				_updateSongLastDifficulty();
 			}
-			else if (controls.UI_RIGHT_P)
+			else if (Funkin.controls.UI_RIGHT_P)
 			{
 				changeDiff(1);
 				_updateSongLastDifficulty();
 			}
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			if (player.playingMusic)
 			{
@@ -332,14 +332,14 @@ class FreeplayState extends MusicBeatState
 					colorTween.cancel();
 				}
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				MusicBeatState.switchState(new MainMenuState());
+				Funkin.switchState(MainMenuState);
 			}
 		}
 
 		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK)) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
+			switchSubState(GameplayChangersSubstate);
 			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end
@@ -403,7 +403,7 @@ class FreeplayState extends MusicBeatState
 				player.pauseOrResume(player.paused);
 			}
 		}
-		else if (controls.ACCEPT && !player.playingMusic)
+		else if (Funkin.controls.ACCEPT && !player.playingMusic)
 		{
 			persistentUpdate = false;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
@@ -434,17 +434,17 @@ class FreeplayState extends MusicBeatState
 				return;
 			}
 			LoadingState.prepareToSong();
-			LoadingState.loadAndSwitchState(new PlayState());
+			LoadingState.loadAndSwitchState(PlayState);
 			// FlxG.sound.music.volume = 0;
 			destroyFreeplayVocals();
 			#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 			DiscordClient.loadModRPC();
 			#end
 		}
-		else if ((controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
+		else if ((Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
+			switchSubState(ResetScoreSubState, [songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter]);
 			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end

@@ -76,7 +76,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 								if (data == null)
 									data = {keyboard: 'NONE', gamepad: 'NONE'};
 
-								if (!controls.controllerMode)
+								if (!Funkin.controls.controllerMode)
 									data.keyboard = value;
 								else
 									data.gamepad = value;

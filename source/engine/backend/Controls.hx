@@ -11,7 +11,7 @@ class Controls
 	// I'd have removed it but this makes it a lot less annoying to use in my opinion
 	// You do NOT have to create these variables/getters for adding new keys,
 	// but you will instead have to use:
-	//   controls.justPressed("ui_up")   instead of   controls.UI_UP
+	//   Funkin.controls.justPressed("ui_up")   instead of   Funkin.controls.UI_UP
 	// Dumb but easily usable code, or Smart but complicated? Your choice.
 	// Also idk how to use macros they're weird as fuck lol
 	// Pressed buttons (directions)

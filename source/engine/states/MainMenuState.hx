@@ -115,21 +115,21 @@ class MainMenuState extends MusicBeatState
 
 		if (!selectedSomethin)
 		{
-			if (controls.UI_UP_P)
+			if (Funkin.controls.UI_UP_P)
 				changeItem(-1);
 
-			if (controls.UI_DOWN_P)
+			if (Funkin.controls.UI_DOWN_P)
 				changeItem(1);
 
-			if (controls.BACK)
+			if (Funkin.controls.BACK)
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				FlxTransitionableState.skipNextTransOut = true;
-				MusicBeatState.switchState(new TitleState());
+				Funkin.switchState(TitleState);
 			}
 
-			if (controls.ACCEPT)
+			if (Funkin.controls.ACCEPT)
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 				selectedSomethin = true;
@@ -142,17 +142,17 @@ class MainMenuState extends MusicBeatState
 					switch (optionShit[curSelected])
 					{
 						case 'story_mode':
-							MusicBeatState.switchState(new StoryMenuState());
+							Funkin.switchState(StoryMenuState);
 						case 'freeplay':
-							MusicBeatState.switchState(new FreeplayState());
+							Funkin.switchState(FreeplayState);
 						#if FEATURE_MODS
 						case 'mods':
-							MusicBeatState.switchState(new ModsMenuState());
+							Funkin.switchState(ModsMenuState);
 						#end
 						case 'credits':
-							MusicBeatState.switchState(new CreditsState());
+							Funkin.switchState(CreditsState);
 						case 'options':
-							MusicBeatState.switchState(new OptionsState());
+							Funkin.switchState(OptionsState);
 							OptionsState.onPlayState = false;
 							if (PlayState.SONG != null)
 							{
@@ -178,10 +178,10 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 
-			if (controls.justPressed('debug_1') #if FEATURE_MOBILE_CONTROLS || touchPad.buttonE.justPressed #end)
+			if (Funkin.controls.justPressed('debug_1') #if FEATURE_MOBILE_CONTROLS || touchPad.buttonE.justPressed #end)
 			{
 				selectedSomethin = true;
-				MusicBeatState.switchState(new MasterEditorMenu());
+				Funkin.switchState(MasterEditorMenu);
 			}
 		}
 

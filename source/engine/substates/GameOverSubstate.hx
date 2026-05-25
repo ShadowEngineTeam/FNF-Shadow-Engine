@@ -92,12 +92,12 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		callOnScripts('onUpdate', [elapsed]);
 
-		if (controls.ACCEPT)
+		if (Funkin.controls.ACCEPT)
 		{
 			endBullshit();
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 			FlxG.sound.music.stop();
@@ -107,9 +107,9 @@ class GameOverSubstate extends MusicBeatSubstate
 
 			Mods.loadTopMod();
 			if (PlayState.isStoryMode)
-				MusicBeatState.switchState(new StoryMenuState());
+				Funkin.switchState(StoryMenuState);
 			else
-				MusicBeatState.switchState(new FreeplayState());
+				Funkin.switchState(FreeplayState);
 
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			callOnScripts('onGameOverConfirm', [false]);
@@ -162,7 +162,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			{
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					MusicBeatState.resetState();
+					Funkin.resetState();
 				});
 			});
 			callOnScripts('onGameOverConfirm', [true]);

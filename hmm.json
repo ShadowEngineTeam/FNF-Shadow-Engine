@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "6fb3d89f35ba7e226266b3ae37bc21ca0c778613",
+      "ref": "abba462e648f91f6fdf8748455db4a288b2a76f1",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "f76515f803557a27c2224037fa5bafed90a20e2b",
+      "ref": "0eb0a03d56f23b3214768b099d0d78dbf9a23711",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -33,7 +33,7 @@
     {
       "name": "SScript",
       "type": "git",
-      "ref": "3ee9859cf14ddfb88de5efc8889ea2c719354b87",
+      "ref": "e65eb294bf2733d988e390137eb340e17f258154",
       "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
