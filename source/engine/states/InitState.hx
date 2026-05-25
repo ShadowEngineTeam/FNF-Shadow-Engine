@@ -9,7 +9,6 @@ import lime.system.System as LimeSystem;
 import lime.ui.WindowVSyncMode;
 #end
 
-
 class InitState extends FlxState
 {
 	override public function create():Void
