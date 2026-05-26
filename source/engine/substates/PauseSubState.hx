@@ -182,18 +182,18 @@ class PauseSubState extends MusicBeatSubstate
 
 		super.update(elapsed);
 
-		if (controls.BACK && cantUnpause <= 0)
+		if (Funkin.controls.BACK && cantUnpause <= 0)
 		{
 			close();
 			return;
 		}
 
 		updateSkipTextStuff();
-		if (controls.UI_UP_P)
+		if (Funkin.controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (Funkin.controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
@@ -202,25 +202,25 @@ class PauseSubState extends MusicBeatSubstate
 		switch (daSelected)
 		{
 			case 'Skip Time':
-				if (controls.UI_LEFT_P)
+				if (Funkin.controls.UI_LEFT_P)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 					curTime -= 1000;
 					holdTime = 0;
 				}
-				if (controls.UI_RIGHT_P)
+				if (Funkin.controls.UI_RIGHT_P)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 					curTime += 1000;
 					holdTime = 0;
 				}
 
-				if (controls.UI_LEFT || controls.UI_RIGHT)
+				if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 				{
 					holdTime += elapsed;
 					if (holdTime > 0.5)
 					{
-						curTime += 45000 * elapsed * (controls.UI_LEFT ? -1 : 1);
+						curTime += 45000 * elapsed * (Funkin.controls.UI_LEFT ? -1 : 1);
 					}
 
 					if (curTime >= FlxG.sound.music.length)
@@ -231,7 +231,7 @@ class PauseSubState extends MusicBeatSubstate
 				}
 		}
 
-		if (controls.ACCEPT && cantUnpause <= 0)
+		if (Funkin.controls.ACCEPT && cantUnpause <= 0)
 		{
 			if (menuItems == difficultyChoices)
 			{
@@ -243,7 +243,7 @@ class PauseSubState extends MusicBeatSubstate
 						var poop = Highscore.formatSong(name, curSelected);
 						PlayState.SONG = Song.loadFromJson(poop, name);
 						PlayState.storyDifficulty = curSelected;
-						MusicBeatState.resetState();
+						Funkin.resetState();
 						FlxG.sound.music.volume = 0;
 						PlayState.changedDifficulty = true;
 						PlayState.chartingMode = false;
@@ -319,7 +319,7 @@ class PauseSubState extends MusicBeatSubstate
 				case 'Options':
 					PlayState.instance.paused = true; // For lua
 					PlayState.instance.vocals.volume = 0;
-					MusicBeatState.switchState(new OptionsState());
+					Funkin.switchState(OptionsState);
 					if (ClientPrefs.data.pauseMusic != 'None')
 					{
 						FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)), pauseMusic.volume);
@@ -334,9 +334,9 @@ class PauseSubState extends MusicBeatSubstate
 
 					Mods.loadTopMod();
 					if (PlayState.isStoryMode)
-						MusicBeatState.switchState(new states.StoryMenuState());
+						Funkin.switchState(states.StoryMenuState);
 					else
-						MusicBeatState.switchState(new FreeplayState());
+						Funkin.switchState(FreeplayState);
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					PlayState.changedDifficulty = false;
 					PlayState.chartingMode = false;
@@ -376,7 +376,7 @@ class PauseSubState extends MusicBeatSubstate
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
 		}
-		MusicBeatState.resetState();
+		Funkin.resetState();
 	}
 
 	override function destroy()

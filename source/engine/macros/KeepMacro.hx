@@ -61,7 +61,17 @@ class KeepMacro
 			"haxe.crypto",
 			"haxe.display",
 			"haxe.exceptions",
-			"haxe.extern"
+			"haxe.extern",
+			// SHADOW ENGINE
+			"engine",
+			"backend",
+			"states",
+			"substates",
+			"objects",
+			"cutscenes",
+			"debug",
+			"options",
+			"shaders",
 		])
 			Compiler.include(inc);
 

@@ -1,5 +1,6 @@
 package backend;
 
+import backend.scripting.*;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 
@@ -47,10 +48,13 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
+	@:deprecated("`MusicBeatSubState.controls` is deprecated. Use `Funkin.controls` instead.")
 	public var controls(get, never):Controls;
 
-	private function get_controls():Controls
-		return Controls.instance;
+	private function get_controls()
+	{
+		return Funkin.controls;
+	}
 
 	#if FEATURE_MOBILE_CONTROLS
 	public var touchPad:TouchPad;
@@ -260,7 +264,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	override function destroy()
 	{
-		controls.isInSubstate = false;
+		Funkin.controls.isInSubstate = false;
 		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		removeLuaTouchPad();
@@ -303,7 +307,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			.replace('substates.', '')
 			.replace('.', '/');
 		#end
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 		callOnScripts('onNew');
 		super();
 		callOnScripts('onNewPost');
@@ -324,11 +328,16 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		callOnScripts('onCreatePost');
 	}
 
+	@:deprecated("`MusicBeatSubstate.openSubState` is deprecated. Use `Funkin.switchSubState` or `MusicBeatSubstate.switchSubState` instead.")
 	override function openSubState(subState:FlxSubState)
 	{
-		controls.isInSubstate = true;
 		callOnScripts('onOpenSubState');
 		super.openSubState(subState);
+	}
+
+	public function switchSubState(subState:Class<FlxSubState>, ?args:Array<Dynamic>):Void
+	{
+		Funkin.switchSubState(this, subState, args);
 	}
 
 	override function closeSubState()
@@ -347,8 +356,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		updateCurStep();
 		updateBeat();
 
-		if (!controls.isInSubstate)
-			controls.isInSubstate = true;
+		if (!Funkin.controls.isInSubstate)
+			Funkin.controls.isInSubstate = true;
 
 		if (oldStep != curStep)
 		{

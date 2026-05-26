@@ -125,7 +125,7 @@ class WeekEditorState extends MusicBeatState
 
 		var freeplayButton:ShadowButton = new ShadowButton(0, 650, "Freeplay", function()
 		{
-			MusicBeatState.switchState(new WeekEditorFreeplayState(weekFile));
+			Funkin.switchState(WeekEditorFreeplayState, [weekFile]);
 		}, 90);
 		freeplayButton.screenCenter(X);
 		add(freeplayButton);
@@ -469,7 +469,7 @@ class WeekEditorState extends MusicBeatState
 			ClientPrefs.toggleVolumeKeys(true);
 			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
-				MusicBeatState.switchState(new MasterEditorMenu());
+				Funkin.switchState(MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 		}
@@ -668,7 +668,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 
 		var storyModeButton:ShadowButton = new ShadowButton(0, 685, "Story Mode", function()
 		{
-			MusicBeatState.switchState(new WeekEditorState(weekFile));
+			Funkin.switchState(WeekEditorState, [weekFile]);
 		}, 90);
 		storyModeButton.screenCenter(X);
 		add(storyModeButton);
@@ -815,7 +815,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 			super.update(elapsed);
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
-			MusicBeatState.switchState(new WeekEditorFreeplayState(WeekEditorState.loadedWeek));
+			Funkin.switchState(WeekEditorFreeplayState, [WeekEditorState.loadedWeek]);
 			WeekEditorState.loadedWeek = null;
 			return;
 		}
@@ -838,13 +838,13 @@ class WeekEditorFreeplayState extends MusicBeatState
 			ClientPrefs.toggleVolumeKeys(true);
 			if (FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
-				MusicBeatState.switchState(new MasterEditorMenu());
+				Funkin.switchState(MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 
-			if (controls.UI_UP_P)
+			if (Funkin.controls.UI_UP_P)
 				changeSelection(-1);
-			if (controls.UI_DOWN_P)
+			if (Funkin.controls.UI_DOWN_P)
 				changeSelection(1);
 		}
 		super.update(elapsed);

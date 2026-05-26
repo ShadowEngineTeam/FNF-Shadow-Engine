@@ -134,7 +134,7 @@ class EditorPlayState extends MusicBeatSubstate
 		add(dataTxt);
 
 		var daButton:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			daButton = "P";
 		else
 			daButton = "ESC";
@@ -803,7 +803,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
 		// trace('Pressed: ' + eventKey);
 
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 		{
 			#if debug
 			// Prevents crash specifically on debug without needing to try catch shit
@@ -875,7 +875,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
 		// trace('Pressed: ' + eventKey);
 
-		if (!controls.controllerMode && key > -1)
+		if (!Funkin.controls.controllerMode && key > -1)
 			keyReleased(key);
 	}
 
@@ -920,16 +920,16 @@ class EditorPlayState extends MusicBeatSubstate
 		var releaseArray:Array<Bool> = [];
 		for (key in keysArray)
 		{
-			holdArray.push(controls.pressed(key));
-			if (controls.controllerMode)
+			holdArray.push(Funkin.controls.pressed(key));
+			if (Funkin.controls.controllerMode)
 			{
-				pressArray.push(controls.justPressed(key));
-				releaseArray.push(controls.justReleased(key));
+				pressArray.push(Funkin.controls.justPressed(key));
+				releaseArray.push(Funkin.controls.justReleased(key));
 			}
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && pressArray.contains(true))
+		if (Funkin.controls.controllerMode && pressArray.contains(true))
 			for (i in 0...pressArray.length)
 				if (pressArray[i])
 					keyPressed(i);
@@ -961,7 +961,7 @@ class EditorPlayState extends MusicBeatSubstate
 				SustainSplash.hideAtData(i);
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && releaseArray.contains(true))
+		if (Funkin.controls.controllerMode && releaseArray.contains(true))
 			for (i in 0...releaseArray.length)
 				if (releaseArray[i])
 					keyReleased(i);

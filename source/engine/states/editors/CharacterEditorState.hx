@@ -123,7 +123,7 @@ class CharacterEditorState extends MusicBeatState
 		animsTxtGroup.cameras = [camHUD];
 		add(animsTxtGroup);
 
-		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(controls.mobileC) ? 'F' : 'F1'} for Help', 16);
+		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(Funkin.controls.mobileC) ? 'F' : 'F1'} for Help', 16);
 		tipText.cameras = [camHUD];
 		tipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
 		tipText.borderColor = FlxColor.BLACK;
@@ -171,7 +171,7 @@ class CharacterEditorState extends MusicBeatState
 	function addHelpScreen()
 	{
 		var str:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			str = "CAMERA
 			\nX/Y - Camera Zoom In/Out
@@ -982,7 +982,7 @@ class CharacterEditorState extends MusicBeatState
 		UI_help.add(titleLabel);
 
 		var str:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			str = "CAMERA\nX/Y - Camera Zoom In/Out\nZ - Reset Camera Zoom\n\nCHARACTER\nA - Reset Current Offset\nV/D - Previous/Next Animation\nArrow Buttons - Move Offset\n\nOTHER\nS - Toggle Silhouettes\nHold C - Move Offsets 10x faster and Camera 4x faster";
 		}
@@ -994,7 +994,7 @@ class CharacterEditorState extends MusicBeatState
 		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 30, str, ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 20, 'Press ${Funkin.controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -1076,7 +1076,7 @@ class CharacterEditorState extends MusicBeatState
 			if ((FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
 			{
 				#if FEATURE_MOBILE_CONTROLS
-				if (controls.mobileC)
+				if (Funkin.controls.mobileC)
 				{
 					touchPad.forEachAlive(function(button:TouchButton)
 					{
@@ -1174,7 +1174,7 @@ class CharacterEditorState extends MusicBeatState
 		var moveKeysP;
 		var moveKeys;
 		#if FEATURE_MOBILE_CONTROLS
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			moveKeysP = [
 				touchPad.buttonLeft.justPressed,
@@ -1344,7 +1344,7 @@ class CharacterEditorState extends MusicBeatState
 		if (FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end)
 		{
 			#if FEATURE_MOBILE_CONTROLS
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				touchPad.forEachAlive(function(button:TouchButton)
 				{
@@ -1370,11 +1370,11 @@ class CharacterEditorState extends MusicBeatState
 			FlxG.mouse.visible = false;
 			if (!_goToPlayState)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 			else
-				MusicBeatState.switchState(new PlayState());
+				Funkin.switchState(PlayState);
 			return;
 		}
 	}

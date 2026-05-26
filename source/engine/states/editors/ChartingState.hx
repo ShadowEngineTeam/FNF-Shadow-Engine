@@ -359,7 +359,7 @@ class ChartingState extends MusicBeatState
 
 		UI_infoPanel.x = (FlxG.width - UI_infoPanel.width - UI_box.width) - (ShadowStyle.SPACING_LG * 2);
 
-		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(controls.mobileC) ? "F" : "F1"} for Help', 16);
+		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(Funkin.controls.mobileC) ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
 		tipText.borderColor = FlxColor.BLACK;
 		tipText.scrollFactor.set();
@@ -609,17 +609,17 @@ class ChartingState extends MusicBeatState
 		var row5:Int = row4 + rowStep;
 		var reloadSongJson:ShadowButton = new ShadowButton(pad, row5, "Reload JSON", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				loadJson(_song.song.toLowerCase());
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(reloadSongJson);
 
 		var loadAutosaveBtn:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row5, "Load Auto", function()
 		{
 			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}, 70);
 		tab_group.add(loadAutosaveBtn);
 
@@ -658,20 +658,20 @@ class ChartingState extends MusicBeatState
 
 		var clear_events:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row6, "Clear Events", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings));
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_events);
 
 		var clear_notes:ShadowButton = new ShadowButton(pad + (buttonWidth + buttonGap) * 2, row6, "Clear Notes", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				for (sec in 0..._song.notes.length)
 				{
 					_song.notes[sec].sectionNotes = [];
 				}
 				updateGrid();
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_notes);
 
@@ -1615,7 +1615,7 @@ class ChartingState extends MusicBeatState
 		UI_help.add(titleLabel);
 
 		var helpStr:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			helpStr = "Up/Down - Change Conductor's strum time\nLeft/Right - Go to the previous/next section\n"
 				+ "G - Reset Song Playback Rate\n"
@@ -1636,7 +1636,7 @@ class ChartingState extends MusicBeatState
 		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${Funkin.controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -1823,7 +1823,7 @@ class ChartingState extends MusicBeatState
 			if ((FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
 			{
 				#if FEATURE_MOBILE_CONTROLS
-				if (controls.mobileC)
+				if (Funkin.controls.mobileC)
 				{
 					touchPad.forEachAlive(function(button:TouchButton)
 					{
@@ -1845,7 +1845,7 @@ class ChartingState extends MusicBeatState
 		if (FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end)
 		{
 			#if FEATURE_MOBILE_CONTROLS
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				touchPad.forEachAlive(function(button:TouchButton)
 				{
@@ -1904,7 +1904,7 @@ class ChartingState extends MusicBeatState
 		FlxG.watch.addQuick('daBeat', curBeat);
 		FlxG.watch.addQuick('daStep', curStep);
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			for (touch in FlxG.touches.list)
 			{
@@ -2053,7 +2053,7 @@ class ChartingState extends MusicBeatState
 				#if FEATURE_MOBILE_CONTROLS
 				touchPad.alpha = 0;
 				#end
-				openSubState(new states.editors.EditorPlayState(playbackSpeed));
+				switchSubState(states.editors.EditorPlayState, [playbackSpeed]);
 			}
 			else if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 			{
@@ -2068,7 +2068,7 @@ class ChartingState extends MusicBeatState
 
 				// if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
 				StageData.loadDirectory(_song);
-				LoadingState.loadAndSwitchState(new PlayState());
+				LoadingState.loadAndSwitchState(PlayState);
 			}
 
 			if (curSelectedNote != null && curSelectedNote[1] > -1)
@@ -2088,7 +2088,7 @@ class ChartingState extends MusicBeatState
 				// Protect against lost data when quickly leaving the chart editor.
 				autosaveSong();
 				PlayState.chartingMode = false;
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				FlxG.mouse.visible = false;
 				return;
@@ -2158,7 +2158,7 @@ class ChartingState extends MusicBeatState
 					resetSection();
 			}
 
-			if (!controls.mobileC)
+			if (!Funkin.controls.mobileC)
 			{
 				if (FlxG.mouse.deltaWheel.y != 0)
 				{
@@ -3382,7 +3382,7 @@ class ChartingState extends MusicBeatState
 
 		var noteStrum = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
 		var noteData = 0;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			for (touch in FlxG.touches.list)
 				noteData = Math.floor((touch.x - GRID_SIZE) / GRID_SIZE);
 		else
@@ -3518,7 +3518,7 @@ class ChartingState extends MusicBeatState
 			}
 			else
 				PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}
 		catch (e)
 		{

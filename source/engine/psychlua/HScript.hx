@@ -1,13 +1,12 @@
 package psychlua;
 
-import flixel.FlxBasic;
-import objects.Character;
 import psychlua.LuaUtils;
 #if FEATURE_LUA
 import psychlua.FunkinLua;
 #end
 #if FEATURE_HSCRIPT
-import tea.SScript;
+import hscript.SScript;
+import hscript.SScript.FunctionCall;
 
 class HScript extends SScript
 {
@@ -78,6 +77,7 @@ class HScript extends SScript
 			#end
 		}
 
+		interp.allowStaticVariables = interp.allowPublicVariables = true;
 		preset();
 		execute();
 
@@ -101,23 +101,48 @@ class HScript extends SScript
 		set('FlxTween', flixel.tweens.FlxTween);
 		set('FlxEase', flixel.tweens.FlxEase);
 		set('FlxColor', CustomFlxColor);
+		set('FlxTypedGroup', flixel.group.FlxGroup.FlxTypedGroup);
+		set('FlxSpriteGroup', flixel.group.FlxSpriteGroup);
+		set('FlxSound', flixel.sound.FlxSound);
+		set('FlxBasic', flixel.FlxBasic);
+		set('FlxObject', flixel.FlxObject);
+		set('FlxSubState', flixel.FlxSubState);
+		set('FlxRandom', flixel.math.FlxRandom);
+		set('FlxSave', flixel.util.FlxSave);
 		set('Countdown', backend.BaseStage.Countdown);
-		set('PlayState', PlayState);
-		set('Paths', Paths);
-		set('CoolUtil', CoolUtil);
-		set('StorageUtil', StorageUtil);
-		set('Conductor', Conductor);
-		set('ClientPrefs', ClientPrefs);
-		set('Character', Character);
-		set('Alphabet', Alphabet);
+		set('PlayState', states.PlayState);
+		set('MusicBeatState', backend.MusicBeatState);
+		set('MusicBeatSubstate', backend.MusicBeatSubstate);
+		set('Paths', backend.Paths);
+		set('CoolUtil', backend.CoolUtil);
+		set('StorageUtil', mobile.backend.StorageUtil);
+		set('Conductor', backend.Conductor);
+		set('ClientPrefs', backend.ClientPrefs);
+		set('Character', objects.Character);
+		set('Alphabet', objects.Alphabet);
 		set('Note', objects.Note);
 		set('NoteSplash', objects.NoteSplash);
 		set('SustainSplash', objects.SustainSplash);
+		set('StrumNote', objects.StrumNote);
+		set('HealthIcon', objects.HealthIcon);
+		set('Bar', objects.Bar);
+		set('AttachedSprite', objects.AttachedSprite);
+		set('AttachedText', objects.AttachedText);
+		set('CheckboxThingie', objects.CheckboxThingie);
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
-		set('ScriptedState', ScriptedState);
-		set('ScriptedSubState', ScriptedSubState);
+		set('ScriptedState', psychlua.ScriptedState);
+		set('ScriptedSubState', psychlua.ScriptedSubState);
+		set('Mods', backend.Mods);
+		set('Difficulty', backend.Difficulty);
+		set('Highscore', backend.Highscore);
+		set('Controls', backend.Controls);
+		set('Song', backend.Song);
+		set('Section', backend.Section);
+		set('StageData', backend.StageData);
+		set('WeekData', backend.WeekData);
+		set('InputFormatter', backend.InputFormatter);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
@@ -376,7 +401,7 @@ class HScript extends SScript
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):TeaCall
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -412,7 +437,7 @@ class HScript extends SScript
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):TeaCall
+	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -427,7 +452,7 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				final retVal:FunctionCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)

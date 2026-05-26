@@ -6,10 +6,12 @@ class ScriptedState extends MusicBeatState
 	public static var instance:ScriptedState;
 
 	public var scriptFile:String;
+	public var args:Array<Dynamic>;
 
-	public function new(scriptFile:String)
+	public function new(scriptFile:String, args:Array<Dynamic>)
 	{
 		this.scriptFile = scriptFile;
+		this.args = args;
 		super();
 	}
 
@@ -30,20 +32,22 @@ class ScriptedState extends MusicBeatState
 		startHScriptsNamed(scriptBase);
 		#end
 
+		callOnStateScripts('new', args);
+
 		super.create();
 	}
 
 	public static function implement(funk:FunkinLua)
 	{
-		funk.set("switchScriptedState", function(state:String)
+		funk.set("switchScriptedState", function(state:String, args:Array<Dynamic>)
 		{
-			FlxG.switchState(new ScriptedState(state));
+			Funkin.switchState(ScriptedState, [state, args]);
 		});
 
-		funk.set("openScriptedSubState", function(substate:String)
+		funk.set("openScriptedSubState", function(substate:String, args:Array<Dynamic>)
 		{
 			if (FunkinLua.getCurrentMusicState() != null)
-				FunkinLua.getCurrentMusicState().openSubState(new ScriptedSubState(substate));
+				FunkinLua.getCurrentMusicState().switchSubState(ScriptedSubState, [substate, args]);
 		});
 
 		funk.set("closeScriptedSubState", function()
@@ -59,5 +63,18 @@ class ScriptedState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 
 		super.update(elapsed);
+	}
+
+	public function callOnStateScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, excludeValues:Array<Dynamic> = null):Dynamic
+	{
+		#if (FEATURE_HSCRIPT || FEATURE_LUA)
+		var musicState:MusicBeatState = MusicBeatState.getState();
+		var excludedScripts = [#if FEATURE_LUA for (script in musicState.luaArray) script.scriptName #end].concat([#if FEATURE_HSCRIPT for (script in musicState.hscriptArray) script.origin #end]);
+		excludedScripts.remove(scriptFile);
+
+		return musicState.callOnScripts(funcToCall, args, ignoreStops, excludedScripts, excludeValues);
+		#else
+		return null;
+		#end
 	}
 }

@@ -171,7 +171,7 @@ class CoolUtil
 		PlayState.SONG = Song.loadFromJson(poop, name);
 		PlayState.storyDifficulty = difficultyNum;
 		LoadingState.prepareToSong();
-		LoadingState.loadAndSwitchState(new PlayState());
+		LoadingState.loadAndSwitchState(PlayState);
 
 		// FlxG.sound.music.pause();
 		// FlxG.sound.music.volume = 0;
