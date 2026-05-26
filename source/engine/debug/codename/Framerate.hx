@@ -351,8 +351,11 @@ class Framerate extends Sprite
 		var stackY = offset.y + boardH + 8;
 		for (c in categories)
 		{
-			if (!c.dragged) // until dragged, sit stacked under the board
+			if (!c.dragged)
+			{
 				c.offset.set(offset.x, stackY);
+				c.dragged = true; // position once, then independent
+			}
 			c.title.selectable = c.text.selectable = selectable;
 			c.updateAnim(debugMode > 1);
 			stackY = c.offset.y + c.height + 8;
