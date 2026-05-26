@@ -59,7 +59,7 @@ class OptionsState extends MusicBeatState
 				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
 			case 'Mobile Options':
-				openSubState(new mobile.options.MobileOptionsSubState());
+				switchSubState(mobile.options.MobileOptionsSubState);
 			#end
 		}
 	}

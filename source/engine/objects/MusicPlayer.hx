@@ -200,7 +200,7 @@ class MusicPlayer extends FlxGroup
 		}
 		updatePlaybackTxt();
 
-		if (#if FEATURE_MOBILE_CONTROLS Funkin.controls.touchPad.buttonC.justPressed || #end Funkin.controls.RESET)
+		if (#if FEATURE_MOBILE_CONTROLS instance.touchPad.buttonC.justPressed || #end Funkin.controls.RESET)
 		{
 			playbackRate = 1;
 			setPlaybackRate();
