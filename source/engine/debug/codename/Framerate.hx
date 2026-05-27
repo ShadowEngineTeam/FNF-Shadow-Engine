@@ -353,7 +353,7 @@ class Framerate extends Sprite
 		{
 			if (!c.dragged)
 			{
-				c.offset.set(offset.x, stackY);
+				c.offset.set(offset.x - PAD_X, stackY);
 				c.dragged = true; // position once, then independent
 			}
 			c.title.selectable = c.text.selectable = selectable;
