@@ -101,7 +101,7 @@ interface IMusicState
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite;
 
 	#if FEATURE_LUA
-	public function startLuasNamed(luaFile:String):Bool;
+	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool):Bool;
 	#end
 
 	#if FEATURE_HSCRIPT

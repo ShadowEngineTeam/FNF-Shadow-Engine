@@ -739,24 +739,39 @@ class FunkinLua
 
 		set("addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) // would be dope asf.
 		{
-			var foundScript:String = findScript(luaFile);
-			if (foundScript != null)
+			#if FEATURE_LUA
+			FunkinLua.getCurrentMusicState().startLuasNamed(luaFile, function(file:String)
 			{
-				if (!ignoreAlreadyRunning)
-					for (luaInstance in cast(game.luaArray, Array<Dynamic>))
-					{
-						final funk:FunkinLua = cast(luaInstance, FunkinLua);
-						if (funk.scriptName == foundScript)
-						{
-							luaTrace('addLuaScript: The script "' + foundScript + '" is already running!');
-							return;
-						}
-					}
+				var luaToLoad:String = '';
+				#if FEATURE_MODS
+				luaToLoad = Paths.modFolders(file);
+				if (!FileSystem.exists(luaToLoad))
+				#end
+					luaToLoad = Paths.getSharedPath(file);
 
-				new FunkinLua(foundScript);
-				return;
-			}
-			luaTrace("addLuaScript: Script doesn't exist!", false, false, FlxColor.RED);
+				if (FileSystem.exists(luaToLoad))
+				{
+					if (!ignoreAlreadyRunning)
+						for (script in cast(FunkinLua.getCurrentMusicState().luaArray, Array<Dynamic>))
+						{
+							final funk:FunkinLua = cast(script, FunkinLua);
+							if (funk.scriptName == luaToLoad)
+							{
+								luaTrace('addLuaScript: The script "' + luaFile + '" is already running!');
+								return false;
+							}
+						}
+
+					new FunkinLua(luaToLoad);
+					return true;
+				}
+				else
+				{
+					luaTrace("addLuaScript: Script doesn't exist!", false, false, FlxColor.RED);
+					return false;
+				}
+			});
+			#end
 		});
 		set("addHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
 		{

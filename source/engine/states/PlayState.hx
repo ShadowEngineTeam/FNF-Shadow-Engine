@@ -780,79 +780,11 @@ class PlayState extends MusicBeatState
 
 	function startCharacterScripts(name:String)
 	{
-		var doPush:Bool = false;
-		// Lua
 		#if FEATURE_LUA
-		var baseLuaPath:String = 'characters/$name';
-		for (ext in luaExtensions)
-		{
-			var candidate:String = baseLuaPath + '.' + ext;
-			var luaFile:String = '';
-
-			#if FEATURE_MODS
-			var modPath:String = Paths.modFolders(candidate);
-			if (FileSystem.exists(modPath))
-				luaFile = modPath;
-			else
-			#end
-			{
-				var sharedPath:String = Paths.getSharedPath(candidate);
-				if (FileSystem.exists(sharedPath))
-					luaFile = sharedPath;
-			}
-
-			if (luaFile.length > 0)
-			{
-				var alreadyRunning:Bool = false;
-				for (script in luaArray)
-					if (script.scriptName == luaFile)
-					{
-						alreadyRunning = true;
-						break;
-					}
-
-				if (!alreadyRunning)
-				{
-					new FunkinLua(luaFile);
-					break;
-				}
-			}
-		}
+		startLuasNamed('characters/$name');
 		#end
-
-		// HScript
 		#if FEATURE_HSCRIPT
-		var baseScriptPath:String = 'characters/$name';
-		var scriptFile:String = null;
-		doPush = false;
-
-		for (ext in hscriptExtensions)
-		{
-			var candidate:String = baseScriptPath + ext;
-
-			#if FEATURE_MODS
-			var modCandidate:String = Paths.modFolders(candidate);
-			if (FileSystem.exists(modCandidate))
-			{
-				scriptFile = modCandidate;
-				doPush = true;
-				break;
-			}
-			else
-			#end
-			{
-				candidate = Paths.getSharedPath(candidate);
-				if (FileSystem.exists(candidate))
-				{
-					scriptFile = candidate;
-					doPush = true;
-					break;
-				}
-			}
-		}
-
-		if (doPush && !SScript.global.exists(scriptFile))
-			initHScript(scriptFile);
+		startHScriptsNamed('characters/$name');
 		#end
 	}
 

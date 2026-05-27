@@ -520,12 +520,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	}
 
 	#if FEATURE_LUA
-	public function startLuasNamed(luaFile:String)
+	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool)
 	{
 		function doFile(file:String):Bool
 		{
 			if (!luaExtensions.contains(Path.extension(file)))
 				return false;
+
+			if (doFileMethod != null)
+				return doFileMethod(luaFile);
 
 			var luaToLoad:String = file;
 			if (!FileSystem.exists(luaToLoad))
