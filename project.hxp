@@ -332,8 +332,6 @@ class Project extends HXProject
 		// see https://haxe.org/manual/cr-static-analyzer.html
 		// setHaxedef("analyzer-optimize");
 
-		if (FEATURE_DISCORD_RPC.isEnabled())
-			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
