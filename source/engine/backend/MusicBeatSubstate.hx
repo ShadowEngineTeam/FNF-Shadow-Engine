@@ -293,6 +293,15 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 			hscriptArray.pop();
 		#end
 
+		#if (FEATURE_LUA || FEATURE_HSCRIPT)
+		if (luaDebugCam != null)
+		{
+			if (FlxG.cameras.list.contains(luaDebugCam))
+				FlxG.cameras.remove(luaDebugCam);
+			luaDebugCam = null;
+		}
+		#end
+
 		super.destroy();
 	}
 
