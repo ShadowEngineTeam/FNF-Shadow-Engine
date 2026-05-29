@@ -11,7 +11,6 @@ import openfl.filters.DropShadowFilter;
 import openfl.geom.Point;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
-import flixel.util.FlxTimer;
 
 class Framerate extends Sprite
 {

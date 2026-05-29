@@ -201,6 +201,10 @@ class NotesSubState extends MusicBeatSubstate
 		touchPad.buttonB.x = FlxG.width - 132;
 		touchPad.buttonC.x = 0;
 		touchPad.buttonC.y = FlxG.height - 135;
+		touchPad.active = false;
+		new FlxTimer().start(0.05, function(tmr:FlxTimer) {
+			touchPad.active = true;
+		});
 		#end
 	}
 

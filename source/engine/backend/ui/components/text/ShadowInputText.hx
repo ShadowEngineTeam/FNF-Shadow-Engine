@@ -8,7 +8,6 @@ import flixel.math.FlxRect;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
-import flixel.util.FlxTimer;
 import lime.system.Clipboard;
 import openfl.display.BitmapData;
 import openfl.errors.Error;
