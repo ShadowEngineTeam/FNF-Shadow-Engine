@@ -81,7 +81,7 @@ class Convert
 					toLua(l, elements[i]);
 					Lua.settable(l, -3);
 				}
-			case TClass(IMap):
+			case TClass(_) if (Std.isOfType(v, IMap)):
 				final map:IMap<Dynamic, Dynamic> = cast v;
 
 				Lua.createtable(l, 0, Lambda.count(map));
@@ -117,11 +117,11 @@ class Convert
 			case type if (type == Lua.TTABLE):
 				ret = convertTable(l, idx);
 			case type if (type == Lua.TFUNCTION):
-				ret = new LuaFunction(cpp.Pointer.fromRaw(l), Lua.ref(l, Lua.REGISTRYINDEX));
+				ret = new LuaFunction(cpp.Pointer.fromRaw(l), Lua.ref(l, idx));
 			case type if (type == Lua.TINTEGER):
-				var isInt:Int = 0;
-				var isIntPtr = cpp.Pointer.addressOf(isInt);
-				ret = Lua.tointeger64(l, idx, isIntPtr.raw);
+				var isInteger:Int = 0;
+				final i64:haxe.Int64 = Lua.tointeger64(l, idx, cpp.Pointer.addressOf(isInteger).raw);
+				ret = i64.high * 4294967296.0 + ((i64.low < 0) ? i64.low + 4294967296.0 : i64.low);
 			case type if (type == Lua.TVECTOR):
 				final vec:cpp.RawConstPointer<Single> = Lua.tovector(l, idx);
 				if (vec != null)
@@ -182,35 +182,39 @@ class Convert
 		var isArray:Bool = true;
 
 		var count:Int = 0;
+		var maxIndex:Int = 0;
 
 		iterateTable(l, idx, function():Void
 		{
+			count++;
+
 			if (isArray)
 			{
 				if (Lua.type(l, -2) == Lua.TNUMBER)
 				{
-					final index:Lua_Integer = Lua.tointeger(l, -2);
+					final key:Float = Lua.tonumber(l, -2);
+					final index:Int = Std.int(key);
 
-					if (index < 0)
+					if (index < 1 || index != key) // not a positive whole number
 						isArray = false;
+					else if (index > maxIndex)
+						maxIndex = index;
 				}
 				else
 					isArray = false;
 			}
-
-			count++;
 		});
 
 		if (count == 0)
 			return {};
 
-		if (isArray)
+		if (isArray && maxIndex == count)
 		{
 			final obj:Array<Dynamic> = [];
 
 			iterateTable(l, idx, function():Void
 			{
-				obj[Lua.tointeger(l, -2) - 1] = fromLua(l, -1);
+				obj[Std.int(Lua.tonumber(l, -2)) - 1] = fromLua(l, -1);
 			});
 
 			return obj;

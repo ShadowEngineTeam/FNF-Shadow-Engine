@@ -69,7 +69,7 @@ class FunkinLua
 		// Luau performance tweaks
 		Luau.enableCodegen(1);
 		Luau.bytecodeCacheSetCapacity(256);
-		Luau.setCompileOptions(2, 1, 0);
+		Luau.setCompileOptions(2, 1, 1);
 
 		this.scriptName = scriptName.trim();
 		game.luaArray.push(this);
@@ -1813,11 +1813,7 @@ class FunkinLua
 
 			if (status != 0)
 			{
-				final rawMsg = Lua.tostring(lua, -1);
-				var errorMsg:String = rawMsg != null ? rawMsg.toString() : getErrorMessage(status);
-				Lua.pop(lua, 1);
-				if (errorMsg == null)
-					errorMsg = getErrorMessage(status);
+				var errorMsg:String = getErrorMessage(status);
 				trace(errorMsg);
 				CoolUtil.showPopUp(errorMsg, 'Error on lua script!');
 				luaTrace('$scriptName\n$errorMsg', true, false, FlxColor.RED);
