@@ -1737,6 +1737,7 @@ class ChartingState extends MusicBeatState
 			DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 			#end
 		}
+		persistentUpdate = true;
 		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "CHART_EDITOR");
@@ -2053,6 +2054,7 @@ class ChartingState extends MusicBeatState
 				#if FEATURE_MOBILE_CONTROLS
 				touchPad.alpha = 0;
 				#end
+				persistentUpdate = false;
 				switchSubState(states.editors.EditorPlayState, [playbackSpeed]);
 			}
 			else if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)

@@ -173,9 +173,15 @@ class EditorPlayState extends MusicBeatSubstate
 		recalculateRating();
 	}
 
+	var started:Bool = false;
+
 	override function update(elapsed:Float)
 	{
-		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
+		if (!started)
+		{
+			started = true;
+		}
+		else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = false;

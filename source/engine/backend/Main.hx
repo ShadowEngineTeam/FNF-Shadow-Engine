@@ -99,6 +99,10 @@ class Main extends Sprite
 		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
 		debug.codename.SystemInfo.init();
 
+		final mouseSprite:Sprite = new Sprite();
+        FlxG.game.addChildAt(mouseSprite, FlxG.game.getChildIndex(fpsVar) + 1);
+        untyped FlxG.mouse.cursorContainer = mouseSprite;
+
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 		#if mobile
