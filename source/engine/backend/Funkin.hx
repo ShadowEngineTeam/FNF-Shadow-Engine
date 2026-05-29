@@ -60,10 +60,7 @@ class Funkin
 	public static function startTransition(nextState:FlxState = null)
 	{
 		if (nextState == null)
-		{
-			Funkin.resetState();
-			return;
-		}
+            nextState = FlxG.state;
 
 		FlxG.state.switchSubState(CustomFadeTransition, [0.6, false]);
 		if (nextState == FlxG.state)
