@@ -90,13 +90,13 @@ class MobileFunctions
 			return false;
 		});
 
-		funk.set("vibrate", (?duration:Int, ?period:Int #if android, amplitude:Int #end) ->
+		funk.set("vibrate", (?duration:Int, ?period:Int) ->
 		{
 			if (duration == null)
 				return FunkinLua.luaTrace('vibrate: No duration specified.');
 			else if (period == null)
 				period = 0;
-			return Haptic.vibrate(period, duration #if android, amplitude #end);
+			return Haptic.vibrate(period, duration);
 		});
 
 		funk.set("addTouchPad", (DPadMode:String, ActionMode:String) ->
