@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "2d9f7258145ce4303ee3ea20a5e930c4a48b43ff",
+      "ref": "991ca0900b43c0bc0cffc892868fae6d7b990c25",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "hxvlc",
       "type": "git",
-      "ref": "d29e82991895db792dc448d41bb0b1c5104b995a",
+      "ref": "a7fad909ae7a21dcc0f70f98aab932a610e86884",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
