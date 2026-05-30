@@ -45,7 +45,7 @@
     {
       "name": "hxluau",
       "type": "git",
-      "ref": "ffi",
+      "ref": "2465428f9829f28932d78711794fa27c606d48c5",
       "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
