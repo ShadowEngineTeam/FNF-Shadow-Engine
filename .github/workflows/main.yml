@@ -7,6 +7,7 @@ jobs:
     name: ${{ matrix.name }}
     uses: ./.github/workflows/build.yml
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Windows i686

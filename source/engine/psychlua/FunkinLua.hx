@@ -60,6 +60,7 @@ class FunkinLua
 		var times:Float = Date.now().getTime();
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
+		Cffi.register(lua); 
 
 		// trace('Luau version: ' + Lua.VERSION);
 		// trace("Luau release: " + Lua.RELEASE);
