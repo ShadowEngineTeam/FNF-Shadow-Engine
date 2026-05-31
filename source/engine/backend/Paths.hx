@@ -53,30 +53,23 @@ class Paths
 
 	public static function clearUnusedMemory():Void
 	{
-		// clear non local assets in the tracked assets list
+		// clears non local assets in the tracked assets list
 		for (key in currentTrackedAssets.keys())
 		{
 			// if it is not currently contained within the used local assets
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
-				var obj = currentTrackedAssets.get(key);
-				@:privateAccess
-				if (obj != null)
-				{
-					// remove the key from all cache maps
-					FlxG.bitmap._cache.remove(key);
-					openfl.Assets.cache.removeBitmapData(key);
-					currentTrackedAssets.remove(key);
-
-					// and get rid of the object
-					obj.persist = false; // make sure the garbage collector actually clears it up
-					obj.destroyOnNoUse = true;
-					obj.destroy();
-				}
+				final obj:FlxGraphic = currentTrackedAssets.get(key);
+				if (obj == null)
+					continue;
+				obj.persist = false;
+				obj.destroyOnNoUse = true;
+				FlxG.bitmap.remove(obj);
+				currentTrackedAssets.remove(key);
 			}
 		}
 
-		// run the garbage collector for good measure lmfao
+		// run the garbage collector after
 		System.gc();
 		#if cpp
 		cpp.NativeGc.run(true);
@@ -85,20 +78,18 @@ class Paths
 
 	public static function clearStoredMemory():Void
 	{
-		// clear anything not in the tracked assets list
+		final keysToRemove:Array<String> = [];
+		// clears anything not in the tracked assets list
 		@:privateAccess
 		for (key in FlxG.bitmap._cache.keys())
 		{
-			var obj = FlxG.bitmap._cache.get(key);
-			if (obj != null && !currentTrackedAssets.exists(key))
-			{
-				openfl.Assets.cache.removeBitmapData(key);
-				FlxG.bitmap._cache.remove(key);
-				obj.destroy();
-			}
+			if (!currentTrackedAssets.exists(key))
+				keysToRemove.push(key);
 		}
 
-		// clear all sounds that are cached
+		for (key in keysToRemove)
+			FlxG.bitmap.removeByKey(key);
+
 		for (key => asset in currentTrackedSounds)
 		{
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key) && asset != null)
@@ -314,7 +305,8 @@ class Paths
 		{
 			var exts:Array<String> = [];
 			#if USING_GPU_TEXTURES
-			for (e in GPU_IMAGE_EXTS) exts.push(e);
+			for (e in GPU_IMAGE_EXTS)
+				exts.push(e);
 			#end
 			exts.push(IMAGE_EXT);
 			for (ext in exts)
@@ -329,7 +321,8 @@ class Paths
 				else if (FileSystem.exists(file))
 					bitmap = #if html5 openfl.Assets.getBitmapData(file) #else BitmapData.fromBytes(File.getBytes(file)) #end;
 
-				if (bitmap != null) break;
+				if (bitmap != null)
+					break;
 			}
 		}
 
