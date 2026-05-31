@@ -90,6 +90,7 @@ class Paths
 		for (key in keysToRemove)
 			FlxG.bitmap.removeByKey(key);
 
+		// clear all sounds that are cached
 		for (key => asset in currentTrackedSounds)
 		{
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key) && asset != null)
