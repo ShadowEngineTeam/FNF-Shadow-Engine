@@ -15,28 +15,32 @@ typedef NoteSplashConfig =
 	offsets:Array<Array<Float>>
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class NoteSplash extends FlxSprite
 {
+	@:nullSafety(Off)
 	public var colorSwap:ColorSwap = null;
+
+	@:nullSafety(Off)
 	public var rgbShader:PixelSplashShaderRef;
 
-	private var idleAnim:String;
-	private var _textureLoaded:String = null;
-	private var _configLoaded:String = null;
+	private var idleAnim:Null<String>;
+	private var _textureLoaded:Null<String> = null;
+	private var _configLoaded:Null<String> = null;
 
 	public static var usePixelTextures(default, set):Null<Bool>;
 
 	public static var defaultNoteSplash(get, never):String;
 	public static var configs:Map<String, NoteSplashConfig> = new Map<String, NoteSplashConfig>();
 
+	@:nullSafety(Off)
 	public static var mainGroup:FlxTypedGroup<NoteSplash>;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
 
-		var skin:String = null;
+		var skin:Null<String> = null;
 		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
 			skin = PlayState.SONG.splashSkin;
 		else
@@ -72,7 +76,7 @@ class NoteSplash extends FlxSprite
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 		aliveTime = 0;
 
-		var texture:String = null;
+		var texture:Null<String> = null;
 		if (note != null && note.noteSplashData.texture != null)
 			texture = note.noteSplashData.texture;
 		else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
@@ -80,13 +84,13 @@ class NoteSplash extends FlxSprite
 		else
 			texture = defaultNoteSplash + getSplashSkinPostfix();
 
-		var config:NoteSplashConfig = null;
+		var config:Null<NoteSplashConfig> = null;
 		if (_textureLoaded != texture)
 			config = loadAnims((PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture);
 		else
-			config = precacheConfig(_configLoaded);
+			config = precacheConfig(_configLoaded ?? '');
 
-		var tempShader:RGBPalette = null;
+		var tempShader:Null<RGBPalette> = null;
 		if (ClientPrefs.data.disableRGBNotes)
 		{
 			var hue:Float = 0;
@@ -113,7 +117,8 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			if ((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteCustomColor))
+			var song = PlayState.SONG;
+			if ((note == null || note.noteSplashData.useRGBShader) && (song == null || song.disableNoteCustomColor != true))
 			{
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
@@ -134,7 +139,7 @@ class NoteSplash extends FlxSprite
 		if (note != null)
 			alpha = note.noteSplashData.a;
 		if (!ClientPrefs.data.disableRGBNotes)
-			rgbShader.copyValues(tempShader);
+			rgbShader.copyValues(cast tempShader);
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
@@ -177,11 +182,11 @@ class NoteSplash extends FlxSprite
 		return skin;
 	}
 
-	function loadAnims(skin:String, ?animName:String = null):NoteSplashConfig
+	function loadAnims(skin:String, ?animName:String = null):Null<NoteSplashConfig>
 	{
 		maxAnims = 0;
 		frames = Paths.getSparrowAtlas(skin);
-		var config:NoteSplashConfig = null;
+		var config:Null<NoteSplashConfig> = null;
 		if (frames == null)
 		{
 			skin = defaultNoteSplash + getSplashSkinPostfix();
@@ -234,8 +239,8 @@ class NoteSplash extends FlxSprite
 
 		var config:NoteSplashConfig = {
 			anim: configFile[0],
-			minFps: Std.parseInt(framerates[0]),
-			maxFps: Std.parseInt(framerates[1]),
+			minFps: Std.parseInt(framerates[0]) ?? 0,
+			maxFps: Std.parseInt(framerates[1]) ?? 0,
 			offsets: offs
 		};
 		configs.set(skin, config);

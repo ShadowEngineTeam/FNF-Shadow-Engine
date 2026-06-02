@@ -10,7 +10,7 @@ import mobile.backend.TouchUtil;
  * ...
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
-@:nullSafety(Off)
+@:nullSafety
 class MobileFunctions
 {
 	public static function implement(funk:FunkinLua)
@@ -97,7 +97,7 @@ class MobileFunctions
 				return FunkinLua.luaTrace('vibrate: No duration specified.');
 			else if (period == null)
 				period = 0;
-			return Haptic.vibrate(period, duration);
+			return Haptic.vibrate(period ?? 0, duration);
 		});
 
 		funk.set("addTouchPad", (DPadMode:String, ActionMode:String) ->
@@ -188,7 +188,7 @@ class MobileFunctions
 		funk.set("touchPressedObject", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchPressedObject: $object does not exist.');
@@ -200,7 +200,7 @@ class MobileFunctions
 		funk.set("touchJustPressedObject", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchJustPressedObject: $object does not exist.');
@@ -212,7 +212,7 @@ class MobileFunctions
 		funk.set("touchJustReleasedObject", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchJustReleasedObject: $object does not exist.');
@@ -224,7 +224,7 @@ class MobileFunctions
 		funk.set("touchReleasedObject", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchReleasedObject: $object does not exist.');
@@ -236,7 +236,7 @@ class MobileFunctions
 		funk.set("touchPressedObjectComplex", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchPressedObjectComplex: $object does not exist.');
@@ -248,7 +248,7 @@ class MobileFunctions
 		funk.set("touchJustPressedObjectComplex", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchJustPressedObjectComplex: $object does not exist.');
@@ -260,7 +260,7 @@ class MobileFunctions
 		funk.set("touchJustReleasedObjectComplex", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchJustReleasedObjectComplex: $object does not exist.');
@@ -272,7 +272,7 @@ class MobileFunctions
 		funk.set("touchReleasedObjectComplex", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchReleasedObjectComplex: $object does not exist.');
@@ -284,7 +284,7 @@ class MobileFunctions
 		funk.set("touchOverlapsObject", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchOverlapsObject: $object does not exist.');
@@ -296,7 +296,7 @@ class MobileFunctions
 		funk.set("touchOverlapsObjectComplex", function(object:String, ?camera:String):Bool
 		{
 			var obj:FlxSprite = cast(FunkinLua.getCurrentMusicState().getLuaObject(object), FlxSprite);
-			var cam:FlxCamera = LuaUtils.cameraFromString(camera);
+			var cam:FlxCamera = LuaUtils.cameraFromString(camera ?? "");
 			if (obj == null)
 			{
 				FunkinLua.luaTrace('touchOverlapsObjectComplex: $object does not exist.');
