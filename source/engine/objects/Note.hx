@@ -38,7 +38,7 @@ typedef NoteSplashData =
  * 
  * If you want to make a custom note type, you should search for: "function set_noteType"
 **/
-@:nullSafety(Off)
+@:nullSafety
 class Note extends FlxSkewedSprite
 {
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -52,17 +52,23 @@ class Note extends FlxSkewedSprite
 	public var ignoreNote:Bool = false;
 	public var hitByOpponent:Bool = false;
 	public var noteWasHit:Bool = false;
+	@:nullSafety(Off)
 	public var prevNote:Note;
+
+	@:nullSafety(Off)
 	public var nextNote:Note;
 
 	public var spawned:Bool = false;
 
 	public var tail:Array<Note> = []; // for sustains
+
+	@:nullSafety(Off)
 	public var parent:Note;
 	public var blockHit:Bool = false; // only works for player
 
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
+	@:nullSafety(Off)
 	public var noteType(default, set):String = null;
 
 	public var eventName:String = '';
@@ -70,7 +76,10 @@ class Note extends FlxSkewedSprite
 	public var eventVal1:String = '';
 	public var eventVal2:String = '';
 
+	@:nullSafety(Off)
 	public var colorSwap:ColorSwap;
+
+	@:nullSafety(Off)
 	public var rgbShader:RGBShaderReference;
 
 	public static var globalRgbShaders:Array<RGBPalette> = [];
@@ -124,6 +133,7 @@ class Note extends FlxSkewedSprite
 	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
 	public var ratingDisabled:Bool = false;
 
+	@:nullSafety(Off)
 	public var texture(default, set):String = null;
 
 	public var noAnimation:Bool = false;
@@ -191,7 +201,7 @@ class Note extends FlxSkewedSprite
 
 	private function set_noteType(value:String):String
 	{
-		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
+		noteSplashData.texture = PlayState.SONG?.splashSkin ?? 'noteSplashes';
 		if (ClientPrefs.data.disableRGBNotes)
 			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
 			{
@@ -270,15 +280,15 @@ class Note extends FlxSkewedSprite
 			prevNote = this;
 
 		this.prevNote = prevNote;
-		isSustainNote = sustainNote;
-		this.inEditor = inEditor;
+		isSustainNote = sustainNote == true;
+		this.inEditor = inEditor == true;
 		this.moves = false;
 
 		x += (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
 		this.strumTime = strumTime;
-		if (!inEditor)
+		if (inEditor != true)
 			this.strumTime += ClientPrefs.data.noteOffset;
 
 		this.noteData = noteData;
@@ -395,12 +405,12 @@ class Note extends FlxSkewedSprite
 		var skin:String = texture;
 		if (texture.length < 1)
 		{
-			skin = PlayState.SONG != null ? PlayState.SONG.playerArrowSkin : null;
+			skin = PlayState.SONG?.playerArrowSkin ?? '';
 			if (skin == null || skin.length < 1)
 				skin = defaultNoteSkin;
 		}
 
-		var animName:String = null;
+		var animName:Null<String> = null;
 		if (animation.curAnim != null)
 		{
 			animName = animation.curAnim.name;
