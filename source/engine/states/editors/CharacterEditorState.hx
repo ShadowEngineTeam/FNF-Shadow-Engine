@@ -1674,9 +1674,10 @@ class CharacterEditorState extends MusicBeatState
 		if (_file != null)
 			return;
 
+		var imageValue:Dynamic = (character.imageFiles != null && character.imageFiles.length > 1) ? character.imageFiles : character.imageFile;
 		var json:Dynamic = {
 			"animations": character.animationsArray,
-			"image": (character.imageFiles != null && character.imageFiles.length > 1) ? character.imageFiles : character.imageFile,
+			"image": imageValue,
 			"scale": character.jsonScale,
 			"sing_duration": character.singDuration,
 			"healthicon": character.healthIcon,
