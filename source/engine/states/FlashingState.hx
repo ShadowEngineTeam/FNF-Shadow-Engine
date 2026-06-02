@@ -4,12 +4,12 @@ import flixel.effects.FlxFlicker;
 import lime.app.Application;
 import flixel.addons.transition.FlxTransitionableState;
 
-@:nullSafety
+@:nullSafety(Off)
 class FlashingState extends MusicBeatState
 {
 	public static var leftState:Bool = false;
 
-	@:nullSafety(Off) var warnText:FlxText;
+	var warnText:FlxText;
 
 	override function create()
 	{

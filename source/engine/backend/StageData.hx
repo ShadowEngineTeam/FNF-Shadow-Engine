@@ -26,7 +26,7 @@ typedef StageFile =
 	@:optional var objects:Array<Dynamic>;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 enum abstract LoadFilters(Int) from Int from UInt to Int to UInt
 {
 	var LOW_QUALITY:Int = (1 << 0);

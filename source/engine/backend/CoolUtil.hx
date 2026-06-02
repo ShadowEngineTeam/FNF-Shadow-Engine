@@ -6,7 +6,7 @@ import openfl.utils.Assets;
 import sys.io.Process;
 #end
 
-@:nullSafety(Off)
+@:nullSafety
 class CoolUtil
 {
 	public static function quantize(f:Float, snap:Float)
@@ -22,7 +22,7 @@ class CoolUtil
 
 	public static function coolTextFile(path:String):Array<String>
 	{
-		var daList:String = null;
+		var daList:Null<String> = null;
 		var formatted:Array<String> = path.split(':'); // prevent "shared:", "preload:" and other library names on file path
 		path = formatted[formatted.length - 1];
 		if (FileSystem.exists(path))
@@ -81,7 +81,7 @@ class CoolUtil
 				if (colorOfThisPixel != 0)
 				{
 					if (countByColor.exists(colorOfThisPixel))
-						countByColor[colorOfThisPixel] = countByColor[colorOfThisPixel] + 1;
+						countByColor[colorOfThisPixel] = (countByColor[colorOfThisPixel] ?? 0) + 1;
 					else if (countByColor[colorOfThisPixel] != 13520687 - (2 * 13520687))
 						countByColor[colorOfThisPixel] = 1;
 				}
@@ -93,9 +93,9 @@ class CoolUtil
 		countByColor[FlxColor.BLACK] = 0;
 		for (key in countByColor.keys())
 		{
-			if (countByColor[key] >= maxCount)
+			if ((countByColor[key] ?? 0) >= maxCount)
 			{
-				maxCount = countByColor[key];
+				maxCount = countByColor[key] ?? 0;
 				maxKey = key;
 			}
 		}
@@ -103,7 +103,7 @@ class CoolUtil
 		return maxKey;
 	}
 
-	public static function numberArray(max:Int, ?min = 0):Array<Int>
+	public static function numberArray(max:Int, min = 0):Array<Int>
 	{
 		var dumbArray:Array<Int> = [];
 		for (i in min...max)
@@ -155,13 +155,13 @@ class CoolUtil
 	@:access(flixel.util.FlxSave.validate)
 	public static function getSavePath():String
 	{
-		final company:String = FlxG.stage.application.meta.get('company');
+		final company:Null<String> = FlxG.stage.application.meta.get('company');
 		// #if (flixel < "5.0.0") return company; #else
-		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
+		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file') ?? '')}';
 		// #end
 	}
 
-	public static function loadSong(?name:String = null, ?difficultyNum:Int = -1)
+	public static function loadSong(?name:String = null, difficultyNum:Int = -1)
 	{
 		if (name == null || name.length < 1)
 			name = PlayState.SONG.song;
@@ -253,7 +253,7 @@ class CoolUtil
 		return (result == Math.NaN) ? 1.0 : result;
 	}
 
-	public static function easeInBack(x:Float, ?c:Float = 1.70158):Float
+	public static function easeInBack(x:Float, c:Float = 1.70158):Float
 	{
 		if (x <= 0.0)
 			return 0.0;
@@ -262,7 +262,7 @@ class CoolUtil
 		return (1 + c) * x * x * x - c * x * x;
 	}
 
-	public static function easeOutBack(x:Float, ?c:Float = 1.70158):Float
+	public static function easeOutBack(x:Float, c:Float = 1.70158):Float
 	{
 		if (x <= 0.0)
 			return 0.0;

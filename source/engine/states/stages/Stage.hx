@@ -1,10 +1,10 @@
 package states.stages;
 
-@:nullSafety
+@:nullSafety(Off)
 class Stage extends BaseStage
 {
-	@:nullSafety(Off) var dadbattleBlack:BGSprite;
-	@:nullSafety(Off) var dadbattleLight:BGSprite;
+	var dadbattleBlack:BGSprite;
+	var dadbattleLight:BGSprite;
 
 	override function create()
 	{

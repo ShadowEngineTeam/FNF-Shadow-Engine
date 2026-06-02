@@ -6,7 +6,7 @@ import lime.app.Application;
 import hxdiscord_rpc.Discord;
 import hxdiscord_rpc.Types;
 
-@:nullSafety(Off)
+@:nullSafety
 class DiscordClient
 {
 	public static var isInitialized:Bool = false;
@@ -43,6 +43,8 @@ class DiscordClient
 	private static function onReady(request:cpp.RawConstPointer<DiscordUser>):Void
 	{
 		var requestPtr:cpp.Star<DiscordUser> = cpp.ConstPointer.fromRaw(request).ptr;
+		if (requestPtr == null)
+			return;
 
 		if (Std.parseInt(cast(requestPtr.discriminator, String)) != 0) // New Discord IDs/Discriminator system
 			trace('(Discord) Connected to User (${cast (requestPtr.username, String)}#${cast (requestPtr.discriminator, String)})');
@@ -68,7 +70,7 @@ class DiscordClient
 		discordHandlers.ready = cpp.Function.fromStaticFunction(onReady);
 		discordHandlers.disconnected = cpp.Function.fromStaticFunction(onDisconnected);
 		discordHandlers.errored = cpp.Function.fromStaticFunction(onError);
-		Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, null);
+		Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, cast null);
 
 		if (!isInitialized)
 			trace("(Discord) Client initialized");
@@ -90,8 +92,8 @@ class DiscordClient
 		isInitialized = true;
 	}
 
-	public static function changePresence(?details:String = 'In the Menus', ?state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool,
-			?endTimestamp:Float)
+	public static function changePresence(details:String = 'In the Menus', ?state:Null<String>, ?smallImageKey:String, hasStartTimestamp:Bool = false,
+			endTimestamp:Float = 0)
 	{
 		var startTimestamp:Float = 0;
 		if (hasStartTimestamp)
@@ -100,10 +102,10 @@ class DiscordClient
 			endTimestamp = startTimestamp + endTimestamp;
 
 		presence.details = details;
-		presence.state = state;
+		presence.state = state ?? '';
 		presence.largeImageKey = 'icon';
 		presence.largeImageText = "Version: " + states.MainMenuState.shadowEngineVersion;
-		presence.smallImageKey = smallImageKey;
+		presence.smallImageKey = smallImageKey ?? '';
 		// Obtained times are in milliseconds so they are divided so Discord can use it
 		presence.startTimestamp = Std.int(startTimestamp / 1000);
 		presence.endTimestamp = Std.int(endTimestamp / 1000);

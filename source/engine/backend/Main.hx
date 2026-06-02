@@ -13,7 +13,7 @@ import lime.system.System as LimeSystem;
 import states.InitState;
 import openfl.events.KeyboardEvent;
 
-@:nullSafety(Off)
+@:nullSafety
 class Main extends Sprite
 {
 	public static final game = {
@@ -26,7 +26,7 @@ class Main extends Sprite
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	public static var fpsVar:Framerate;
+	@:nullSafety(Off) public static var fpsVar:Framerate;
 
 	public static function main():Void
 	{
@@ -139,14 +139,14 @@ class Main extends Sprite
 	{
 		@:privateAccess
 		{
-			sprite.__cacheBitmap = null;
-			sprite.__cacheBitmapData = null;
+			sprite.__cacheBitmap = cast null;
+			sprite.__cacheBitmapData = cast null;
 		}
 	}
 
 	function toggleFullScreen(event:KeyboardEvent):Void
 	{
-		if (Controls.instance?.justReleased('fullscreen'))
+		if (Controls.instance?.justReleased('fullscreen') == true)
 			FlxG.fullscreen = !FlxG.fullscreen;
 	}
 

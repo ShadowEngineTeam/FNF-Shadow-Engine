@@ -7,19 +7,19 @@ import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
 
-@:nullSafety
+@:nullSafety(Off)
 class MainMenuState extends MusicBeatState
 {
 	public static var shadowEngineVersion:String = '0.9.0'; // This is also used for Discord RPC
 	public static var psychEngineVersion:String = '0.7.3';
 	public static var curSelected:Int = 0;
 
-	@:nullSafety(Off) var menuItems:FlxTypedGroup<FlxSprite>;
+	var menuItems:FlxTypedGroup<FlxSprite>;
 
 	var optionShit:Array<String> = ['story_mode', 'freeplay', #if FEATURE_MODS 'mods', #end 'credits', 'options'];
 
-	@:nullSafety(Off) var magenta:FlxSprite;
-	@:nullSafety(Off) var camFollow:FlxObject;
+	var magenta:FlxSprite;
+	var camFollow:FlxObject;
 
 	override function create()
 	{
