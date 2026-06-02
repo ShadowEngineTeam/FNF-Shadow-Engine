@@ -5,7 +5,7 @@ import flixel.system.FlxAssets.FlxSoundAsset;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 
-@:nullSafety(Off)
+@:nullSafety
 class CustomSoundTray extends FlxSoundTray
 {
 	var graphicScale:Float = 0.30;
@@ -23,10 +23,12 @@ class CustomSoundTray extends FlxSoundTray
 	public function new()
 	{
 		super();
-		removeChildren();
 
 		bg = new Bitmap();
 		backingBar = new Bitmap();
+		volumeMaxSound = Paths.sound("soundtray/VolMAX");
+
+		removeChildren();
 
 		loadImages();
 
@@ -35,7 +37,6 @@ class CustomSoundTray extends FlxSoundTray
 
 		volumeUpSound = Paths.sound("soundtray/Volup");
 		volumeDownSound = Paths.sound("soundtray/Voldown");
-		volumeMaxSound = Paths.sound("soundtray/VolMAX");
 
 		_lastVolume = Math.round(FlxG.sound.logToLinear(FlxG.sound.volume) * 10);
 	}
@@ -50,7 +51,7 @@ class CustomSoundTray extends FlxSoundTray
 		var bgPath:String = getImagePath('soundtray/volumebox');
 		if (FileSystem.exists(bgPath))
 		{
-			bg.bitmapData = BitmapData.fromBytes(File.getBytes(bgPath));
+			bg.bitmapData = BitmapData.fromBytes(cast File.getBytes(bgPath));
 			bg.scaleX = graphicScale;
 			bg.scaleY = graphicScale;
 			bg.smoothing = true;
@@ -60,7 +61,7 @@ class CustomSoundTray extends FlxSoundTray
 		var backingPath:String = getImagePath('soundtray/bars_10');
 		if (FileSystem.exists(backingPath))
 		{
-			backingBar.bitmapData = BitmapData.fromBytes(File.getBytes(backingPath));
+			backingBar.bitmapData = BitmapData.fromBytes(cast File.getBytes(backingPath));
 			backingBar.x = 9;
 			backingBar.y = 5;
 			backingBar.scaleX = graphicScale;
@@ -78,7 +79,7 @@ class CustomSoundTray extends FlxSoundTray
 
 			if (FileSystem.exists(barPath))
 			{
-				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(File.getBytes(barPath)));
+				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(cast File.getBytes(barPath)));
 				bar.x = 9;
 				bar.y = 5;
 				bar.scaleX = graphicScale;

@@ -9,7 +9,7 @@ import states.FreeplayState;
  * Music player used for Freeplay
  */
 @:access(states.FreeplayState)
-@:nullSafety(Off)
+@:nullSafety
 class MusicPlayer extends FlxGroup
 {
 	public var instance:FreeplayState;
@@ -18,7 +18,7 @@ class MusicPlayer extends FlxGroup
 	public var paused(get, never):Bool;
 
 	public var playingMusic:Bool = false;
-	public var curTime:Float;
+	public var curTime:Float = 0;
 
 	var songBG:FlxSprite;
 	var songTxt:FlxText;
@@ -28,7 +28,7 @@ class MusicPlayer extends FlxGroup
 	var playbackSymbols:Array<FlxText> = [];
 	var playbackTxt:FlxText;
 
-	var wasPlaying:Bool;
+	var wasPlaying:Bool = false;
 
 	var holdPitchTime:Float = 0;
 	var playbackRate(default, set):Float = 1;
@@ -43,18 +43,25 @@ class MusicPlayer extends FlxGroup
 
 		songBG = new FlxSprite(xPos - 6, 0).makeGraphic(1, 100, 0xFF000000);
 		songBG.alpha = 0.6;
-		add(songBG);
 
 		playbackBG = new FlxSprite(xPos - 6, 0).makeGraphic(1, 100, 0xFF000000);
 		playbackBG.alpha = 0.6;
-		add(playbackBG);
 
 		songTxt = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
 		songTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
-		add(songTxt);
 
 		timeTxt = new FlxText(xPos, songTxt.y + 60, 0, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
+
+		progressBar = new FlxBar(timeTxt.x, timeTxt.y + timeTxt.height, LEFT_TO_RIGHT, Std.int(timeTxt.width), 8, null, "", 0, Math.POSITIVE_INFINITY);
+		progressBar.createFilledBar(FlxColor.WHITE, FlxColor.BLACK);
+
+		playbackTxt = new FlxText(FlxG.width * 0.6, 20, 0, "", 32);
+		playbackTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE);
+
+		add(songBG);
+		add(playbackBG);
+		add(songTxt);
 		add(timeTxt);
 
 		for (i in 0...2)
@@ -69,12 +76,7 @@ class MusicPlayer extends FlxGroup
 			add(text);
 		}
 
-		progressBar = new FlxBar(timeTxt.x, timeTxt.y + timeTxt.height, LEFT_TO_RIGHT, Std.int(timeTxt.width), 8, null, "", 0, Math.POSITIVE_INFINITY);
-		progressBar.createFilledBar(FlxColor.WHITE, FlxColor.BLACK);
 		add(progressBar);
-
-		playbackTxt = new FlxText(FlxG.width * 0.6, 20, 0, "", 32);
-		playbackTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE);
 		add(playbackTxt);
 
 		switchPlayMusic();
