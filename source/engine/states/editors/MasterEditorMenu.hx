@@ -5,7 +5,7 @@ import objects.Character;
 import states.MainMenuState;
 import states.FreeplayState;
 
-@:nullSafety(Off)
+@:nullSafety
 class MasterEditorMenu extends MusicBeatState
 {
 	var options:Array<String> = [
@@ -17,12 +17,12 @@ class MasterEditorMenu extends MusicBeatState
 		'Dialogue Portrait Editor',
 		'Note Splash Debug'
 	];
-	private var grpTexts:FlxTypedGroup<Alphabet>;
-	private var directories:Array<String> = [null];
+	@:nullSafety(Off) private var grpTexts:FlxTypedGroup<Alphabet>;
+	@:nullSafety(Off) private var directories:Array<String> = [null];
 
 	private var curSelected = 0;
 	private var curDirectory = 0;
-	private var directoryTxt:FlxText;
+	@:nullSafety(Off) private var directoryTxt:FlxText;
 
 	override function create()
 	{

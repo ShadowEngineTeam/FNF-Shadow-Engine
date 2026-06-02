@@ -2,7 +2,7 @@ package backend.rendering;
 
 // PsychCamera handles followLerp based on elapsed
 // and stops camera from snapping at higher framerates
-@:nullSafety(Off)
+@:nullSafety
 class PsychCamera extends ShadowCamera
 {
 	override public function update(elapsed:Float):Void
@@ -17,13 +17,13 @@ class PsychCamera extends ShadowCamera
 		updateFlash(elapsed);
 		updateFade(elapsed);
 
-		flashSprite.filters = filtersEnabled ? filters : null;
+		flashSprite.filters = cast (filtersEnabled ? filters : null);
 
 		updateFlashSpritePosition();
 		updateShake(elapsed);
 	}
 
-	public function updateFollowDelta(?elapsed:Float = 0):Void
+	public function updateFollowDelta(elapsed:Float = 0):Void
 	{
 		// Either follow the object closely,
 		// or double check our deadzone and update accordingly.

@@ -1,6 +1,6 @@
 package backend;
 
-@:nullSafety(Off)
+@:nullSafety
 class Difficulty
 {
 	public static var defaultList(default, never):Array<String> = ['Easy', 'Normal', 'Hard'];
@@ -67,7 +67,7 @@ class Difficulty
 		return list[num == null ? PlayState.storyDifficulty : num];
 	}
 
-	inline public static function getSongPrefix(num:Null<Int> = null, ?includeDash:Bool = true):Null<String>
+	inline public static function getSongPrefix(num:Null<Int> = null, includeDash:Bool = true):Null<String>
 	{
 		final idx:Int = num ?? PlayState.storyDifficulty;
 		final raw:String = list[idx];

@@ -4,10 +4,10 @@ import flixel.graphics.FlxGraphic;
 import openfl.display.BlendMode;
 import shaders.AdjustColorShader;
 
-@:nullSafety(Off)
+@:nullSafety
 class StageErect extends BaseStage
 {
-	var peeps:BGSprite;
+	@:nullSafety(Off) var peeps:BGSprite;
 
 	override function create()
 	{

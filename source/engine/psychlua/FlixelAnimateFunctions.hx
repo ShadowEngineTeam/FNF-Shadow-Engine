@@ -1,6 +1,6 @@
 package psychlua;
 
-@:nullSafety(Off)
+@:nullSafety
 class FlixelAnimateFunctions
 {
 	public static function implement(funk:FunkinLua)
@@ -67,5 +67,5 @@ class FlixelAnimateFunctions
 	}
 
 	public static inline function formatIndices(indices:String):Array<Int>
-		return [for (i in indices.trim().split(',')) Std.parseInt(i)];
+		return [for (i in indices.trim().split(',')) Std.parseInt(i) ?? 0];
 }

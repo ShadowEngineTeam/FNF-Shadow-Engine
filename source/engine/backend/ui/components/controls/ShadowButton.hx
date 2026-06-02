@@ -9,12 +9,12 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowButton extends FlxSpriteGroup
 {
 	public var bg:FlxSprite;
 	public var label:FlxText;
-	public var callback:Void->Void;
+	public var callback:Null<Void->Void>;
 
 	var _width:Int;
 	var _height:Int;
@@ -30,10 +30,10 @@ class ShadowButton extends FlxSpriteGroup
 		callback = onClick;
 
 		bg = new FlxSprite();
+		label = new FlxText(0, 0, width, text);
 		drawBackground(ShadowStyle.BG_MEDIUM, ShadowStyle.BORDER_DARK);
 		add(bg);
 
-		label = new FlxText(0, 0, width, text);
 		label.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		label.antialiasing = ShadowStyle.antialiasing;
 		label.y = (_height - label.height) / 2;

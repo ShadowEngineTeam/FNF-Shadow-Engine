@@ -45,7 +45,7 @@ using backend.BitmapDataUtil;
 @:access(flixel.graphics.frames.FlxFrame)
 @:access(openfl.display.OpenGLRenderer)
 @:access(openfl.geom.ColorTransform)
-@:nullSafety(Off)
+@:nullSafety
 class ShadowCamera extends FlxCamera
 {
 	/**
@@ -109,7 +109,7 @@ class ShadowCamera extends FlxCamera
 
 		this.id = id;
 
-		_backgroundFrame = new FlxFrame(new FlxGraphic('', null));
+		_backgroundFrame = new FlxFrame(new FlxGraphic('', cast null));
 		_backgroundFrame.frame = new FlxRect();
 
 		_blendShader = new RuntimeCustomBlendShader();
@@ -210,7 +210,7 @@ class ShadowCamera extends FlxCamera
 			itemToReturn.colored = colored;
 			itemToReturn.hasColorOffsets = hasColorOffsets;
 			itemToReturn.blend = blend;
-			itemToReturn.shader = shader;
+			itemToReturn.shader = cast shader;
 
 			itemToReturn.nextTyped = _headTiles;
 			_headTiles = itemToReturn;

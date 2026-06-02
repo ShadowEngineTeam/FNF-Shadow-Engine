@@ -5,7 +5,7 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import objects.Character;
 
-@:nullSafety(Off)
+@:nullSafety
 class ModSettingsSubState extends BaseOptionsMenu
 {
 	var save:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -25,7 +25,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 		else
 		{
 			var saveMap:Map<String, Dynamic> = FlxG.save.data.modSettings;
-			save = saveMap[folder] != null ? saveMap[folder] : [];
+			save = cast (saveMap[folder] ?? []);
 		}
 
 		// save = []; //reset for debug purposes
@@ -93,7 +93,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 
 						@:privateAccess
 						{
-							newOption.getValue = function() return save.get(newOption.variable);
+							newOption.getValue = function():Dynamic return save.get(newOption.variable);
 							newOption.setValue = function(value:Dynamic)
 							{
 								if (save.exists(newOption.variable))
@@ -183,7 +183,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 		{
 			var modPath:String = ModsMenuState.modsGroup.members[ModsMenuState.curSelectedMod].folder;
 			var settingsPath:String = Paths.mods('$modPath/data/settings.json');
-			var settingsJson:Array<Dynamic> = Json.parse(File.getContent(settingsPath), settingsPath);
+			var settingsJson:Array<Dynamic> = Json.parse(File.getContent(settingsPath) ?? '', settingsPath);
 			for (option in settingsJson)
 				option.value = save.get(option.save);
 

@@ -9,11 +9,11 @@ import backend.ui.ShadowStyle;
 import backend.ui.components.text.ShadowInputText;
 import backend.ui.components.controls.ShadowDropdown;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowTextInput extends FlxSpriteGroup
 {
 	public var input:ShadowInputText;
-	public var callback:String->Void;
+	public var callback:Null<String->Void>;
 	public var text(get, set):String;
 
 	var bg:FlxSprite;
@@ -30,11 +30,12 @@ class ShadowTextInput extends FlxSpriteGroup
 
 		bg = new FlxSprite();
 		bg.makeGraphic(_width, _height, ShadowStyle.BG_INPUT, true);
-		drawBorder(ShadowStyle.BORDER_DARK);
-		add(bg);
 
 		var startText:String = defaultText != null ? defaultText : "";
 		input = new ShadowInputText(2, 0, _width - 4, "", ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, FlxColor.TRANSPARENT, true);
+
+		drawBorder(ShadowStyle.BORDER_DARK);
+		add(bg);
 		input.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		input.antialiasing = ShadowStyle.antialiasing;
 		input.background = false;

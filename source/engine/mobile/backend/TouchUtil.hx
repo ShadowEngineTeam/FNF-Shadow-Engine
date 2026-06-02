@@ -7,7 +7,7 @@ import flixel.input.touch.FlxTouch;
  * ...
  * @author: Karim Akra
  */
-@:nullSafety(Off)
+@:nullSafety
 class TouchUtil
 {
 	public static var pressed(get, never):Bool;
@@ -88,6 +88,6 @@ class TouchUtil
 			if (touch != null)
 				return touch;
 
-		return FlxG.touches.getFirst();
+		return cast FlxG.touches.getFirst();
 	}
 }

@@ -1,6 +1,6 @@
 package psychlua;
 
-@:nullSafety(Off)
+@:nullSafety
 class ModchartSprite extends FlxAnimate
 {
 	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
@@ -16,7 +16,7 @@ class ModchartSprite extends FlxAnimate
 		animation.play(name, forced, reverse, startFrame);
 
 		var daOffset = animOffsets.get(name);
-		if (animOffsets.exists(name))
+		if (daOffset != null)
 			offset.set(daOffset[0], daOffset[1]);
 	}
 

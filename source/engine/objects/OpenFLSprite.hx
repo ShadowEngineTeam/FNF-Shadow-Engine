@@ -5,7 +5,7 @@ import openfl.display.Sprite;
 /**
  * Designed to draw a OpenFL Sprite as a FlxSprite (To allow layering and auto sizing for haxe flixel cameras)
  */
-@:nullSafety(Off)
+@:nullSafety
 class OpenFLSprite extends FlxSprite
 {
 	public var flSprite:Sprite;
@@ -14,9 +14,9 @@ class OpenFLSprite extends FlxSprite
 	{
 		super(x, y);
 
-		makeGraphic(width, height, FlxColor.TRANSPARENT);
-
 		flSprite = Sprite;
+
+		makeGraphic(width, height, FlxColor.TRANSPARENT);
 
 		pixels.draw(flSprite);
 	}

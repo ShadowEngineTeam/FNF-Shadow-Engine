@@ -1,10 +1,10 @@
 package psychlua;
 
 @:keep
-@:nullSafety(Off)
+@:nullSafety
 class ScriptedSubState extends MusicBeatSubstate
 {
-	public static var instance:ScriptedSubState;
+	public static var instance:Null<ScriptedSubState>;
 
 	public var scriptFile:String;
 	public var args:Array<Dynamic>;

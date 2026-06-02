@@ -9,7 +9,7 @@ import sys.thread.Mutex;
 private typedef Thread = Dynamic;
 #end
 
-@:nullSafety(Off)
+@:nullSafety
 final class ThreadUtil
 {
 	inline static function error(text:String)
@@ -55,7 +55,7 @@ final class ThreadUtil
 		catch (e)
 			error("Failed to safely create a thread: " + e.details());
 		#end
-		return null;
+		return cast null;
 	}
 
 	#if (target.threaded)
@@ -68,9 +68,12 @@ final class ThreadUtil
 
 	static function __threadExecAsync()
 	{
-		var callback:Void->Void;
-		while ((callback = __pendingExecs.pop(true)) != null)
+		while (true)
 		{
+			var callback = __pendingExecs.pop(true);
+			if (callback == null)
+				break;
+
 			__threadMutex.acquire();
 			__threadUsed++;
 			__threadMutex.release();

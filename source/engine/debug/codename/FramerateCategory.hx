@@ -6,7 +6,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
-@:nullSafety(Off)
+@:nullSafety
 class FramerateCategory extends Sprite
 {
 	public var title:TextField;
@@ -40,18 +40,19 @@ class FramerateCategory extends Sprite
 		// Bitmaps are scaled, so they live in an unscaled container that carries the shadow filter.
 		panel = new Sprite();
 		panel.filters = [Framerate.panelShadow()];
-		addChild(panel);
 
 		bgSprite = new Bitmap(Framerate.__bitmap);
 		bgSprite.alpha = 0.82;
-		panel.addChild(bgSprite);
 
 		headerSprite = new Bitmap(Framerate.__darkBitmap);
 		headerSprite.alpha = 0.55;
-		panel.addChild(headerSprite);
 
 		borderSprite = new Bitmap(Framerate.__accentBitmap);
 		borderSprite.alpha = 1;
+
+		addChild(panel);
+		panel.addChild(bgSprite);
+		panel.addChild(headerSprite);
 		panel.addChild(borderSprite);
 
 		for (label in [this.title, this.text])

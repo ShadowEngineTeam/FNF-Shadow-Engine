@@ -9,7 +9,7 @@ import lime.system.System as LimeSystem;
 import lime.ui.WindowVSyncMode;
 #end
 
-@:nullSafety(Off)
+@:nullSafety
 class InitState extends FlxState
 {
 	override public function create():Void
@@ -45,7 +45,7 @@ class InitState extends FlxState
 		FlxG.keys.preventDefaultKeys = [TAB];
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
-		if (FlxG.save.data?.fullscreen)
+		if (FlxG.save.data?.fullscreen == true)
 			FlxG.fullscreen = FlxG.save.data.fullscreen;
 
 		if (FlxG.save.data?.weekCompleted != null)

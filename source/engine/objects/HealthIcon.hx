@@ -1,9 +1,9 @@
 package objects;
 
-@:nullSafety(Off)
+@:nullSafety
 class HealthIcon extends FlxSprite
 {
-	public var sprTracker:FlxSprite;
+	public var sprTracker:Null<FlxSprite>;
 
 	private var isOldIcon:Bool = false;
 	private var isPlayer:Bool = false;
