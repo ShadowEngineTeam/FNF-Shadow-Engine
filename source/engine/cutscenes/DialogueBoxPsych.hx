@@ -22,7 +22,7 @@ typedef DialogueLine =
 }
 
 // TO DO: Clean code? Maybe? idk
-@:nullSafety(Off)
+@:nullSafety
 class DialogueBoxPsych extends FlxSpriteGroup
 {
 	public static var DEFAULT_TEXT_X = 175;
@@ -31,14 +31,20 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	var scrollSpeed = 4000;
 
+	@:nullSafety(Off)
 	var dialogue:TypedAlphabet;
+
+	@:nullSafety(Off)
 	var dialogueList:DialogueFile = null;
 
-	public var finishThing:Void->Void;
-	public var nextDialogueThing:Void->Void = null;
-	public var skipDialogueThing:Void->Void = null;
+	public var finishThing:Null<Void->Void>;
+	public var nextDialogueThing:Null<Void->Void> = null;
+	public var skipDialogueThing:Null<Void->Void> = null;
 
+	@:nullSafety(Off)
 	var bgFade:FlxSprite = null;
+
+	@:nullSafety(Off)
 	var box:FlxSprite;
 	var textToType:String = '';
 
@@ -115,8 +121,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		{
 			if (dialogueList.dialogue[i] != null)
 			{
-				var charToAdd:String = dialogueList.dialogue[i].portrait;
-				if (!charsMap.exists(charToAdd) || !charsMap.get(charToAdd))
+				var charToAdd:String = dialogueList.dialogue[i].portrait ?? '';
+				if (!charsMap.exists(charToAdd) || charsMap.get(charToAdd) != true)
 				{
 					charsMap.set(charToAdd, true);
 				}
@@ -156,6 +162,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 	}
 
+	@:nullSafety(Off)
 	var daText:TypedAlphabet = null;
 	var ignoreThisFrame:Bool = true; // First frame is reserved for loading dialogue images
 
@@ -319,7 +326,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 				remove(box);
 				box.kill();
 				box.destroy();
-				box = null;
+				box = cast null;
 			}
 
 			if (bgFade != null)
@@ -329,7 +336,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 				{
 					remove(bgFade);
 					bgFade.destroy();
-					bgFade = null;
+					bgFade = cast null;
 				}
 			}
 
@@ -363,7 +370,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 						leChar.destroy();
 					}
 				}
-				finishThing();
+				if (finishThing != null)
+					finishThing();
 				kill();
 			}
 		}
@@ -375,7 +383,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	function startNextDialog():Void
 	{
-		var curDialogue:DialogueLine = null;
+		var curDialogue:Null<DialogueLine> = null;
 		do
 		{
 			curDialogue = dialogueList.dialogue[currentText];
@@ -428,9 +436,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		lastCharacter = character;
 		lastBoxType = boxType;
 
-		daText.text = curDialogue.text;
+		daText.text = curDialogue.text ?? '';
 		daText.delay = curDialogue.speed;
-		daText.sound = curDialogue.sound;
+		daText.sound = curDialogue.sound ?? '';
 		if (daText.sound == null || daText.sound.trim() == '')
 			daText.sound = 'dialogue';
 
@@ -460,10 +468,10 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 	}
 
-	public static function parseDialogue(path:String):DialogueFile
+	public static function parseDialogue(path:String):Null<DialogueFile>
 	{
 		if (FileSystem.exists(path))
-			return cast Json.parse(File.getContent(path), path);
+			return cast Json.parse(File.getContent(path) ?? '', path);
 
 		return null;
 	}

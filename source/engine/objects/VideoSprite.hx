@@ -5,18 +5,24 @@ import flixel.addons.display.FlxPieDial;
 import hxvlc.flixel.FlxVideoSprite;
 #end
 
-@:nullSafety(Off)
+@:nullSafety
 class VideoSprite extends FlxSpriteGroup
 {
 	#if FEATURE_VIDEOS
-	public var finishCallback:Void->Void = null;
-	public var onSkip:Void->Void = null;
+	public var finishCallback:Null<Void->Void> = null;
+	public var onSkip:Null<Void->Void> = null;
 
 	final _timeToSkip:Float = 1;
 
 	public var holdingTime:Float = 0;
+
+	@:nullSafety(Off)
 	public var videoSprite:FlxVideoSprite;
+
+	@:nullSafety(Off)
 	public var skipSprite:FlxPieDial;
+
+	@:nullSafety(Off)
 	public var cover:FlxSprite;
 	public var canSkip(default, set):Bool = false;
 
@@ -50,10 +56,11 @@ class VideoSprite extends FlxSpriteGroup
 			this.canSkip = true;
 
 		// callbacks
-		if (!shouldLoop)
+		if (!shouldLoop && videoSprite.bitmap != null)
 			videoSprite.bitmap.onEndReached.add(finishVideo);
 
-		videoSprite.bitmap.onFormatSetup.add(function()
+		if (videoSprite.bitmap != null)
+			videoSprite.bitmap.onFormatSetup.add(function()
 		{
 			/*
 				#if FEATURE_VIDEOS
@@ -131,7 +138,8 @@ class VideoSprite extends FlxSpriteGroup
 				if (onSkip != null)
 					onSkip();
 				finishCallback = null;
-				videoSprite.bitmap.onEndReached.dispatch();
+				if (videoSprite.bitmap != null)
+					videoSprite.bitmap.onEndReached.dispatch();
 				//trace('Skipped video');
 				return;
 			}
@@ -158,7 +166,7 @@ class VideoSprite extends FlxSpriteGroup
 		{
 			remove(skipSprite);
 			skipSprite.destroy();
-			skipSprite = null;
+			skipSprite = cast null;
 		}
 		return canSkip;
 	}

@@ -10,26 +10,39 @@ import flixel.FlxCamera;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowDropdown extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;
+
+	@:nullSafety(Off)
 	public var selectedLabel(get, null):String;
-	public var callback:Int->Void;
+	public var callback:Null<Int->Void>;
 	public var hasFocus:Bool = false;
 
 	private static var _instances:Array<ShadowDropdown> = [];
 	private static var _clickConsumedFrame:Int = -1;
-	private static var _clickConsumer:ShadowDropdown = null;
+	private static var _clickConsumer:Null<ShadowDropdown> = null;
 
 	var options:Array<String>;
+
+	@:nullSafety(Off)
 	var header:FlxSprite;
+
+	@:nullSafety(Off)
 	var headerText:FlxText;
+
+	@:nullSafety(Off)
 	var arrow:FlxSprite;
+
+	@:nullSafety(Off)
 	var dropList:ShadowDropdownList;
+
+	@:nullSafety(Off)
 	var listBg:FlxSprite;
 	var isOpen:Bool = false;
 
+	@:nullSafety(Off)
 	var _rowHighlight:FlxSprite;
 	var _rowItems:Array<FlxText> = [];
 
@@ -53,7 +66,6 @@ class ShadowDropdown extends FlxSpriteGroup
 	{
 		super(x, y);
 
-		_instances.push(this);
 		options = items;
 		callback = onChange;
 		_width = width;
@@ -85,6 +97,8 @@ class ShadowDropdown extends FlxSpriteGroup
 		_ignoreUntilMouseRelease = (FlxG.mouse.pressed || FlxG.mouse.pressedRight || FlxG.mouse.pressedMiddle);
 
 		applyCamerasToChildren();
+
+		_instances.push(this);
 	}
 
 	override public function destroy():Void
