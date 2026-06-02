@@ -9,6 +9,7 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety(Off)
 class ShadowCheckbox extends FlxSpriteGroup
 {
 	public var checked(get, set):Bool;

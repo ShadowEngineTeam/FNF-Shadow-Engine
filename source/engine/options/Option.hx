@@ -6,6 +6,7 @@ typedef Keybind =
 	gamepad:String
 }
 
+@:nullSafety(Off)
 class Option
 {
 	public var child:Alphabet;

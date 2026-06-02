@@ -9,6 +9,7 @@ import objects.TypedAlphabet;
 import cutscenes.DialogueBoxPsych;
 import cutscenes.DialogueCharacter;
 
+@:nullSafety(Off)
 class DialogueCharacterEditorState extends MusicBeatState
 {
 	var box:FlxSprite;

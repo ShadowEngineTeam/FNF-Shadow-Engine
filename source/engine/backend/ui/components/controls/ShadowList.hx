@@ -10,6 +10,7 @@ import backend.Paths;
 import backend.ui.ShadowStyle;
 import backend.ui.components.text.ShadowLabel;
 
+@:nullSafety(Off)
 class ShadowList extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;

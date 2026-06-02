@@ -3,6 +3,7 @@ package psychlua;
 import openfl.filters.ShaderFilter;
 import flixel.addons.display.FlxRuntimeShader;
 
+@:nullSafety(Off)
 class ShaderFunctions
 {
 	private static var storedFilters:Map<String, ShaderFilter> = [];

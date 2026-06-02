@@ -14,6 +14,7 @@ import openfl.events.KeyboardEvent;
 import objects.Character;
 import openfl.utils.Assets as OpenFlAssets;
 
+@:nullSafety(Off)
 class EditorPlayState extends MusicBeatSubstate
 {
 	// Borrowed from original PlayState

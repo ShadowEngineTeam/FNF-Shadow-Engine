@@ -4,6 +4,7 @@ import objects.AttachedText;
 import objects.CheckboxThingie;
 import flixel.addons.transition.FlxTransitionableState;
 
+@:nullSafety(Off)
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
 	private var curOption:GameplayOption = null;

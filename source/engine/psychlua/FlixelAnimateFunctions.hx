@@ -1,5 +1,6 @@
 package psychlua;
 
+@:nullSafety(Off)
 class FlixelAnimateFunctions
 {
 	public static function implement(funk:FunkinLua)

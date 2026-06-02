@@ -2,6 +2,7 @@ package states;
 
 import objects.AttachedSprite;
 
+@:nullSafety(Off)
 class CreditsState extends MusicBeatState
 {
 	var curSelected:Int = -1;

@@ -1,5 +1,6 @@
 package backend;
 
+@:nullSafety(Off)
 class Highscore
 {
 	public static var weekScores:Map<String, Int> = new Map();

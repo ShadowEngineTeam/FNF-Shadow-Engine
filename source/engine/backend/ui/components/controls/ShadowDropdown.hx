@@ -10,6 +10,7 @@ import flixel.FlxCamera;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety(Off)
 class ShadowDropdown extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;

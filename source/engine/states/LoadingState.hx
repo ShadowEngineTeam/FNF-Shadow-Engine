@@ -15,6 +15,7 @@ import backend.Song;
 import backend.StageData;
 import objects.Character;
 
+@:nullSafety(Off)
 class LoadingState extends MusicBeatState
 {
 	public static var loaded:Int = 0;

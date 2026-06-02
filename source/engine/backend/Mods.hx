@@ -7,6 +7,7 @@ typedef ModsList =
 	all:Array<String>
 };
 
+@:nullSafety(Off)
 class Mods
 {
 	static public var currentModDirectory:String = '';

@@ -13,6 +13,7 @@ import lime.system.System as LimeSystem;
 import states.InitState;
 import openfl.events.KeyboardEvent;
 
+@:nullSafety(Off)
 class Main extends Sprite
 {
 	public static final game = {

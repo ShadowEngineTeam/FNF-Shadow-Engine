@@ -8,6 +8,7 @@ typedef NoteTypeProperty =
 	value:Dynamic
 }
 
+@:nullSafety(Off)
 class NoteTypesConfig
 {
 	private static var noteTypesData:Map<String, Array<NoteTypeProperty>> = new Map<String, Array<NoteTypeProperty>>();

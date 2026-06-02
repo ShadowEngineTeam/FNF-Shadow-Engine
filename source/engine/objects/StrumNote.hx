@@ -7,6 +7,7 @@ import shaders.RGBPalette.RGBShaderReference;
 
 using backend.CoolUtil;
 
+@:nullSafety(Off)
 class StrumNote extends FlxSkewedSprite
 {
 	public var colorSwap:ColorSwap = null;

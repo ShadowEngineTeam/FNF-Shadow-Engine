@@ -5,6 +5,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import backend.ClientPrefs;
 
+@:nullSafety(Off)
 class ShadowStyle
 {
 	private static var _focusedPanel:FlxSpriteGroup = null;

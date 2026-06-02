@@ -1,5 +1,6 @@
 package substates;
 
+@:nullSafety(Off)
 class Prompt extends MusicBeatSubstate
 {
 	public var okc:Void->Void;

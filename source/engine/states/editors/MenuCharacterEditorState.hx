@@ -10,6 +10,7 @@ import openfl.events.IOErrorEvent;
 import openfl.net.FileFilter;
 import objects.MenuCharacter;
 
+@:nullSafety(Off)
 class MenuCharacterEditorState extends MusicBeatState
 {
 	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;

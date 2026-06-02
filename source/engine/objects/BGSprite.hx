@@ -1,5 +1,6 @@
 package objects;
 
+@:nullSafety(Off)
 class BGSprite extends FlxSprite
 {
 	private var idleAnim:String;

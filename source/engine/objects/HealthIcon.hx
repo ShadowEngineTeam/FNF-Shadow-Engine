@@ -1,5 +1,6 @@
 package objects;
 
+@:nullSafety(Off)
 class HealthIcon extends FlxSprite
 {
 	public var sprTracker:FlxSprite;

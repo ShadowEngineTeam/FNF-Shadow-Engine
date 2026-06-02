@@ -1,5 +1,6 @@
 package states.stages;
 
+@:nullSafety(Off)
 class Stage extends BaseStage
 {
 	var dadbattleBlack:BGSprite;

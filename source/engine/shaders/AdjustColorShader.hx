@@ -3,6 +3,7 @@ package shaders;
 import lime.utils.Assets;
 import flixel.addons.display.FlxRuntimeShader;
 
+@:nullSafety(Off)
 class AdjustColorShader extends FlxRuntimeShader
 {
 	public var hue(default, set):Float;

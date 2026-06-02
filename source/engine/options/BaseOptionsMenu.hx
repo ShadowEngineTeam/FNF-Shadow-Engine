@@ -8,6 +8,7 @@ import objects.CheckboxThingie;
 import objects.AttachedText;
 import backend.InputFormatter;
 
+@:nullSafety(Off)
 class BaseOptionsMenu extends MusicBeatSubstate
 {
 	private var curOption:Option = null;

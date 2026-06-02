@@ -5,6 +5,7 @@ import flixel.system.FlxAssets.FlxSoundAsset;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 
+@:nullSafety(Off)
 class CustomSoundTray extends FlxSoundTray
 {
 	var graphicScale:Float = 0.30;

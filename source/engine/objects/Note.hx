@@ -38,6 +38,7 @@ typedef NoteSplashData =
  * 
  * If you want to make a custom note type, you should search for: "function set_noteType"
 **/
+@:nullSafety(Off)
 class Note extends FlxSkewedSprite
 {
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();

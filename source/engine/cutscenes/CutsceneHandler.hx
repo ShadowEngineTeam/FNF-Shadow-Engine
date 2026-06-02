@@ -3,6 +3,7 @@ package cutscenes;
 import flixel.FlxBasic;
 import flixel.util.FlxSort;
 
+@:nullSafety(Off)
 class CutsceneHandler extends FlxBasic
 {
 	public var timedEvents:Array<Dynamic> = [];

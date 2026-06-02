@@ -9,6 +9,7 @@ import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
 
+@:nullSafety(Off)
 class CharacterEditorState extends MusicBeatState
 {
 	var character:Character;
@@ -1676,7 +1677,7 @@ class CharacterEditorState extends MusicBeatState
 
 		var json:Dynamic = {
 			"animations": character.animationsArray,
-			"image": (character.imageFiles != null && character.imageFiles.length > 1) ? character.imageFiles : character.imageFile,
+			"image": (character.imageFiles != null && character.imageFiles.length > 1) ? (character.imageFiles : Dynamic) : character.imageFile,
 			"scale": character.jsonScale,
 			"sing_duration": character.singDuration,
 			"healthicon": character.healthIcon,

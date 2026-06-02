@@ -48,6 +48,7 @@ enum CharacterSpriteType
 	TEXTURE_ATLAS;
 }
 
+@:nullSafety(Off)
 class Character extends FlxAnimate
 {
 	/**

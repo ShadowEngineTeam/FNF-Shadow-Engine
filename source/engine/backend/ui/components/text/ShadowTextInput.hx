@@ -9,6 +9,7 @@ import backend.ui.ShadowStyle;
 import backend.ui.components.text.ShadowInputText;
 import backend.ui.components.controls.ShadowDropdown;
 
+@:nullSafety(Off)
 class ShadowTextInput extends FlxSpriteGroup
 {
 	public var input:ShadowInputText;

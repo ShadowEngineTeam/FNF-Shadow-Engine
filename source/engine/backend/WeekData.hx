@@ -19,6 +19,7 @@ typedef WeekFile =
 	var difficulties:String;
 }
 
+@:nullSafety(Off)
 class WeekData
 {
 	public static var weeksLoaded:Map<String, WeekData> = new Map<String, WeekData>();

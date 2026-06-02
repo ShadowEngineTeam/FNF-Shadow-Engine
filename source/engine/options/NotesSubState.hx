@@ -13,6 +13,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
+@:nullSafety(Off)
 class NotesSubState extends MusicBeatSubstate
 {
 	var onModeColumn:Bool = true;

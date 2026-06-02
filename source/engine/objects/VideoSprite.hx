@@ -5,6 +5,7 @@ import flixel.addons.display.FlxPieDial;
 import hxvlc.flixel.FlxVideoSprite;
 #end
 
+@:nullSafety(Off)
 class VideoSprite extends FlxSpriteGroup
 {
 	#if FEATURE_VIDEOS

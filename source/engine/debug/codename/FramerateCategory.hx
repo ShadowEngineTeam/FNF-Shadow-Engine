@@ -6,6 +6,7 @@ import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
+@:nullSafety(Off)
 class FramerateCategory extends Sprite
 {
 	public var title:TextField;

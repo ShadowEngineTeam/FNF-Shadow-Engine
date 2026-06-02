@@ -47,6 +47,7 @@ import sys.thread.Mutex;
  * "function eventEarlyTrigger" - Used for making your event start a few MILLISECONDS earlier
  * "function triggerEvent" - Called when the song hits your event's timestamp, this is probably what you were looking for
 **/
+@:nullSafety(Off)
 class PlayState extends MusicBeatState
 {
 	public static var STRUM_X = 48;

@@ -9,6 +9,7 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety(Off)
 class ShadowStepper extends FlxSpriteGroup
 {
 	public var value(get, set):Float;

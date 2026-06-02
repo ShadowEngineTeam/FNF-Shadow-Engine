@@ -4,6 +4,7 @@ import backend.scripting.*;
 import flixel.util.FlxSave;
 import haxe.io.Path;
 
+@:nullSafety(Off)
 class MusicBeatSubstate extends FlxSubState implements IMusicState
 {
 	public var stateInstance:FlxState = null;

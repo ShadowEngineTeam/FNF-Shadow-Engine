@@ -7,6 +7,7 @@ import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
 
+@:nullSafety(Off)
 class MainMenuState extends MusicBeatState
 {
 	public static var shadowEngineVersion:String = '0.9.0'; // This is also used for Discord RPC

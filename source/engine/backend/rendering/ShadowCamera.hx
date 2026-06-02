@@ -45,6 +45,7 @@ using backend.BitmapDataUtil;
 @:access(flixel.graphics.frames.FlxFrame)
 @:access(openfl.display.OpenGLRenderer)
 @:access(openfl.geom.ColorTransform)
+@:nullSafety(Off)
 class ShadowCamera extends FlxCamera
 {
 	/**

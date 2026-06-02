@@ -5,6 +5,7 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety
 class ShadowLabel extends FlxText
 {
 	public function new(x:Float, y:Float, text:String, ?size:Int, ?color:FlxColor, fieldWidth:Int = 0)

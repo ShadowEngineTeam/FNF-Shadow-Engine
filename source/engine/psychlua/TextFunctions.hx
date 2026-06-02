@@ -1,5 +1,6 @@
 package psychlua;
 
+@:nullSafety(Off)
 class TextFunctions
 {
 	private static var game(get, never):Dynamic;

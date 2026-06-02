@@ -4,6 +4,7 @@ package mobile.backend;
  * A storage class for mobile.
  * @author Karim Akra and Homura Akemi (HomuHomu833)
  */
+@:nullSafety
 class StorageUtil
 {
 	#if sys

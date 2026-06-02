@@ -6,6 +6,7 @@ import openfl.utils.Assets;
 import sys.io.Process;
 #end
 
+@:nullSafety(Off)
 class CoolUtil
 {
 	public static function quantize(f:Float, snap:Float)

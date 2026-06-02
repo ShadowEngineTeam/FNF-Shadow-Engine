@@ -32,6 +32,7 @@ typedef SwagSong =
 	@:optional var format:String;
 }
 
+@:nullSafety(Off)
 class Song
 {
 	public var song:String;

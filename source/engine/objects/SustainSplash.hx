@@ -8,6 +8,7 @@ import shaders.PixelSplashShader.PixelSplashShaderRef;
 
 using backend.CoolUtil;
 
+@:nullSafety(Off)
 class SustainSplash extends FlxSprite
 {
 	public static var DEFAULT_TEXTURE(get, never):String;

@@ -13,6 +13,7 @@ import objects.TypedAlphabet;
 import cutscenes.DialogueBoxPsych;
 import cutscenes.DialogueCharacter;
 
+@:nullSafety(Off)
 class DialogueEditorState extends MusicBeatState
 {
 	var character:DialogueCharacter;

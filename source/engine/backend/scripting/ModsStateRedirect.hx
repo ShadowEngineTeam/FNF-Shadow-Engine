@@ -3,6 +3,7 @@ package backend.scripting;
 import psychlua.ScriptedState;
 import psychlua.ScriptedSubState;
 
+@:nullSafety(Off)
 class ModsStateRedirect
 {
 	static var redirects:Map<String, String> = new Map<String, String>();

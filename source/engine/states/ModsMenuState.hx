@@ -13,6 +13,7 @@ import options.ModSettingsSubState;
 import flixel.addons.transition.FlxTransitionableState;
 import mobile.backend.TouchUtil;
 
+@:nullSafety(Off)
 class ModsMenuState extends MusicBeatState
 {
 	var bg:FlxSprite;

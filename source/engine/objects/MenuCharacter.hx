@@ -12,6 +12,7 @@ typedef MenuCharacterFile =
 	var flipX:Bool;
 }
 
+@:nullSafety(Off)
 class MenuCharacter extends FlxSprite
 {
 	public var character:String;

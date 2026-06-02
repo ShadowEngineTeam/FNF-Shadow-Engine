@@ -12,6 +12,7 @@ typedef BPMChangeEvent =
 	@:optional var stepCrochet:Float;
 }
 
+@:nullSafety(Off)
 class Conductor
 {
 	public static var bpm(default, set):Float = 100;

@@ -19,6 +19,7 @@ typedef TitleData =
 	bpm:Float
 }
 
+@:nullSafety(Off)
 class TitleState extends MusicBeatState
 {
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];

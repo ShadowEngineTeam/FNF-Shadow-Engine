@@ -12,6 +12,7 @@ using StringTools;
  * Unified file system class that works with both native file access and OpenFL assets.
  * @see https://github.com/Psych-Slice/P-Slice/blob/master/source/mikolka/funkin/custom/NativeFileSystem.hx
  */
+@:nullSafety
 class FileSystem
 {
 	inline static function cwd(path:String):String

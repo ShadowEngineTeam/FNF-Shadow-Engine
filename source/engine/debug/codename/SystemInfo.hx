@@ -26,6 +26,7 @@ using StringTools;
 @:headerInclude('sys/utsname.h')
 #end
 #end
+@:nullSafety(Off)
 class SystemInfo extends FramerateCategory
 {
 	public static var osInfo:String = "Unknown";

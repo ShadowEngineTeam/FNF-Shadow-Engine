@@ -15,6 +15,7 @@ typedef NoteSplashConfig =
 	offsets:Array<Array<Float>>
 }
 
+@:nullSafety(Off)
 class NoteSplash extends FlxSprite
 {
 	public var colorSwap:ColorSwap = null;

@@ -94,6 +94,7 @@ double MemoryCounter_obj::native_getMemory()
     static double native_getMemory();
 ')
 #end
+@:nullSafety
 class MemoryCounter extends Sprite
 {
 	public var memLabel:TextField;

@@ -22,6 +22,7 @@ typedef DialogueLine =
 }
 
 // TO DO: Clean code? Maybe? idk
+@:nullSafety(Off)
 class DialogueBoxPsych extends FlxSpriteGroup
 {
 	public static var DEFAULT_TEXT_X = 175;

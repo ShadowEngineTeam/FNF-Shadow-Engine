@@ -12,6 +12,7 @@ import openfl.geom.Point;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 
+@:nullSafety(Off)
 class Framerate extends Sprite
 {
 	public static var instance:Framerate;

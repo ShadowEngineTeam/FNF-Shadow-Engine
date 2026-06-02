@@ -1,5 +1,6 @@
 package objects;
 
+@:nullSafety(Off)
 class AttachedSprite extends FlxSprite
 {
 	public var sprTracker:FlxSprite;

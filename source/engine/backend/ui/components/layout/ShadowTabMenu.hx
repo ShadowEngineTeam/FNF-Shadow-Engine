@@ -15,6 +15,7 @@ typedef TabDef =
 	var label:String;
 }
 
+@:nullSafety(Off)
 class ShadowTabMenu extends FlxSpriteGroup
 {
 	public var selectedTab(get, set):Int;

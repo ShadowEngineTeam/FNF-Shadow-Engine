@@ -11,6 +11,7 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
+@:nullSafety(Off)
 class OptionsState extends MusicBeatState
 {
 	var options:Array<String> = [

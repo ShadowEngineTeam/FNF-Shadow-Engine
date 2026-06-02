@@ -9,6 +9,7 @@ import haxe.io.Path;
 /**
  * A static engine functions and global objects instances holder.
  */
+@:nullSafety
 class Funkin
 {
 	public static var controls(get, never):Controls;

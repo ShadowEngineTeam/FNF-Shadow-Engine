@@ -1,5 +1,6 @@
 package objects;
 
+@:nullSafety
 class MenuItem extends FlxSprite
 {
 	public var targetY:Float = 0;

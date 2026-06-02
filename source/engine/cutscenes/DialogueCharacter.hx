@@ -22,6 +22,7 @@ typedef DialogueCharacterFile =
 	var scale:Float;
 }
 
+@:nullSafety(Off)
 class DialogueCharacter extends FlxSprite
 {
 	private static var IDLE_SUFFIX:String = '-IDLE';

@@ -7,6 +7,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import states.FreeplayState;
 import options.OptionsState;
 
+@:nullSafety(Off)
 class PauseSubState extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;

@@ -104,6 +104,7 @@ import states.TitleState;
 	public var showNoteTiming:Bool = false;
 }
 
+@:nullSafety(Off)
 class ClientPrefs
 {
 	public static var data:SaveVariables = {};

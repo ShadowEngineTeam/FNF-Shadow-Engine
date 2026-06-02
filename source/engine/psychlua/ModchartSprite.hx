@@ -1,5 +1,6 @@
 package psychlua;
 
+@:nullSafety(Off)
 class ModchartSprite extends FlxAnimate
 {
 	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();

@@ -6,6 +6,7 @@ import objects.NoteSplash;
 
 using StringTools;
 
+@:nullSafety(Off)
 class NoteSplashDebugState extends MusicBeatState
 {
 	var config:NoteSplashConfig;

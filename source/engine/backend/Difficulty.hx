@@ -1,5 +1,6 @@
 package backend;
 
+@:nullSafety(Off)
 class Difficulty
 {
 	public static var defaultList(default, never):Array<String> = ['Easy', 'Normal', 'Hard'];

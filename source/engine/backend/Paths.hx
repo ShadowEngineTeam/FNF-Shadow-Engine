@@ -13,6 +13,7 @@ import openfl.system.System;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
 
+@:nullSafety(Off)
 class Paths
 {
 	public static final IMAGE_EXT:String = "png";

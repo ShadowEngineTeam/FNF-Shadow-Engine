@@ -9,6 +9,7 @@ import states.FreeplayState;
  * Music player used for Freeplay
  */
 @:access(states.FreeplayState)
+@:nullSafety(Off)
 class MusicPlayer extends FlxGroup
 {
 	public var instance:FreeplayState;

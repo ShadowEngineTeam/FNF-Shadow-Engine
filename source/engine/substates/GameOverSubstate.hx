@@ -7,6 +7,7 @@ import states.StoryMenuState;
 import states.FreeplayState;
 import lime.ui.Haptic;
 
+@:nullSafety(Off)
 class GameOverSubstate extends MusicBeatSubstate
 {
 	public var boyfriend:Character;

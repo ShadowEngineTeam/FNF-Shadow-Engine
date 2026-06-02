@@ -3,6 +3,7 @@ package backend.scripting;
 import backend.IMusicState;
 import flixel.FlxG;
 
+@:nullSafety
 class ScriptSignalCalls
 {
 	public static var initialized:Bool = false;

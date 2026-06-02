@@ -18,6 +18,7 @@ typedef LuaTweenOptions =
 	ease:EaseFunction
 }
 
+@:nullSafety(Off)
 class LuaUtils
 {
 	public static final Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";

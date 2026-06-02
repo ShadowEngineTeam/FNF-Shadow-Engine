@@ -9,6 +9,7 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety(Off)
 class ShadowSlider extends FlxSpriteGroup
 {
 	public var value(get, set):Float;

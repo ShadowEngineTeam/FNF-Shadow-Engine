@@ -1,6 +1,7 @@
 // for results screen I have no fucking idea
 package objects;
 
+@:nullSafety
 class Ana
 {
 	public var hitTime:Float;

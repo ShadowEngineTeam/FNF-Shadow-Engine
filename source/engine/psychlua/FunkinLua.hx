@@ -30,6 +30,7 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import mobile.psychlua.Functions;
 
+@:nullSafety(Off)
 class FunkinLua
 {
 	private var game(get, never):Dynamic;

@@ -5,6 +5,7 @@ package macros;
 import haxe.macro.*;
 import haxe.macro.Expr;
 
+@:nullSafety
 class KeepMacro
 {
 	public static function keepClasses()

@@ -8,6 +8,7 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
+@:nullSafety(Off)
 class ShadowPanel extends FlxSpriteGroup
 {
 	public var bg:FlxSprite;

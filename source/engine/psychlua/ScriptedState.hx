@@ -1,6 +1,7 @@
 package psychlua;
 
 @:keep
+@:nullSafety(Off)
 class ScriptedState extends MusicBeatState
 {
 	public static var instance:ScriptedState;

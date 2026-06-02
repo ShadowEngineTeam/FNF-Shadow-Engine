@@ -10,6 +10,7 @@ import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
 
+@:nullSafety(Off)
 class NoteOffsetState extends MusicBeatState
 {
 	var stageDirectory:String = 'week1';

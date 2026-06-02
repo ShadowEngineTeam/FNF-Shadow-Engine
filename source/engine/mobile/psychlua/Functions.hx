@@ -10,6 +10,7 @@ import mobile.backend.TouchUtil;
  * ...
  * @author: Karim Akra and Homura Akemi (HomuHomu833)
  */
+@:nullSafety(Off)
 class MobileFunctions
 {
 	public static function implement(funk:FunkinLua)

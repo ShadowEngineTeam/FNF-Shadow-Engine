@@ -13,6 +13,7 @@ import states.editors.MasterEditorMenu;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.frames.FlxAtlasFrames;
 
+@:nullSafety(Off)
 class WeekEditorState extends MusicBeatState
 {
 	var txtWeekTitle:FlxText;

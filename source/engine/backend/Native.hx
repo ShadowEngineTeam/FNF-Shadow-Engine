@@ -20,6 +20,7 @@ package backend;
 #if cpp
 @:headerCode('#include <thread>')
 #end
+@:nullSafety
 class Native
 {
 	public static function disableErrorReporting():Void

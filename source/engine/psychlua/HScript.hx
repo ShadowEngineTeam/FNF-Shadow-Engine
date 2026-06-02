@@ -8,6 +8,7 @@ import psychlua.FunkinLua;
 import hscript.SScript;
 import hscript.SScript.FunctionCall;
 
+@:nullSafety(Off)
 class HScript extends SScript
 {
 	public var modFolder:String;

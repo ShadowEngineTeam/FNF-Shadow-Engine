@@ -10,6 +10,7 @@ import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 import flixel.math.FlxMath;
 
+@:nullSafety(Off)
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];

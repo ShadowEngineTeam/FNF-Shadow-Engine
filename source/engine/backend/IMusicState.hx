@@ -5,6 +5,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSave;
 import backend.rendering.PsychCamera;
 
+@:nullSafety
 interface IMusicState
 {
 	public var stateInstance:FlxState;

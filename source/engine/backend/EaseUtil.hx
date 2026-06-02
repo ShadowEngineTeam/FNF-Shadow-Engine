@@ -2,6 +2,7 @@
 
 package backend;
 
+@:nullSafety
 class EaseUtil
 {
 	public static inline function stepped(steps:Int):Float->Float

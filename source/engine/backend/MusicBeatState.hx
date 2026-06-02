@@ -6,6 +6,7 @@ import flixel.util.FlxSave;
 import backend.rendering.PsychCamera;
 import haxe.io.Path;
 
+@:nullSafety(Off)
 class MusicBeatState extends FlxTransitionableState implements IMusicState
 {
 	public var stateInstance:FlxState = null;

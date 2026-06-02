@@ -5,6 +5,7 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import objects.Character;
 
+@:nullSafety(Off)
 class ModSettingsSubState extends BaseOptionsMenu
 {
 	var save:Map<String, Dynamic> = new Map<String, Dynamic>();

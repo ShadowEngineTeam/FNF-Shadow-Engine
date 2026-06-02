@@ -1,5 +1,6 @@
 package backend.codename;
 
+@:nullSafety
 enum abstract RegistryHive(Int)
 {
 	var HKEY_CLASSES_ROOT = 0x80000000;

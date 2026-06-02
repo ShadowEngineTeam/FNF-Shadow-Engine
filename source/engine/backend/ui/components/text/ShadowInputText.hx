@@ -16,6 +16,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Rectangle;
 import backend.ui.components.controls.ShadowDropdown;
 
+@:nullSafety(Off)
 class ShadowInputText extends FlxText
 {
 	public static inline var NO_FILTER:Int = 0;

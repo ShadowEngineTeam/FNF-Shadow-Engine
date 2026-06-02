@@ -29,6 +29,7 @@ using StringTools;
 #endif
 ')
 #end
+@:nullSafety(Off)
 final class MemoryUtil
 {
 	/**
