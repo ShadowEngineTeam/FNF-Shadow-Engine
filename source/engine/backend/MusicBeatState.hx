@@ -6,9 +6,10 @@ import flixel.util.FlxSave;
 import backend.rendering.PsychCamera;
 import haxe.io.Path;
 
-@:nullSafety(Off)
+@:nullSafety
 class MusicBeatState extends FlxTransitionableState implements IMusicState
 {
+	@:nullSafety(Off)
 	public var stateInstance:FlxState = null;
 
 	private var curSection:Int = 0;
@@ -40,8 +41,13 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
+	@:nullSafety(Off)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+
+	@:nullSafety(Off)
 	private var luaDebugCam:ShadowCamera;
+
+	@:nullSafety(Off)
 	private var currentClassName:String;
 	#end
 
@@ -296,7 +302,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		{
 			if (FlxG.cameras.list.contains(luaDebugCam))
 				FlxG.cameras.remove(luaDebugCam);
-			luaDebugCam = null;
+			luaDebugCam = cast null;
 		}
 		#end
 
@@ -471,7 +477,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	{
 		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
 
-		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
+		var shit = ((Conductor.songPosition - ClientPrefs.data.noteOffset) - lastChange.songTime) / (lastChange.stepCrochet ?? 0);
 		curDecStep = lastChange.stepTime + shit;
 		curStep = lastChange.stepTime + Math.floor(shit);
 	}
@@ -551,7 +557,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 				func(stage);
 	}
 
-	public function getBeatsOnSection()
+	public function getBeatsOnSection():Float
 	{
 		var val:Null<Float> = 4;
 		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null)
@@ -601,13 +607,13 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	{
 		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
-			return modchartSprites.get(tag);
+			return cast modchartSprites.get(tag);
 		if (text && modchartTexts.exists(tag))
-			return modchartTexts.get(tag);
+			return cast modchartTexts.get(tag);
 		if (variables.exists(tag))
-			return variables.get(tag);
+			return cast variables.get(tag);
 		#end
-		return null;
+		return cast null;
 	}
 
 	#if FEATURE_LUA
@@ -748,7 +754,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			if (len <= 0)
 				len = e.message.length;
 			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
-			var newScript:HScript = cast(SScript.global.get(file), HScript);
+			var newScript:HScript = cast SScript.global.get(file);
 			if (newScript != null)
 			{
 				newScript.destroy();
@@ -823,7 +829,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		return returnVal;
 	}
 
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = LuaUtils.Function_Continue;

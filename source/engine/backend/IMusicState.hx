@@ -93,7 +93,7 @@ interface IMusicState
 	public function stepHit():Void;
 	public function beatHit():Void;
 	public function sectionHit():Void;
-	function getBeatsOnSection():Null<Float>;
+	function getBeatsOnSection():Float;
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
 	public function addTextToDebug(text:String, color:FlxColor):Void;
@@ -116,7 +116,7 @@ interface IMusicState
 	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 		excludeValues:Array<Dynamic> = null):Dynamic;
 
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 		excludeValues:Array<Dynamic> = null):Dynamic;
 
 	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void;
