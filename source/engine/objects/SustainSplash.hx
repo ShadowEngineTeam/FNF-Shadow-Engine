@@ -8,32 +8,45 @@ import shaders.PixelSplashShader.PixelSplashShaderRef;
 
 using backend.CoolUtil;
 
-@:nullSafety(Off)
+@:nullSafety
 class SustainSplash extends FlxSprite
 {
 	public static var DEFAULT_TEXTURE(get, never):String;
 
-	public static var startCrochet:Float;
-	public static var frameRate:Int;
+	public static var startCrochet:Float = 0;
+	public static var frameRate:Int = 0;
+
+	@:nullSafety(Off)
 	public static var mainGroup:FlxTypedGroup<SustainSplash>;
+
 	@:isVar
+	@:nullSafety(Off)
 	public static var texture(get, set):String = null;
 	public static var useRGBShader:Bool = true;
 	public static var usePixelTextures(default, set):Null<Bool>;
 	public static var noRGBTextures(default, null):Array<String> = [];
 
+	@:nullSafety(Off)
 	public static var playerTexture:String = null;
+
+	@:nullSafety(Off)
 	public static var opponentTexture:String = null;
 
+	@:nullSafety(Off)
 	public var strumNote(default, set):StrumNote;
-	public var noteData(default, null):Int;
-	public var targetStrumTime(default, null):Float;
+	public var noteData(default, null):Int = 0;
+	public var targetStrumTime(default, null):Float = 0;
 	public var mustPress(default, null):Bool = true;
+
+	@:nullSafety(Off)
 	public var colorSwap:ColorSwap;
 	public var rgbShaders(default, null):Array<Array<PixelSplashShaderRef>> = [[], []];
 
+	@:nullSafety(Off)
 	private var curTexture:String = null;
 	private var reachedEnd:Bool = false;
+
+	@:nullSafety(Off)
 	private var rgbShader:PixelSplashShaderRef;
 
 	public static function init(group:FlxTypedGroup<SustainSplash>, startCrochet:Float, frameRate:Int):Void
@@ -209,7 +222,7 @@ class SustainSplash extends FlxSprite
 
 				rgbShader = rgbShaders[shaderID][noteData];
 				shader = rgbShader.shader;
-				rgbShader.copyValues(useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null);
+				rgbShader.copyValues(cast (useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null));
 			}
 		}
 	}
@@ -302,7 +315,7 @@ class SustainSplash extends FlxSprite
 
 		noteData = -1;
 		targetStrumTime = 0;
-		strumNote = null;
+		strumNote = cast null;
 		visible = false;
 	}
 

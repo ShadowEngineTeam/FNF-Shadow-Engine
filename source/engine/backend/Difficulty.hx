@@ -29,6 +29,12 @@ class Difficulty
 		if (week == null)
 			week = WeekData.getCurrentWeek();
 
+		if (week == null)
+		{
+			resetList();
+			return;
+		}
+
 		var diffStr:String = week.difficulties;
 		if (diffStr != null && diffStr.length > 0)
 		{

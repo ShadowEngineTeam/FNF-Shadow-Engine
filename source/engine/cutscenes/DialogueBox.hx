@@ -2,9 +2,10 @@ package cutscenes;
 
 import flixel.addons.text.FlxTypeText;
 
-@:nullSafety(Off)
+@:nullSafety
 class DialogueBox extends FlxSpriteGroup
 {
+	@:nullSafety(Off)
 	var box:FlxSprite;
 
 	var curCharacter:String = '';
@@ -12,18 +13,26 @@ class DialogueBox extends FlxSpriteGroup
 	var dialogueList:Array<String> = [];
 
 	// SECOND DIALOGUE FOR THE PIXEL SHIT INSTEAD???
+	@:nullSafety(Off)
 	var swagDialogue:FlxTypeText;
 
+	@:nullSafety(Off)
 	var dropText:FlxText;
 
-	public var finishThing:Void->Void;
-	public var nextDialogueThing:Void->Void = null;
-	public var skipDialogueThing:Void->Void = null;
+	public var finishThing:Null<Void->Void>;
+	public var nextDialogueThing:Null<Void->Void> = null;
+	public var skipDialogueThing:Null<Void->Void> = null;
 
+	@:nullSafety(Off)
 	var portraitLeft:FlxSprite;
+
+	@:nullSafety(Off)
 	var portraitRight:FlxSprite;
 
+	@:nullSafety(Off)
 	var handSelect:FlxSprite;
+
+	@:nullSafety(Off)
 	var bgFade:FlxSprite;
 
 	public function new(talkingRight:Bool = true, ?dialogueList:Array<String>)
@@ -51,7 +60,7 @@ class DialogueBox extends FlxSpriteGroup
 				hasDialog = false;
 		}
 
-		this.dialogueList = dialogueList;
+		this.dialogueList = dialogueList ?? [];
 
 		if (!hasDialog)
 			return;
@@ -170,7 +179,8 @@ class DialogueBox extends FlxSpriteGroup
 
 						new FlxTimer().start(1.5, function(tmr:FlxTimer)
 						{
-							finishThing();
+							if (finishThing != null)
+								finishThing();
 							kill();
 						});
 					}

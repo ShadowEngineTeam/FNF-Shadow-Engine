@@ -12,14 +12,21 @@ import openfl.geom.Point;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 
-@:nullSafety(Off)
+@:nullSafety
 class Framerate extends Sprite
 {
+	@:nullSafety(Off)
 	public static var instance:Framerate;
+
 	public static var isLoaded:Bool = false;
 
+	@:nullSafety(Off)
 	public static var textFormat:TextFormat;
+
+	@:nullSafety(Off)
 	public static var fpsCounter:FramerateCounter;
+
+	@:nullSafety(Off)
 	public static var memoryCounter:MemoryCounter;
 
 	public static var fontName:String = #if windows '${Sys.getEnv("windir")}\\Fonts\\consola.ttf' #else "_typewriter" #end;
@@ -53,6 +60,7 @@ class Framerate extends Sprite
 
 	public var categories:Array<FramerateCategory> = [];
 
+	@:nullSafety(Off)
 	@:isVar public static var __bitmap(get, null):BitmapData = null;
 
 	private static function get___bitmap():BitmapData
@@ -62,6 +70,7 @@ class Framerate extends Sprite
 		return __bitmap;
 	}
 
+	@:nullSafety(Off)
 	@:isVar public static var __accentBitmap(get, null):BitmapData = null;
 
 	private static function get___accentBitmap():BitmapData
@@ -71,6 +80,7 @@ class Framerate extends Sprite
 		return __accentBitmap;
 	}
 
+	@:nullSafety(Off)
 	@:isVar public static var __darkBitmap(get, null):BitmapData = null;
 
 	private static function get___darkBitmap():BitmapData
@@ -122,7 +132,7 @@ class Framerate extends Sprite
 
 	var dragging:Bool = false;
 	var dragBoard:Bool = false;
-	var dragCat:FramerateCategory = null;
+	var dragCat:Null<FramerateCategory> = null;
 	var dragStartLocal:Point = new Point();
 	var dragStartOffset:FlxPoint = new FlxPoint();
 
@@ -141,6 +151,12 @@ class Framerate extends Sprite
 		super();
 		if (instance != null)
 			throw "Cannot create another instance";
+
+		board = new Sprite();
+		panel = new Sprite();
+		bgSprite = new Bitmap(__bitmap);
+		borderSprite = new Bitmap(__accentBitmap);
+
 		instance = this;
 		textFormat = new TextFormat(fontName, 13, COLOR_FG);
 
@@ -165,20 +181,16 @@ class Framerate extends Sprite
 			}
 		});
 
-		board = new Sprite();
 		addChild(board);
 
 		// Panel chrome lives in an unscaled container so the drop shadow's blur
 		// isn't multiplied by the background bitmap's scale.
-		panel = new Sprite();
 		panel.filters = [panelShadow()];
 		board.addChild(panel);
 
-		bgSprite = new Bitmap(__bitmap);
 		bgSprite.alpha = 0.82;
 		panel.addChild(bgSprite);
 
-		borderSprite = new Bitmap(__accentBitmap);
 		borderSprite.alpha = 1;
 		panel.addChild(borderSprite);
 
