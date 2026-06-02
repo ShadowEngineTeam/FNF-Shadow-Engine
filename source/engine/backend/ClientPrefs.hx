@@ -104,7 +104,7 @@ import states.TitleState;
 	public var showNoteTiming:Bool = false;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class ClientPrefs
 {
 	public static var data:SaveVariables = {};
@@ -166,30 +166,38 @@ class ClientPrefs
 		'fullscreen' => [MobileInputID.NONE],
 		'fpsCounter' => [MobileInputID.NONE]
 	];
-	public static var defaultMobileBinds:Map<String, Array<MobileInputID>> = null;
+	public static var defaultMobileBinds:Null<Map<String, Array<MobileInputID>>> = null;
 	#end
-	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
-	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
+	public static var defaultKeys:Null<Map<String, Array<FlxKey>>> = null;
+	public static var defaultButtons:Null<Map<String, Array<FlxGamepadInputID>>> = null;
 
 	public static function resetKeys(controller:Null<Bool> = null) // Null = both, False = Keyboard, True = Controller
 	{
-		if (controller != true)
+		var dks = defaultKeys;
+		if (controller != true && dks != null)
 			for (key in keyBinds.keys())
-				if (defaultKeys.exists(key))
-					keyBinds.set(key, defaultKeys.get(key).copy());
+			{
+				var dk = dks.get(key);
+				if (dk != null)
+					keyBinds.set(key, dk.copy());
+			}
 
-		if (controller != false)
+		var dbs = defaultButtons;
+		if (controller != false && dbs != null)
 			for (button in gamepadBinds.keys())
-				if (defaultButtons.exists(button))
-					gamepadBinds.set(button, defaultButtons.get(button).copy());
+			{
+				var db = dbs.get(button);
+				if (db != null)
+					gamepadBinds.set(button, db.copy());
+			}
 	}
 
 	public static function clearInvalidKeys(key:String)
 	{
-		var keyBind:Array<FlxKey> = keyBinds.get(key);
-		var gamepadBind:Array<FlxGamepadInputID> = gamepadBinds.get(key);
+		var keyBind:Null<Array<FlxKey>> = keyBinds.get(key);
+		var gamepadBind:Null<Array<FlxGamepadInputID>> = gamepadBinds.get(key);
 		#if FEATURE_MOBILE_CONTROLS
-		var mobileBind:Array<MobileInputID> = mobileBinds.get(key);
+		var mobileBind:Null<Array<MobileInputID>> = mobileBinds.get(key);
 		while (mobileBind != null && mobileBind.contains(NONE))
 			mobileBind.remove(NONE);
 		#end
@@ -301,7 +309,7 @@ class ClientPrefs
 		}
 	}
 
-	inline public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic
+	inline public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, customDefaultValue:Bool = false):Dynamic
 	{
 		if (!customDefaultValue)
 			defaultValue = defaultData.gameplaySettings.get(name);
@@ -310,9 +318,9 @@ class ClientPrefs
 
 	public static function reloadVolumeKeys()
 	{
-		TitleState.muteKeys = keyBinds.get('volume_mute').copy();
-		TitleState.volumeDownKeys = keyBinds.get('volume_down').copy();
-		TitleState.volumeUpKeys = keyBinds.get('volume_up').copy();
+		TitleState.muteKeys = (keyBinds.get('volume_mute') ?? []).copy();
+		TitleState.volumeDownKeys = (keyBinds.get('volume_down') ?? []).copy();
+		TitleState.volumeUpKeys = (keyBinds.get('volume_up') ?? []).copy();
 		toggleVolumeKeys(true);
 	}
 
