@@ -3,16 +3,16 @@ package cutscenes;
 import flixel.FlxBasic;
 import flixel.util.FlxSort;
 
-@:nullSafety(Off)
+@:nullSafety
 class CutsceneHandler extends FlxBasic
 {
 	public var timedEvents:Array<Dynamic> = [];
-	public var finishCallback:Void->Void = null;
-	public var finishCallback2:Void->Void = null;
-	public var onStart:Void->Void = null;
+	public var finishCallback:Null<Void->Void> = null;
+	public var finishCallback2:Null<Void->Void> = null;
+	public var onStart:Null<Void->Void> = null;
 	public var endTime:Float = 0;
 	public var objects:Array<FlxSprite> = [];
-	public var music:String = null;
+	public var music:Null<String> = null;
 
 	public function new()
 	{
@@ -47,7 +47,8 @@ class CutsceneHandler extends FlxBasic
 		cutsceneTime += elapsed;
 		if (endTime <= cutsceneTime)
 		{
-			finishCallback();
+			if (finishCallback != null)
+				finishCallback();
 			if (finishCallback2 != null)
 				finishCallback2();
 

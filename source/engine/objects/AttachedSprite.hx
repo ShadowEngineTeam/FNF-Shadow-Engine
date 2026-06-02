@@ -1,9 +1,9 @@
 package objects;
 
-@:nullSafety(Off)
+@:nullSafety
 class AttachedSprite extends FlxSprite
 {
-	public var sprTracker:FlxSprite;
+	public var sprTracker:Null<FlxSprite>;
 	public var xAdd:Float = 0;
 	public var yAdd:Float = 0;
 	public var angleAdd:Float = 0;
@@ -13,12 +13,12 @@ class AttachedSprite extends FlxSprite
 	public var copyAlpha:Bool = true;
 	public var copyVisible:Bool = false;
 
-	public function new(?file:String = null, ?anim:String = null, ?library:String = null, ?loop:Bool = false)
+	public function new(?file:String = null, ?anim:String = null, ?library:String = null, loop:Bool = false)
 	{
 		super();
 		if (anim != null)
 		{
-			frames = Paths.getSparrowAtlas(file, library);
+			frames = Paths.getSparrowAtlas(cast file, library);
 			animation.addByPrefix('idle', anim, 24, loop);
 			animation.play('idle');
 		}

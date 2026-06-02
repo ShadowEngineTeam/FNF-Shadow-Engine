@@ -22,14 +22,14 @@ typedef DialogueCharacterFile =
 	var scale:Float;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class DialogueCharacter extends FlxSprite
 {
 	private static var IDLE_SUFFIX:String = '-IDLE';
 	public static var DEFAULT_CHARACTER:String = 'bf';
 	public static var DEFAULT_SCALE:Float = 0.7;
 
-	public var jsonFile:DialogueCharacterFile = null;
+	@:nullSafety(Off) public var jsonFile:DialogueCharacterFile = null;
 	public var dialogueAnimations:Map<String, DialogueAnimArray> = new Map<String, DialogueAnimArray>();
 
 	public var startingPos:Float = 0; // For center characters, it works as the starting Y, for everything else it works as starting X
@@ -69,7 +69,7 @@ class DialogueCharacter extends FlxSprite
 		if (!FileSystem.exists(path))
 			path = Paths.getSharedPath(defaultPath);
 
-		var rawJson:String = File.getContent(path);
+		var rawJson:String = File.getContent(path) ?? '';
 		jsonFile = cast Json.parse(rawJson, path);
 	}
 
@@ -89,7 +89,7 @@ class DialogueCharacter extends FlxSprite
 
 	public function playAnim(animName:String = null, playIdle:Bool = false)
 	{
-		var leAnim:String = animName;
+		var leAnim:String = animName ?? '';
 		if (animName == null || !dialogueAnimations.exists(animName)) // Anim is null, get a random animation
 		{
 			var arrayAnims:Array<String> = [];
@@ -103,18 +103,19 @@ class DialogueCharacter extends FlxSprite
 			}
 		}
 
-		if (dialogueAnimations.exists(leAnim)
-			&& (dialogueAnimations.get(leAnim).loop_name == null
-				|| dialogueAnimations.get(leAnim).loop_name.length < 1
-				|| dialogueAnimations.get(leAnim).loop_name == dialogueAnimations.get(leAnim).idle_name))
+		var leData:Null<DialogueAnimArray> = dialogueAnimations.get(leAnim);
+		if (leData != null
+			&& (leData.loop_name == null
+				|| leData.loop_name.length < 1
+				|| leData.loop_name == leData.idle_name))
 		{
 			playIdle = true;
 		}
 		animation.play(playIdle ? leAnim + IDLE_SUFFIX : leAnim, false);
 
-		if (dialogueAnimations.exists(leAnim))
+		var anim:Null<DialogueAnimArray> = dialogueAnimations.get(leAnim);
+		if (anim != null)
 		{
-			var anim:DialogueAnimArray = dialogueAnimations.get(leAnim);
 			if (playIdle)
 			{
 				offset.set(anim.idle_offsets[0], anim.idle_offsets[1]);

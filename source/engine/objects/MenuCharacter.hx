@@ -12,10 +12,10 @@ typedef MenuCharacterFile =
 	var flipX:Bool;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class MenuCharacter extends FlxSprite
 {
-	public var character:String;
+	public var character:String = '';
 	public var hasConfirmAnimation:Bool = false;
 
 	private static var DEFAULT_CHARACTER:String = 'bf';
@@ -61,7 +61,7 @@ class MenuCharacter extends FlxSprite
 				if (!FileSystem.exists(path))
 					path = Paths.getSharedPath(defaultPath);
 
-				var rawJson:String = File.getContent(path);
+				var rawJson:String = File.getContent(path) ?? '';
 
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson, path);
 				frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);

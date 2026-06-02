@@ -1,15 +1,15 @@
 package objects;
 
-@:nullSafety(Off)
+@:nullSafety
 class CheckboxThingie extends FlxSprite
 {
-	public var sprTracker:FlxSprite;
-	public var daValue(default, set):Bool;
+	public var sprTracker:Null<FlxSprite>;
+	@:nullSafety(Off) public var daValue(default, set):Bool;
 	public var copyAlpha:Bool = true;
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 
-	public function new(x:Float = 0, y:Float = 0, ?checked = false)
+	public function new(x:Float = 0, y:Float = 0, checked = false)
 	{
 		super(x, y);
 

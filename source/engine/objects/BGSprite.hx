@@ -1,11 +1,11 @@
 package objects;
 
-@:nullSafety(Off)
+@:nullSafety
 class BGSprite extends FlxSprite
 {
-	private var idleAnim:String;
+	private var idleAnim:Null<String>;
 
-	public function new(image:String, x:Float = 0, y:Float = 0, ?scrollX:Float = 1, ?scrollY:Float = 1, ?animArray:Array<String> = null, ?loop:Bool = false)
+	public function new(image:String, x:Float = 0, y:Float = 0, scrollX:Float = 1, scrollY:Float = 1, ?animArray:Array<String> = null, loop:Bool = false)
 	{
 		super(x, y);
 
