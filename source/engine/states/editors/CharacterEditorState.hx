@@ -337,7 +337,7 @@ class CharacterEditorState extends MusicBeatState
 			if (!character.isAnimationNull())
 			{
 				var myAnim = anims[curAnim];
-				if (!character.isAnimateAtlas)
+				if (!character.isAnimate)
 				{
 					ghost.loadGraphic(character.graphic);
 					ghost.frames.frames = character.frames.frames;
@@ -355,8 +355,9 @@ class CharacterEditorState extends MusicBeatState
 						animateGhost.active = false;
 					}
 
-					if (animateGhost == null || animateGhostImage != character.imageFile)
-						animateGhost.frames = Paths.getTextureAtlas(character.imageFile);
+					var ghostKey:String = character.imageFiles.join(',');
+					if (animateGhost == null || animateGhostImage != ghostKey)
+						animateGhost.frames = Paths.getMixedAtlas(character.imageFiles);
 
 					if (myAnim.indices != null && myAnim.indices.length > 0)
 						animateGhost.anim.addBySymbolIndices('anim', myAnim.name, myAnim.indices, 0, false);
@@ -366,10 +367,10 @@ class CharacterEditorState extends MusicBeatState
 					animateGhost.anim.play('anim', true, false, character.anim.curAnim.curFrame);
 					animateGhost.anim.pause();
 
-					animateGhostImage = character.imageFile;
+					animateGhostImage = ghostKey;
 				}
 
-				var spr:FlxSprite = character.spriteType == TEXTURE_ATLAS ? animateGhost : ghost;
+				var spr:FlxSprite = character.isAnimate ? animateGhost : ghost;
 				if (spr != null)
 				{
 					spr.setPosition(character.x, character.y);
@@ -535,6 +536,7 @@ class CharacterEditorState extends MusicBeatState
 	var animationIndicesInputText:ShadowTextInput;
 	var animationFramerate:ShadowStepper;
 	var animationLoopCheckBox:ShadowCheckbox;
+	var animationAnimateCheckBox:ShadowCheckbox;
 	var animationInfoLabel:ShadowLabel;
 
 	function addAnimationsUI()
@@ -577,6 +579,7 @@ class CharacterEditorState extends MusicBeatState
 		animationIndicesInputText = new ShadowTextInput(leftX, controlY3, fullW, "");
 		animationFramerate = new ShadowStepper(leftX, controlY4, 1, 24, 0, 240, 0, null, 70);
 		animationLoopCheckBox = new ShadowCheckbox(rightX, controlY4 + checkboxOffset, "Should it Loop?");
+		animationAnimateCheckBox = new ShadowCheckbox(rightX, controlY1 + checkboxOffset, "Force Animate Symbol");
 
 		animationDropDown = new ShadowDropdown(leftX, controlY0, [''], function(index:Int)
 		{
@@ -585,6 +588,7 @@ class CharacterEditorState extends MusicBeatState
 				return;
 			animationInputText.text = anim.anim;
 			animationFrameLabelCheckBox.checked = anim.isFrameLabel;
+			animationAnimateCheckBox.checked = anim.isAnimate == true;
 			animationNameInputText.text = anim.name;
 			animationLoopCheckBox.checked = anim.loop;
 			animationFramerate.value = anim.fps;
@@ -626,7 +630,9 @@ class CharacterEditorState extends MusicBeatState
 			addedAnim.loop = animationLoopCheckBox.checked;
 			addedAnim.indices = indices;
 			addedAnim.offsets = lastOffsets;
-			addAnimation(addedAnim.anim, addedAnim.name, addedAnim.fps, addedAnim.loop, addedAnim.indices, addedAnim.isFrameLabel);
+			if (animationAnimateCheckBox.checked)
+				addedAnim.isAnimate = true;
+			addAnimation(addedAnim.anim, addedAnim.name, addedAnim.fps, addedAnim.loop, addedAnim.indices, addedAnim.isFrameLabel, addedAnim.isAnimate);
 			character.animationsArray.push(addedAnim);
 
 			reloadAnimList();
@@ -675,6 +681,7 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(animationIndicesInputText);
 		tab_group.add(animationFramerate);
 		tab_group.add(animationLoopCheckBox);
+		tab_group.add(animationAnimateCheckBox);
 		tab_group.add(addUpdateButton);
 		tab_group.add(removeButton);
 		tab_group.add(animationDropDown);
@@ -736,14 +743,15 @@ class CharacterEditorState extends MusicBeatState
 		var colorStepperWidth:Int = 55;
 		var colorGap:Int = ShadowStyle.SPACING_SM;
 
-		imageInputText = new ShadowTextInput(leftX, controlY0, leftW, character.imageFile, function(text:String)
+		imageInputText = new ShadowTextInput(leftX, controlY0, leftW, character.imageFiles.join(', '), function(text:String)
 		{
-			character.imageFile = text;
+			character.imageFiles = parseImageInput(text);
+			character.imageFile = character.imageFiles.length > 0 ? character.imageFiles[0] : '';
 		});
 		var reloadImage:ShadowButton = new ShadowButton(rightX, controlY0, "Reload Image", function()
 		{
 			var lastAnim:String = character.getAnimationName();
-			character.imageFile = imageInputText.text;
+			character.imageFiles = parseImageInput(imageInputText.text);
 			reloadCharacterImage();
 			if (!character.isAnimationNull())
 			{
@@ -998,25 +1006,37 @@ class CharacterEditorState extends MusicBeatState
 		UI_help.add(closeText);
 	}
 
+	function parseImageInput(text:String):Array<String>
+	{
+		var result:Array<String> = [];
+		for (part in text.split(','))
+		{
+			var trimmed:String = part.trim();
+			if (trimmed.length > 0)
+				result.push(trimmed);
+		}
+		return result;
+	}
+
 	function reloadCharacterImage()
 	{
 		var lastAnim:String = character.getAnimationName();
 		var anims:Array<AnimArray> = character.animationsArray.copy();
 
-		character.isAnimateAtlas = false;
 		character.color = FlxColor.WHITE;
 		character.alpha = 1;
-		if (Paths.fileExists('images/' + character.imageFile + '/Animation.json', TEXT))
-		{
-			character.frames = Paths.getTextureAtlas(character.imageFile);
-			character.isAnimateAtlas = true;
-		}
-		else if (Paths.fileExists('images/' + character.imageFile + '.txt', TEXT))
-			character.frames = Paths.getPackerAtlas(character.imageFile);
-		else if (Paths.fileExists('images/' + character.imageFile + '.json', TEXT))
-			character.frames = Paths.getAsepriteAtlas(character.imageFile);
-		else
-			character.frames = Paths.getSparrowAtlas(character.imageFile);
+
+		if (character.imageFiles == null || character.imageFiles.length == 0)
+			character.imageFiles = [character.imageFile];
+
+		var newFrames = Paths.getMixedAtlas(character.imageFiles);
+		if (newFrames != null)
+			character.frames = newFrames;
+
+		character.isAnimateAtlas = (character.frames is FlxAnimateFrames);
+		character.isMultiAtlas = character.imageFiles.length > 1;
+		character.spriteType = character.isAnimateAtlas ? TEXTURE_ATLAS : (character.isMultiAtlas ? MULTI_ATLAS : SPRITE);
+		character.imageFile = character.imageFiles[0];
 
 		for (anim in anims)
 		{
@@ -1025,7 +1045,7 @@ class CharacterEditorState extends MusicBeatState
 			var animFps:Int = anim.fps;
 			var animLoop:Bool = !!anim.loop; // Bruh
 			var animIndices:Array<Int> = anim.indices;
-			addAnimation(animAnim, animName, animFps, animLoop, animIndices, anim.isFrameLabel);
+			addAnimation(animAnim, animName, animFps, animLoop, animIndices, anim.isFrameLabel == true, anim.isAnimate);
 		}
 
 		if (anims.length > 0)
@@ -1043,7 +1063,7 @@ class CharacterEditorState extends MusicBeatState
 			return;
 
 		check_player.checked = character.isPlayer;
-		imageInputText.text = character.imageFile;
+		imageInputText.text = character.imageFiles.join(', ');
 		healthIconInputText.text = character.healthIcon;
 		vocalsInputText.text = character.vocalsFile != null ? character.vocalsFile : '';
 		singDurationStepper.value = character.singDuration;
@@ -1539,32 +1559,18 @@ class CharacterEditorState extends MusicBeatState
 			|| name == 'gf';
 	}
 
-	function addAnimation(anim:String, name:String, fps:Float, loop:Bool, indices:Array<Int>, frameLabel:Bool = false)
+	function addAnimation(anim:String, name:String, fps:Float, loop:Bool, indices:Array<Int>, frameLabel:Bool = false, ?isAnimate:Null<Bool> = null)
 	{
-		if (!character.isAnimateAtlas)
-		{
-			if (indices != null && indices.length > 0)
-				character.animation.addByIndices(anim, name, indices, "", fps, loop);
-			else
-				character.animation.addByPrefix(anim, name, fps, loop);
-		}
-		else
-		{
-			if (frameLabel)
-			{
-				if (indices != null && indices.length > 0)
-					character.anim.addByFrameLabelIndices(anim, name, indices, fps, loop);
-				else
-					character.anim.addBySymbol(anim, name, fps, loop);
-			}
-			else
-			{
-				if (indices != null && indices.length > 0)
-					character.anim.addBySymbolIndices(anim, name, indices, fps, loop);
-				else
-					character.anim.addBySymbol(anim, name, fps, loop);
-			}
-		}
+		character.addAnimByType({
+			anim: anim,
+			name: name,
+			fps: Std.int(fps),
+			loop: loop,
+			indices: indices,
+			offsets: [0, 0],
+			isFrameLabel: frameLabel,
+			isAnimate: isAnimate
+		});
 
 		if (!character.animOffsets.exists(anim))
 			character.addOffset(anim, 0, 0);
@@ -1670,7 +1676,7 @@ class CharacterEditorState extends MusicBeatState
 
 		var json:Dynamic = {
 			"animations": character.animationsArray,
-			"image": character.imageFile,
+			"image": (character.imageFiles != null && character.imageFiles.length > 1) ? character.imageFiles : character.imageFile,
 			"scale": character.jsonScale,
 			"sing_duration": character.singDuration,
 			"healthicon": character.healthIcon,

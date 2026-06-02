@@ -82,6 +82,7 @@ import flixel.system.FlxAssets.FlxShader;
 
 // flixel-animate
 import animate.FlxAnimate;
+import animate.FlxAnimateFrames;
 
 // ShadowUI
 import backend.ui.ShadowStyle;

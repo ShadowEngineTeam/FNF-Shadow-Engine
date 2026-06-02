@@ -12,7 +12,6 @@ import openfl.utils.Assets;
 import openfl.system.System;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
-import animate.FlxAnimateFrames;
 
 class Paths
 {
@@ -553,6 +552,44 @@ class Paths
 		#end
 
 		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
+	}
+
+	public static function isTextureAtlas(key:String, ?library:String = null):Bool
+	{
+		return fileExists('images/$key/Animation.json', TEXT, false, library)
+			|| fileExists('images/$key/spritemap1.json', TEXT, false, library);
+	}
+
+	public static function getMixedAtlas(keys:Array<String>, ?library:String = null, ?settings:FlxAnimateSettings):FlxAtlasFrames
+	{
+		var atlases:Array<FlxAtlasFrames> = [];
+		for (key in keys)
+		{
+			var atlas:FlxAtlasFrames = isTextureAtlas(key, library) ? getTextureAtlas(key, library, settings) : getAtlas(key, library);
+			if (atlas != null)
+				atlases.push(atlas);
+		}
+
+		if (atlases.length == 0)
+			return null;
+		if (atlases.length == 1)
+			return atlases[0];
+
+		var base:FlxAtlasFrames = null;
+		for (atlas in atlases)
+			if (atlas is FlxAnimateFrames)
+			{
+				base = atlas;
+				break;
+			}
+		if (base == null)
+			base = atlases[0];
+
+		for (atlas in atlases)
+			if (atlas != base)
+				base.addAtlas(atlas);
+
+		return base;
 	}
 
 	public static function formatToSongPath(path:String):String
