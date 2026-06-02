@@ -8,11 +8,11 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowPanel extends FlxSpriteGroup
 {
 	public var bg:FlxSprite;
-	public var title(default, set):String;
+	public var title(default, set):Null<String>;
 	public var collapsed(default, set):Bool = false;
 	public var showMinimizeButton:Bool = true;
 
@@ -43,27 +43,28 @@ class ShadowPanel extends FlxSpriteGroup
 		_width = width;
 		_height = height;
 		_contentHeight = height - ShadowStyle.HEIGHT_HEADER;
-		this.title = title;
-
 		var fill = bgColor != null ? bgColor : ShadowStyle.BG_DARK;
 		var border = borderColor != null ? borderColor : ShadowStyle.BORDER_DARK;
 
 		headerBar = new FlxSprite();
+		titleText = new FlxText(ShadowStyle.SPACING_SM, 0, _width, title != null ? title : "");
+		minimizeBtn = new FlxSprite();
+		bg = new FlxSprite(0, ShadowStyle.HEIGHT_HEADER);
+
+		this.title = title;
+
 		drawHeaderBar();
 		add(headerBar);
 
-		titleText = new FlxText(ShadowStyle.SPACING_SM, 0, _width, title != null ? title : "");
 		titleText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, LEFT);
 		titleText.antialiasing = ShadowStyle.antialiasing;
 		titleText.y = (ShadowStyle.HEIGHT_HEADER - titleText.height) / 2;
 		add(titleText);
 
-		minimizeBtn = new FlxSprite();
 		drawMinimizeButton(false);
 		minimizeBtn.y = (ShadowStyle.HEIGHT_HEADER - ShadowStyle.SIZE_HEADER_BTN) / 2;
 		add(minimizeBtn);
 
-		bg = new FlxSprite(0, ShadowStyle.HEIGHT_HEADER);
 		drawBackground(fill, border);
 		add(bg);
 
@@ -159,7 +160,7 @@ class ShadowPanel extends FlxSpriteGroup
 		}
 	}
 
-	function set_title(value:String):String
+	function set_title(value:Null<String>):Null<String>
 	{
 		title = value;
 		if (titleText != null)

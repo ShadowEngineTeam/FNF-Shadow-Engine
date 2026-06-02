@@ -5,7 +5,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.mappings.FlxGamepadMapping;
 import flixel.input.keyboard.FlxKey;
 
-@:nullSafety(Off)
+@:nullSafety
 class Controls
 {
 	// Keeping same use cases on stuff for it to be easier to understand/use
@@ -144,38 +144,38 @@ class Controls
 
 	public function justPressed(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds[key]) == true);
+		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds[key] ?? []) == true);
 		if (result)
 			controllerMode = false;
 
 		return result
-			|| _myGamepadJustPressed(gamepadBinds[key]) == true
-			#if FEATURE_MOBILE_CONTROLS || mobileCJustPressed(mobileBinds[key]) == true
-			|| touchPadJustPressed(mobileBinds[key]) == true #end;
+			|| _myGamepadJustPressed(gamepadBinds[key] ?? []) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCJustPressed(mobileBinds[key] ?? []) == true
+			|| touchPadJustPressed(mobileBinds[key] ?? []) == true #end;
 	}
 
 	public function pressed(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds[key]) == true);
+		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds[key] ?? []) == true);
 		if (result)
 			controllerMode = false;
 
 		return result
-			|| _myGamepadPressed(gamepadBinds[key]) == true
-			#if FEATURE_MOBILE_CONTROLS || mobileCPressed(mobileBinds[key]) == true
-			|| touchPadPressed(mobileBinds[key]) == true #end;
+			|| _myGamepadPressed(gamepadBinds[key] ?? []) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCPressed(mobileBinds[key] ?? []) == true
+			|| touchPadPressed(mobileBinds[key] ?? []) == true #end;
 	}
 
 	public function justReleased(key:String)
 	{
-		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds[key]) == true);
+		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds[key] ?? []) == true);
 		if (result)
 			controllerMode = false;
 
 		return result
-			|| _myGamepadJustReleased(gamepadBinds[key]) == true
-			#if FEATURE_MOBILE_CONTROLS || mobileCJustReleased(mobileBinds[key]) == true
-			|| touchPadJustReleased(mobileBinds[key]) == true #end;
+			|| _myGamepadJustReleased(gamepadBinds[key] ?? []) == true
+			#if FEATURE_MOBILE_CONTROLS || mobileCJustReleased(mobileBinds[key] ?? []) == true
+			|| touchPadJustReleased(mobileBinds[key] ?? []) == true #end;
 	}
 
 	public var controllerMode:Bool = false;
@@ -317,7 +317,7 @@ class Controls
 	#end
 
 	// IGNORE THESE
-	public static var instance:Controls;
+	public static var instance:Controls = new Controls();
 
 	public function new()
 	{

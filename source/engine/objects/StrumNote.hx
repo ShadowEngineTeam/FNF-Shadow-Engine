@@ -7,11 +7,11 @@ import shaders.RGBPalette.RGBShaderReference;
 
 using backend.CoolUtil;
 
-@:nullSafety(Off)
+@:nullSafety
 class StrumNote extends FlxSkewedSprite
 {
-	public var colorSwap:ColorSwap = null;
-	public var rgbShader:RGBShaderReference;
+	public var colorSwap:Null<ColorSwap> = null;
+	public var rgbShader:Null<RGBShaderReference>;
 	public var resetAnim:Float = 0;
 
 	private var noteData:Int = 0;
@@ -22,9 +22,9 @@ class StrumNote extends FlxSkewedSprite
 
 	private var player:Int;
 
-	public var texture(default, set):String = null;
+	public var texture(default, set):Null<String> = null;
 
-	private function set_texture(value:String):String
+	private function set_texture(value:Null<String>):Null<String>
 	{
 		if (texture != value)
 		{
@@ -54,7 +54,9 @@ class StrumNote extends FlxSkewedSprite
 
 	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
 	{
-		if (ClientPrefs.data.disableRGBNotes) 
+		this.player = player;
+		this.noteData = leData;
+		if (ClientPrefs.data.disableRGBNotes)
 		{
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
@@ -103,16 +105,16 @@ class StrumNote extends FlxSkewedSprite
 
 	public function reloadNote()
 	{
-		var lastAnim:String = null;
+		var lastAnim:Null<String> = null;
 		if (animation.curAnim != null)
 			lastAnim = animation.curAnim.name;
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
-			loadGraphic(Paths.image('pixelUI/' + texture));
+			loadGraphic(Paths.image('pixelUI/' + (texture ?? '')));
 			width = width / 4;
 			height = height / 5;
-			loadGraphic(Paths.image('pixelUI/' + texture), true, Math.floor(width), Math.floor(height));
+			loadGraphic(Paths.image('pixelUI/' + (texture ?? '')), true, Math.floor(width), Math.floor(height));
 
 			antialiasing = false;
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
@@ -143,7 +145,7 @@ class StrumNote extends FlxSkewedSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas(texture);
+			frames = Paths.getSparrowAtlas(texture ?? '');
 			animation.addByPrefix('green', 'arrowUP');
 			animation.addByPrefix('blue', 'arrowDOWN');
 			animation.addByPrefix('purple', 'arrowLEFT');
@@ -211,7 +213,7 @@ class StrumNote extends FlxSkewedSprite
 			centerOffsets();
 			centerOrigin();
 		}
-		if (ClientPrefs.data.disableRGBNotes)
+		if (ClientPrefs.data.disableRGBNotes && colorSwap != null)
 		{
 			if (animation.curAnim == null || animation.curAnim.name == 'static')
 			{
@@ -235,7 +237,7 @@ class StrumNote extends FlxSkewedSprite
 				}
 			}
 		}
-		else if (useRGBShader)
+		else if (useRGBShader && rgbShader != null)
 			rgbShader.enabled = (animation.curAnim != null && animation.curAnim.name != 'static');
 	}
 

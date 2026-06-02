@@ -9,11 +9,11 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowStepper extends FlxSpriteGroup
 {
 	public var value(get, set):Float;
-	public var callback:Float->Void;
+	public var callback:Null<Float->Void>;
 
 	public var min:Float;
 	public var max:Float;
@@ -47,21 +47,22 @@ class ShadowStepper extends FlxSpriteGroup
 		_width = width;
 		_height = ShadowStyle.HEIGHT_INPUT;
 
+		var arrowHeight:Int = Std.int(_height / 2);
+		var textWidth:Int = _width - _arrowWidth - ShadowStyle.SPACING_XS * 2;
 		bg = new FlxSprite();
+		upArrow = new FlxSprite(_width - _arrowWidth, 0);
+		downArrow = new FlxSprite(_width - _arrowWidth, arrowHeight);
+		valueText = new FlxText(ShadowStyle.SPACING_XS, 0, textWidth, "");
+
 		drawBackground();
 		add(bg);
 
-		var arrowHeight:Int = Std.int(_height / 2);
-		upArrow = new FlxSprite(_width - _arrowWidth, 0);
 		drawUpArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(upArrow);
 
-		downArrow = new FlxSprite(_width - _arrowWidth, arrowHeight);
 		drawDownArrow(ShadowStyle.TEXT_SECONDARY, arrowHeight);
 		add(downArrow);
 
-		var textWidth:Int = _width - _arrowWidth - ShadowStyle.SPACING_XS * 2;
-		valueText = new FlxText(ShadowStyle.SPACING_XS, 0, textWidth, "");
 		valueText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY, CENTER);
 		valueText.antialiasing = ShadowStyle.antialiasing;
 		valueText.y = (_height - valueText.height) / 2;

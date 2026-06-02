@@ -23,9 +23,9 @@ class Funkin
 			return;
 		}
 
-		var nextStateInstance:FlxState = backend.scripting.ModsStateRedirect.redirectState(nextState, arguments ?? []);
+		var nextStateInstance:Null<FlxState> = backend.scripting.ModsStateRedirect.redirectState(nextState, arguments ?? []);
 
-		if (nextStateInstance == FlxG.state)
+		if (nextStateInstance == null || nextStateInstance == FlxG.state)
 		{
 			resetState();
 			return;
@@ -43,9 +43,10 @@ class Funkin
 		if (Funkin.controls != null)
 			Funkin.controls.isInSubstate = true;
 
-		var substateInstance:FlxSubState = backend.scripting.ModsStateRedirect.redirectSubstate(substate, arguments ?? []);
+		var substateInstance:Null<FlxSubState> = backend.scripting.ModsStateRedirect.redirectSubstate(substate, arguments ?? []);
 
-		state.openSubState(substateInstance);
+		if (substateInstance != null)
+			state.openSubState(substateInstance);
     }
 
 	public static function resetState()

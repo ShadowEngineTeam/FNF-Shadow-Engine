@@ -9,11 +9,11 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowSlider extends FlxSpriteGroup
 {
 	public var value(get, set):Float;
-	public var callback:Float->Void;
+	public var callback:Null<Float->Void>;
 
 	public var min:Float;
 	public var max:Float;
@@ -23,7 +23,7 @@ class ShadowSlider extends FlxSpriteGroup
 	var track:FlxSprite;
 	var fill:FlxSprite;
 	var thumb:FlxSprite;
-	var valueText:FlxText;
+	var valueText:Null<FlxText>;
 
 	var _width:Int;
 	var _height:Int;
@@ -49,14 +49,15 @@ class ShadowSlider extends FlxSpriteGroup
 
 		var trackY:Int = Std.int((_height - _trackHeight) / 2);
 		track = new FlxSprite(0, trackY);
+		fill = new FlxSprite(1, trackY + 1);
+		thumb = new FlxSprite(0, Std.int((_height - _thumbHeight) / 2));
+
 		drawTrack();
 		add(track);
 
-		fill = new FlxSprite(1, trackY + 1);
 		fill.makeGraphic(1, _trackHeight - 2, ShadowStyle.ACCENT, true);
 		add(fill);
 
-		thumb = new FlxSprite(0, Std.int((_height - _thumbHeight) / 2));
 		drawThumb(ShadowStyle.BG_LIGHT);
 		add(thumb);
 

@@ -9,11 +9,11 @@ import flixel.util.FlxColor;
 import backend.Paths;
 import backend.ui.ShadowStyle;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShadowCheckbox extends FlxSpriteGroup
 {
 	public var checked(get, set):Bool;
-	public var callback:Bool->Void;
+	public var callback:Null<Bool->Void>;
 	public var box:FlxSprite;
 	public var checkmark:FlxSprite;
 	public var label:FlxText;
@@ -30,15 +30,16 @@ class ShadowCheckbox extends FlxSpriteGroup
 		callback = onChange;
 
 		box = new FlxSprite();
+		checkmark = new FlxSprite();
+		label = new FlxText(_size + ShadowStyle.SPACING_SM, 0, 0, text);
+
 		drawBox(ShadowStyle.BORDER_DARK);
 		add(box);
 
-		checkmark = new FlxSprite();
 		drawCheckmark();
 		checkmark.visible = false;
 		add(checkmark);
 
-		label = new FlxText(_size + ShadowStyle.SPACING_SM, 0, 0, text);
 		label.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		label.antialiasing = ShadowStyle.antialiasing;
 		label.y = (_size - label.height) / 2;

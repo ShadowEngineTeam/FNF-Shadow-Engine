@@ -3,7 +3,7 @@ package backend.scripting;
 import psychlua.ScriptedState;
 import psychlua.ScriptedSubState;
 
-@:nullSafety(Off)
+@:nullSafety
 class ModsStateRedirect
 {
 	static var redirects:Map<String, String> = new Map<String, String>();
@@ -39,7 +39,7 @@ class ModsStateRedirect
 	{
 		try
 		{
-			var content:String = File.getContent(path);
+			var content:String = File.getContent(path) ?? '';
 			var lines:Array<String> = content.split('\n');
 			for (line in lines)
 			{
@@ -63,18 +63,18 @@ class ModsStateRedirect
 		}
 	}
 
-	public static function redirectState(state:Class<FlxState>, arguments:Array<Dynamic>):FlxState
+	public static function redirectState(state:Class<FlxState>, arguments:Array<Dynamic>):Null<FlxState>
 	{
 		if (state == null)
 			return null;
 		if (!loaded)
 			loadRedirects();
 
-		var className:String = getClassName(state);
+		var className:Null<String> = getClassName(state);
 		if (className == null)
 			return Type.createInstance(state, arguments);
 
-		var redirectTarget:String = redirects.get(className);
+		var redirectTarget:Null<String> = redirects.get(className);
 		if (redirectTarget != null && redirectTarget.length > 0)
 		{
 			// trace('State redirect: $className -> $redirectTarget');
@@ -84,18 +84,18 @@ class ModsStateRedirect
 		return Type.createInstance(state, arguments);
 	}
 
-	public static function redirectSubstate(subState:Class<FlxSubState>, arguments:Array<Dynamic>):FlxSubState
+	public static function redirectSubstate(subState:Class<FlxSubState>, arguments:Array<Dynamic>):Null<FlxSubState>
 	{
 		if (subState == null)
 			return null;
 		if (!loaded)
 			loadRedirects();
 
-		var className:String = getClassName(subState);
+		var className:Null<String> = getClassName(subState);
 		if (className == null)
 			return Type.createInstance(subState, arguments);
 
-		var redirectTarget:String = redirects.get(className);
+		var redirectTarget:Null<String> = redirects.get(className);
 		if (redirectTarget != null && redirectTarget.length > 0)
 		{
 			// trace('Substate redirect: $className -> $redirectTarget');

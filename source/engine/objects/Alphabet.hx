@@ -7,10 +7,10 @@ enum Alignment
 	RIGHT;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class Alphabet extends FlxSpriteGroup
 {
-	public var text(default, set):String;
+	public var text(default, set):String = "";
 
 	public var bold:Bool = false;
 	public var letters:Array<AlphaCharacter> = [];
@@ -28,7 +28,7 @@ class Alphabet extends FlxSpriteGroup
 	public var distancePerItem:FlxPoint = FlxPoint.get(20, 120);
 	public var startPosition:FlxPoint = FlxPoint.get(0, 0); // for the calculations
 
-	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true)
+	public function new(x:Float, y:Float, text:String = "", bold:Bool = true)
 	{
 		super(x, y);
 

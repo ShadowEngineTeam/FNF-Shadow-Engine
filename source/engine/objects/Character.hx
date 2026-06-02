@@ -48,7 +48,7 @@ enum CharacterSpriteType
 	TEXTURE_ATLAS;
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class Character extends FlxAnimate
 {
 	/**
@@ -95,7 +95,7 @@ class Character extends FlxAnimate
 
 	public var spriteType:CharacterSpriteType = SPRITE;
 
-	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
+	public function new(x:Float, y:Float, character:String = 'bf', isPlayer:Bool = false)
 	{
 		super(x, y);
 
@@ -120,7 +120,7 @@ class Character extends FlxAnimate
 
 				try
 				{
-					loadCharacterFile(Json.parse(File.getContent(path), path));
+					loadCharacterFile(Json.parse(File.getContent(path) ?? '', path));
 				}
 				catch (e:Dynamic)
 				{
@@ -336,7 +336,8 @@ class Character extends FlxAnimate
 		if (animOffsets.exists(AnimName))
 		{
 			var daOffset = animOffsets.get(AnimName);
-			offset.set(daOffset[0], daOffset[1]);
+			if (daOffset != null)
+				offset.set(daOffset[0], daOffset[1]);
 		}
 		// else offset.set(0, 0);
 
