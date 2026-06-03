@@ -255,8 +255,7 @@ class CharacterEditorState extends MusicBeatState
 		if (!reload && character.editorIsPlayer != null && isPlayer != character.editorIsPlayer)
 		{
 			character.isPlayer = !character.isPlayer;
-			character.baseFlipX = (character.originalFlipX != character.isPlayer);
-			character.flipX = character.baseFlipX;
+			character.flipX = (character.originalFlipX != character.isPlayer);
 			if (check_player != null)
 				check_player.checked = character.isPlayer;
 		}
@@ -453,8 +452,7 @@ class CharacterEditorState extends MusicBeatState
 		check_player = new ShadowCheckbox(leftX, controlY1 + checkboxOffset, "Playable Character", character.isPlayer, function(checked:Bool)
 		{
 			character.isPlayer = checked;
-			character.baseFlipX = (character.originalFlipX != character.isPlayer);
-			character.flipX = character.baseFlipX;
+			character.flipX = (character.originalFlipX != character.isPlayer);
 			updateCharacterPositions();
 			updatePointerPos(false);
 		});
@@ -802,8 +800,7 @@ class CharacterEditorState extends MusicBeatState
 			function(checked:Bool)
 			{
 				character.originalFlipX = checked;
-				character.baseFlipX = (character.originalFlipX != character.isPlayer);
-				character.flipX = character.baseFlipX;
+				character.flipX = (character.originalFlipX != character.isPlayer);
 			});
 
 		noAntialiasingCheckBox = new ShadowCheckbox(leftX + leftStepperWidth + colGap, controlY4 + checkboxOffset, "No Antialiasing",

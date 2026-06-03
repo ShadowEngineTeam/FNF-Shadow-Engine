@@ -96,12 +96,6 @@ class Character extends FlxAnimate
 	public var editorIsPlayer:Null<Bool> = null;
 	public var isAnimateAtlas:Bool = false;
 
-	public var baseFlipX:Bool = false;
-	public var baseFlipY:Bool = false;
-
-	public var animFlipX:Map<String, Bool>;
-	public var animFlipY:Map<String, Bool>;
-
 	public var spriteType:CharacterSpriteType = SPRITE;
 
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
@@ -109,8 +103,6 @@ class Character extends FlxAnimate
 		super(x, y);
 
 		animOffsets = new Map<String, Array<Dynamic>>();
-		animFlipX = new Map<String, Bool>();
-		animFlipY = new Map<String, Bool>();
 		curCharacter = character;
 		this.isPlayer = isPlayer;
 		switch (curCharacter)
@@ -188,10 +180,7 @@ class Character extends FlxAnimate
 		// data
 		healthIcon = json.healthicon;
 		singDuration = json.sing_duration;
-		baseFlipX = (json.flip_x != isPlayer);
-		baseFlipY = false;
-		flipX = baseFlipX;
-		flipY = baseFlipY;
+		flipX = (json.flip_x != isPlayer);
 		healthColorArray = (json.healthbar_colors != null && json.healthbar_colors.length > 2) ? json.healthbar_colors : [161, 161, 161];
 		vocalsFile = json.vocals_file != null ? json.vocals_file : '';
 		originalFlipX = (json.flip_x == true);
@@ -347,9 +336,6 @@ class Character extends FlxAnimate
 		specialAnim = false;
 		anim.play(AnimName, Force, Reversed, Frame);
 
-		flipX = baseFlipX != (animFlipX.exists(AnimName) ? animFlipX.get(AnimName) == true : false);
-		flipY = baseFlipY != (animFlipY.exists(AnimName) ? animFlipY.get(AnimName) == true : false);
-
 		if (animOffsets.exists(AnimName))
 		{
 			var daOffset = animOffsets.get(AnimName);
@@ -440,11 +426,6 @@ class Character extends FlxAnimate
 		var animLoop:Bool = !!anim.loop; // bruh?
 		var animIndices:Array<Int> = anim.indices;
 
-		if (anim.flipX != null)
-			animFlipX.set(animName, anim.flipX == true);
-		if (anim.flipY != null)
-			animFlipY.set(animName, anim.flipY == true);
-
 		var asAnimate:Bool;
 		if (anim.isAnimate != null)
 			asAnimate = (anim.isAnimate == true) && isAnimateAtlas;
@@ -478,6 +459,18 @@ class Character extends FlxAnimate
 				this.anim.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
 			else
 				this.anim.addByPrefix(animAnim, animName, animFps, animLoop);
+		}
+
+		if (anim.flipX != null || anim.flipY != null)
+		{
+			var theAnim = animation.getByName(animName);
+			if (theAnim != null)
+			{
+				if (anim.flipX != null)
+					theAnim.flipX = anim.flipX == true;
+				if (anim.flipY != null)
+					theAnim.flipY = anim.flipY == true;
+			}
 		}
 	}
 
