@@ -153,6 +153,80 @@ class Character extends FlxAnimate
 		scale.set(1, 1);
 		updateHitbox();
 
+		if (json.animations != null && json.animations.length > 0 && json.animations[0].prefix != null)
+		{
+			trace('V-Slice character JSON detected for character ' + curCharacter);
+
+			if (json.assetPath != null)
+			{
+				var cleanPath:String = json.assetPath;
+				if (cleanPath.startsWith('shared:'))
+					cleanPath = cleanPath.substring(7);
+
+				json.image = cleanPath;
+			}
+
+			if (json.flipX != null)
+				json.flip_x = json.flipX;
+			if (json.cameraOffsets != null)
+				json.camera_position = json.cameraOffsets;
+			if (json.singTime != null)
+				json.sing_duration = json.singTime;
+			if (json.isPixel != null)
+				json.no_antialiasing = json.isPixel;
+
+			if (json.healthIcon != null && json.healthIcon.id != null)
+				json.healthicon = json.healthIcon.id;
+
+			if (json.offsets != null)
+				json.position = json.offsets;
+
+			if (json.animations != null)
+			{
+				var anims:Array<Dynamic> = (json.animations : Array<Dynamic>);
+				var newAnims:Array<Dynamic> = new Array<Dynamic>();
+				var assetPaths:Array<String> = [];
+
+				for (a in anims)
+				{
+					var na:Dynamic = {
+						anim: (a.name != null && a.name != '') ? a.name : (a.anim != null ? a.anim : ''),
+						name: (a.prefix != null && a.prefix != '') ? a.prefix : (a.animation != null ? a.animation : ''),
+						fps: (a.frameRate != null) ? a.frameRate : (a.fps != null ? a.fps : 24),
+						loop: (a.looped != null) ? a.looped : (a.loop != null ? a.loop : false),
+						indices: (a.frameIndices != null) ? a.frameIndices : (a.indices != null ? a.indices : []),
+						offsets: (a.offsets != null) ? a.offsets : [0, 0]
+					};
+
+					if (a.assetPath != null)
+					{
+						var cleanPath:String = a.assetPath;
+						if (cleanPath.startsWith('shared:'))
+							cleanPath = cleanPath.substring(7);
+						if (assetPaths.indexOf(cleanPath) < 0)
+							assetPaths.push(cleanPath);
+					}
+
+					newAnims.push(na);
+				}
+
+				json.animations = newAnims;
+
+				if (assetPaths.length > 0)
+				{
+					var imgs:Array<String> = [];
+					if (json.image is String)
+						imgs.push(json.image);
+					else if (json.image != null)
+						imgs = imgs.concat(json.image);
+					for (p in assetPaths)
+						if (imgs.indexOf(p) < 0)
+							imgs.push(p);
+					json.image = imgs;
+				}
+			}
+		}
+
 		var images:Array<String>;
 		if (json.image is String)
 			images = [json.image];
