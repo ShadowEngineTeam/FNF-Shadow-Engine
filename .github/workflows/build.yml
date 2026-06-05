@@ -126,10 +126,10 @@ jobs:
             cd "$app"
             ldid -S "../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements" "${{ env.PROJECT_NAME }}"
             cd ..
-            rm -rf Payload
             mkdir Payload
             mv "$app" Payload
             zip -r "${{ env.PROJECT_NAME }}.ipa" Payload
+            rm -rf Payload
             cd ../../..
           done
 
