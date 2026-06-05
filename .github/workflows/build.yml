@@ -117,20 +117,14 @@ jobs:
         run: |
           brew install ldid
           for config in Debug-iphoneos Debug-iphonesimulator Release-iphoneos Release-iphonesimulator; do
-            dir="export/release/ios/build/$config"
-            [ -d "$dir" ] || dir="export/debug/ios/build/$config"
-            [ -d "$dir" ] || continue
-            cd "$dir"
-            app=$(find . -maxdepth 1 -name "*.app" -type d | head -1)
-            [ -z "$app" ] && continue
-            cd "$app"
-            ldid -S "../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements" "${{ env.PROJECT_NAME }}"
+            cd "export/release/ios/build/$config/${{ env.PROJECT_NAME }}.app"
+            ldid -S../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements ${{ env.PROJECT_NAME }}
             cd ..
             mkdir Payload
-            mv "$app" Payload
-            zip -r "${{ env.PROJECT_NAME }}.ipa" Payload
+            mv ${{ env.PROJECT_NAME }}.app Payload
+            zip -r ${{ env.PROJECT_NAME }}.ipa Payload
             rm -rf Payload
-            cd ../../..
+            cd ../../../../../..
           done
 
       - name: Upload Artifact
