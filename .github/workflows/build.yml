@@ -112,7 +112,7 @@ jobs:
           esac
 
       - name: Make IPA
-        if: ${{ inputs.name == 'iOS' }}
+        if: startsWith(inputs.name, 'iOS')
         run: |
           brew install ldid
           cd export/release/ios/build/Release-iphoneos/${{ env.PROJECT_NAME }}.app
