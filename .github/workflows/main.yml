@@ -64,6 +64,12 @@ jobs:
             assetType: ASTC
             artifactName: iOSBuild
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
+          - name: iOS (Simulator)
+            os: macos-15
+            buildArgs: "ios -simulator -nosign"
+            assetType: ASTC
+            artifactName: iOSSimulatorBuild
+            artifactPath: "export/release/ios/build/Release-iphonesimulator/*.ipa"
     secrets:
       SE_KEYSTORE_FILE: ${{ secrets.SE_KEYSTORE_FILE }}
       SE_KEYSTORE_INFO_FILE: ${{ secrets.SE_KEYSTORE_INFO_FILE }}
