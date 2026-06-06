@@ -68,11 +68,7 @@ class FunkinLua
 		// LuaL.dostring(lua, CLENSE);
 
 		// Luau performance tweaks
-		#if (ios && !simulator)
-		Luau.enableCodegen(0);
-		#else
 		Luau.enableCodegen(1);
-		#end
 		Luau.bytecodeCacheSetCapacity(256);
 		Luau.setCompileOptions(2, 1, 1);
 
