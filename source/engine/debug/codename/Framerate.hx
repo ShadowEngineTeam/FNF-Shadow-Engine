@@ -282,7 +282,7 @@ class Framerate extends Sprite
 		#elseif ios
 		for (camera in FlxG.cameras.list)
 		{
-			var pos = FlxG.mouse.getScreenPosition(camera);
+			var pos = FlxG.mouse.getViewPosition(camera);
 			if (pos.x >= FlxG.game.x + offset.x
 				&& pos.x <= FlxG.game.x + offset.x + 80
 				&& pos.y >= FlxG.game.y + offset.y
