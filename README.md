@@ -9,6 +9,8 @@
 
 # Friday Night Funkin' - Shadow Engine
 
+[![pi-apps badge](https://github.com/Botspot/pi-apps/blob/master/icons/badge.png?raw=true)](https://github.com/Botspot/pi-apps)
+
 "I’m Shadow, the Hedgehog. And now, I am the ultimate forkform." - Shadow the Hedgehog
 
 A highly modified Psych Engine 0.7.3.
