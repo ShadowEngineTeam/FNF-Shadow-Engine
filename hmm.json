@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "236af6f1d1fa43e9b1c5fccd0360b9d7ddee8d67",
+      "ref": "f8672398dde87a50d7380d4855bf297929ca0ca9",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "hxvlc",
       "type": "git",
-      "ref": "97eeb29e5bac4ce2c3370db9976b90ad6b690ea8",
+      "ref": "a7fad909ae7a21dcc0f70f98aab932a610e86884",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
