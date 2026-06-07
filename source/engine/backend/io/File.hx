@@ -181,7 +181,7 @@ class File
 		#end
 	}
 
-	#if (linux && FEATURE_MODS)
+	#if ((linux || ios) && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
 	{
 		if (SysFileSystem.exists(path))

@@ -226,7 +226,7 @@ class FileSystem
 		return results.map(f -> f.substr(f.lastIndexOf("/") + 1));
 	}
 
-	#if (linux && FEATURE_MODS)
+	#if ((linux || ios) && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
 	{
 		if (SysFileSystem.exists(path))
