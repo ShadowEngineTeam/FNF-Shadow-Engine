@@ -8,13 +8,13 @@ import psychlua.FunkinLua;
 import hscript.SScript;
 import hscript.SScript.FunctionCall;
 
-@:nullSafety(Off)
+@:nullSafety
 class HScript extends SScript
 {
-	public var modFolder:String;
+	public var modFolder:Null<String>;
 
 	#if FEATURE_LUA
-	public var parentLua:FunkinLua;
+	public var parentLua:Null<FunkinLua>;
 
 	public static function initHaxeModule(parent:FunkinLua)
 	{
@@ -45,7 +45,7 @@ class HScript extends SScript
 	}
 	#end
 
-	public var origin:String;
+	public var origin:String = '';
 
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
 	{
@@ -85,7 +85,7 @@ class HScript extends SScript
 		//trace('hscript file loaded successfully: $origin (${Std.int(Date.now().getTime() - times)}ms)');
 	}
 
-	var varsToBring:Any = null;
+	var varsToBring:Null<Any> = null;
 
 	override function preset()
 	{
@@ -205,11 +205,15 @@ class HScript extends SScript
 		set('keyboardPressed', function(name:String) return Reflect.getProperty(FlxG.keys.pressed, name));
 		set('keyboardReleased', function(name:String) return Reflect.getProperty(FlxG.keys.justReleased, name));
 
-		set('anyGamepadJustPressed', function(name:String) return FlxG.gamepads.anyJustPressed(name));
-		set('anyGamepadPressed', function(name:String) FlxG.gamepads.anyPressed(name));
-		set('anyGamepadReleased', function(name:String) return FlxG.gamepads.anyJustReleased(name));
+		// FlxGamepadInputID's String conversion is nullable and inlined into these calls, which can't be guarded in user code
+		@:nullSafety(Off)
+		{
+			set('anyGamepadJustPressed', function(name:String) return FlxG.gamepads.anyJustPressed(name));
+			set('anyGamepadPressed', function(name:String) FlxG.gamepads.anyPressed(name));
+			set('anyGamepadReleased', function(name:String) return FlxG.gamepads.anyJustReleased(name));
+		}
 
-		set('gamepadAnalogX', function(id:Int, ?leftStick:Bool = true)
+		set('gamepadAnalogX', function(id:Int, leftStick:Bool = true)
 		{
 			var controller = FlxG.gamepads.getByID(id);
 			if (controller == null)
@@ -217,7 +221,7 @@ class HScript extends SScript
 
 			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
-		set('gamepadAnalogY', function(id:Int, ?leftStick:Bool = true)
+		set('gamepadAnalogY', function(id:Int, leftStick:Bool = true)
 		{
 			var controller = FlxG.gamepads.getByID(id);
 			if (controller == null)
@@ -326,14 +330,14 @@ class HScript extends SScript
 			if (funk == null)
 				funk = parentLua;
 
-			if (parentLua != null)
+			if (funk != null)
 				funk.addLocalCallback(name, func);
 			else
 				FunkinLua.luaTrace('createCallback ($name): 3rd argument is null', false, false, FlxColor.RED);
 		});
 		#end
 
-		set('addHaxeLibrary', function(libName:String, ?libPackage:String = '')
+		set('addHaxeLibrary', function(libName:String, libPackage:String = '')
 		{
 			try
 			{
@@ -405,7 +409,7 @@ class HScript extends SScript
 	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
 	{
 		if (funcToRun == null)
-			return null;
+			return cast null;
 
 		if (!exists(funcToRun))
 		{
@@ -414,7 +418,7 @@ class HScript extends SScript
 			#else
 			FunkinLua.getCurrentMusicState().addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
 			#end
-			return null;
+			return cast null;
 		}
 
 		final callValue = call(funcToRun, funcArgs);
@@ -428,20 +432,20 @@ class HScript extends SScript
 				if (parentLua != null)
 				{
 					FunkinLua.luaTrace('$origin: ${parentLua.lastCalledFunction} - $msg', false, false, FlxColor.RED);
-					return null;
+					return cast null;
 				}
 				#end
 				FunkinLua.getCurrentMusicState().addTextToDebug('$origin - $msg', FlxColor.RED);
 			}
-			return null;
+			return cast null;
 		}
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):FunctionCall
+	public function executeFunction(?funcToRun:String = null, ?funcArgs:Array<Dynamic>):FunctionCall
 	{
 		if (funcToRun == null)
-			return null;
+			return cast null;
 		return call(funcToRun, funcArgs);
 	}
 
@@ -461,7 +465,7 @@ class HScript extends SScript
 							|| LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 
 					final e = retVal.exceptions[0];
-					final calledFunc:String = if (funk.hscript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
+					final calledFunc:Null<String> = if (funk.hscript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
 					if (e != null)
 						FunkinLua.luaTrace(funk.hscript.origin + ":" + calledFunc + " - " + e, false, false, FlxColor.RED);
 					return null;
@@ -495,7 +499,7 @@ class HScript extends SScript
 			#end
 		});
 		// This function is unnecessary because import already exists in SScript as a native feature
-		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '')
+		funk.addLocalCallback("addHaxeLibrary", function(libName:String, libPackage:String = '')
 		{
 			var str:String = '';
 			if (libPackage.length > 0)
@@ -534,7 +538,7 @@ class HScript extends SScript
 
 	override public function destroy()
 	{
-		origin = null;
+		origin = '';
 		#if FEATURE_LUA parentLua = null; #end
 
 		super.destroy();
