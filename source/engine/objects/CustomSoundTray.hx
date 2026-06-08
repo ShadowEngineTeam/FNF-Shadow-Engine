@@ -49,9 +49,10 @@ class CustomSoundTray extends FlxSoundTray
 		removeChildren();
 
 		var bgPath:String = getImagePath('soundtray/volumebox');
-		if (FileSystem.exists(bgPath))
+		var bgBytes:Null<haxe.io.Bytes> = FileSystem.exists(bgPath) ? File.getBytes(bgPath) : null;
+		if (bgBytes != null)
 		{
-			bg.bitmapData = BitmapData.fromBytes(cast File.getBytes(bgPath));
+			bg.bitmapData = BitmapData.fromBytes(bgBytes);
 			bg.scaleX = graphicScale;
 			bg.scaleY = graphicScale;
 			bg.smoothing = true;
@@ -59,9 +60,10 @@ class CustomSoundTray extends FlxSoundTray
 		}
 
 		var backingPath:String = getImagePath('soundtray/bars_10');
-		if (FileSystem.exists(backingPath))
+		var backingBytes:Null<haxe.io.Bytes> = FileSystem.exists(backingPath) ? File.getBytes(backingPath) : null;
+		if (backingBytes != null)
 		{
-			backingBar.bitmapData = BitmapData.fromBytes(cast File.getBytes(backingPath));
+			backingBar.bitmapData = BitmapData.fromBytes(backingBytes);
 			backingBar.x = 9;
 			backingBar.y = 5;
 			backingBar.scaleX = graphicScale;
@@ -76,10 +78,11 @@ class CustomSoundTray extends FlxSoundTray
 		for (i in 1...11)
 		{
 			var barPath:String = getImagePath('soundtray/bars_' + i);
+			var barBytes:Null<haxe.io.Bytes> = FileSystem.exists(barPath) ? File.getBytes(barPath) : null;
 
-			if (FileSystem.exists(barPath))
+			if (barBytes != null)
 			{
-				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(cast File.getBytes(barPath)));
+				var bar:Bitmap = new Bitmap(BitmapData.fromBytes(barBytes));
 				bar.x = 9;
 				bar.y = 5;
 				bar.scaleX = graphicScale;

@@ -299,7 +299,9 @@ class Paths
 		}
 		else if (FileSystem.exists(file))
 		{
-			bitmap = BitmapData.fromBytes(cast File.getBytes(file));
+			var bytes:Null<haxe.io.Bytes> = File.getBytes(file);
+			if (bytes != null)
+				bitmap = BitmapData.fromBytes(bytes);
 		}
 		else
 		#end
@@ -320,7 +322,15 @@ class Paths
 					return cast currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
-					bitmap = #if html5 openfl.Assets.getBitmapData(file) #else BitmapData.fromBytes(cast File.getBytes(file)) #end;
+				{
+					#if html5
+					bitmap = openfl.Assets.getBitmapData(file);
+					#else
+					var bytes:Null<haxe.io.Bytes> = File.getBytes(file);
+					if (bytes != null)
+						bitmap = BitmapData.fromBytes(bytes);
+					#end
+				}
 
 				if (bitmap != null)
 					break;
@@ -351,7 +361,11 @@ class Paths
 		if (bitmap == null)
 		{
 			if (FileSystem.exists(file))
-				bitmap = BitmapData.fromBytes(cast File.getBytes(file));
+			{
+				var bytes:Null<haxe.io.Bytes> = File.getBytes(file);
+				if (bytes != null)
+					bitmap = BitmapData.fromBytes(bytes);
+			}
 
 			if (bitmap == null)
 				return cast null;
@@ -453,7 +467,15 @@ class Paths
 				var retKey:String = (path != null) ? '$path/$key' : key;
 				retKey = getPath('$retKey.$ext', SOUND, library);
 				if (FileSystem.exists(retKey))
-					currentTrackedSounds.set(gottenPath, #if html5 openfl.Assets.getSound(retKey) #else Sound.fromBytes(cast File.getBytes(retKey)) #end);
+				{
+					#if html5
+					currentTrackedSounds.set(gottenPath, openfl.Assets.getSound(retKey));
+					#else
+					var bytes:Null<haxe.io.Bytes> = File.getBytes(retKey);
+					if (bytes != null)
+						currentTrackedSounds.set(gottenPath, Sound.fromBytes(bytes));
+					#end
+				}
 			}
 
 			if (currentTrackedSounds.exists(gottenPath))

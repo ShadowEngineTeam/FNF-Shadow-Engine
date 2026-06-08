@@ -539,7 +539,7 @@ class Character extends FlxAnimate
 
 		if (anim.flipX != null || anim.flipY != null)
 		{
-			var theAnim = animation.getByName(animName);
+			var theAnim:Null<flixel.animation.FlxAnimation> = animation.getByName(animName);
 			if (theAnim != null)
 			{
 				if (anim.flipX != null)
