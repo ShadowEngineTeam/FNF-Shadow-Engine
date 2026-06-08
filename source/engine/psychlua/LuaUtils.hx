@@ -18,7 +18,7 @@ typedef LuaTweenOptions =
 	ease:EaseFunction
 }
 
-@:nullSafety(Off)
+@:nullSafety
 class LuaUtils
 {
 	public static final Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";
@@ -134,7 +134,7 @@ class LuaUtils
 			{
 				if (settings == null)
 					settings = new Map<String, Dynamic>();
-				var data:String = File.getContent(path);
+				var data:String = File.getContent(path) ?? '';
 				try
 				{
 					// FunkinLua.luaTrace('getModSetting: Trying to find default value for "$saveTag" in Mod: "$modName"');
@@ -313,7 +313,7 @@ class LuaUtils
 		return Reflect.getProperty(leArray, variable);
 	}
 
-	public static function getPropertyLoop(split:Array<String>, ?checkForTextsToo:Bool = true, ?getProperty:Bool = true, ?allowMaps:Bool = false):Dynamic
+	public static function getPropertyLoop(split:Array<String>, ?checkForTextsToo:Bool = true, getProperty:Bool = true, ?allowMaps:Bool = false):Dynamic
 	{
 		var obj:Dynamic = getObjectDirectly(split[0], checkForTextsToo);
 		var end = split.length;
@@ -342,7 +342,7 @@ class LuaUtils
 
 	inline public static function getTextObject(name:String):FlxText
 	{
-		return #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
+		return cast #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
 		Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
 	}
 
@@ -395,7 +395,7 @@ class LuaUtils
 				var myIndices:Array<Int> = [];
 				for (i in 0...strIndices.length)
 				{
-					myIndices.push(Std.parseInt(strIndices[i]));
+					myIndices.push(Std.parseInt(strIndices[i]) ?? 0);
 				}
 				indices = myIndices;
 			}
@@ -435,12 +435,12 @@ class LuaUtils
 	public static function resetTextTag(tag:String)
 	{
 		#if FEATURE_LUA
-		if (!FunkinLua.getCurrentMusicState().modchartTexts.exists(tag))
+		var target:Null<FlxText> = FunkinLua.getCurrentMusicState().modchartTexts.get(tag);
+		if (target == null)
 		{
 			return;
 		}
 
-		var target:FlxText = cast(FunkinLua.getCurrentMusicState().modchartTexts.get(tag), FlxText);
 		FunkinLua.getCurrentMusicState().remove(target, true);
 		target.kill();
 		target.destroy();
@@ -451,12 +451,12 @@ class LuaUtils
 	public static function resetSpriteTag(tag:String)
 	{
 		#if FEATURE_LUA
-		if (!FunkinLua.getCurrentMusicState().modchartSprites.exists(tag))
+		var target:Null<ModchartSprite> = FunkinLua.getCurrentMusicState().modchartSprites.get(tag);
+		if (target == null)
 		{
 			return;
 		}
 
-		var target:ModchartSprite = cast(FunkinLua.getCurrentMusicState().modchartSprites.get(tag), ModchartSprite);
 		FunkinLua.getCurrentMusicState().remove(target, true);
 		target.kill();
 		target.destroy();
@@ -467,10 +467,11 @@ class LuaUtils
 	public static function cancelTween(tag:String)
 	{
 		#if FEATURE_LUA
-		if (FunkinLua.getCurrentMusicState().modchartTweens.exists(tag))
+		var theTween:Null<FlxTween> = FunkinLua.getCurrentMusicState().modchartTweens.get(tag);
+		if (theTween != null)
 		{
-			FunkinLua.getCurrentMusicState().modchartTweens.get(tag).cancel();
-			FunkinLua.getCurrentMusicState().modchartTweens.get(tag).destroy();
+			theTween.cancel();
+			theTween.destroy();
 			FunkinLua.getCurrentMusicState().modchartTweens.remove(tag);
 		}
 		#end
@@ -489,9 +490,9 @@ class LuaUtils
 	public static function cancelTimer(tag:String)
 	{
 		#if FEATURE_LUA
-		if (FunkinLua.getCurrentMusicState().modchartTimers.exists(tag))
+		var theTimer:Null<FlxTimer> = FunkinLua.getCurrentMusicState().modchartTimers.get(tag);
+		if (theTimer != null)
 		{
-			var theTimer:FlxTimer = cast(FunkinLua.getCurrentMusicState().modchartTimers.get(tag), FlxTimer);
 			theTimer.cancel();
 			theTimer.destroy();
 			FunkinLua.getCurrentMusicState().modchartTimers.remove(tag);
@@ -517,7 +518,7 @@ class LuaUtils
 	}
 
 	// buncho string stuffs
-	public static function getTweenTypeByString(?type:String = '')
+	public static function getTweenTypeByString(type:String = '')
 	{
 		switch (type.toLowerCase().trim())
 		{
@@ -533,7 +534,7 @@ class LuaUtils
 		return FlxTweenType.ONESHOT;
 	}
 
-	public static function getTweenEaseByString(?ease:String = '')
+	public static function getTweenEaseByString(ease:String = '')
 	{
 		switch (ease.toLowerCase().trim())
 		{
@@ -680,7 +681,7 @@ class LuaUtils
 	public static function cameraFromString(cam:String):FlxCamera
 	{
 		if (FunkinLua.getCurrentMusicState().modchartCameras.exists(cam))
-			return FunkinLua.getCurrentMusicState().modchartCameras.get(cam);
+			return cast FunkinLua.getCurrentMusicState().modchartCameras.get(cam);
 		else
 			return switch (cam.toLowerCase())
 			{
