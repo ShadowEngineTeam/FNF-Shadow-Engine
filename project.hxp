@@ -16,7 +16,8 @@ class Project extends HXProject
 	static var COLOR_ERROR = ESC + "[31m";
 
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
-	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
+	static final TITLE_ANDROID:String = "FNF: Shadow Engine";
+	static final TITLE_IOS:String = "FNF\u2002Shadow\u2002Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
 	static final VERSION:String = "0.9.0";
 	static final BUILD_NUMBER:Int = 771;
@@ -26,7 +27,7 @@ class Project extends HXProject
 
 	static var PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
-	static final LIBRARY_SHADOWS_LIST:Array<String> = ["compatibility", "gpu_textures"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["compatibility"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -175,9 +176,11 @@ class Project extends HXProject
 	function configureApp():Void
 	{
 		if (isIOS())
-			meta.title = ~/ /ig.replace(TITLE_MOBILE, "\u2002");
+			meta.title = TITLE_IOS;
+		else if (isAndroid())
+			meta.title = TITLE_ANDROID;
 		else
-			meta.title = isMobile() ? TITLE_MOBILE : TITLE;
+			meta.title = TITLE;
 		meta.version = VERSION;
 		meta.buildNumber = Std.string(BUILD_NUMBER);
 		meta.company = COMPANY;

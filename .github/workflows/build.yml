@@ -112,15 +112,23 @@ jobs:
           esac
 
       - name: Make IPA
-        if: ${{ inputs.name == 'iOS' }}
+        if: startsWith(inputs.name, 'iOS')
+        shell: bash
         run: |
           brew install ldid
-          cd export/release/ios/build/Release-iphoneos/${{ env.PROJECT_NAME }}.app
-          ldid -S../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements ${{ env.PROJECT_NAME }}
-          cd ..
-          mkdir Payload
-          mv ${{ env.PROJECT_NAME }}.app Payload
-          zip -r ${{ env.PROJECT_NAME }}.ipa Payload
+          for config in Debug-iphoneos Debug-iphonesimulator Release-iphoneos Release-iphonesimulator; do
+            if [ ! -d "export/release/ios/build/$config" ]; then
+              continue
+            fi
+            cd "export/release/ios/build/$config/${{ env.PROJECT_NAME }}.app"
+            ldid -S../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements ${{ env.PROJECT_NAME }}
+            cd ..
+            mkdir Payload
+            mv ${{ env.PROJECT_NAME }}.app Payload
+            zip -r ${{ env.PROJECT_NAME }}.ipa Payload
+            rm -rf Payload
+            cd ../../../../../..
+          done
 
       - name: Upload Artifact
         uses: actions/upload-artifact@main

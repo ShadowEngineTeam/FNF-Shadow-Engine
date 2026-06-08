@@ -89,6 +89,9 @@ class KeepMacro
 			for (inc in ["sys", "openfl.net"])
 				Compiler.include(inc, compathx4);
 		}
+
+		if (Context.defined("FEATURE_FUNKIN_CONTENT"))
+			Compiler.include("funkin.vis");
 	}
 }
 #end
