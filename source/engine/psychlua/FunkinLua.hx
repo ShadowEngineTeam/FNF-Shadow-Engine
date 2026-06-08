@@ -30,7 +30,7 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 import mobile.psychlua.Functions;
 
-@:nullSafety(Off)
+@:nullSafety
 class FunkinLua
 {
 	private var game(get, never):Dynamic;
@@ -39,16 +39,16 @@ class FunkinLua
 		return cast FunkinLua.getCurrentMusicState();
 
 	#if FEATURE_LUA
-	public var lua:State = null;
+	public var lua:Null<State> = null;
 	#end
 
-	public var camTarget:FlxCamera;
+	public var camTarget:Null<FlxCamera>;
 	public var scriptName:String = '';
-	public var modFolder:String = null;
+	public var modFolder:Null<String> = null;
 	public var closed:Bool = false;
 
 	#if FEATURE_HSCRIPT
-	public var hscript:HScript = null;
+	public var hscript:Null<HScript> = null;
 	#end
 
 	public var callbacks:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -350,7 +350,7 @@ class FunkinLua
 				PauseSubState.restartSong(skipTransition);
 				return true;
 			});
-			set("exitSong", function(?skipTransition:Bool = false)
+			set("exitSong", function(skipTransition:Bool = false)
 			{
 				if (skipTransition)
 				{
@@ -485,8 +485,8 @@ class FunkinLua
 
 				if (FileSystem.exists(path))
 				{
-					var shit:DialogueFile = DialogueBoxPsych.parseDialogue(path);
-					if (shit.dialogue.length > 0)
+					var shit:Null<DialogueFile> = DialogueBoxPsych.parseDialogue(path);
+					if (shit != null && shit.dialogue.length > 0)
 					{
 						cast(game, PlayState).startDialogue(shit, music);
 						luaTrace('startDialogue: Successfully loaded dialogue', false, false, FlxColor.GREEN);
@@ -698,7 +698,7 @@ class FunkinLua
 				{
 					var luaInstance:FunkinLua = cast _luaInstance;
 					final funk:FunkinLua = cast(luaInstance, FunkinLua);
-					if (funk.scriptName == foundScript)
+					if (funk.scriptName == foundScript && funk.lua != null && lua != null)
 					{
 						Lua.getglobal(funk.lua, global);
 						var value:Dynamic = Convert.fromLua(funk.lua, -1);
@@ -739,7 +739,7 @@ class FunkinLua
 		});
 		set("getVar", FunkinLua.getCurrentMusicState().variables.get);
 
-		set("addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) // would be dope asf.
+		set("addLuaScript", function(luaFile:String, ignoreAlreadyRunning:Bool = false) // would be dope asf.
 		{
 			#if FEATURE_LUA
 			FunkinLua.getCurrentMusicState().startLuasNamed(luaFile, function(file:String)
@@ -775,7 +775,7 @@ class FunkinLua
 			});
 			#end
 		});
-		set("addHScript", function(hscriptFile:String, ?ignoreAlreadyRunning:Bool = false)
+		set("addHScript", function(hscriptFile:String, ignoreAlreadyRunning:Bool = false)
 		{
 			#if FEATURE_HSCRIPT
 			FunkinLua.getCurrentMusicState().startHScriptsNamed(hscriptFile, function(file:String)
@@ -861,7 +861,7 @@ class FunkinLua
 			#end
 		});
 
-		set("loadSong", function(?name:String = null, ?difficultyNum:Int = -1)
+		set("loadSong", function(?name:String = null, difficultyNum:Int = -1)
 		{
 			if (name == null || name.length < 1)
 				name = PlayState.SONG.song;
@@ -1246,13 +1246,13 @@ class FunkinLua
 			leSprite.active = true;
 		});
 
-		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = "sparrow", swfMode:Bool = false, cacheOnLoad:Bool = false)
+		set("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, spriteType:String = "sparrow", swfMode:Bool = false, cacheOnLoad:Bool = false)
 		{
 			tag = tag.replace('.', '');
 			LuaUtils.resetSpriteTag(tag);
 			var leSprite:ModchartSprite = new ModchartSprite(x, y);
 
-			LuaUtils.loadFrames(leSprite, image, spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});
+			LuaUtils.loadFrames(leSprite, image ?? '', spriteType, {swfMode: swfMode, cacheOnLoad: cacheOnLoad});
 			game.modchartSprites.set(tag, leSprite);
 		});
 
@@ -1353,7 +1353,7 @@ class FunkinLua
 
 		set("addLuaSprite", function(tag:String, front:Bool = false)
 		{
-			var mySprite:FlxSprite = null;
+			var mySprite:Null<FlxSprite> = null;
 			if (game.modchartSprites.exists(tag))
 				mySprite = cast(game.modchartSprites.get(tag), FlxSprite);
 			else if (game.variables.exists(tag))
@@ -1571,7 +1571,7 @@ class FunkinLua
 				}
 			}
 
-			if (!objectsArray.contains(null) && FlxG.overlap(objectsArray[0], objectsArray[1]))
+			if (!cast(objectsArray, Array<Dynamic>).contains(null) && FlxG.overlap(objectsArray[0], objectsArray[1]))
 			{
 				return true;
 			}
@@ -1809,7 +1809,7 @@ class FunkinLua
 			var isString:Bool = !FileSystem.exists(scriptName);
 			var status:Int = 0;
 			if (!isString)
-				status = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
+				status = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName) ?? '');
 			else
 				status = LuaL.dostring(lua, scriptName);
 
@@ -1838,7 +1838,7 @@ class FunkinLua
 	// main
 	public var lastCalledFunction:String = '';
 
-	public static var lastCalledScript:FunkinLua = null;
+	public static var lastCalledScript:Null<FunkinLua> = null;
 
 	public function call(func:String, args:Array<Dynamic>):Dynamic
 	{
@@ -1874,7 +1874,7 @@ class FunkinLua
 			{
 				var errorStr:String;
 				final rawErr = Lua.tostring(lua, -1);
-				var error:String = rawErr != null ? rawErr.toString() : null;
+				var error:Null<String> = rawErr != null ? rawErr.toString() : null;
 				if (error != null)
 				{
 					LuaL.traceback(lua, lua, error, 2);
@@ -1986,7 +1986,7 @@ class FunkinLua
 			return false;
 
 		#if FEATURE_LUA
-		var lua:State = lastCalledScript.lua;
+		var lua:Null<State> = lastCalledScript.lua;
 		if (lua == null)
 			return false;
 
@@ -2028,14 +2028,16 @@ class FunkinLua
 				return sharedLuauPath;
 		}
 
-		return null;
+		return cast null;
 	}
 
 	public function getErrorMessage(status:Int):String
 	{
 		#if FEATURE_LUA
+		if (lua == null)
+			return '';
 		final rawV = Lua.tostring(lua, -1);
-		var v:String = rawV != null ? rawV.toString() : null;
+		var v:Null<String> = rawV != null ? rawV.toString() : null;
 		Lua.pop(lua, 1);
 
 		if (v != null)
@@ -2064,7 +2066,8 @@ class FunkinLua
 	{
 		#if FEATURE_LUA
 		callbacks.set(name, myFunction);
-		Convert.addCallback(lua, name, null); // just so that it gets called
+		if (lua != null)
+			Convert.addCallback(lua, name, null); // just so that it gets called
 		#end
 	}
 
@@ -2077,7 +2080,7 @@ class FunkinLua
 
 		if (runtimeShaders.exists(name))
 		{
-			var shaderData:Array<String> = runtimeShaders.get(name);
+			var shaderData:Null<Array<String>> = runtimeShaders.get(name);
 			if (shaderData != null && (shaderData[0] != null || shaderData[1] != null))
 			{
 				luaTrace('Shader $name was already initialized!');
@@ -2101,8 +2104,8 @@ class FunkinLua
 
 			var fragPath:String = folder + name + '.frag';
 			var vertPath:String = folder + name + '.vert';
-			var frag:String = null;
-			var vert:String = null;
+			var frag:Null<String> = null;
+			var vert:Null<String> = null;
 			var found:Bool = false;
 
 			if (FileSystem.exists(fragPath))
@@ -2119,7 +2122,7 @@ class FunkinLua
 
 			if (found)
 			{
-				runtimeShaders.set(name, [frag, vert]);
+				runtimeShaders.set(name, cast [frag, vert]);
 				// trace('Found shader $name!');
 				return true;
 			}
@@ -2140,7 +2143,7 @@ class FunkinLua
 		if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
 			return lastMusicState = cast(s.subState, MusicBeatSubstate);
 
-		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : null;
+		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : cast null;
 	}
 }
 

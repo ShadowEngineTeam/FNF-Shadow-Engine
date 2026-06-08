@@ -457,7 +457,11 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:FunctionCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				final hScript:Null<HScript> = funk.hscript;
+				if (hScript == null)
+					return null;
+
+				final retVal:FunctionCall = hScript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)
@@ -465,14 +469,14 @@ class HScript extends SScript
 							|| LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 
 					final e = retVal.exceptions[0];
-					final calledFunc:Null<String> = if (funk.hscript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
+					final calledFunc:Null<String> = if (hScript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
 					if (e != null)
-						FunkinLua.luaTrace(funk.hscript.origin + ":" + calledFunc + " - " + e, false, false, FlxColor.RED);
+						FunkinLua.luaTrace(hScript.origin + ":" + calledFunc + " - " + e, false, false, FlxColor.RED);
 					return null;
 				}
-				else if (funk.hscript.returnValue != null)
+				else if (hScript.returnValue != null)
 				{
-					return funk.hscript.returnValue;
+					return hScript.returnValue;
 				}
 				#else
 				FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
@@ -483,12 +487,16 @@ class HScript extends SScript
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null)
 		{
 			#if FEATURE_HSCRIPT
-			var callValue = funk.hscript.executeFunction(funcToRun, funcArgs);
+			final hScript:Null<HScript> = funk.hscript;
+			if (hScript == null)
+				return null;
+
+			var callValue = hScript.executeFunction(funcToRun, funcArgs);
 			if (!callValue.succeeded)
 			{
 				var e = callValue.exceptions[0];
 				if (e != null)
-					FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
+					FunkinLua.luaTrace('ERROR (${hScript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
 						false, FlxColor.RED);
 				return null;
 			}
