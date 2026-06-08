@@ -2066,6 +2066,8 @@ class PlayState extends MusicBeatState
 
 	function set_health(value:Float):Float
 	{
+		value = FlxMath.roundDecimal(value, 5); // Fix Float imprecision
+
 		if (healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
 		{
 			health = value;
