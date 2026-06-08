@@ -2064,9 +2064,12 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	var iconsAnimations:Bool = true;
+
 	function set_health(value:Float):Float
 	{
-		if (healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
+		value = FlxMath.roundDecimal(value, 5); // Fix Float imprecision
+		if (!iconsAnimations || healthBar == null || !healthBar.enabled || healthBar.valueFunction == null)
 		{
 			health = value;
 			return health;
@@ -2077,7 +2080,63 @@ class PlayState extends MusicBeatState
 		var newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max),
 			healthBar.bounds.min, healthBar.bounds.max, 0, 100);
 		healthBar.percent = (newPercent != null ? newPercent : 0);
+
+		updateIconAnimations();
 		return health;
+	}
+
+	public function updateIconAnimations():Void
+	{
+		if (!iconsAnimations || healthBar == null || !healthBar.enabled)
+			return;
+
+		final iconP1HasLoseIcon:Bool = (iconP1.animation.curAnim.frames.length >= 2);
+		final iconP1HasWinIcon:Bool = (iconP1.animation.curAnim.frames.length >= 3);
+		final iconP2HasLoseIcon:Bool = (iconP2.animation.curAnim.frames.length >= 2);
+		final iconP2HasWinIcon:Bool = (iconP2.animation.curAnim.frames.length >= 3);
+
+		inline function setFrameIfDifferent(icon:HealthIcon, frame:Int)
+		{
+			if (icon.animation.curAnim.curFrame != frame)
+				icon.animation.curAnim.curFrame = frame;
+		}
+
+		if (characterPlayingAsDad)
+		{
+			if (healthBar.percent > 80)
+			{
+				setFrameIfDifferent(iconP1, iconP1HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP2, iconP2HasWinIcon ? 2 : 0);
+			}
+			else if (healthBar.percent < 20)
+			{
+				setFrameIfDifferent(iconP2, iconP2HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP1, iconP1HasWinIcon ? 2 : 0);
+			}
+			else
+			{
+				setFrameIfDifferent(iconP1, 0);
+				setFrameIfDifferent(iconP2, 0);
+			}
+		}
+		else
+		{
+			if (healthBar.percent < 20)
+			{
+				setFrameIfDifferent(iconP1, iconP1HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP2, iconP2HasWinIcon ? 2 : 0);
+			}
+			else if (healthBar.percent > 80)
+			{
+				setFrameIfDifferent(iconP2, iconP2HasLoseIcon ? 1 : 0);
+				setFrameIfDifferent(iconP1, iconP1HasWinIcon ? 2 : 0);
+			}
+			else
+			{
+				setFrameIfDifferent(iconP2, 0);
+				setFrameIfDifferent(iconP1, 0);
+			}
+		}
 	}
 
 	function openPauseMenu()
@@ -2399,6 +2458,7 @@ class PlayState extends MusicBeatState
 							boyfriend = boyfriendMap.get(value2);
 							boyfriend.alpha = lastAlpha;
 							iconP1.changeIcon(boyfriend.healthIcon);
+							updateIconAnimations();
 						}
 						setOnScripts('boyfriendName', boyfriend.curCharacter);
 
@@ -2427,6 +2487,7 @@ class PlayState extends MusicBeatState
 							}
 							dad.alpha = lastAlpha;
 							iconP2.changeIcon(dad.healthIcon);
+							updateIconAnimations();
 						}
 						setOnScripts('dadName', dad.curCharacter);
 
