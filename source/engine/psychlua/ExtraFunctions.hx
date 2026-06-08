@@ -5,7 +5,7 @@ import flixel.util.FlxSave;
 import openfl.utils.Assets;
 
 // Things to trivialize some dumb stuff like splitting strings on older Lua
-@:nullSafety(Off)
+@:nullSafety
 class ExtraFunctions
 {
 	public static function implement(funk:FunkinLua)
@@ -24,11 +24,15 @@ class ExtraFunctions
 			return Reflect.getProperty(FlxG.keys.justReleased, name.toUpperCase());
 		});
 
-		funk.set("anyGamepadJustPressed", function(name:String) return FlxG.gamepads.anyJustPressed(name.toUpperCase()));
-		funk.set("anyGamepadPressed", function(name:String) return FlxG.gamepads.anyPressed(name.toUpperCase()));
-		funk.set("anyGamepadReleased", function(name:String) return FlxG.gamepads.anyJustReleased(name.toUpperCase()));
+		// FlxGamepadInputID's String conversion is nullable and inlined into these calls, which can't be guarded in user code
+		@:nullSafety(Off)
+		{
+			funk.set("anyGamepadJustPressed", function(name:String) return FlxG.gamepads.anyJustPressed(name.toUpperCase()));
+			funk.set("anyGamepadPressed", function(name:String) return FlxG.gamepads.anyPressed(name.toUpperCase()));
+			funk.set("anyGamepadReleased", function(name:String) return FlxG.gamepads.anyJustReleased(name.toUpperCase()));
+		}
 
-		funk.set("gamepadAnalogX", function(id:Int, ?leftStick:Bool = true)
+		funk.set("gamepadAnalogX", function(id:Int, leftStick:Bool = true)
 		{
 			var controller = FlxG.gamepads.getByID(id);
 			if (controller == null)
@@ -36,7 +40,7 @@ class ExtraFunctions
 
 			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
-		funk.set("gamepadAnalogY", function(id:Int, ?leftStick:Bool = true)
+		funk.set("gamepadAnalogY", function(id:Int, leftStick:Bool = true)
 		{
 			var controller = FlxG.gamepads.getByID(id);
 			if (controller == null)
@@ -139,18 +143,20 @@ class ExtraFunctions
 		});
 		funk.set("flushSaveData", function(name:String)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save:Null<FlxSave> = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				FunkinLua.getCurrentMusicState().modchartSaves.get(name).flush();
+				save.flush();
 				return;
 			}
 			FunkinLua.luaTrace('flushSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("getDataFromSave", function(name:String, field:String, ?defaultValue:Dynamic = null)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save:Null<FlxSave> = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				var saveData:FlxSave = cast(FunkinLua.getCurrentMusicState().modchartSaves.get(name), FlxSave).data;
+				var saveData:Dynamic = save.data;
 				if (Reflect.hasField(saveData, field))
 					return Reflect.field(saveData, field);
 				else
@@ -161,25 +167,27 @@ class ExtraFunctions
 		});
 		funk.set("setDataFromSave", function(name:String, field:String, value:Dynamic)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save:Null<FlxSave> = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				Reflect.setField(cast(FunkinLua.getCurrentMusicState().modchartSaves.get(name), FlxSave).data, field, value);
+				Reflect.setField(save.data, field, value);
 				return;
 			}
 			FunkinLua.luaTrace('setDataFromSave: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 		funk.set("eraseSaveData", function(name:String)
 		{
-			if (FunkinLua.getCurrentMusicState().modchartSaves.exists(name))
+			var save:Null<FlxSave> = FunkinLua.getCurrentMusicState().modchartSaves.get(name);
+			if (save != null)
 			{
-				FunkinLua.getCurrentMusicState().modchartSaves.get(name).erase();
+				save.erase();
 				return;
 			}
 			FunkinLua.luaTrace('eraseSaveData: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 
 		// File management
-		funk.set("checkFileExists", function(filename:String, ?absolute:Bool = false)
+		funk.set("checkFileExists", function(filename:String, absolute:Bool = false)
 		{
 			if (absolute)
 				return FileSystem.exists(filename);
@@ -193,7 +201,7 @@ class ExtraFunctions
 			var path = Paths.getPath('assets/$filename', TEXT);
 			return FileSystem.exists(path);
 		});
-		funk.set("saveFile", function(path:String, content:String, ?absolute:Bool = false)
+		funk.set("saveFile", function(path:String, content:String, absolute:Bool = false)
 		{
 			try
 			{
@@ -214,7 +222,7 @@ class ExtraFunctions
 			}
 			return false;
 		});
-		funk.set("deleteFile", function(path:String, ?ignoreModFolders:Bool = false)
+		funk.set("deleteFile", function(path:String, ignoreModFolders:Bool = false)
 		{
 			try
 			{
@@ -278,7 +286,7 @@ class ExtraFunctions
 			{
 				if (exclude == '')
 					break;
-				toExclude.push(Std.parseInt(excludeArray[i].trim()));
+				toExclude.push(Std.parseInt(excludeArray[i].trim()) ?? 0);
 			}
 			return FlxG.random.int(min, max, toExclude);
 		});

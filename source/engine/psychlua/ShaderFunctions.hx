@@ -3,7 +3,7 @@ package psychlua;
 import openfl.filters.ShaderFilter;
 import flixel.addons.display.FlxRuntimeShader;
 
-@:nullSafety(Off)
+@:nullSafety
 class ShaderFunctions
 {
 	private static var storedFilters:Map<String, ShaderFilter> = [];
@@ -33,7 +33,7 @@ class ShaderFunctions
 				return false;
 			}
 
-			var arr:Array<String> = funk.runtimeShaders.get(shader);
+			var arr:Array<String> = funk.runtimeShaders.get(shader) ?? [];
 			// Both FlxGame and FlxCamera has a _filters array and a setFilters function
 			// We should maybe make an interface for that?
 			var camera = getCam(cam);
@@ -92,7 +92,7 @@ class ShaderFunctions
 
 			if (leObj != null)
 			{
-				var arr:Array<String> = funk.runtimeShaders.get(shader);
+				var arr:Array<String> = funk.runtimeShaders.get(shader) ?? [];
 				leObj.shader = new FlxRuntimeShader(arr[0], arr[1]);
 				return true;
 			}
@@ -110,7 +110,7 @@ class ShaderFunctions
 
 			if (leObj != null)
 			{
-				leObj.shader = null;
+				leObj.shader = cast null;
 				return true;
 			}
 			return false;
@@ -269,11 +269,12 @@ class ShaderFunctions
 
 	public static function getShader(obj:String):FlxRuntimeShader
 	{
-		if (storedFilters.exists(obj))
-			return cast(storedFilters[obj].shader, FlxRuntimeShader);
+		var stored:Null<ShaderFilter> = storedFilters.get(obj);
+		if (stored != null)
+			return cast(stored.shader, FlxRuntimeShader);
 
 		var split:Array<String> = obj.split('.');
-		var target:FlxSprite = null;
+		var target:Null<FlxSprite> = null;
 		if (split.length > 1)
 			target = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 		else
@@ -282,7 +283,7 @@ class ShaderFunctions
 		if (target == null)
 		{
 			FunkinLua.luaTrace('Error on getting shader: Object $obj not found', false, false, FlxColor.RED);
-			return null;
+			return cast null;
 		}
 		return cast(target.shader, FlxRuntimeShader);
 	}

@@ -6,7 +6,7 @@ import substates.GameOverSubstate;
 
 // Functions that use a high amount of Reflections, which are somewhat CPU intensive
 // These functions are held together by duct tape
-@:nullSafety(Off)
+@:nullSafety
 class ReflectionFunctions
 {
 	static final instanceStr:Dynamic = "##PSYCHLUA_STRINGTOOBJ";
@@ -170,7 +170,7 @@ class ReflectionFunctions
 			}
 			return value;
 		});
-		funk.set("addToGroup", function(group:String, tag:String, ?index:Int = -1)
+		funk.set("addToGroup", function(group:String, tag:String, index:Int = -1)
 		{
 			var obj:FlxSprite = LuaUtils.getObjectDirectly(tag);
 			if (obj == null || obj.destroy == null)
@@ -255,7 +255,7 @@ class ReflectionFunctions
 				FunkinLua.luaTrace('createInstance: Variable $variableToSave is already being used and cannot be replaced!', false, false, FlxColor.RED);
 			return false;
 		});
-		funk.set("addInstance", function(objectName:String, ?inFront:Bool = false)
+		funk.set("addInstance", function(objectName:String, inFront:Bool = false)
 		{
 			if (FunkinLua.getCurrentMusicState().variables.exists(objectName))
 			{
@@ -282,8 +282,10 @@ class ReflectionFunctions
 		});
 	}
 
-	static function parseInstances(args:Array<Dynamic>)
+	static function parseInstances(args:Null<Array<Dynamic>>):Array<Dynamic>
 	{
+		if (args == null)
+			return [];
 		for (i in 0...args.length)
 		{
 			var myArg:String = cast args[i];
@@ -316,7 +318,7 @@ class ReflectionFunctions
 			args = [];
 
 		var split:Array<String> = funcStr.split('.');
-		var funcToRun:Function = null;
+		var funcToRun:Null<Function> = null;
 		var obj:Dynamic = classObj;
 		// trace('start: ' + obj);
 		if (obj == null)
