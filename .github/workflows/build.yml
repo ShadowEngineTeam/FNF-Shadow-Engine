@@ -121,7 +121,28 @@ jobs:
               continue
             fi
             cd "export/release/ios/build/$config/${{ env.PROJECT_NAME }}.app"
+            if [ -d Frameworks ]; then
+              for fw in Frameworks/*.framework; do
+                name=$(basename "$fw" .framework)
+                if [ -f "$fw/$name" ]; then
+                  ldid -S "$fw/$name"
+                fi
+              done
+            fi
             ldid -S../../../${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.entitlements ${{ env.PROJECT_NAME }}
+            if [ -d Frameworks ]; then
+              for fw in Frameworks/*.framework; do
+                name=$(basename "$fw" .framework)
+                if [ -f "$fw/$name" ]; then
+                  echo "== entitlements: $name =="
+                  ldid -e "$fw/$name"
+                  echo "========================="
+                fi
+              done
+            fi
+            echo "== entitlements: ${{ env.PROJECT_NAME }} =="
+            ldid -e ${{ env.PROJECT_NAME }}
+            echo "========================="
             cd ..
             mkdir Payload
             mv ${{ env.PROJECT_NAME }}.app Payload
