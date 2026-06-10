@@ -17,9 +17,10 @@ body:
     validations:
       required: false
 
-  - type: dropdown
+  - type: textarea
     id: target
     attributes:
       label: "What platfrom and platform version are you playing on?"
+      render: bash
     validations:
       required: true
