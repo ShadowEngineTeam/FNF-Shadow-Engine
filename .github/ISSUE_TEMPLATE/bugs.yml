@@ -10,22 +10,16 @@ body:
       required: true
 
   - type: textarea
-    id: terminal
+    id: logs
     attributes:
-      label: "Crash Log or logcat logs (if existing)"
+      label: "Crash Log or System Log (if existing)"
       render: bash
     validations:
       required: false
 
   - type: dropdown
-    id: btarget
+    id: target
     attributes:
-      label: "What platfrom are you playing on?"
-      options:
-        - "Windows"
-        - "Linux"
-        - "Mac"
-        - "Android"
-        - "iOS"
+      label: "What platfrom and platform version are you playing on?"
     validations:
       required: true
