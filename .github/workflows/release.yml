@@ -16,19 +16,19 @@ jobs:
       matrix:
         include:
           - name: Windows i686
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -final -32 -D HXCPP_M32 -D officialBuild"
             assetType: BC
             artifactName: windowsBuild-i686
             artifactPath: export\release\windows\bin\*
           - name: Windows x86_64
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -final -64 -D HXCPP_M64 -D officialBuild"
             assetType: BC
             artifactName: windowsBuild-x86_64
             artifactPath: export\release\windows\bin\*
           - name: Windows ARM64
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -final -arm64 -D HXCPP_ARM64 -D officialBuild"
             assetType: ASTC
             artifactName: windowsBuild-arm64
@@ -254,7 +254,7 @@ jobs:
           zip -r "/home/runner/${{ env.PROJECT_NAME }}-BC-windows-arm64.zip" .
 
       - name: Publish The Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3.0.0
         with:
           name: "0.9.0"
           tag_name: "0.9.0"

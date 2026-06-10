@@ -11,19 +11,19 @@ jobs:
       matrix:
         include:
           - name: Windows i686
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -32 -D HXCPP_M32"
             assetType: BC
             artifactName: windowsBuild-i686
             artifactPath: export\release\windows\bin\*
           - name: Windows x86_64
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -64 -D HXCPP_M64"
             assetType: BC
             artifactName: windowsBuild-x86_64
             artifactPath: export\release\windows\bin\*
           - name: Windows ARM64
-            os: windows-2025
+            os: windows-2025vs2026
             buildArgs: "windows -arm64 -D HXCPP_ARM64"
             assetType: ASTC
             artifactName: windowsBuild-arm64
