@@ -21,7 +21,7 @@ class OptionsState extends MusicBeatState
 		'Visuals and UI',
 		'Gameplay',
 		#if (mobile || FEATURE_MOBILE_CONTROLS)
-		'Mobile Options'
+		'Mobile'
 		#end
 	];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
@@ -58,8 +58,8 @@ class OptionsState extends MusicBeatState
 			case 'Adjust Delay and Combo':
 				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
-			case 'Mobile Options':
-				switchSubState(mobile.options.MobileOptionsSubState);
+			case 'Mobile':
+				switchSubState(mobile.options.MobileSettingsSubState);
 			#end
 		}
 	}
