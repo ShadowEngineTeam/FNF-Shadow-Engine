@@ -4,7 +4,7 @@ import flixel.input.keyboard.FlxKey;
 import options.BaseOptionsMenu;
 import options.Option;
 
-class MobileOptionsSubState extends BaseOptionsMenu
+class MobileSettingsSubState extends BaseOptionsMenu
 {
 	#if FEATURE_MOBILE_CONTROLS
 	final exControlTypes:Array<String> = ["NONE", "SINGLE", "DOUBLE"];
@@ -14,8 +14,8 @@ class MobileOptionsSubState extends BaseOptionsMenu
 
 	public function new()
 	{
-		title = 'Mobile Options';
-		rpcTitle = 'Mobile Options Menu'; // for Discord Rich Presence, fuck it
+		title = 'Mobile Settings';
+		rpcTitle = 'Mobile Settings Menu'; // for Discord Rich Presence, fuck it
 
 		#if FEATURE_MOBILE_CONTROLS
 		option = new Option('Extra Controls', 'Select how many extra buttons you prefer to have?\nThey can be used for mechanics with LUA or HScript.',
