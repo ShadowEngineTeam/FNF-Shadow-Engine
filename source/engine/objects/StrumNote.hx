@@ -7,23 +7,126 @@ import shaders.RGBPalette.RGBShaderReference;
 
 using backend.CoolUtil;
 
+/**
+ * One of the four (or more) static arrows that live at the top/bottom of the strumline.
+ *
+ * Animation layout is data-driven (see `SPARROW_DIRS` / `PIXEL_DIR_FRAMES`) so adding
+ * directions later only needs entries in those tables.
+**/
 class StrumNote extends FlxSkewedSprite
 {
+	// ─── Direction tables (drives reloadNote) ───────────────────────────────
+	// Index = noteData % 4, matching Note.colArray order.
+
+	static inline var SPARROW_FPS:Int = 24;
+	static inline var PIXEL_PRESSED_FPS:Int = 12;
+
+	// Sparrow atlas suffixes per direction
+	static final SPARROW_DIRS:Array<String> = ['left', 'down', 'up', 'right'];
+	static final SPARROW_STATIC:Array<String> = ['arrowLEFT', 'arrowDOWN', 'arrowUP', 'arrowRIGHT'];
+
+	// Generic color-name aliases that the engine relies on elsewhere
+	static final COLOR_TO_SPARROW:Array<{name:String, prefix:String}> = [
+		{name: 'purple', prefix: 'arrowLEFT'},
+		{name: 'blue',   prefix: 'arrowDOWN'},
+		{name: 'green',  prefix: 'arrowUP'},
+		{name: 'red',    prefix: 'arrowRIGHT'}
+	];
+
+	// Pixel sprite-sheet frame layout. For each noteData % 4:
+	// static, pressed, confirm, confirmFps (the original had case 2 at 12fps — preserved)
+	static final PIXEL_DIR_FRAMES:Array<{statics:Array<Int>, pressed:Array<Int>, confirm:Array<Int>, confirmFps:Int}> = [
+		{statics: [0], pressed: [4,  8], confirm: [12, 16], confirmFps: 24},
+		{statics: [1], pressed: [5,  9], confirm: [13, 17], confirmFps: 24},
+		{statics: [2], pressed: [6, 10], confirm: [14, 18], confirmFps: 12},
+		{statics: [3], pressed: [7, 11], confirm: [15, 19], confirmFps: 24}
+	];
+
+	// Generic single-frame color aliases on the pixel sheet
+	static final COLOR_TO_PIXEL_FRAME:Array<{name:String, frame:Int}> = [
+		{name: 'purple', frame: 4},
+		{name: 'blue',   frame: 5},
+		{name: 'green',  frame: 6},
+		{name: 'red',    frame: 7}
+	];
+
+	// ─── Public state ───────────────────────────────────────────────────────
 	public var colorSwap:ColorSwap = null;
 	public var rgbShader:RGBShaderReference;
 	public var resetAnim:Float = 0;
 
-	private var noteData:Int = 0;
-
 	public var direction:Float = 90; // plan on doing scroll directions soon -bb
-	public var downScroll:Bool = false; // plan on doing scroll directions soon -bb
+	public var downScroll:Bool = false;
 	public var sustainReduce:Bool = true;
 
-	private var player:Int;
-
+	public var useRGBShader:Bool = true;
 	public var texture(default, set):String = null;
 
-	private function set_texture(value:String):String
+	public static var _activeStrumNotes:Array<StrumNote> = [];
+	public static var usePixelTextures(default, set):Null<Bool>;
+
+	// ─── Private state ──────────────────────────────────────────────────────
+	var noteData:Int = 0;
+	var player:Int;
+
+	// ─── Construction ───────────────────────────────────────────────────────
+
+	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
+	{
+		super(x, y);
+
+		this.noteData = leData;
+		this.player = player;
+
+		_activeStrumNotes.push(this);
+
+		initShader(leData);
+		texture = resolveSkin(daTexture); // setter triggers reloadNote
+		scrollFactor.set();
+	}
+
+	function initShader(leData:Int):Void
+	{
+		if (ClientPrefs.data.disableRGBNotes)
+		{
+			colorSwap = new ColorSwap();
+			shader = colorSwap.shader;
+			return;
+		}
+
+		rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
+		rgbShader.enabled = false;
+
+		if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
+			useRGBShader = false;
+
+		final arr:Array<FlxColor> = isPixel ? ClientPrefs.data.arrowRGBPixel[leData] : ClientPrefs.data.arrowRGB[leData];
+		if (leData <= arr.length)
+		{
+			@:bypassAccessor
+			{
+				rgbShader.r = arr[0];
+				rgbShader.g = arr[1];
+				rgbShader.b = arr[2];
+			}
+		}
+	}
+
+	function resolveSkin(daTexture:String):String
+	{
+		final postfix:String = Note.getNoteSkinPostfix();
+		final base:String = (daTexture != null && daTexture.length > 1) ? daTexture : Note.defaultNoteSkin;
+		final customSkin:String = base + postfix;
+		final folder:String = isPixel ? 'pixelUI/' : '';
+
+		if (Paths.fileExists('images/$folder$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+			return customSkin;
+		return Note.defaultNoteSkin;
+	}
+
+	// ─── Setters ────────────────────────────────────────────────────────────
+
+	function set_texture(value:String):String
 	{
 		if (texture != value)
 		{
@@ -33,11 +136,7 @@ class StrumNote extends FlxSkewedSprite
 		return value;
 	}
 
-	public static var _activeStrumNotes:Array<StrumNote> = [];
-	
-	public static var usePixelTextures(default, set):Null<Bool>;
-
-	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
+	static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
 	{
 		if (usePixelTextures != value)
 		{
@@ -45,150 +144,75 @@ class StrumNote extends FlxSkewedSprite
 			for (note in _activeStrumNotes)
 				note.reloadNote();
 		}
-
 		return value;
 	}
 
-	public var useRGBShader:Bool = true;
+	// ─── Texture loading ────────────────────────────────────────────────────
 
-	public function new(x:Float, y:Float, leData:Int, player:Int, daTexture:String)
+	public function reloadNote():Void
 	{
-		if (ClientPrefs.data.disableRGBNotes) 
-		{
-			colorSwap = new ColorSwap();
-			shader = colorSwap.shader;
-		}
+		final lastAnim:String = (animation.curAnim != null) ? animation.curAnim.name : null;
+
+		if (isPixel)
+			loadPixelGraphics();
 		else
-		{
-			rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
-			rgbShader.enabled = false;
-			if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
-				useRGBShader = false;
+			loadSparrowGraphics();
 
-			var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[leData];
-			if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-				arr = ClientPrefs.data.arrowRGBPixel[leData];
-
-			if (leData <= arr.length)
-			{
-				@:bypassAccessor
-				{
-					rgbShader.r = arr[0];
-					rgbShader.g = arr[1];
-					rgbShader.b = arr[2];
-				}
-			}
-		}
-
-		noteData = leData;
-		this.player = player;
-		this.noteData = leData;
-		super(x, y);
-
-		_activeStrumNotes.push(this);
-
-		var skinPostfix:String = Note.getNoteSkinPostfix();
-		var skin:String = if (daTexture != null && daTexture.length > 1) daTexture else Note.defaultNoteSkin;
-		var customSkin:String = skin + skinPostfix;
-
-		if (Paths.fileExists('images/${PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : ''}$customSkin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
-			skin = customSkin;
-		else
-			skin = Note.defaultNoteSkin;
-
-		texture = skin; // Load texture and anims
-		scrollFactor.set();
-	}
-
-	public function reloadNote()
-	{
-		var lastAnim:String = null;
-		if (animation.curAnim != null)
-			lastAnim = animation.curAnim.name;
-
-		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-		{
-			loadGraphic(Paths.image('pixelUI/' + texture));
-			width = width / 4;
-			height = height / 5;
-			loadGraphic(Paths.image('pixelUI/' + texture), true, Math.floor(width), Math.floor(height));
-
-			antialiasing = false;
-			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-
-			animation.add('green', [6]);
-			animation.add('red', [7]);
-			animation.add('blue', [5]);
-			animation.add('purple', [4]);
-			switch (Math.abs(noteData) % 4)
-			{
-				case 0:
-					animation.add('static', [0]);
-					animation.add('pressed', [4, 8], 12, false);
-					animation.add('confirm', [12, 16], 24, false);
-				case 1:
-					animation.add('static', [1]);
-					animation.add('pressed', [5, 9], 12, false);
-					animation.add('confirm', [13, 17], 24, false);
-				case 2:
-					animation.add('static', [2]);
-					animation.add('pressed', [6, 10], 12, false);
-					animation.add('confirm', [14, 18], 12, false);
-				case 3:
-					animation.add('static', [3]);
-					animation.add('pressed', [7, 11], 12, false);
-					animation.add('confirm', [15, 19], 24, false);
-			}
-		}
-		else
-		{
-			frames = Paths.getSparrowAtlas(texture);
-			animation.addByPrefix('green', 'arrowUP');
-			animation.addByPrefix('blue', 'arrowDOWN');
-			animation.addByPrefix('purple', 'arrowLEFT');
-			animation.addByPrefix('red', 'arrowRIGHT');
-
-			antialiasing = ClientPrefs.data.antialiasing;
-			setGraphicSize(Std.int(width * 0.7));
-
-			switch (Math.abs(noteData) % 4)
-			{
-				case 0:
-					animation.addByPrefix('static', 'arrowLEFT');
-					animation.addByPrefix('pressed', 'left press', 24, false);
-					animation.addByPrefix('confirm', 'left confirm', 24, false);
-				case 1:
-					animation.addByPrefix('static', 'arrowDOWN');
-					animation.addByPrefix('pressed', 'down press', 24, false);
-					animation.addByPrefix('confirm', 'down confirm', 24, false);
-				case 2:
-					animation.addByPrefix('static', 'arrowUP');
-					animation.addByPrefix('pressed', 'up press', 24, false);
-					animation.addByPrefix('confirm', 'up confirm', 24, false);
-				case 3:
-					animation.addByPrefix('static', 'arrowRIGHT');
-					animation.addByPrefix('pressed', 'right press', 24, false);
-					animation.addByPrefix('confirm', 'right confirm', 24, false);
-			}
-		}
 		updateHitbox();
 
 		if (lastAnim != null)
-		{
 			playAnim(lastAnim, true);
-		}
 	}
 
-	public function postAddedToGroup()
+	function loadPixelGraphics():Void
+	{
+		// Two-pass load: the first call reads the source dimensions so we can
+		// figure out cell size for the second call.
+		loadGraphic(Paths.image('pixelUI/' + texture));
+		width = width / 4;
+		height = height / 5;
+		loadGraphic(Paths.image('pixelUI/' + texture), true, Math.floor(width), Math.floor(height));
+
+		antialiasing = false;
+		setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+
+		for (entry in COLOR_TO_PIXEL_FRAME)
+			animation.add(entry.name, [entry.frame]);
+
+		final dir = PIXEL_DIR_FRAMES[Std.int(Math.abs(noteData)) % 4];
+		animation.add('static',  dir.statics);
+		animation.add('pressed', dir.pressed, PIXEL_PRESSED_FPS, false);
+		animation.add('confirm', dir.confirm, dir.confirmFps, false);
+	}
+
+	function loadSparrowGraphics():Void
+	{
+		frames = Paths.getSparrowAtlas(texture);
+		antialiasing = ClientPrefs.data.antialiasing;
+		setGraphicSize(Std.int(width * 0.7));
+
+		for (entry in COLOR_TO_SPARROW)
+			animation.addByPrefix(entry.name, entry.prefix);
+
+		final dirIdx:Int = Std.int(Math.abs(noteData)) % 4;
+		final dirName:String = SPARROW_DIRS[dirIdx];
+		animation.addByPrefix('static',  SPARROW_STATIC[dirIdx]);
+		animation.addByPrefix('pressed', '$dirName press',   SPARROW_FPS, false);
+		animation.addByPrefix('confirm', '$dirName confirm', SPARROW_FPS, false);
+	}
+
+	// ─── Group / animation lifecycle ────────────────────────────────────────
+
+	public function postAddedToGroup():Void
 	{
 		playAnim('static');
 		x += Note.swagWidth * noteData;
 		x += 50;
-		x += ((FlxG.width / 2) * player);
+		x += (FlxG.width / 2) * player;
 		ID = noteData;
 	}
 
-	override function update(elapsed:Float)
+	override function update(elapsed:Float):Void
 	{
 		if (resetAnim > 0)
 		{
@@ -202,7 +226,7 @@ class StrumNote extends FlxSkewedSprite
 		super.update(elapsed);
 	}
 
-	public function playAnim(anim:String, ?force:Bool = false)
+	public function playAnim(anim:String, ?force:Bool = false):Void
 	{
 		animation.play(anim, force);
 		if (animation.curAnim != null)
@@ -210,32 +234,33 @@ class StrumNote extends FlxSkewedSprite
 			centerOffsets();
 			centerOrigin();
 		}
-		if (ClientPrefs.data.disableRGBNotes)
-		{
-			if (animation.curAnim == null || animation.curAnim.name == 'static')
-			{
-				colorSwap.hue = 0;
-				colorSwap.saturation = 0;
-				colorSwap.brightness = 0;
-			}
-			else
-			{
-				if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
-				{
-					colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
-					colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
-					colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
-				}
 
-				if (animation.curAnim != null)
-				{
-					if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage.priorityBool(usePixelTextures))
-						centerOrigin();
-				}
-			}
-		}
+		if (ClientPrefs.data.disableRGBNotes)
+			updateColorSwapForAnim();
 		else if (useRGBShader)
 			rgbShader.enabled = (animation.curAnim != null && animation.curAnim.name != 'static');
+	}
+
+	function updateColorSwapForAnim():Void
+	{
+		final cur = animation.curAnim;
+		if (cur == null || cur.name == 'static')
+		{
+			colorSwap.hue = 0;
+			colorSwap.saturation = 0;
+			colorSwap.brightness = 0;
+			return;
+		}
+
+		if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+		{
+			colorSwap.hue        = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+			colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+			colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+		}
+
+		if (cur.name == 'confirm' && !isPixel)
+			centerOrigin();
 	}
 
 	override function destroy():Void
@@ -243,4 +268,11 @@ class StrumNote extends FlxSkewedSprite
 		_activeStrumNotes.remove(this);
 		super.destroy();
 	}
+
+	// ─── Helpers ────────────────────────────────────────────────────────────
+
+	public var isPixel(get, never):Bool;
+
+	inline function get_isPixel():Bool
+		return PlayState.isPixelStage.priorityBool(usePixelTextures);
 }
