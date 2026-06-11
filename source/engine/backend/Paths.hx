@@ -335,14 +335,14 @@ class Paths
 
 		trace('Failed to load image: $file');
 
-		if (currentTrackedAssets.exists('__flixel_logo'))
+		if (currentTrackedAssets.exists('__no_texture'))
 		{
-			if (!localTrackedAssets.contains('__flixel_logo'))
-				localTrackedAssets.push('__flixel_logo');
-			return currentTrackedAssets.get('__flixel_logo');
+			if (!localTrackedAssets.contains('__no_texture'))
+				localTrackedAssets.push('__no_texture');
+			return currentTrackedAssets.get('__no_texture');
 		}
 
-		return cacheBitmap('__flixel_logo', FlxAssets.getBitmapFromClass(GraphicLogo));
+		return cacheBitmap('__no_texture', FlxAssets.getBitmapFromClass(NoTexture));
 	}
 
 	public static function cacheBitmap(file:String, ?bitmap:BitmapData = null):FlxGraphic
@@ -683,4 +683,9 @@ class Paths
 		return #if mobile Sys.getCwd() + #end 'mods/' + key;
 	}
 	#end
+}
+
+@:bitmap('assets/embed/images/no_texture.png')
+class NoTexture extends BitmapData
+{
 }
