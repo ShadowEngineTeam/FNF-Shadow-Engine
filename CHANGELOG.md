@@ -14,13 +14,10 @@
 - Fixed float imprecision
 - Improved cleaning memory
 - Added `startLuasNamed`
-- Added getCaseInsensitivePath for iOS
 - Added TITLE_IOS
 - Added iOS simulator building (main only)
 - Enabled hxdiscord_rpc IO thread
 - Updated hxluau, ShadowScript, lime, hxcpp refs
-- Updated build.yml, release.yml, main.yml
-- Include getCaseInsensitivePath for iOS
 - Updated gamemode config
 
 ## 0.9.0 — 2026-05-20

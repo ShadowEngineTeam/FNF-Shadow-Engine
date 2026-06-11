@@ -8,7 +8,7 @@ class StorageUtil
 {
 	#if sys
 	public static function getStorageDirectory():String
-		return #if android haxe.io.Path.addTrailingSlash(getAndroidStorageDirectory()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
+		return haxe.io.Path.addTrailingSlash(#if android getAndroidStorageDirectory() #elseif ios lime.system.System.documentsDirectory #end) #else Sys.getCwd() #end;
 
 	#if android
 	private static function getAndroidStorageDirectory():String
