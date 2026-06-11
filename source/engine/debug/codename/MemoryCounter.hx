@@ -57,33 +57,22 @@ double MemoryCounter_obj::native_getMemory()
         return isRunningUnderWine() ? (double)counters.PagefileUsage : (double)counters.PrivateUsage;
     return 0.0;
 #elif defined(__APPLE__) && defined(__MACH__)
-    struct task_vm_info vmInfo = {0};
+    task_vm_info_data_t vmInfo = {};
     mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
-    kern_return_t kr = task_info(mach_task_self(), TASK_VM_INFO,
-                                 (task_info_t)&vmInfo, &count);
-    if (kr != KERN_SUCCESS)
-        return 0.0;
-    const mach_msg_type_number_t kMinCount =
-        (mach_msg_type_number_t)(
-            (offsetof(task_vm_info_data_t, compressed) + sizeof(vmInfo.compressed))
-            / sizeof(natural_t));
-    if (count >= kMinCount)
-        return (double)(vmInfo.resident_size + vmInfo.compressed);
-    return (double)vmInfo.resident_size;
+    if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&vmInfo, &count) == KERN_SUCCESS)
+        return (double)vmInfo.phys_footprint;
+    return 0.0;
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
     FILE *fp = fopen("/proc/self/status", "r");
     if (!fp)
-		return 0.0;
+        return 0.0;
     char line[256];
-    unsigned long vmpriv = 0, vmrss = 0, vmswap = 0;
+    unsigned long vmrss = 0, vmswap = 0;
     while (fgets(line, sizeof(line), fp)) {
-        sscanf(line, "VmPrivate: %lu kB", &vmpriv);
-        sscanf(line, "VmRSS: %lu kB",     &vmrss);
-        sscanf(line, "VmSwap: %lu kB",    &vmswap);
+        sscanf(line, "VmRSS: %lu kB",  &vmrss);
+        sscanf(line, "VmSwap: %lu kB", &vmswap);
     }
     fclose(fp);
-    if (vmpriv > 0)
-        return (double)vmpriv * 1024.0;
     return (double)(vmrss + vmswap) * 1024.0;
 #else
     return 0.0;
