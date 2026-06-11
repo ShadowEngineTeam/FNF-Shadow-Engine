@@ -38,7 +38,7 @@ class File
 	public static function getContent(path:String):Null<String>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -60,7 +60,7 @@ class File
 	public static function getBytes(path:String):Null<haxe.io.Bytes>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -102,7 +102,7 @@ class File
 	public static function read(path:String, binary:Bool = true):Null<#if sys FileInput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -119,7 +119,7 @@ class File
 	public static function write(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -136,7 +136,7 @@ class File
 	public static function append(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -153,7 +153,7 @@ class File
 	public static function update(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualPath:String = cwd(path);
 		actualPath = getCaseInsensitivePath(path);
 		if (actualPath == null)
@@ -170,7 +170,7 @@ class File
 	public static function copy(srcPath:String, dstPath:String):Void
 	{
 		#if FEATURE_MODS
-		#if (linux || ios)
+		#if linux
 		var actualSrc:String = cwd(srcPath);
 		actualSrc = getCaseInsensitivePath(actualSrc);
 		if (actualSrc == null)
