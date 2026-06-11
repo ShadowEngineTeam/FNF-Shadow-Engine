@@ -896,10 +896,6 @@ class PlayState extends MusicBeatState
 				psychDialogue.finishThing = function()
 				{
 					psychDialogue = null;
-					persistentUpdate = false;
-					persistentDraw = true;
-					paused = true;
-					openSubState(new substates.ResultsScreen());
 					endSong();
 				}
 			}
@@ -2692,24 +2688,20 @@ class PlayState extends MusicBeatState
 		}
 
 		if (ClientPrefs.data.noteOffset <= 0 || ignoreNoteOffset)
-		{
-			persistentUpdate = false;
-			persistentDraw = true;
-			paused = true;
-			switchSubState(ResultsScreen);
-			// endCallback();
-		}
+			endCallback();
 		else
-		{
 			finishTimer = new FlxTimer().start(ClientPrefs.data.noteOffset / 1000, function(tmr:FlxTimer)
 			{
-				persistentUpdate = false;
-				persistentDraw = true;
-				paused = true;
-				switchSubState(ResultsScreen);
-				// endCallback();
+				endCallback();
 			});
-		}
+	}
+
+	public function showResults():Void
+	{
+		persistentUpdate = false;
+		persistentDraw = true;
+		paused = true;
+		switchSubState(ResultsScreen);
 	}
 
 	public var transitioning = false;
@@ -2771,62 +2763,67 @@ class PlayState extends MusicBeatState
 				return false;
 			}
 
-			if (isStoryMode)
+			transitioning = true;
+			showResults();
+		}
+		return true;
+	}
+
+	public function doTransitionAfterResults():Void
+	{
+		if (isStoryMode)
+		{
+			campaignScore += songScore;
+			campaignMisses += songMisses;
+
+			storyPlaylist.remove(storyPlaylist[0]);
+
+			if (storyPlaylist.length <= 0)
 			{
-				campaignScore += songScore;
-				campaignMisses += songMisses;
+				Mods.loadTopMod();
+				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 
-				storyPlaylist.remove(storyPlaylist[0]);
+				Funkin.switchState(StoryMenuState);
 
-				if (storyPlaylist.length <= 0)
+				if (!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay'))
 				{
-					Mods.loadTopMod();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'));
-					#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
+					StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
+					Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
 
-					Funkin.switchState(StoryMenuState);
-
-					if (!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay'))
-					{
-						StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
-						Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
-
-						FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
-						FlxG.save.flush();
-					}
-					changedDifficulty = false;
+					FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
+					FlxG.save.flush();
 				}
-				else
-				{
-					var difficulty:String = Difficulty.getFilePath();
-
-					trace('LOADING NEXT SONG');
-					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
-
-					FlxTransitionableState.skipNextTransIn = true;
-					FlxTransitionableState.skipNextTransOut = true;
-					prevCamFollow = camFollow;
-
-					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
-					FlxG.sound.music.stop();
-
-					LoadingState.prepareToSong();
-					LoadingState.loadAndSwitchState(PlayState, false, false);
-				}
+				changedDifficulty = false;
 			}
 			else
 			{
-				trace('WENT BACK TO FREEPLAY??');
-				Mods.loadTopMod();
-				#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
+				var difficulty:String = Difficulty.getFilePath();
 
-				Funkin.switchState(FreeplayState);
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
-				changedDifficulty = false;
+				trace('LOADING NEXT SONG');
+				trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
+
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				prevCamFollow = camFollow;
+
+				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
+				FlxG.sound.music.stop();
+
+				LoadingState.prepareToSong();
+				LoadingState.loadAndSwitchState(PlayState, false, false);
 			}
-			transitioning = true;
 		}
-		return true;
+		else
+		{
+			trace('WENT BACK TO FREEPLAY??');
+			Mods.loadTopMod();
+			#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
+
+			Funkin.switchState(FreeplayState);
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			changedDifficulty = false;
+		}
 	}
 
 	public function KillNotes()
