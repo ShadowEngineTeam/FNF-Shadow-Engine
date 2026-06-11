@@ -185,7 +185,7 @@ class ResultsScreen extends MusicBeatSubstate
 		if (Funkin.controls.ACCEPT)
 		{
 			music.stop();
-			PlayState.instance.endCallback();
+			PlayState.instance.doTransitionAfterResults();
 		}
 
 		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonB.justPressed || #end Funkin.controls.RESET)
