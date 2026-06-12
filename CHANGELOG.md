@@ -8,8 +8,7 @@
 - Added V-Slice character JSON detector
 - Fixed memory leak caused by luaDebugCam
 - Fixed FPS counter camera and desktop editor playstate
-- Fixed ioS for real this time
-- Fixed mobile deprecation warnings
+- Fixed iOS for real this time
 - Fixed dragging issue
 - Fixed error logs in hscript and addTextToDebug
 - Fixed float imprecision
