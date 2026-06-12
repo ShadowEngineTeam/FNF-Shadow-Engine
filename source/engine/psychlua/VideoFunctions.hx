@@ -22,7 +22,7 @@ class VideoFunctions
 				return;
 			}
 
-			var state = FunkinLua.getCurrentMusicState();
+			var state:Dynamic = FunkinLua.getCurrentMusicState();
 			var existingVideo = state.variables.get(tag);
 			if (existingVideo != null) removeLuaVideo(tag, state);
 
