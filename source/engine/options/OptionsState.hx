@@ -59,7 +59,7 @@ class OptionsState extends MusicBeatState
 			case 'Adjust Delay and Combo':
 				Funkin.switchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
-			case 'Mobile Options':
+			case 'Mobile':
 				switchSubState(mobile.options.MobileSettingsSubState);
 			#end
 		}

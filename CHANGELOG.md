@@ -19,6 +19,7 @@
 - Enabled hxdiscord_rpc IO thread
 - Updated hxluau, ShadowScript, lime, hxcpp refs
 - Updated gamemode config
+- Updated touchpad assets
 
 ## 0.9.0 — 2026-05-20
 
