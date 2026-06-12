@@ -18,11 +18,8 @@ typedef NoteSplashConfig =
 @:nullSafety
 class NoteSplash extends FlxSprite
 {
-	@:nullSafety(Off)
-	public var colorSwap:ColorSwap = null;
-
-	@:nullSafety(Off)
-	public var rgbShader:PixelSplashShaderRef;
+	public var colorSwap:Null<ColorSwap> = null;
+	public var rgbShader:Null<PixelSplashShaderRef>;
 
 	private var idleAnim:Null<String>;
 	private var _textureLoaded:Null<String> = null;
@@ -33,18 +30,14 @@ class NoteSplash extends FlxSprite
 	public static var defaultNoteSplash(get, never):String;
 	public static var configs:Map<String, NoteSplashConfig> = new Map<String, NoteSplashConfig>();
 
-	@:nullSafety(Off)
-	public static var mainGroup:FlxTypedGroup<NoteSplash>;
+	public static var mainGroup:Null<FlxTypedGroup<NoteSplash>>;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
 
-		var skin:Null<String> = null;
-		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
-			skin = PlayState.SONG.splashSkin;
-		else
-			skin = defaultNoteSplash + getSplashSkinPostfix();
+		var songSplash = PlayState.SONG?.splashSkin;
+		var skin:String = (songSplash != null && songSplash.length > 0) ? songSplash : defaultNoteSplash + getSplashSkinPostfix();
 
 		if (ClientPrefs.data.disableRGBNotes)
 		{
@@ -76,13 +69,14 @@ class NoteSplash extends FlxSprite
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 		aliveTime = 0;
 
-		var texture:Null<String> = null;
-		if (note != null && note.noteSplashData.texture != null)
-			texture = note.noteSplashData.texture;
-		else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
-			texture = PlayState.SONG.splashSkin;
-		else
-			texture = defaultNoteSplash + getSplashSkinPostfix();
+		var textureCandidate:Null<String> = (note != null) ? note.noteSplashData.texture : null;
+		if (textureCandidate == null)
+		{
+			var songSplash = PlayState.SONG?.splashSkin;
+			if (songSplash != null && songSplash.length > 0)
+				textureCandidate = songSplash;
+		}
+		var texture:String = textureCandidate ?? defaultNoteSplash + getSplashSkinPostfix();
 
 		var config:Null<NoteSplashConfig> = null;
 		if (_textureLoaded != texture)
@@ -111,9 +105,12 @@ class NoteSplash extends FlxSprite
 				}
 			}
 
-			colorSwap.hue = hue;
-			colorSwap.saturation = saturation;
-			colorSwap.brightness = brightness;
+			if (colorSwap != null)
+			{
+				colorSwap.hue = hue;
+				colorSwap.saturation = saturation;
+				colorSwap.brightness = brightness;
+			}
 		}
 		else
 		{
@@ -122,13 +119,17 @@ class NoteSplash extends FlxSprite
 			{
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
-					if (note.noteSplashData.r != -1)
-						note.rgbShader.r = note.noteSplashData.r;
-					if (note.noteSplashData.g != -1)
-						note.rgbShader.g = note.noteSplashData.g;
-					if (note.noteSplashData.b != -1)
-						note.rgbShader.b = note.noteSplashData.b;
-					tempShader = note.rgbShader.parent;
+					var noteRgb = note.rgbShader;
+					if (noteRgb != null)
+					{
+						if (note.noteSplashData.r != -1)
+							noteRgb.r = note.noteSplashData.r;
+						if (note.noteSplashData.g != -1)
+							noteRgb.g = note.noteSplashData.g;
+						if (note.noteSplashData.b != -1)
+							noteRgb.b = note.noteSplashData.b;
+						tempShader = noteRgb.parent;
+					}
 				}
 				else
 					tempShader = Note.globalRgbShaders[direction];
@@ -139,7 +140,10 @@ class NoteSplash extends FlxSprite
 		if (note != null)
 			alpha = note.noteSplashData.a;
 		if (!ClientPrefs.data.disableRGBNotes)
-			rgbShader.copyValues(cast tempShader);
+		{
+			if (rgbShader != null)
+				rgbShader.copyValues(cast tempShader);
+		}
 
 		if (note != null)
 			antialiasing = note.noteSplashData.antialiasing;
@@ -219,7 +223,7 @@ class NoteSplash extends FlxSprite
 		}
 	}
 
-	public static function precacheConfig(skin:String)
+	public static function precacheConfig(skin:String):Null<NoteSplashConfig>
 	{
 		if (configs.exists(skin))
 			return configs.get(skin);
