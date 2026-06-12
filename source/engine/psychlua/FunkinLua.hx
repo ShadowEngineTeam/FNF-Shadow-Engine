@@ -1801,6 +1801,7 @@ class FunkinLua
 		DeprecatedFunctions.implement(this);
 		MobileFunctions.implement(this);
 		FlixelAnimateFunctions.implement(this);
+		VideoFunctions.implement(this);
 		#if android AndroidFunctions.implement(this); #end
 
 		try
