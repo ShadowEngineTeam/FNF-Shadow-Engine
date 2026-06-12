@@ -21,7 +21,7 @@
 - Updated gamemode config
 - Updated touchpad assets
 
-## 0.9.0 — 2026-05-20
+## 0.9.0 - 2026-05-20
 
 - Switched hxluajit with hxluau (we are so roblox yes)
 - Switched SScript with ShadowScript (hscript-improved fork)
@@ -33,7 +33,7 @@
 - Game now uses SDL3 (bugs for mobile mostly fixed and main loop is now nanoseconds delta time)
 - New LuaAPI
 
-## 0.7.0 — 2026-02-24
+## 0.7.0 - 2026-02-24
 
 - Switched Scoring system fixed score to PBOT1
 - Added Graphic null check and improved bitmap caching
@@ -50,7 +50,7 @@
 - Save folder changed from `FNF-SE` to `ShadowEngineTeam`
 - Switched S3TC to BPTC, supporting all BC GPU textures
 
-## 0.6.0 — 2026-02-07
+## 0.6.0 - 2026-02-07
 
 - HSV support (as an option) and pixel note splashes and hold splashes
 - Mobile Controls under `MOBILE_CONTROLS_ALLOWED` compile flag
@@ -71,11 +71,11 @@
 - Updated GPU texture handling (premultiply in GPU texture instead of shader)
 - Split `library_shadows` for each work and updated references
 
-## 0.4.5 — 2026-01-15
+## 0.4.5 - 2026-01-15
 
 Several bug fixes. [Check tag differences from 0.4.4](https://github.com/FNF-SE/FNF-Shadow-Engine/compare/0.4.4...0.4.5).
 
-## 0.4.4 — 2026-01-11
+## 0.4.4 - 2026-01-11
 
 - Fixed Test Erect (forgot to add erect stage)
 - Fixed Touch Here To Play
@@ -89,7 +89,7 @@ Several bug fixes. [Check tag differences from 0.4.4](https://github.com/FNF-SE/
 - Added emergency buttons (Shift + F4 for Main Menu, Shift + F5 for reset the state)
 - Implemented undo, redo and note skin preview in ChartingState
 
-## 0.4.0 — 2025-12-28
+## 0.4.0 - 2025-12-28
 
 - Added `flixel-animate` with lua functions
 - Added Erect and Nightmare difficulties
@@ -105,7 +105,7 @@ Several bug fixes. [Check tag differences from 0.4.4](https://github.com/FNF-SE/
 - FPS Counter rework
 - FileSystem Overhaul (SE can check OpenFL assets in FileSystem codes, no more CopyState for mobile)
 
-## 0.3.0 — 2025-11-11
+## 0.3.0 - 2025-11-11
 
 - Removed more leftovers from GHR (Gacha Horror Recreation)
 - Switched XML to HXP in the project file and added welcoming
@@ -121,7 +121,7 @@ Several bug fixes. [Check tag differences from 0.4.4](https://github.com/FNF-SE/
 - Improved shader handling (mostly for macOS)
 - Slightly better mobile support
 
-## 0.2.1 — 2025-10-19
+## 0.2.1 - 2025-10-19
 
 - Remove leftovers from GHR (Gacha Horror Recreation)
 - Added missing things from Psych
@@ -131,6 +131,6 @@ Several bug fixes. [Check tag differences from 0.4.4](https://github.com/FNF-SE/
 - Added including all classes as possible macro
 - Added our icon!!
 
-## 0.2.0 — 2025-10-19
+## 0.2.0 - 2025-10-19
 
 First release.
