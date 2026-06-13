@@ -74,7 +74,7 @@ class CreditsState extends MusicBeatState
 			"Sky",
 			"skelly",
 			"Porting Base Game to Shadow Engine",
-			"",
+			"https://youtube.com/@skilitonskelly",
 			"FFFFFF"
 		],
 		[""],
