@@ -1,6 +1,7 @@
 name: Bug report
 description: Report bugs with the recreation here
 labels: [bug]
+
 body:
   - type: textarea
     id: description
@@ -17,10 +18,32 @@ body:
     validations:
       required: false
 
-  - type: textarea
-    id: target
+  - type: dropdown
+    id: platform
     attributes:
-      label: "What platfrom and platform version are you playing on?"
-      render: bash
+      label: Platform
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Android
+        - iOS
+    validations:
+      required: true
+
+  - type: input
+    id: platform_details
+    attributes:
+      label: Platform Version / Edition
+      description: |
+        Examples:
+        - Windows 11 Pro 25H2
+        - Windows 10 Home 22H2
+        - Arch Linux
+        - Debian 13
+        - macOS 15.7
+        - Android 15
+        - iOS 18.5
+      placeholder: "Windows 11 Pro 25H2"
     validations:
       required: true
