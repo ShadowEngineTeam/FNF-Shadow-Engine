@@ -2314,6 +2314,10 @@ class PlayState extends MusicBeatState
 							flValue1 = 0;
 						if (flValue2 == null)
 							flValue2 = 0;
+
+						camTween?.cancel();
+						camTween = null;
+
 						camFollow.x = flValue1;
 						camFollow.y = flValue2;
 					}
@@ -2541,6 +2545,9 @@ class PlayState extends MusicBeatState
 					}
 				}
 
+				camTween?.cancel();
+				camTween = null;
+
 				if (ease == "classic" || ease == "instant")
 				{
 					camFollow.x = targetX;
@@ -2551,7 +2558,6 @@ class PlayState extends MusicBeatState
 				else
 				{
 					var easeFunc = psychlua.LuaUtils.getTweenEaseByString(ease);
-					camTween?.cancel();
 					camTween = FlxTween.tween(camFollow, {x: targetX, y: targetY}, duration, {
 						ease: easeFunc,
 						onComplete: s ->
@@ -2583,6 +2589,12 @@ class PlayState extends MusicBeatState
 					return;
 				}
 
+				if (zoomTween != null)
+				{
+					zoomTween.cancel();
+					zoomTween = null;
+				}
+
 				var easeStr:String = (value2 != null) ? value2.toLowerCase() : "";
 				if (easeStr == "classic" || easeStr == "instant")
 				{
@@ -2595,9 +2607,6 @@ class PlayState extends MusicBeatState
 				}
 
 				var easeFunc = psychlua.LuaUtils.getTweenEaseByString(value2);
-
-				if (zoomTween != null)
-					zoomTween.cancel();
 
 				zoomTween = FlxTween.tween(this, {defaultCamZoom: targetZoom}, (Conductor.stepCrochet / 1000) * floaties[0], {
 					onStart: (x) ->
