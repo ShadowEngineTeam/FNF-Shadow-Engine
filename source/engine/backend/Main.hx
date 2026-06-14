@@ -26,7 +26,8 @@ class Main extends Sprite
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	@:nullSafety(Off) public static var fpsVar:Framerate;
+	@:nullSafety(Off)
+	public static var fpsVar:Framerate;
 
 	public static function main():Void
 	{

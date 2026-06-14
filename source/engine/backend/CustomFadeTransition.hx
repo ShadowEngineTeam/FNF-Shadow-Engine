@@ -8,8 +8,10 @@ class CustomFadeTransition extends MusicBeatSubstate
 	public static var finishCallback:Null<Void->Void>;
 
 	var isTransIn:Bool = false;
-	@:nullSafety(Off) var transBlack:FlxSprite;
-	@:nullSafety(Off) var transGradient:FlxSprite;
+	@:nullSafety(Off)
+	var transBlack:FlxSprite;
+	@:nullSafety(Off)
+	var transGradient:FlxSprite;
 
 	var duration:Float;
 

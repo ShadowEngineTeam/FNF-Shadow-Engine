@@ -4,7 +4,7 @@ package objects;
 class CheckboxThingie extends FlxSprite
 {
 	public var sprTracker:Null<FlxSprite>;
-	@:nullSafety(Off) public var daValue(default, set):Bool;
+	public var daValue(default, set):Bool;
 	public var copyAlpha:Bool = true;
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
@@ -49,13 +49,13 @@ class CheckboxThingie extends FlxSprite
 	{
 		if (check)
 		{
-			if (animation.curAnim.name != 'checked' && animation.curAnim.name != 'checking')
+			if (animation.curAnim?.name != 'checked' && animation.curAnim?.name != 'checking')
 			{
 				animation.play('checking', true);
 				offset.set(34, 25);
 			}
 		}
-		else if (animation.curAnim.name != 'unchecked' && animation.curAnim.name != 'unchecking')
+		else if (animation.curAnim?.name != 'unchecked' && animation.curAnim?.name != 'unchecking')
 		{
 			animation.play("unchecking", true);
 			offset.set(25, 28);

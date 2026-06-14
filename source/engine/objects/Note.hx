@@ -534,9 +534,8 @@ class Note extends FlxSkewedSprite
 
 			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
 			{
-				var pn = prevNote;
-				var prevHit = (pn != null) ? pn.wasGoodHit : false;
-				if ((isSustainNote && prevHit) || strumTime <= Conductor.songPosition)
+				@:nullSafety(Off)
+			if ((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition)
 					wasGoodHit = true;
 			}
 		}
@@ -587,9 +586,8 @@ class Note extends FlxSkewedSprite
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
 		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
-		var pn = prevNote;
-		var prevHit = (pn != null) ? pn.wasGoodHit : false;
-		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevHit && !canBeHit))))
+		@:nullSafety(Off)
+		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
 			var swagRect:FlxRect = clipRect;
 			if (swagRect == null)

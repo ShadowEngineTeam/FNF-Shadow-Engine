@@ -66,8 +66,8 @@ class SustainSplash extends FlxSprite
 
 	public static function generateSustainSplash(strumNote:StrumNote, targetStrumTime:Float, mustPress:Bool = true):SustainSplash
 	{
-		var group = SustainSplash.mainGroup;
-		var splash:SustainSplash = (group != null ? group : new FlxTypedGroup<SustainSplash>()).recycle(null, () -> new SustainSplash(), false, true);
+		@:nullSafety(Off)
+		var splash:SustainSplash = SustainSplash.mainGroup.recycle(null, () -> new SustainSplash(), false, true);
 		splash.resetSustainSplash(strumNote, targetStrumTime, mustPress);
 
 		return splash;
@@ -75,38 +75,32 @@ class SustainSplash extends FlxSprite
 
 	public static function hideAtData(noteData:Int):Void
 	{
-		var group = SustainSplash.mainGroup;
-		if (group == null)
+		if (SustainSplash.mainGroup == null)
 			return;
-		for (splash in group.members)
-		{
+		@:nullSafety(Off)
+		for (splash in SustainSplash.mainGroup.members)
 			if (splashIsValid(splash, noteData) && splash.mustPress && splash.animation.curAnim?.name != 'end')
 				splash.visible = false;
-		}
 	}
 
 	public static function showAtData(noteData:Int):Void
 	{
-		var group = SustainSplash.mainGroup;
-		if (group == null)
+		if (SustainSplash.mainGroup == null)
 			return;
-		for (splash in group.members)
-		{
+		@:nullSafety(Off)
+		for (splash in SustainSplash.mainGroup.members)
 			if (splashIsValid(splash, noteData) && splash.mustPress)
 				splash.visible = true;
-		}
 	}
 
 	public static function hasSplashAtData(noteData:Int, mustPess:Bool):Bool
 	{
-		var group = SustainSplash.mainGroup;
-		if (group == null)
+		if (SustainSplash.mainGroup == null)
 			return false;
-		for (splash in group.members)
-		{
+		@:nullSafety(Off)
+		for (splash in SustainSplash.mainGroup.members)
 			if (splashIsValid(splash, noteData) && splash.mustPress == mustPess)
 				return true;
-		}
 
 		return false;
 	}
@@ -187,8 +181,7 @@ class SustainSplash extends FlxSprite
 
 	private function initRGBShader():Void
 	{
-		var sn = strumNote;
-		if (sn == null)
+		if (strumNote == null)
 			return;
 
 		if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
@@ -198,48 +191,40 @@ class SustainSplash extends FlxSprite
 
 		if (ClientPrefs.data.disableRGBNotes)
 		{
-			var swap = colorSwap;
-			if (swap == null)
+			@:nullSafety(Off)
 			{
-				swap = new ColorSwap();
-				colorSwap = swap;
-			}
-			shader = swap.shader;
-			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
-			{
-				swap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
-				swap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
-				swap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+				if (colorSwap == null)
+					colorSwap = new ColorSwap();
+				shader = colorSwap.shader;
+				if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
+				{
+					colorSwap.hue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
+					colorSwap.saturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
+					colorSwap.brightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
+				}
 			}
 		}
 		else
 		{
-			var cached = rgbShaders[shaderID][noteData];
-			if (cached == null)
+			@:nullSafety(Off)
 			{
-				cached = new PixelSplashShaderRef();
-				rgbShaders[shaderID][noteData] = cached;
+				if (rgbShaders[shaderID][noteData] == null)
+					rgbShaders[shaderID][noteData] = new PixelSplashShaderRef();
+
+				if (rgbShader != null)
+					rgbShader.shader.mult.value[0] = 0.0;
+
+				rgbShader = rgbShaders[shaderID][noteData];
+				shader = rgbShader.shader;
+				rgbShader.copyValues(cast (useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null));
 			}
-
-			if (rgbShader != null)
-				rgbShader.shader.mult.value[0] = 0.0;
-
-			rgbShader = cached;
-			shader = cached.shader;
-			cached.copyValues(cast (useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null));
 		}
 	}
 
 	private function precacheSustainSplash():Void
 	{
 		final textures:Array<String> = [];
-		var playerTex = playerTexture;
-		var opponentTex = opponentTexture;
-		var texToUse:String = texture;
-		if (mustPress && playerTex != null)
-			texToUse = playerTex;
-		else if (!mustPress && opponentTex != null)
-			texToUse = opponentTex;
+		var texToUse:String = mustPress ? (playerTexture ?? texture) : (opponentTexture ?? texture);
 
 		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
@@ -261,10 +246,7 @@ class SustainSplash extends FlxSprite
 
 	private static function getTextureNameFromData(noteData:Int, mustPress:Bool):String
 	{
-		var playerTex = playerTexture;
-		var opponentTex = opponentTexture;
-		var tex:Null<String> = mustPress ? playerTex : opponentTex;
-		var resolvedTex:String = tex ?? texture;
+		var resolvedTex:String = mustPress ? (playerTexture ?? texture) : (opponentTexture ?? texture);
 
 		if (!useRGBShader || ClientPrefs.data.disableRGBNotes)
 		{
@@ -283,14 +265,16 @@ class SustainSplash extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		var sn = strumNote;
-		if (sn != null)
+		if (strumNote != null)
 		{
-			if (animation.curAnim?.name != 'end')
-				alpha = sn.alpha;
-			else
-				alpha = ClientPrefs.data.splashAlpha;
-			setPosition(sn.x, sn.y);
+			@:nullSafety(Off)
+			{
+				if (animation.curAnim?.name != 'end')
+					alpha = strumNote.alpha;
+				else
+					alpha = ClientPrefs.data.splashAlpha;
+				setPosition(strumNote.x, strumNote.y);
+			}
 		}
 
 		if (Conductor.songPosition >= targetStrumTime && !reachedEnd)
@@ -307,11 +291,11 @@ class SustainSplash extends FlxSprite
 
 	override public function draw():Void
 	{
-		var sn = strumNote;
-		if (sn == null)
+		if (strumNote == null)
 			return;
 
-		if ((x != sn.x || y != sn.y) && visible && active && alive && exists)
+		@:nullSafety(Off)
+		if ((x != strumNote.x || y != strumNote.y) && visible && active && alive && exists)
 			update(FlxG.elapsed);
 
 		super.draw();
@@ -338,11 +322,13 @@ class SustainSplash extends FlxSprite
 	{
 		_texture = value;
 
-		var group = SustainSplash.mainGroup;
-		if (group != null)
-			for (splash in group.members)
+		if (SustainSplash.mainGroup != null)
+		{
+			@:nullSafety(Off)
+			for (splash in SustainSplash.mainGroup.members)
 				if (splash.exists && splash.alive)
 					splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
+		}
 
 		return value;
 	}
@@ -357,11 +343,13 @@ class SustainSplash extends FlxSprite
 			#end
 			usePixelTextures = value;
 
-			var group = SustainSplash.mainGroup;
-			if (group != null)
-				for (splash in group.members)
+			if (SustainSplash.mainGroup != null)
+			{
+				@:nullSafety(Off)
+				for (splash in SustainSplash.mainGroup.members)
 					if (splash.exists && splash.alive)
 						splash.reloadSustainSplash(getTextureNameFromData(splash.noteData, splash.mustPress), true);
+			}
 		}
 
 		return value;
@@ -374,11 +362,13 @@ class SustainSplash extends FlxSprite
 	@:noCompletion
 	private function set_strumNote(value:Null<StrumNote>):Null<StrumNote>
 	{
-		var sn = strumNote;
-		if (sn != null)
+		if (strumNote != null)
 		{
-			alpha = sn.alpha;
-			setPosition(sn.x, sn.y);
+			@:nullSafety(Off)
+			{
+				alpha = strumNote.alpha;
+				setPosition(strumNote.x, strumNote.y);
+			}
 		}
 
 		return strumNote = value;

@@ -36,8 +36,10 @@ class NoteSplash extends FlxSprite
 	{
 		super(x, y);
 
-		var songSplash = PlayState.SONG?.splashSkin;
-		var skin:String = (songSplash != null && songSplash.length > 0) ? songSplash : defaultNoteSplash + getSplashSkinPostfix();
+		var skin:String = defaultNoteSplash + getSplashSkinPostfix();
+		@:nullSafety(Off)
+		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
+			skin = PlayState.SONG.splashSkin;
 
 		if (ClientPrefs.data.disableRGBNotes)
 		{
@@ -69,14 +71,14 @@ class NoteSplash extends FlxSprite
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 		aliveTime = 0;
 
-		var textureCandidate:Null<String> = (note != null) ? note.noteSplashData.texture : null;
-		if (textureCandidate == null)
+		var texture:String = defaultNoteSplash + getSplashSkinPostfix();
+		@:nullSafety(Off)
 		{
-			var songSplash = PlayState.SONG?.splashSkin;
-			if (songSplash != null && songSplash.length > 0)
-				textureCandidate = songSplash;
+			if (note != null && note.noteSplashData.texture != null)
+				texture = note.noteSplashData.texture;
+			else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
+				texture = PlayState.SONG.splashSkin;
 		}
-		var texture:String = textureCandidate ?? defaultNoteSplash + getSplashSkinPostfix();
 
 		var config:Null<NoteSplashConfig> = null;
 		if (_textureLoaded != texture)
@@ -119,16 +121,18 @@ class NoteSplash extends FlxSprite
 			{
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
-					var noteRgb = note.rgbShader;
-					if (noteRgb != null)
+					if (note.rgbShader != null)
 					{
-						if (note.noteSplashData.r != -1)
-							noteRgb.r = note.noteSplashData.r;
-						if (note.noteSplashData.g != -1)
-							noteRgb.g = note.noteSplashData.g;
-						if (note.noteSplashData.b != -1)
-							noteRgb.b = note.noteSplashData.b;
-						tempShader = noteRgb.parent;
+						@:nullSafety(Off)
+						{
+							if (note.noteSplashData.r != -1)
+								note.rgbShader.r = note.noteSplashData.r;
+							if (note.noteSplashData.g != -1)
+								note.rgbShader.g = note.noteSplashData.g;
+							if (note.noteSplashData.b != -1)
+								note.rgbShader.b = note.noteSplashData.b;
+							tempShader = note.rgbShader.parent;
+						}
 					}
 				}
 				else

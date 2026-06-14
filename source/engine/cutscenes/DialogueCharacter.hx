@@ -29,7 +29,8 @@ class DialogueCharacter extends FlxSprite
 	public static var DEFAULT_CHARACTER:String = 'bf';
 	public static var DEFAULT_SCALE:Float = 0.7;
 
-	@:nullSafety(Off) public var jsonFile:DialogueCharacterFile = null;
+	@:nullSafety(Off)
+	public var jsonFile:DialogueCharacterFile = null;
 	public var dialogueAnimations:Map<String, DialogueAnimArray> = new Map<String, DialogueAnimArray>();
 
 	public var startingPos:Float = 0; // For center characters, it works as the starting Y, for everything else it works as starting X
