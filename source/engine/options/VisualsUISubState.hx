@@ -24,7 +24,9 @@ class VisualsUISubState extends BaseOptionsMenu
 		notes = new FlxTypedGroup<StrumNote>();
 		for (i in 0...Note.colArray.length)
 		{
-			var note:StrumNote = new StrumNote(370 + (560 / Note.colArray.length) * i, -200, i, 0, cast null);
+			// preview strum intentionally has no texture; StrumNote's daTexture is typed non-null
+			@:nullSafety(Off)
+			var note:StrumNote = new StrumNote(370 + (560 / Note.colArray.length) * i, -200, i, 0, null);
 			note.centerOffsets();
 			note.centerOrigin();
 			note.playAnim('static');

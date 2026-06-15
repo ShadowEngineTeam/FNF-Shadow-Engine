@@ -326,7 +326,11 @@ class DialogueBoxPsych extends FlxSpriteGroup
 				remove(box);
 				box.kill();
 				box.destroy();
-				box = cast null;
+				// box is a non-null late-init field; clearing it back to null needs the checker off here
+				@:nullSafety(Off)
+				{
+					box = null;
+				}
 			}
 
 			if (bgFade != null)
@@ -336,7 +340,11 @@ class DialogueBoxPsych extends FlxSpriteGroup
 				{
 					remove(bgFade);
 					bgFade.destroy();
-					bgFade = cast null;
+					// bgFade is a non-null late-init field; clearing it back to null needs the checker off here
+					@:nullSafety(Off)
+					{
+						bgFade = null;
+					}
 				}
 			}
 
@@ -471,7 +479,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	public static function parseDialogue(path:String):Null<DialogueFile>
 	{
 		if (FileSystem.exists(path))
-			return cast Json.parse(File.getContent(path) ?? '', path);
+			return Json.parse(File.getContent(path) ?? '', path);
 
 		return null;
 	}

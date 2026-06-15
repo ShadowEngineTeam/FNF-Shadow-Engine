@@ -110,7 +110,11 @@ class ShaderFunctions
 
 			if (leObj != null)
 			{
-				leObj.shader = cast null;
+				// FlxSprite.shader is typed non-null but is null-tolerant (null clears it)
+				@:nullSafety(Off)
+				{
+					leObj.shader = null;
+				}
 				return true;
 			}
 			return false;
@@ -267,6 +271,7 @@ class ShaderFunctions
 		});
 	}
 
+	@:nullSafety(Off)
 	public static function getShader(obj:String):FlxRuntimeShader
 	{
 		var stored:Null<ShaderFilter> = storedFilters.get(obj);
@@ -283,7 +288,7 @@ class ShaderFunctions
 		if (target == null)
 		{
 			FunkinLua.luaTrace('Error on getting shader: Object $obj not found', false, false, FlxColor.RED);
-			return cast null;
+			return null;
 		}
 		return cast(target.shader, FlxRuntimeShader);
 	}

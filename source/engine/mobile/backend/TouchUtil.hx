@@ -82,12 +82,13 @@ class TouchUtil
 	}
 
 	@:noCompletion
+	@:nullSafety(Off)
 	private static function get_touch():FlxTouch
 	{
 		for (touch in FlxG.touches.list)
 			if (touch != null)
 				return touch;
 
-		return cast FlxG.touches.getFirst();
+		return FlxG.touches.getFirst();
 	}
 }

@@ -406,10 +406,11 @@ class HScript extends SScript
 		}
 	}
 
+	@:nullSafety(Off)
 	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
 	{
 		if (funcToRun == null)
-			return cast null;
+			return null;
 
 		if (!exists(funcToRun))
 		{
@@ -418,7 +419,7 @@ class HScript extends SScript
 			#else
 			FunkinLua.getCurrentMusicState().addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
 			#end
-			return cast null;
+			return null;
 		}
 
 		final callValue = call(funcToRun, funcArgs);
@@ -432,20 +433,21 @@ class HScript extends SScript
 				if (parentLua != null)
 				{
 					FunkinLua.luaTrace('$origin: ${parentLua.lastCalledFunction} - $msg', false, false, FlxColor.RED);
-					return cast null;
+					return null;
 				}
 				#end
 				FunkinLua.getCurrentMusicState().addTextToDebug('$origin - $msg', FlxColor.RED);
 			}
-			return cast null;
+			return null;
 		}
 		return callValue;
 	}
 
+	@:nullSafety(Off)
 	public function executeFunction(?funcToRun:String = null, ?funcArgs:Array<Dynamic>):FunctionCall
 	{
 		if (funcToRun == null)
-			return cast null;
+			return null;
 		return call(funcToRun, funcArgs);
 	}
 

@@ -44,8 +44,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	@:nullSafety(Off)
 	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 
-	@:nullSafety(Off)
-	private var luaDebugCam:ShadowCamera;
+	private var luaDebugCam:Null<ShadowCamera>;
 
 	@:nullSafety(Off)
 	private var currentClassName:String;
@@ -298,11 +297,12 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 		#end
 
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
-		if (luaDebugCam != null)
+		final cam:Null<ShadowCamera> = luaDebugCam;
+		if (cam != null)
 		{
-			if (FlxG.cameras.list.contains(luaDebugCam))
-				FlxG.cameras.remove(luaDebugCam);
-			luaDebugCam = cast null;
+			if (FlxG.cameras.list.contains(cam))
+				FlxG.cameras.remove(cam);
+			luaDebugCam = null;
 		}
 		#end
 
@@ -572,10 +572,11 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			return;
 
 		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		luaDebugCam = new ShadowCamera();
-		luaDebugCam.bgColor.alpha = 0;
-		FlxG.cameras.add(luaDebugCam, false);
-		luaDebugGroup.cameras = [luaDebugCam];
+		final cam:ShadowCamera = new ShadowCamera();
+		cam.bgColor.alpha = 0;
+		FlxG.cameras.add(cam, false);
+		luaDebugGroup.cameras = [cam];
+		luaDebugCam = cam;
 		add(luaDebugGroup);
 	}
 
@@ -603,17 +604,18 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	}
 	#end
 
+	@:nullSafety(Off)
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
 	{
 		#if FEATURE_LUA
 		if (modchartSprites.exists(tag))
-			return cast modchartSprites.get(tag);
+			return modchartSprites.get(tag);
 		if (text && modchartTexts.exists(tag))
-			return cast modchartTexts.get(tag);
+			return modchartTexts.get(tag);
 		if (variables.exists(tag))
-			return cast variables.get(tag);
+			return variables.get(tag);
 		#end
-		return cast null;
+		return null;
 	}
 
 	#if FEATURE_LUA
@@ -754,7 +756,8 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 			if (len <= 0)
 				len = e.message.length;
 			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
-			var newScript:HScript = cast SScript.global.get(file);
+			var existingScript:Null<SScript> = SScript.global.get(file);
+			var newScript:Null<HScript> = existingScript != null ? Std.downcast(existingScript, HScript) : null;
 			if (newScript != null)
 			{
 				newScript.destroy();

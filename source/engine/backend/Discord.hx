@@ -70,7 +70,11 @@ class DiscordClient
 		discordHandlers.ready = cpp.Function.fromStaticFunction(onReady);
 		discordHandlers.disconnected = cpp.Function.fromStaticFunction(onDisconnected);
 		discordHandlers.errored = cpp.Function.fromStaticFunction(onError);
-		Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, cast null);
+		// final arg (optional steamId) is a native pointer that accepts null
+		@:nullSafety(Off)
+		{
+			Discord.Initialize(clientID, cpp.RawPointer.addressOf(discordHandlers), #if (hxdiscord_rpc > "1.2.4") false #else 1 #end, null);
+		}
 
 		if (!isInitialized)
 			trace("(Discord) Client initialized");

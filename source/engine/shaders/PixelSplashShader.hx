@@ -5,7 +5,7 @@ class PixelSplashShaderRef
 {
 	public var shader:PixelSplashShader = new PixelSplashShader();
 
-	public function copyValues(tempShader:RGBPalette)
+	public function copyValues(tempShader:Null<RGBPalette>)
 	{
 		var enabled:Bool = false;
 		if (tempShader != null)

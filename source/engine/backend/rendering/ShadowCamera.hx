@@ -109,7 +109,10 @@ class ShadowCamera extends FlxCamera
 
 		this.id = id;
 
-		_backgroundFrame = new FlxFrame(new FlxGraphic('', cast null));
+		// FlxGraphic's bitmapData is typed non-null but tolerates null for this placeholder frame
+		@:nullSafety(Off)
+		var placeholderGraphic:FlxGraphic = new FlxGraphic('', null);
+		_backgroundFrame = new FlxFrame(placeholderGraphic);
 		_backgroundFrame.frame = new FlxRect();
 
 		_blendShader = new RuntimeCustomBlendShader();
@@ -210,7 +213,11 @@ class ShadowCamera extends FlxCamera
 			itemToReturn.colored = colored;
 			itemToReturn.hasColorOffsets = hasColorOffsets;
 			itemToReturn.blend = blend;
-			itemToReturn.shader = cast shader;
+			// shader is optional (nullable); FlxDrawQuadsItem.shader is typed non-null but tolerates it
+			@:nullSafety(Off)
+			{
+				itemToReturn.shader = shader;
+			}
 
 			itemToReturn.nextTyped = _headTiles;
 			_headTiles = itemToReturn;

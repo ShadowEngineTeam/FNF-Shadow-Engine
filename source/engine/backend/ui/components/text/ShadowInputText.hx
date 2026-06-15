@@ -138,6 +138,7 @@ class ShadowInputText extends FlxText
 		calcFrame();
 	}
 
+	@:nullSafety(Off)
 	override public function destroy():Void
 	{
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -145,7 +146,7 @@ class ShadowInputText extends FlxText
 		if (_caretTimer != null)
 		{
 			_caretTimer.cancel();
-			_caretTimer = cast null;
+			_caretTimer = null;
 		}
 
 		backgroundSprite = FlxDestroyUtil.destroy(backgroundSprite);
@@ -160,7 +161,7 @@ class ShadowInputText extends FlxText
 		{
 			while (_charBoundaries.length > 0)
 				_charBoundaries.pop();
-			_charBoundaries = cast null;
+			_charBoundaries = null;
 		}
 		#end
 
@@ -681,18 +682,18 @@ class ShadowInputText extends FlxText
 		#end
 	}
 
-	private function getCharBoundaries(charIndex:Int):Rectangle
+	private function getCharBoundaries(charIndex:Int):Null<Rectangle>
 	{
 		if (_charBoundaries == null || _charBoundaries.length == 0 || charIndex < 0)
-			return cast null;
+			return null;
 
 		if (text == null || text.length == 0)
-			return cast null;
+			return null;
 
 		if (charIndex >= _charBoundaries.length)
 		{
 			if (_charBoundaries.length == 0)
-				return cast null;
+				return null;
 			var r:Rectangle = new Rectangle();
 			_charBoundaries[_charBoundaries.length - 1].copyToFlash(r);
 			return r;
@@ -707,7 +708,7 @@ class ShadowInputText extends FlxText
 	{
 		if (text != null && text.length > 0 && _charBoundaries != null && _charBoundaries.length > 0)
 		{
-			var boundary:Rectangle = getCharBoundaries(text.length - 1);
+			var boundary:Null<Rectangle> = getCharBoundaries(text.length - 1);
 			if (boundary != null)
 				return x + boundary.right + 4;
 		}
@@ -797,8 +798,8 @@ class ShadowInputText extends FlxText
 			selectionSprite.pixels.fillRect(selectionSprite.pixels.rect, FlxColor.TRANSPARENT);
 		}
 
-		var startRect = getCharBoundaries(begin);
-		var endRect = getCharBoundaries(end - 1);
+		var startRect:Null<Rectangle> = getCharBoundaries(begin);
+		var endRect:Null<Rectangle> = getCharBoundaries(end - 1);
 		if (startRect == null || endRect == null)
 		{
 			selectionSprite.visible = false;

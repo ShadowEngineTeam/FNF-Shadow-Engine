@@ -176,7 +176,7 @@ class ClientPrefs
 		if (controller != true && defaultKeys != null)
 			for (key in keyBinds.keys())
 			{
-				var dk = defaultKeys.get(key);
+				var dk:Null<Array<FlxKey>> = defaultKeys.get(key);
 				if (dk != null)
 					keyBinds.set(key, dk.copy());
 			}
@@ -184,7 +184,7 @@ class ClientPrefs
 		if (controller != false && defaultButtons != null)
 			for (button in gamepadBinds.keys())
 			{
-				var db = defaultButtons.get(button);
+				var db:Null<Array<FlxGamepadInputID>> = defaultButtons.get(button);
 				if (db != null)
 					gamepadBinds.set(button, db.copy());
 			}

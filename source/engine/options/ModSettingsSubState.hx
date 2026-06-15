@@ -25,7 +25,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 		else
 		{
 			var saveMap:Map<String, Dynamic> = FlxG.save.data.modSettings;
-			save = cast (saveMap[folder] ?? []);
+			save = saveMap[folder] ?? new Map<String, Dynamic>();
 		}
 
 		// save = []; //reset for debug purposes

@@ -284,6 +284,7 @@ class Paths
 	}
 	#end
 
+	@:nullSafety(Off)
 	public static function image(key:String, ?library:String = null):FlxGraphic
 	{
 		var bitmap:Null<BitmapData> = null;
@@ -295,7 +296,7 @@ class Paths
 		{
 			if (!localTrackedAssets.contains(file))
 				localTrackedAssets.push(file);
-			return cast currentTrackedAssets.get(file);
+			return currentTrackedAssets.get(file);
 		}
 		else if (FileSystem.exists(file))
 		{
@@ -319,7 +320,7 @@ class Paths
 				{
 					if (!localTrackedAssets.contains(file))
 						localTrackedAssets.push(file);
-					return cast currentTrackedAssets.get(file);
+					return currentTrackedAssets.get(file);
 				}
 				else if (FileSystem.exists(file))
 				{
@@ -350,12 +351,13 @@ class Paths
 		{
 			if (!localTrackedAssets.contains('__no_texture'))
 				localTrackedAssets.push('__no_texture');
-			return cast currentTrackedAssets.get('__no_texture');
+			return currentTrackedAssets.get('__no_texture');
 		}
 
 		return cacheBitmap('__no_texture', FlxAssets.getBitmapFromClass(NoTexture));
 	}
 
+	@:nullSafety(Off)
 	public static function cacheBitmap(file:String, ?bitmap:BitmapData = null):FlxGraphic
 	{
 		if (bitmap == null)
@@ -368,7 +370,7 @@ class Paths
 			}
 
 			if (bitmap == null)
-				return cast null;
+				return null;
 		}
 
 		if (!localTrackedAssets.contains(file))
@@ -389,6 +391,7 @@ class Paths
 		return newGraphic;
 	}
 
+	@:nullSafety(Off)
 	public static function getTextFromFile(key:String, ignoreMods:Bool = false):String
 	{
 		#if FEATURE_MODS
@@ -396,15 +399,15 @@ class Paths
 		{
 			var modPath:String = modFolders(key);
 			if (FileSystem.exists(modPath))
-				return cast File.getContent(modPath);
+				return File.getContent(modPath);
 		}
 		#end
 
 		var sharedPath:String = getSharedPath(key);
 		if (FileSystem.exists(sharedPath))
-			return cast File.getContent(sharedPath);
+			return File.getContent(sharedPath);
 
-		return cast null;
+		return null;
 	}
 
 	public static function sound(key:String, ?library:String):Sound
@@ -434,6 +437,7 @@ class Paths
 		return returnSound(null, songKey);
 	}
 
+	@:nullSafety(Off)
 	public static function returnSound(path:Null<String>, key:String, ?library:String):Sound
 	{
 		#if FEATURE_MODS
@@ -450,7 +454,7 @@ class Paths
 				currentTrackedSounds.set(file, Sound.fromFile(file));
 			if (!localTrackedAssets.contains(file))
 				localTrackedAssets.push(file);
-			return cast currentTrackedSounds.get(file);
+			return currentTrackedSounds.get(file);
 		}
 		#end
 
@@ -482,13 +486,14 @@ class Paths
 			{
 				if (!localTrackedAssets.contains(gottenPath))
 					localTrackedAssets.push(gottenPath);
-				return cast currentTrackedSounds.get(gottenPath);
+				return currentTrackedSounds.get(gottenPath);
 			}
 		}
 
-		return cast null;
+		return null;
 	}
 
+	@:nullSafety(Off)
 	public static function getAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
@@ -497,25 +502,26 @@ class Paths
 		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
-			return cast FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml) ?? "");
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml) ?? "");
 		#end
 
 		if (FileSystem.exists(xmlPath))
-			return cast FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath) ?? "");
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath) ?? "");
 
 		var jsonPath:String = getPath('images/$key.json', TEXT, library, true);
 		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
-			return cast FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson) ?? "");
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson) ?? "");
 		#end
 
 		if (FileSystem.exists(jsonPath))
-			return cast FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath) ?? "");
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath) ?? "");
 
 		return getPackerAtlas(key, library);
 	}
 
+	@:nullSafety(Off)
 	public static function getSparrowAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
@@ -523,13 +529,14 @@ class Paths
 		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
-			return cast FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml) ?? "");
+			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml) ?? "");
 		#end
 
 		var xmlPath:String = getPath('images/$key.xml', library);
-		return cast FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath) ?? "");
+		return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath) ?? "");
 	}
 
+	@:nullSafety(Off)
 	public static function getPackerAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
@@ -537,13 +544,14 @@ class Paths
 		#if FEATURE_MODS
 		var modTxt:String = modsTxt(key);
 		if (FileSystem.exists(modTxt))
-			return cast FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(modTxt) ?? "");
+			return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(modTxt) ?? "");
 		#end
 
 		var txtPath:String = getPath('images/$key.txt', library);
-		return cast FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(txtPath) ?? "");
+		return FlxAtlasFrames.fromSpriteSheetPacker(imageLoaded, File.getContent(txtPath) ?? "");
 	}
 
+	@:nullSafety(Off)
 	public static function getAsepriteAtlas(key:String, ?library:String = null):FlxAtlasFrames
 	{
 		var imageLoaded:FlxGraphic = image(key, library);
@@ -551,11 +559,11 @@ class Paths
 		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
-			return cast FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson) ?? "");
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson) ?? "");
 		#end
 
 		var jsonPath:String = getPath('images/$key.json', library);
-		return cast FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath) ?? "");
+		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath) ?? "");
 	}
 
 	public static function getTextureAtlas(key:String, ?library:String = null, ?settings:FlxAnimateSettings):FlxAnimateFrames
@@ -583,6 +591,7 @@ class Paths
 			|| fileExists('images/$key/spritemap1.json', TEXT, false, library);
 	}
 
+	@:nullSafety(Off)
 	public static function getMixedAtlas(keys:Array<String>, ?library:String = null, ?settings:FlxAnimateSettings):FlxAtlasFrames
 	{
 		var atlases:Array<FlxAtlasFrames> = [];
@@ -594,7 +603,7 @@ class Paths
 		}
 
 		if (atlases.length == 0)
-			return cast null;
+			return null;
 		if (atlases.length == 1)
 			return atlases[0];
 

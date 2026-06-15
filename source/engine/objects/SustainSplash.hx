@@ -216,7 +216,7 @@ class SustainSplash extends FlxSprite
 
 				rgbShader = rgbShaders[shaderID][noteData];
 				shader = rgbShader.shader;
-				rgbShader.copyValues(cast (useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null));
+				rgbShader.copyValues(useRGBShader ? Note.initializeGlobalRGBShader(noteData) : null);
 			}
 		}
 	}

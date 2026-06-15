@@ -2000,7 +2000,8 @@ class FunkinLua
 		#end
 	}
 
-	function findScript(scriptFile:String, ext:String = '.lua')
+	@:nullSafety(Off)
+	function findScript(scriptFile:String, ext:String = '.lua'):String
 	{
 		if (!scriptFile.endsWith(ext))
 			scriptFile += ext;
@@ -2029,7 +2030,7 @@ class FunkinLua
 				return sharedLuauPath;
 		}
 
-		return cast null;
+		return null;
 	}
 
 	public function getErrorMessage(status:Int):String
@@ -2123,7 +2124,9 @@ class FunkinLua
 
 			if (found)
 			{
-				runtimeShaders.set(name, cast [frag, vert]);
+				// frag/vert may individually be null (only one file required), so the map intentionally holds nullable entries here
+				@:nullSafety(Off)
+				runtimeShaders.set(name, [frag, vert]);
 				// trace('Found shader $name!');
 				return true;
 			}
@@ -2134,6 +2137,7 @@ class FunkinLua
 	}
 
 	private static var lastMusicState:Dynamic = null;
+	@:nullSafety(Off)
 	public static function getCurrentMusicState():IMusicState
 	{
 		final s = FlxG.state;
@@ -2144,7 +2148,7 @@ class FunkinLua
 		if (s.subState != null && Std.isOfType(s.subState, MusicBeatSubstate))
 			return lastMusicState = cast(s.subState, MusicBeatSubstate);
 
-		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : cast null;
+		return Std.isOfType(s, MusicBeatState) ? lastMusicState = cast(s, MusicBeatState) : null;
 	}
 }
 

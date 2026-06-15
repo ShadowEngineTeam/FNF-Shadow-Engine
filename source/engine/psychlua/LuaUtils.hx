@@ -340,9 +340,10 @@ class LuaUtils
 		}
 	}
 
+	@:nullSafety(Off)
 	inline public static function getTextObject(name:String):FlxText
 	{
-		return cast #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
+		return #if FEATURE_LUA FunkinLua.getCurrentMusicState().modchartTexts.exists(name) ? FunkinLua.getCurrentMusicState().modchartTexts.get(name) : #end
 		Reflect.getProperty(FunkinLua.getCurrentMusicState(), name);
 	}
 
@@ -678,10 +679,11 @@ class LuaUtils
 		return "unknown";
 	}
 
+	@:nullSafety(Off)
 	public static function cameraFromString(cam:String):FlxCamera
 	{
 		if (FunkinLua.getCurrentMusicState().modchartCameras.exists(cam))
-			return cast FunkinLua.getCurrentMusicState().modchartCameras.get(cam);
+			return FunkinLua.getCurrentMusicState().modchartCameras.get(cam);
 		else
 			return switch (cam.toLowerCase())
 			{

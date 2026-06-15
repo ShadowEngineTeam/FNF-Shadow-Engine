@@ -26,6 +26,7 @@ final class ThreadUtil
 	 * @param func Function to execute
 	 * @param autoRestart Whenever the thread should auto restart itself after crashing.
 	 */
+	@:nullSafety(Off)
 	public static function createSafe(func:Void->Void, autoRestart:Bool = false):Thread
 	{
 		#if (target.threaded)
@@ -55,7 +56,7 @@ final class ThreadUtil
 		catch (e)
 			error("Failed to safely create a thread: " + e.details());
 		#end
-		return cast null;
+		return null;
 	}
 
 	#if (target.threaded)
@@ -70,7 +71,7 @@ final class ThreadUtil
 	{
 		while (true)
 		{
-			var callback = __pendingExecs.pop(true);
+			var callback:Null<Void->Void> = __pendingExecs.pop(true);
 			if (callback == null)
 				break;
 

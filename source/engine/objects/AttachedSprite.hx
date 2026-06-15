@@ -18,7 +18,11 @@ class AttachedSprite extends FlxSprite
 		super();
 		if (anim != null)
 		{
-			frames = Paths.getSparrowAtlas(cast file, library);
+			// callers that pass an anim are expected to pass a file too; file is typed nullable
+			@:nullSafety(Off)
+			{
+				frames = Paths.getSparrowAtlas(file, library);
+			}
 			animation.addByPrefix('idle', anim, 24, loop);
 			animation.play('idle');
 		}

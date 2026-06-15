@@ -369,7 +369,7 @@ class Note extends FlxSkewedSprite
 
 	public static function initializeGlobalRGBShader(noteData:Int):RGBPalette
 	{
-		var cached = globalRgbShaders[noteData];
+		var cached:Null<RGBPalette> = globalRgbShaders[noteData];
 		if (cached != null)
 			return cached;
 

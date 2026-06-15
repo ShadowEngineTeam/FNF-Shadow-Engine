@@ -145,7 +145,7 @@ class NoteSplash extends FlxSprite
 		if (!ClientPrefs.data.disableRGBNotes)
 		{
 			if (rgbShader != null)
-				rgbShader.copyValues(cast tempShader);
+				rgbShader.copyValues(tempShader);
 		}
 
 		if (note != null)

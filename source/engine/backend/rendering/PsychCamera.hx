@@ -17,7 +17,11 @@ class PsychCamera extends ShadowCamera
 		updateFlash(elapsed);
 		updateFade(elapsed);
 
-		flashSprite.filters = cast (filtersEnabled ? filters : null);
+		// openfl's filters is typed non-null but accepts null to clear filters
+		@:nullSafety(Off)
+		{
+			flashSprite.filters = filtersEnabled ? filters : null;
+		}
 
 		updateFlashSpritePosition();
 		updateShake(elapsed);

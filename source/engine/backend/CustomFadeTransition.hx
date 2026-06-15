@@ -8,10 +8,8 @@ class CustomFadeTransition extends MusicBeatSubstate
 	public static var finishCallback:Null<Void->Void>;
 
 	var isTransIn:Bool = false;
-	@:nullSafety(Off)
-	var transBlack:FlxSprite;
-	@:nullSafety(Off)
-	var transGradient:FlxSprite;
+	var transBlack:Null<FlxSprite>;
+	var transGradient:Null<FlxSprite>;
 
 	var duration:Float;
 
@@ -27,24 +25,26 @@ class CustomFadeTransition extends MusicBeatSubstate
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 		var width:Int = Std.int(FlxG.width / Math.max(camera.zoom, 0.001));
 		var height:Int = Std.int(FlxG.height / Math.max(camera.zoom, 0.001));
-		transGradient = FlxGradient.createGradientFlxSprite(1, height, (isTransIn ? [0x0, FlxColor.BLACK] : [FlxColor.BLACK, 0x0]));
-		transGradient.scale.x = width;
-		transGradient.updateHitbox();
-		transGradient.scrollFactor.set();
-		transGradient.screenCenter(X);
-		add(transGradient);
+		final gradient:FlxSprite = FlxGradient.createGradientFlxSprite(1, height, (isTransIn ? [0x0, FlxColor.BLACK] : [FlxColor.BLACK, 0x0]));
+		gradient.scale.x = width;
+		gradient.updateHitbox();
+		gradient.scrollFactor.set();
+		gradient.screenCenter(X);
+		add(gradient);
+		transGradient = gradient;
 
-		transBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
-		transBlack.scale.set(width, height + 400);
-		transBlack.updateHitbox();
-		transBlack.scrollFactor.set();
-		transBlack.screenCenter(X);
-		add(transBlack);
+		final black:FlxSprite = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+		black.scale.set(width, height + 400);
+		black.updateHitbox();
+		black.scrollFactor.set();
+		black.screenCenter(X);
+		add(black);
+		transBlack = black;
 
 		if (isTransIn)
-			transGradient.y = transBlack.y - transBlack.height;
+			gradient.y = black.y - black.height;
 		else
-			transGradient.y = -transGradient.height;
+			gradient.y = -gradient.height;
 
 		super.create();
 	}
@@ -53,19 +53,24 @@ class CustomFadeTransition extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
+		final gradient:Null<FlxSprite> = transGradient;
+		final black:Null<FlxSprite> = transBlack;
+		if (gradient == null || black == null)
+			return;
+
 		final height:Float = FlxG.height * Math.max(camera.zoom, 0.001);
-		final targetPos:Float = transGradient.height + 50 * Math.max(camera.zoom, 0.001);
+		final targetPos:Float = gradient.height + 50 * Math.max(camera.zoom, 0.001);
 		if (duration > 0)
-			transGradient.y += (height + targetPos) * elapsed / duration;
+			gradient.y += (height + targetPos) * elapsed / duration;
 		else
-			transGradient.y = (targetPos) * elapsed;
+			gradient.y = (targetPos) * elapsed;
 
 		if (isTransIn)
-			transBlack.y = transGradient.y + transGradient.height;
+			black.y = gradient.y + gradient.height;
 		else
-			transBlack.y = transGradient.y - transBlack.height;
+			black.y = gradient.y - black.height;
 
-		if (transGradient.y >= targetPos)
+		if (gradient.y >= targetPos)
 		{
 			close();
 			if (finishCallback != null)
