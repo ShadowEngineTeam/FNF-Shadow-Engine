@@ -59,9 +59,23 @@ class CreditsState extends MusicBeatState
 		],
 		[
 			"Zanxt",
-			"santidayo",
+			"santi",
 			"Helper and Tester of Shadow Engine",
 			"https://www.youtube.com/@SantiYea",
+			"FFFFFF"
+		],
+		[
+			"sirthegamercoder",
+			"mtgm",
+			"Little Artist and Coding of Shadow Engine",
+			"https://bsky.app/profile/stgmd.bsky.social",
+			"FFFFFF"
+		],
+		[
+			"Sky",
+			"skelly",
+			"Porting Base Game to Shadow Engine",
+			"https://youtube.com/@skilitonskelly",
 			"FFFFFF"
 		],
 		[""],

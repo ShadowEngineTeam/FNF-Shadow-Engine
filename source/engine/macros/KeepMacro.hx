@@ -42,8 +42,27 @@ class KeepMacro
 			"flixel.addons.transition",
 			"flixel.addons.util",
 			"flixel.addons.weapon",
-			// OPENFL SYSTEM
+			// FLIXEL ANIMATE
+			"animate",
+			// OPENFL
+			"openfl.display",
+			"openfl.display3D",
+			"openfl.errors",
+			"openfl.events",
+			"openfl.filters",
+			"openfl.geom",
+			"openfl.media",
 			"openfl.system",
+			"openfl.text",
+			"openfl.ui",
+			"openfl.utils",
+			// LIME
+			"lime.app",
+			"lime.graphics",
+			"lime.media",
+			"lime.system",
+			"lime.ui",
+			"lime.utils",
 			// HXVLC & HXCODEC WRAPPERS
 			#if FEATURE_VIDEOS
 			"hxcodec",
@@ -53,16 +72,34 @@ class KeepMacro
 			"hxvlc.openfl",
 			"vlc",
 			#end
+			#if FEATURE_DISCORD_RPC
+			"hxdiscord_rpc",
+			#end
+			#if FEATURE_LUA
+			"hxluau",
+			#end
+			#if FEATURE_HSCRIPT
+			"hscript",
+			#end
 			"psychlua",
 			// BASE HAXE
 			"DateTools",
 			"EReg",
 			"Lambda",
 			"StringBuf",
+			"haxe.CallStack",
+			"haxe.Constraints",
 			"haxe.crypto",
 			"haxe.display",
+			"haxe.ds",
 			"haxe.exceptions",
 			"haxe.extern",
+			"haxe.format",
+			"haxe.Int64",
+			"haxe.io",
+			"haxe.iterators",
+			"haxe.Json",
+			"haxe.Timer",
 			// SHADOW ENGINE
 			"engine",
 			"backend",
