@@ -173,20 +173,18 @@ class ClientPrefs
 
 	public static function resetKeys(controller:Null<Bool> = null) // Null = both, False = Keyboard, True = Controller
 	{
-		var dks = defaultKeys;
-		if (controller != true && dks != null)
+		if (controller != true && defaultKeys != null)
 			for (key in keyBinds.keys())
 			{
-				var dk = dks.get(key);
+				var dk = defaultKeys.get(key);
 				if (dk != null)
 					keyBinds.set(key, dk.copy());
 			}
 
-		var dbs = defaultButtons;
-		if (controller != false && dbs != null)
+		if (controller != false && defaultButtons != null)
 			for (button in gamepadBinds.keys())
 			{
-				var db = dbs.get(button);
+				var db = defaultButtons.get(button);
 				if (db != null)
 					gamepadBinds.set(button, db.copy());
 			}

@@ -4,7 +4,7 @@ package objects;
 class CheckboxThingie extends FlxSprite
 {
 	public var sprTracker:Null<FlxSprite>;
-	public var daValue(default, set):Bool;
+	public var daValue(never, set):Bool;
 	public var copyAlpha:Bool = true;
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;

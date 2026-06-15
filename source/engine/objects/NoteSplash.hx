@@ -116,8 +116,7 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			var song = PlayState.SONG;
-			if ((note == null || note.noteSplashData.useRGBShader) && (song == null || song.disableNoteCustomColor != true))
+			if ((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || PlayState.SONG.disableNoteCustomColor != true))
 			{
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
