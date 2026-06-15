@@ -12,6 +12,7 @@
 - Fixed dragging issue
 - Fixed error logs in hscript and addTextToDebug
 - Fixed float imprecision
+- Added Tracy profiler support
 - Improved cleaning memory
 - Added `startLuasNamed`
 - Added TITLE_IOS
