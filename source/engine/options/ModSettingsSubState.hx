@@ -47,15 +47,20 @@ class ModSettingsSubState extends BaseOptionsMenu
 						if (gamepadStr == null)
 							gamepadStr = 'NONE';
 
-						newOption.defaultKeys.keyboard = keyboardStr;
-						newOption.defaultKeys.gamepad = gamepadStr;
+						final defKeys:Null<options.Option.Keybind> = newOption.defaultKeys;
+						final optKeys:Null<options.Option.Keybind> = newOption.keys;
+						if (defKeys != null && optKeys != null)
+						{
+							defKeys.keyboard = keyboardStr;
+							defKeys.gamepad = gamepadStr;
 
-						if (save.exists(option.save))
-							save.remove(option.save);
+							if (save.exists(option.save))
+								save.remove(option.save);
 
-						newOption.keys.keyboard = newOption.defaultKeys.keyboard;
-						newOption.keys.gamepad = newOption.defaultKeys.gamepad;
-						save.set(option.save, newOption.keys);
+							optKeys.keyboard = defKeys.keyboard;
+							optKeys.gamepad = defKeys.gamepad;
+							save.set(option.save, optKeys);
+						}
 
 						// getting inputs and checking
 						var keyboardKey:FlxKey = cast FlxKey.fromString(keyboardStr);
@@ -138,7 +143,8 @@ class ModSettingsSubState extends BaseOptionsMenu
 					switch (newOption.type)
 					{
 						case 'string':
-							var num:Int = newOption.options.indexOf(myValue);
+							final opts:Null<Array<String>> = newOption.options;
+							var num:Int = opts != null ? opts.indexOf(myValue) : -1;
 							if (num > -1)
 								newOption.curOption = num;
 					}

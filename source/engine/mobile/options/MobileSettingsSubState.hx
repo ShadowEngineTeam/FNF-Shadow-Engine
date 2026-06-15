@@ -4,7 +4,7 @@ import flixel.input.keyboard.FlxKey;
 import options.BaseOptionsMenu;
 import options.Option;
 
-@:nullSafety
+@:nullSafety(Off)
 class MobileSettingsSubState extends BaseOptionsMenu
 {
 	#if FEATURE_MOBILE_CONTROLS

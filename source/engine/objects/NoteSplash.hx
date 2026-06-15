@@ -113,6 +113,7 @@ class NoteSplash extends FlxSprite
 			}
 
 			@:nullSafety(Off)
+			if (colorSwap != null)
 			{
 				colorSwap.hue = hue;
 				colorSwap.saturation = saturation;
@@ -126,6 +127,7 @@ class NoteSplash extends FlxSprite
 				if (note != null && !note.noteSplashData.useGlobalShader)
 				{
 					@:nullSafety(Off)
+					if (note.rgbShader != null)
 					{
 						if (note.noteSplashData.r != -1)
 							note.rgbShader.r = note.noteSplashData.r;
@@ -147,7 +149,8 @@ class NoteSplash extends FlxSprite
 		if (!ClientPrefs.data.disableRGBNotes)
 		{
 			@:nullSafety(Off)
-			rgbShader.copyValues(tempShader);
+			if (rgbShader != null)
+				rgbShader.copyValues(tempShader);
 		}
 
 		if (note != null)
