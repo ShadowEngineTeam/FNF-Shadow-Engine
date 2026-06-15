@@ -36,6 +36,7 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+	static final FEATURE_TRACY:CompileFlag = CompileFlag.get("FEATURE_TRACY");
 	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
 
 	static final ENABLE_ASCII_ART:Bool = true;
@@ -193,7 +194,7 @@ class Project extends HXProject
 			PRELOADER = "flixel.system.FlxBasePreloader";
 		app.preloader = PRELOADER;
 
-		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}/';
+		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}${FEATURE_TRACY.isEnabled() ? "-tracy" : ""}/' ;
 		app.path = buildDir;
 
 		for (shadowName in LIBRARY_SHADOWS_LIST)
@@ -235,6 +236,7 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
+		FEATURE_TRACY.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
@@ -260,6 +262,17 @@ class Project extends HXProject
 
 		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
+
+		if (FEATURE_TRACY.isEnabled())
+		{
+			setHaxedef("HXCPP_TELEMETRY");
+			setHaxedef("HXCPP_TRACY");
+			setHaxedef("HXCPP_TRACY_MEMORY");
+			setHaxedef("HXCPP_TRACY_ON_DEMAND");
+			// setHaxedef("HXCPP_TRACY_INCLUDE_CALLSTACKS");
+
+			setHaxedef("absolute-paths"); // Fix source locations so Tracy can see them
+		}
 
 		if (FEATURE_HSCRIPT.isEnabled())
 		{

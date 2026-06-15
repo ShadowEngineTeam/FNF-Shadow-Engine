@@ -22,6 +22,10 @@ class InitState extends FlxState
 
 		Paths.clearStoredMemory();
 
+		#if FEATURE_TRACY
+		cpp.vm.tracy.TracyProfiler.setThreadName("main");
+		#end
+
 		#if FEATURE_VIDEOS
 		hxvlc.util.Handle.init();
 		#end
