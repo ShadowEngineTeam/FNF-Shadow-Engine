@@ -79,13 +79,11 @@ class ShadowInputText extends FlxText
 	public var fieldBorderColor(default, set):Int = FlxColor.BLACK;
 	public var fieldBorderThickness(default, set):Int = 1;
 	public var backgroundColor(default, set):Int = FlxColor.WHITE;
-	@:nullSafety(Off)
-	private var backgroundSprite:FlxSprite;
+	private var backgroundSprite:Null<FlxSprite>;
 	private var _caretTimer:FlxTimer;
 	private var caret:FlxSprite;
 	private var selectionSprite:FlxSprite;
-	@:nullSafety(Off)
-	private var fieldBorderSprite:FlxSprite;
+	private var fieldBorderSprite:Null<FlxSprite>;
 	private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
 	private var _charBoundaries:Array<FlxRect> = [];
 	private var lastScroll:Int = 0;

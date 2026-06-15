@@ -15,8 +15,7 @@ class ShadowDropdown extends FlxSpriteGroup
 {
 	public var selectedIndex(get, set):Int;
 
-	@:nullSafety(Off)
-	public var selectedLabel(get, null):String;
+	public var selectedLabel(get, never):String;
 	public var callback:Null<Int->Void>;
 	public var hasFocus:Bool = false;
 
@@ -26,16 +25,12 @@ class ShadowDropdown extends FlxSpriteGroup
 
 	var options:Array<String>;
 
-	@:nullSafety(Off)
 	var header:FlxSprite;
 
-	@:nullSafety(Off)
 	var headerText:FlxText;
 
-	@:nullSafety(Off)
 	var arrow:FlxSprite;
 
-	@:nullSafety(Off)
 	var dropList:ShadowDropdownList;
 
 	var listBg:Null<FlxSprite>;
@@ -70,21 +65,23 @@ class ShadowDropdown extends FlxSpriteGroup
 		_height = ShadowStyle.HEIGHT_INPUT;
 		_maxVisible = maxVisibleItems;
 
+		// initialize all non-null fields before any method call so the null-safety checker is satisfied
 		header = new FlxSprite(0, 0);
+		headerText = new FlxText(ShadowStyle.SPACING_SM, 0, _width - 24, options.length > 0 ? options[0] : "");
+		arrow = new FlxSprite(_width - 16, 0);
+		dropList = new ShadowDropdownList(0, _height);
+
 		drawHeader(ShadowStyle.BORDER_DARK);
 		add(header);
 
-		headerText = new FlxText(ShadowStyle.SPACING_SM, 0, _width - 24, options.length > 0 ? options[0] : "");
 		headerText.setFormat(Paths.font(ShadowStyle.FONT_DEFAULT), ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_PRIMARY);
 		headerText.antialiasing = ShadowStyle.antialiasing;
 		headerText.y = (_height - headerText.height) / 2;
 		add(headerText);
 
-		arrow = new FlxSprite(_width - 16, 0);
 		drawArrow();
 		add(arrow);
 
-		dropList = new ShadowDropdownList(0, _height);
 		dropList.dropdown = this;
 		dropList.visible = false;
 		dropList.exists = false;
