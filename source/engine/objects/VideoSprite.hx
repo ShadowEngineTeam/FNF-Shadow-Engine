@@ -16,11 +16,9 @@ class VideoSprite extends FlxSpriteGroup
 	@:nullSafety(Off)
 	public var videoSprite:FlxVideoSprite;
 
-	@:nullSafety(Off)
-	public var skipSprite:FlxRadialGauge;
+	public var skipSprite:Null<FlxRadialGauge>;
 
-	@:nullSafety(Off)
-	public var cover:FlxSprite;
+	public var cover:Null<FlxSprite>;
 	public var canSkip(default, set):Bool = false;
 	public var waiting:Bool = false;
 	final _timeToSkip:Float = 1;
@@ -36,10 +34,12 @@ class VideoSprite extends FlxSpriteGroup
 
 		waiting = isWaiting;
 		if (!waiting) {
-			add(cover = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK));
-			cover.scale.set(FlxG.width + 100, FlxG.height + 100);
-			cover.screenCenter();
-			cover.scrollFactor.set();
+			final bg:FlxSprite = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+			add(bg);
+			bg.scale.set(FlxG.width + 100, FlxG.height + 100);
+			bg.screenCenter();
+			bg.scrollFactor.set();
+			cover = bg;
 		}
 
 		// initialize sprites
@@ -76,9 +76,10 @@ class VideoSprite extends FlxSpriteGroup
 		if (alreadyDestroyed) return;
 
 		//trace('Video destroyed');
-		if (cover != null) {
-			remove(cover);
-			cover.destroy();
+		final c:Null<FlxSprite> = cover;
+		if (c != null) {
+			remove(c);
+			c.destroy();
 		}
 
 		finishCallback = null;
@@ -129,23 +130,29 @@ class VideoSprite extends FlxSpriteGroup
 	function set_canSkip(val:Bool):Bool {
 		if (val) {
 			if (skipSprite == null) {
-				add(skipSprite = new FlxRadialGauge(0, 0, backend.Paths.image('pie')));
-				skipSprite.setPosition(FlxG.width - (skipSprite.width + 80), FlxG.height - (skipSprite.height + 72));
-				skipSprite.amount = 0;
+				final gauge:FlxRadialGauge = new FlxRadialGauge(0, 0, backend.Paths.image('pie'));
+				add(gauge);
+				gauge.setPosition(FlxG.width - (gauge.width + 80), FlxG.height - (gauge.height + 72));
+				gauge.amount = 0;
+				skipSprite = gauge;
 			}
 		}
-		else if (skipSprite != null) {
-			remove(skipSprite);
-			skipSprite = flixel.util.FlxDestroyUtil.destroy(skipSprite);
+		else {
+			final gauge:Null<FlxRadialGauge> = skipSprite;
+			if (gauge != null) {
+				remove(gauge);
+				skipSprite = flixel.util.FlxDestroyUtil.destroy(gauge);
+			}
 		}
 
 		return canSkip = val;
 	}
 
 	function updateSkipAlpha():Void {
-		if (skipSprite == null) return;
-		skipSprite.amount = FlxMath.bound(holdingTime / _timeToSkip * 1.025, 0, 1);
-		skipSprite.alpha = FlxMath.remapToRange(skipSprite.amount, 0.025, 1, 0, 1);
+		final gauge:Null<FlxRadialGauge> = skipSprite;
+		if (gauge == null) return;
+		gauge.amount = FlxMath.bound(holdingTime / _timeToSkip * 1.025, 0, 1);
+		gauge.alpha = FlxMath.remapToRange(gauge.amount, 0.025, 1, 0, 1);
 	}
 
 	public function play():Void

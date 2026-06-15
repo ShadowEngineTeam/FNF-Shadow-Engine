@@ -38,12 +38,10 @@ class ShadowDropdown extends FlxSpriteGroup
 	@:nullSafety(Off)
 	var dropList:ShadowDropdownList;
 
-	@:nullSafety(Off)
-	var listBg:FlxSprite;
+	var listBg:Null<FlxSprite>;
 	var isOpen:Bool = false;
 
-	@:nullSafety(Off)
-	var _rowHighlight:FlxSprite;
+	var _rowHighlight:Null<FlxSprite>;
 	var _rowItems:Array<FlxText> = [];
 
 	var _width:Int;
@@ -239,8 +237,12 @@ class ShadowDropdown extends FlxSpriteGroup
 		if (!isMouseOverList(cam))
 			return -1;
 
+		final bg:Null<FlxSprite> = listBg;
+		if (bg == null)
+			return -1;
+
 		FlxG.mouse.getViewPosition(cam, _tmpMouse);
-		listBg.getScreenPosition(_tmpBg, cam);
+		bg.getScreenPosition(_tmpBg, cam);
 
 		var localY:Float = _tmpMouse.y - _tmpBg.y;
 		if (localY < 0)
@@ -332,21 +334,25 @@ class ShadowDropdown extends FlxSpriteGroup
 		}
 
 		ensureListAssets();
-		_rowHighlight.x = this.x;
+		final bg:Null<FlxSprite> = listBg;
+		final highlight:Null<FlxSprite> = _rowHighlight;
+		if (bg == null || highlight == null)
+			return;
+		highlight.x = this.x;
 
 		var listHeight:Int = visibleCount * _height;
 
-		listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
+		bg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
 		for (i in 0..._width)
-			listBg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
+			bg.pixels.setPixel32(i, listHeight - 1, ShadowStyle.BORDER_DARK);
 		for (i in 0...listHeight)
 		{
-			listBg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
-			listBg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
+			bg.pixels.setPixel32(0, i, ShadowStyle.BORDER_DARK);
+			bg.pixels.setPixel32(_width - 1, i, ShadowStyle.BORDER_DARK);
 		}
-		listBg.x = this.x;
-		listBg.y = this.y + _height;
-		listBg.visible = true;
+		bg.x = this.x;
+		bg.y = this.y + _height;
+		bg.visible = true;
 
 		dropList.visible = true;
 		dropList.exists = true;
@@ -471,7 +477,7 @@ class ShadowDropdown extends FlxSpriteGroup
 	function get_selectedLabel():String
 	{
 		if (options != null && options.length > _selectedIndex && _selectedIndex >= 0)
-			return options[_selectedIndex];
+			return options[_selectedIndex] ?? "";
 		return "";
 	}
 

@@ -26,8 +26,7 @@ class Main extends Sprite
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	@:nullSafety(Off)
-	public static var fpsVar:Framerate;
+	public static var fpsVar:Null<Framerate>;
 
 	public static function main():Void
 	{
@@ -97,12 +96,14 @@ class Main extends Sprite
 
 		addChild(funkinGame);
 
+		final fps:Framerate = new Framerate();
+		fpsVar = fps;
 		@:privateAccess
-		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
+		FlxG.game.addChildAt(fps, FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
 		debug.codename.SystemInfo.init();
 
 		final mouseSprite:Sprite = new Sprite();
-        FlxG.game.addChildAt(mouseSprite, FlxG.game.getChildIndex(fpsVar) + 1);
+        FlxG.game.addChildAt(mouseSprite, FlxG.game.getChildIndex(fps) + 1);
         untyped FlxG.mouse.cursorContainer = mouseSprite;
 
 		Lib.current.stage.align = "tl";

@@ -71,15 +71,19 @@ class DialogueCharacter extends FlxSprite
 			path = Paths.getSharedPath(defaultPath);
 
 		var rawJson:String = File.getContent(path) ?? '';
-		jsonFile = cast Json.parse(rawJson, path);
+		jsonFile = Json.parse(rawJson, path);
 	}
 
 	public function reloadAnimations()
 	{
 		dialogueAnimations.clear();
-		if (jsonFile.animations != null && jsonFile.animations.length > 0)
+		final json:Null<DialogueCharacterFile> = jsonFile;
+		if (json == null)
+			return;
+		final anims = json.animations;
+		if (anims != null && anims.length > 0)
 		{
-			for (anim in jsonFile.animations)
+			for (anim in anims)
 			{
 				animation.addByPrefix(anim.anim, anim.loop_name, 24, isGhost);
 				animation.addByPrefix(anim.anim + IDLE_SUFFIX, anim.idle_name, 24, true);
