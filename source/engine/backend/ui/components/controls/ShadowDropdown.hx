@@ -32,6 +32,18 @@ class ShadowDropdown extends FlxSpriteGroup
 	var _rowHighlight:FlxSprite;
 	var _rowItems:Array<FlxText> = [];
 
+	static inline var SCROLLBAR_W:Int = 16;
+	static inline var SCROLL_BTN_H:Int = 18;
+
+	var _scrollUpBtn:FlxSprite;
+	var _scrollDownBtn:FlxSprite;
+	var _scrollTrack:FlxSprite;
+	var _scrollThumb:FlxSprite;
+	var _hasScrollbar:Bool = false;
+	var _scrollDragging:Bool = false;
+	var _scrollDragStartY:Float = 0;
+	var _scrollDragStartIndex:Int = 0;
+
 	var _width:Int;
 	var _height:Int;
 	var _maxVisible:Int;
@@ -126,6 +138,15 @@ class ShadowDropdown extends FlxSpriteGroup
 		for (t in _rowItems)
 			if (t != null)
 				t.cameras = cameras;
+
+		if (_scrollUpBtn != null)
+			_scrollUpBtn.cameras = cameras;
+		if (_scrollDownBtn != null)
+			_scrollDownBtn.cameras = cameras;
+		if (_scrollTrack != null)
+			_scrollTrack.cameras = cameras;
+		if (_scrollThumb != null)
+			_scrollThumb.cameras = cameras;
 	}
 
 	public static function closeAllOpen():Void
@@ -149,6 +170,20 @@ class ShadowDropdown extends FlxSpriteGroup
 		if (_clickConsumedFrame != Std.int(FlxG.game.ticks))
 			return false;
 		return _clickConsumer.exists && _clickConsumer.active && _clickConsumer.visible && _clickConsumer.isOpen;
+	}
+
+	public static function isPointOverAnyOpenList(?exclude:ShadowDropdown):Bool
+	{
+		for (d in _instances)
+		{
+			if (d == null || d == exclude)
+				continue;
+			if (!d.exists || !d.active || !d.visible || !d.isOpen)
+				continue;
+			if (d.isMouseOverList(d.getCam()))
+				return true;
+		}
+		return false;
 	}
 
 	public static function consumeClick(?consumer:ShadowDropdown):Void
@@ -199,6 +234,24 @@ class ShadowDropdown extends FlxSpriteGroup
 		}
 	}
 
+	function drawScrollButton(s:FlxSprite, up:Bool):Void
+	{
+		s.makeGraphic(SCROLLBAR_W, SCROLL_BTN_H, ShadowStyle.BG_LIGHT, true);
+		var cx:Int = Std.int(SCROLLBAR_W / 2);
+		var cy:Int = Std.int(SCROLL_BTN_H / 2);
+		var dir:Int = up ? 1 : -1;
+		for (row in 0...3)
+		{
+			for (col in 0...(row * 2 + 1))
+			{
+				var px:Int = cx - row + col;
+				var py:Int = cy + dir * (row - 1);
+				if (px >= 0 && px < SCROLLBAR_W && py >= 0 && py < SCROLL_BTN_H)
+					s.pixels.setPixel32(px, py, ShadowStyle.TEXT_SECONDARY);
+			}
+		}
+	}
+
 	inline function mouseOverSpriteScreenRect(s:FlxSprite, cam:FlxCamera):Bool
 	{
 		if (s == null || !s.visible)
@@ -227,8 +280,11 @@ class ShadowDropdown extends FlxSpriteGroup
 		FlxG.mouse.getViewPosition(cam, _tmpMouse);
 		listBg.getScreenPosition(_tmpBg, cam);
 
+		var localX:Float = _tmpMouse.x - _tmpBg.x;
 		var localY:Float = _tmpMouse.y - _tmpBg.y;
 		if (localY < 0)
+			return -1;
+		if (_hasScrollbar && localX >= _width - SCROLLBAR_W)
 			return -1;
 
 		var idx:Int = _scrollIndex + Std.int(localY / _height);
@@ -265,6 +321,43 @@ class ShadowDropdown extends FlxSpriteGroup
 			t.cameras = cameras;
 			_rowItems.push(t);
 			dropList.add(t);
+		}
+
+		if (_scrollUpBtn == null)
+		{
+			_scrollUpBtn = new FlxSprite(0, 0);
+			drawScrollButton(_scrollUpBtn, true);
+			_scrollUpBtn.visible = false;
+			_scrollUpBtn.cameras = cameras;
+			dropList.add(_scrollUpBtn);
+		}
+
+		if (_scrollDownBtn == null)
+		{
+			_scrollDownBtn = new FlxSprite(0, 0);
+			drawScrollButton(_scrollDownBtn, false);
+			_scrollDownBtn.visible = false;
+			_scrollDownBtn.cameras = cameras;
+			dropList.add(_scrollDownBtn);
+		}
+
+		if (_scrollTrack == null)
+		{
+			var trackH:Int = Std.int(Math.max(1, _maxVisible * _height - SCROLL_BTN_H * 2));
+			_scrollTrack = new FlxSprite(0, 0);
+			_scrollTrack.makeGraphic(SCROLLBAR_W, trackH, ShadowStyle.BG_INPUT, true);
+			_scrollTrack.visible = false;
+			_scrollTrack.cameras = cameras;
+			dropList.add(_scrollTrack);
+		}
+
+		if (_scrollThumb == null)
+		{
+			_scrollThumb = new FlxSprite(0, 0);
+			_scrollThumb.makeGraphic(SCROLLBAR_W - 2, 10, ShadowStyle.BORDER_LIGHT, true);
+			_scrollThumb.visible = false;
+			_scrollThumb.cameras = cameras;
+			dropList.add(_scrollThumb);
 		}
 	}
 
@@ -313,6 +406,15 @@ class ShadowDropdown extends FlxSpriteGroup
 			for (row in _rowItems)
 				if (row != null)
 					row.visible = false;
+			if (_scrollUpBtn != null)
+				_scrollUpBtn.visible = false;
+			if (_scrollDownBtn != null)
+				_scrollDownBtn.visible = false;
+			if (_scrollTrack != null)
+				_scrollTrack.visible = false;
+			if (_scrollThumb != null)
+				_scrollThumb.visible = false;
+			_hasScrollbar = false;
 			return;
 		}
 
@@ -320,6 +422,8 @@ class ShadowDropdown extends FlxSpriteGroup
 		_rowHighlight.x = this.x;
 
 		var listHeight:Int = visibleCount * _height;
+		_hasScrollbar = options.length > _maxVisible;
+		var rowTextWidth:Int = _width - ShadowStyle.SPACING_SM * 2 - (_hasScrollbar ? SCROLLBAR_W : 0);
 
 		listBg.makeGraphic(_width, listHeight, ShadowStyle.BG_DARK, true);
 		for (i in 0..._width)
@@ -360,6 +464,7 @@ class ShadowDropdown extends FlxSpriteGroup
 				row.visible = true;
 				row.x = this.x + ShadowStyle.SPACING_SM; // ensure X is always correct
 				row.y = (this.y + _height) + i * _height + Std.int((_height - 14) / 2);
+				row.fieldWidth = rowTextWidth;
 				row.text = options[optionIndex];
 
 				row.color = (optionIndex == _selectedIndex) ? ShadowStyle.ACCENT : ShadowStyle.TEXT_PRIMARY;
@@ -386,6 +491,44 @@ class ShadowDropdown extends FlxSpriteGroup
 				_rowHighlight.visible = false;
 			}
 		}
+
+		if (_hasScrollbar)
+		{
+			var maxScroll:Int = options.length - visibleCount;
+
+			_scrollUpBtn.x = this.x + _width - SCROLLBAR_W;
+			_scrollUpBtn.y = this.y + _height;
+			_scrollUpBtn.visible = true;
+
+			_scrollDownBtn.x = this.x + _width - SCROLLBAR_W;
+			_scrollDownBtn.y = this.y + _height + listHeight - SCROLL_BTN_H;
+			_scrollDownBtn.visible = true;
+
+			_scrollTrack.x = this.x + _width - SCROLLBAR_W;
+			_scrollTrack.y = this.y + _height + SCROLL_BTN_H;
+			_scrollTrack.visible = true;
+
+			var trackH:Float = _scrollTrack.height;
+			var thumbH:Float = Math.max(10, trackH * (visibleCount / options.length));
+			if (Std.int(_scrollThumb.height) != Std.int(thumbH))
+				_scrollThumb.makeGraphic(SCROLLBAR_W - 2, Std.int(thumbH), ShadowStyle.BORDER_LIGHT, true);
+
+			var ratio:Float = maxScroll > 0 ? _scrollIndex / maxScroll : 0;
+			_scrollThumb.x = this.x + _width - SCROLLBAR_W + 1;
+			_scrollThumb.y = _scrollTrack.y + ratio * (trackH - thumbH);
+			_scrollThumb.visible = true;
+		}
+		else
+		{
+			if (_scrollUpBtn != null)
+				_scrollUpBtn.visible = false;
+			if (_scrollDownBtn != null)
+				_scrollDownBtn.visible = false;
+			if (_scrollTrack != null)
+				_scrollTrack.visible = false;
+			if (_scrollThumb != null)
+				_scrollThumb.visible = false;
+		}
 	}
 
 	inline function openList():Void
@@ -408,6 +551,7 @@ class ShadowDropdown extends FlxSpriteGroup
 		isOpen = false;
 		hasFocus = false;
 		_hoverIndex = -1;
+		_scrollDragging = false;
 
 		if (dropList != null)
 		{
@@ -423,6 +567,14 @@ class ShadowDropdown extends FlxSpriteGroup
 		for (row in _rowItems)
 			if (row != null)
 				row.visible = false;
+		if (_scrollUpBtn != null)
+			_scrollUpBtn.visible = false;
+		if (_scrollDownBtn != null)
+			_scrollDownBtn.visible = false;
+		if (_scrollTrack != null)
+			_scrollTrack.visible = false;
+		if (_scrollThumb != null)
+			_scrollThumb.visible = false;
 
 		clearClickConsumer(this);
 		if (!_headerHovered)
@@ -520,7 +672,7 @@ class ShadowDropdown extends FlxSpriteGroup
 				_ignoreUntilMouseRelease = false;
 		}
 
-		var overHeader:Bool = isMouseOverHeader(cam);
+		var overHeader:Bool = isMouseOverHeader(cam) && !ShadowDropdown.isPointOverAnyOpenList(this);
 		if (overHeader && !_headerHovered)
 		{
 			_headerHovered = true;
@@ -559,6 +711,48 @@ class ShadowDropdown extends FlxSpriteGroup
 
 			if (isOpen && leftClick)
 			{
+				if (_hasScrollbar)
+				{
+					if (mouseOverSpriteScreenRect(_scrollUpBtn, cam))
+					{
+						scrollListBy(-1);
+						consumeClick(this);
+						return;
+					}
+
+					if (mouseOverSpriteScreenRect(_scrollDownBtn, cam))
+					{
+						scrollListBy(1);
+						consumeClick(this);
+						return;
+					}
+
+					if (mouseOverSpriteScreenRect(_scrollThumb, cam))
+					{
+						FlxG.mouse.getViewPosition(cam, _tmpMouse);
+						_scrollDragging = true;
+						_scrollDragStartY = _tmpMouse.y;
+						_scrollDragStartIndex = _scrollIndex;
+						consumeClick(this);
+						return;
+					}
+
+					if (mouseOverSpriteScreenRect(_scrollTrack, cam))
+					{
+						FlxG.mouse.getViewPosition(cam, _tmpMouse);
+						_scrollTrack.getScreenPosition(_tmpBg, cam);
+
+						var visibleCount:Int = Std.int(Math.min(options.length, _maxVisible));
+						var maxScroll:Int = Std.int(Math.max(0, options.length - visibleCount));
+						var ratio:Float = Math.max(0, Math.min(1, (_tmpMouse.y - _tmpBg.y) / _scrollTrack.height));
+
+						_scrollIndex = Std.int(Math.round(ratio * maxScroll));
+						buildDropList();
+						consumeClick(this);
+						return;
+					}
+				}
+
 				var idx:Int = getHoveredIndexOnList(cam);
 				if (idx != -1)
 				{
@@ -579,6 +773,33 @@ class ShadowDropdown extends FlxSpriteGroup
 			}
 		}
 
+		if (_scrollDragging)
+		{
+			if (!isOpen || !_hasScrollbar || !FlxG.mouse.pressed)
+			{
+				_scrollDragging = false;
+			}
+			else
+			{
+				var visibleCount:Int = Std.int(Math.min(options.length, _maxVisible));
+				var maxScroll:Int = Std.int(Math.max(0, options.length - visibleCount));
+				var usable:Float = _scrollTrack.height - _scrollThumb.height;
+
+				if (usable > 0 && maxScroll > 0)
+				{
+					FlxG.mouse.getViewPosition(cam, _tmpMouse);
+					var dy:Float = _tmpMouse.y - _scrollDragStartY;
+					var newIndex:Int = Std.int(Math.round(_scrollDragStartIndex + dy / usable * maxScroll));
+					newIndex = Std.int(Math.max(0, Math.min(maxScroll, newIndex)));
+					if (newIndex != _scrollIndex)
+					{
+						_scrollIndex = newIndex;
+						buildDropList();
+					}
+				}
+			}
+		}
+
 		if (isOpen && isMouseOverList(cam))
 		{
 			var wheel:Int = Math.round(FlxG.mouse.deltaWheel.y);
@@ -588,6 +809,18 @@ class ShadowDropdown extends FlxSpriteGroup
 				_scrollIndex = Math.round(FlxMath.bound(_scrollIndex - wheel, 0, maxScroll));
 				buildDropList();
 			}
+		}
+	}
+
+	function scrollListBy(delta:Int):Void
+	{
+		var visibleCount:Int = Std.int(Math.min(options.length, _maxVisible));
+		var maxScroll:Int = Std.int(Math.max(0, options.length - visibleCount));
+		var newIndex:Int = Std.int(Math.max(0, Math.min(maxScroll, _scrollIndex + delta)));
+		if (newIndex != _scrollIndex)
+		{
+			_scrollIndex = newIndex;
+			buildDropList();
 		}
 	}
 }
