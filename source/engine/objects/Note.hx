@@ -158,6 +158,13 @@ class Note extends FlxSkewedSprite
 	{
 		_activeNotes.remove(this);
 		kill();
+
+		// don't carry over shader/colorSwap state from the note's previous life -
+		// the next reuse may have a different noteData/skin and needs to rebind
+		colorSwap = null;
+		rgbShader = null;
+		shader = null;
+
 		notePool.push(this);
 	}
 

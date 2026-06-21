@@ -1572,7 +1572,7 @@ class PlayState extends MusicBeatState
 	{
 		final args:Array<Dynamic> = [event.event, event.value1, event.value2, event.strumTime];
 		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', args, true, [], [0]);
-		if (returnedValue != null && returnedValue != 0)
+		if (returnedValue != null && returnedValue != 0 /*&& returnedValue != ScriptResult.Continue*/)
 		{
 			return returnedValue;
 		}

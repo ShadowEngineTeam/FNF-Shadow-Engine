@@ -288,10 +288,7 @@ class MusicBeatState extends FlxTransitionableState implements IMusicState
 	public function new()
 	{
 		stateInstance = this;
-		if (ScriptManager.instance == null)
-			ScriptManager.instance = new ScriptManager(this);
-		scripts = ScriptManager.instance;
-		scripts.rebind(this);
+		scripts = new ScriptManager(this);
 
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this))).replace('states.', '').replace('.', '/');
