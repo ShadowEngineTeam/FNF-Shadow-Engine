@@ -368,29 +368,19 @@ class PauseSubState extends MusicBeatSubstate
 
 	public static function restartSong(noTrans:Bool = false)
 	{
+		var pss = cast(FlxG.state.subState, PauseSubState);
+		if (pss != null) pss.grpMenuShit.visible = false;
+
 		PlayState.instance.paused = true; // For lua
 		FlxG.sound.music.volume = 0;
 		PlayState.instance.vocals.volume = 0;
 
-		if (PlayState.isPixelStage)
+		if (noTrans)
 		{
-			RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
-			new FlxTimer().start(2, function(_)
-			{
-				FlxTransitionableState.skipNextTransIn = true;
-				FlxTransitionableState.skipNextTransOut = true;
-				Funkin.resetState();
-			});
+			FlxTransitionableState.skipNextTransIn = true;
+			FlxTransitionableState.skipNextTransOut = true;
 		}
-		else
-		{
-			if (noTrans)
-			{
-				FlxTransitionableState.skipNextTransIn = true;
-				FlxTransitionableState.skipNextTransOut = true;
-			}
-			Funkin.resetState();
-		}
+		Funkin.resetState();
 	}
 
 	override function destroy()
