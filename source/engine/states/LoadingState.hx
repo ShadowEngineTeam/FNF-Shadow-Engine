@@ -255,7 +255,7 @@ class LoadingState extends MusicBeatState
 		var player2:String = song.player2;
 		var gfVersion:String = song.gfVersion;
 		var needsVoices:Bool = song.needsVoices;
-		var prefixVocals:String = needsVoices ? '$folder/Voices' + Difficulty.getSongPrefix() : null;
+		var prefixVocals:String = needsVoices ? '$folder/Voices' : null;
 		if (gfVersion == null)
 			gfVersion = 'gf';
 

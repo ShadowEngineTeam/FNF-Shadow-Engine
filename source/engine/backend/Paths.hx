@@ -23,7 +23,6 @@ class Paths
 	public static final VIDEO_EXT:String = "mp4";
 	#end
 	public static final SOUND_EXTS:Array<String> = ['ogg', 'opus', 'mp3', 'flac', 'wav'];
-	public static var LOADOLD:Bool = false;
 
 	public static final dumpExclusions:Array<String> = [
 		'assets/shared/images/touchpad/bg.$IMAGE_EXT',
@@ -409,13 +408,13 @@ class Paths
 
 	inline public static function voices(song:String, postfix:String = null):Any
 	{
-		var songKey:String = 'songs/${formatToSongPath(song)}/Voices${postfix != null ? '-$postfix' : ''}${LOADOLD ? "-Old" : ""}';
+		var songKey:String = 'songs/${formatToSongPath(song)}/Voices${postfix != null ? '-$postfix' : ''}';
 		return returnSound(null, songKey);
 	}
 
 	inline public static function inst(song:String, postfix:String = null):Sound
 	{
-		var songKey:String = 'songs/${formatToSongPath(song)}/Inst${postfix != null ? '-$postfix' : ''}${LOADOLD ? "-Old" : ""}';
+		var songKey:String = 'songs/${formatToSongPath(song)}/Inst${postfix != null ? '-$postfix' : ''}';
 		return returnSound(null, songKey);
 	}
 
