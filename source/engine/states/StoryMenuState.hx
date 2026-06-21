@@ -343,13 +343,16 @@ class StoryMenuState extends MusicBeatState
 	function changeDifficulty(change:Int = 0):Void
 	{
 		//read changeDiff function in freeplay for more info
-		if (curDifficulty == -1) {
+		if (curDifficulty == -1)
+		{
 			for (diff in Difficulty.list)
 				trace(diff);
 			final normalIndex:Int = Difficulty.list.indexOf(NORMAL);
 			curDifficulty = normalIndex != -1 ? normalIndex : 0;
 			trace(curDifficulty);
-		} else curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
+		}
+		else
+			curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
 
 		callOnScripts('onChangeDifficulty');
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
