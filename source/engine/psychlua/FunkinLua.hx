@@ -107,7 +107,7 @@ class FunkinLua
 			set('startedCountdown', false);
 
 			set('difficultyName', Difficulty.getByIndex());
-			set('difficultyPath', Paths.formatToSongPath(diff));
+			set('difficultyPath', Paths.formatToSongPath(Difficulty.getByIndex()));
 			set('isErect', game.isErect);
 			set('weekRaw', PlayState.storyWeek);
 			set('week', WeekData.weeksList[PlayState.storyWeek]);
