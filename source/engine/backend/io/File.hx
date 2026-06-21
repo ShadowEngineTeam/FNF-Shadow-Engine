@@ -26,10 +26,12 @@ class File
 
 	static function openflcwd(path:String):String
 	{
+		#if !FEATURE_EMBED_ASSETS
 		@:privateAccess
 		for (library in lime.utils.Assets.libraries.keys())
 			if (Assets.exists('$library:$path') && !path.startsWith('$library:'))
 				return '$library:$path';
+		#end
 
 		return path;
 	}
