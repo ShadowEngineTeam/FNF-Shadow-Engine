@@ -1,4 +1,5 @@
 package states;
+
 import backend.InputFormatter;
 import backend.WeekData;
 import backend.Highscore;
