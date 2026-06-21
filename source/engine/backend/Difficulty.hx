@@ -5,6 +5,9 @@ class Difficulty
 	public static var defaultList(default, never):Array<Diff> = [EASY, NORMAL, HARD];
 	public static var list:Array<Diff> = [];
 
+	inline public static function getString(?index:Int):String
+		return Std.string(getByIndex(index));
+
 	inline public static function getByIndex(?index:Int):Diff
 	{
 		index ??= PlayState.storyDifficulty;
@@ -30,7 +33,14 @@ class Difficulty
 		week ??= WeekData.getCurrentWeek();
 
 		final diffStr:Array<Diff> = week.difficulties;
-		diffStr?.length > 0 ? list = diffStr : resetList();
+		if (diffStr != null && diffStr.length > 0)
+		{
+			list = [];
+			for (diff in diffStr)
+				list.push((diff:String).toLowerCase());
+		}
+		else
+			resetList();
 	}
 
 	inline public static function resetList():Void
