@@ -6,12 +6,14 @@ import openfl.filters.ColorMatrixFilter;
 
 class RetroCameraFade
 {
+	// im lazy, but we only use this for week 6
+  	// and also sorta yoinked for djflixel, lol !
 	public static function fadeWhite(camera:FlxCamera, camSteps:Int = 5, time:Float = 1):Void
 	{
 		var steps:Int = 0;
 		var stepsTotal:Int = camSteps;
 
-		new FlxTimer().start(time / stepsTotal, _ ->
+		new FlxTimer().start(time / (stepsTotal + 1), _ ->
 		{
 			var V:Float = (1 / stepsTotal) * steps;
 			if (steps == stepsTotal)
@@ -63,7 +65,7 @@ class RetroCameraFade
 		var steps:Int = 0;
 		var stepsTotal:Int = camSteps;
 
-		new FlxTimer().start(time / stepsTotal, _ ->
+		new FlxTimer().start(time / (stepsTotal + 1), _ ->
 		{
 			var V:Float = (1 / stepsTotal) * steps;
 			if (steps == stepsTotal)
@@ -77,7 +79,7 @@ class RetroCameraFade
 			];
 			camera.filters = [new ColorMatrixFilter(matrix)];
 			steps++;
-		}, camSteps);
+		}, stepsTotal + 1);
 	}
 
 	public static function fadeBlack(camera:FlxCamera, camSteps:Int = 5, time:Float = 1):Void
@@ -93,7 +95,7 @@ class RetroCameraFade
 		];
 		camera.filters = [new ColorMatrixFilter(matrixDerp)];
 
-		new FlxTimer().start(time / stepsTotal, _ ->
+		new FlxTimer().start(time / (stepsTotal + 1), _ ->
 		{
 			var V:Float = (1 / stepsTotal) * steps;
 			if (steps == stepsTotal)

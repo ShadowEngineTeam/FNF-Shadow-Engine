@@ -641,7 +641,8 @@ class PlayState extends MusicBeatState
 		#end
 
 		if (isPixelStage)
-			RetroCameraFade.fadeBlack(FlxG.camera, 10, 1);
+			for (cam in FlxG.cameras.list)
+				RetroCameraFade.fadeBlack(cam, 10, 1);
 
 		startCallback();
 
@@ -1675,7 +1676,7 @@ class PlayState extends MusicBeatState
 	override function closeSubState()
 	{
 		stagesFunc(function(stage:BaseStage) stage.closeSubState());
-		if (paused)
+		if (paused && !closedFromPause)
 		{
 			if (FlxG.sound.music != null && !startingSong)
 				resyncVocals();
@@ -1685,7 +1686,7 @@ class PlayState extends MusicBeatState
 			FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
 				twn.active = true);
 
-			paused = false;
+			paused = closedFromPause =  false;
 			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = touchPad.visible = true;
 			#end
@@ -1771,6 +1772,7 @@ class PlayState extends MusicBeatState
 	}
 
 	public var paused:Bool = false;
+	public var closedFromPause:Bool = false;
 	public var canReset:Bool = true;
 
 	var startedCountdown:Bool = false;

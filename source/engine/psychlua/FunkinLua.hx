@@ -198,16 +198,24 @@ class FunkinLua
 				cast(game, PlayState).persistentUpdate = false;
 				FlxG.camera.followLerp = 0;
 				PlayState.startOnTime = 0;
-				if (PlayState.isPixelStage)
+				if (PlayState.isPixelStage && !skipTransition)
 				{
-					RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
+					for (cam in FlxG.cameras.list)
+						RetroCameraFade.fadeToBlack(cam, 10, 2);
 					new FlxTimer().start(2, function(_)
 					{
-						FlxG.resetState();
+						Funkin.resetState();
 					});
 				}
 				else
+				{
+					if (skipTransition)
+					{
+						FlxTransitionableState.skipNextTransIn = true;
+						FlxTransitionableState.skipNextTransOut = true;
+					}
 					Funkin.resetState();
+				}
 				return true;
 			});
 			set("exitSong", function(?skipTransition:Bool = false)

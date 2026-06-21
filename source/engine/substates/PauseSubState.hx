@@ -3,11 +3,10 @@ package substates;
 import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
-import effects.RetroCameraFade;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.util.FlxTimer;
 import states.FreeplayState;
 import options.OptionsState;
+import effects.RetroCameraFade;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -286,10 +285,13 @@ class PauseSubState extends MusicBeatSubstate
 					practiceText.visible = PlayState.instance.practiceMode;
 				case "Restart Song":
 					restartSong();
+					close();
 				case 'Chart Editor':
 					PlayState.instance.openChartEditor();
+					close();
 				case "Leave Charting Mode":
 					restartSong();
+					close();
 					PlayState.chartingMode = false;
 				case 'Skip Time':
 					if (curTime < Conductor.songPosition)
@@ -318,7 +320,7 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.botplayTxt.alpha = 1;
 					PlayState.instance.botplaySine = 0;
 				case 'Options':
-					PlayState.instance.paused = true; // For lua
+					PlayState.instance.paused = PlayState.instance.closedFromPause = true; // For lua
 					PlayState.instance.vocals.volume = 0;
 					Funkin.switchState(OptionsState);
 					if (ClientPrefs.data.pauseMusic != 'None')
@@ -328,6 +330,7 @@ class PauseSubState extends MusicBeatSubstate
 						FlxG.sound.music.time = pauseMusic.time;
 					}
 					OptionsState.onPlayState = true;
+					close();
 				case "Exit to menu":
 					#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 					PlayState.deathCounter = 0;
@@ -368,19 +371,30 @@ class PauseSubState extends MusicBeatSubstate
 
 	public static function restartSong(noTrans:Bool = false)
 	{
-		var pss = cast(FlxG.state.subState, PauseSubState);
-		if (pss != null) pss.grpMenuShit.visible = false;
-
-		PlayState.instance.paused = true; // For lua
+		PlayState.instance.paused = PlayState.instance.closedFromPause = true; // For lua
 		FlxG.sound.music.volume = 0;
 		PlayState.instance.vocals.volume = 0;
 
-		if (noTrans)
+		if (PlayState.isPixelStage && !noTrans)
 		{
-			FlxTransitionableState.skipNextTransIn = true;
-			FlxTransitionableState.skipNextTransOut = true;
+			for (cam in FlxG.cameras.list)
+				RetroCameraFade.fadeToBlack(cam, 10, 2);
+			new FlxTimer().start(2, function(_)
+			{
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				Funkin.resetState();
+			});
 		}
-		Funkin.resetState();
+		else
+		{
+			if (noTrans)
+			{
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
+			Funkin.resetState();
+		}
 	}
 
 	override function destroy()
