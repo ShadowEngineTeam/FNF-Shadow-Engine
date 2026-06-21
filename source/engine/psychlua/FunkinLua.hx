@@ -106,8 +106,7 @@ class FunkinLua
 			set('songLength', FlxG.sound.music.length);
 			set('startedCountdown', false);
 
-			final diff:String = Difficulty.getByIndex();
-			set('difficultyName', diff);
+			set('difficultyName', Difficulty.getByIndex());
 			set('difficultyPath', Paths.formatToSongPath(diff));
 			set('isErect', game.isErect);
 			set('weekRaw', PlayState.storyWeek);
