@@ -2988,6 +2988,8 @@ class PlayState extends MusicBeatState
 			rating.x += ClientPrefs.data.comboOffset[0];
 			rating.y -= ClientPrefs.data.comboOffset[1];
 			rating.antialiasing = antialias;
+			rating.pixelPerfectRender = !antialias;
+			rating.pixelPerfectPosition = !antialias;
 
 			var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
 			comboSpr.screenCenter();
@@ -2998,6 +3000,8 @@ class PlayState extends MusicBeatState
 			comboSpr.x += ClientPrefs.data.comboOffset[0];
 			comboSpr.y -= ClientPrefs.data.comboOffset[1];
 			comboSpr.antialiasing = antialias;
+			comboSpr.pixelPerfectRender = !antialias;
+			comboSpr.pixelPerfectPosition = !antialias;
 			comboSpr.y += 60;
 			comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
 			comboGroup.add(rating);
@@ -3103,6 +3107,8 @@ class PlayState extends MusicBeatState
 				numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
 				numScore.visible = !ClientPrefs.data.hideHud;
 				numScore.antialiasing = antialias;
+				numScore.pixelPerfectRender = !antialias;
+				numScore.pixelPerfectPosition = !antialias;
 
 				// if (combo >= 10 || combo == 0)
 				if (showComboNum)

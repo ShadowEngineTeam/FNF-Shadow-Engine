@@ -628,6 +628,9 @@ class EditorPlayState extends MusicBeatSubstate
 		var pixelShitPart2:String = '';
 
 		rating.loadGraphic(Paths.image(pixelShitPart1 + daRating.image + pixelShitPart2));
+		rating.antialiasing = ClientPrefs.data.antialiasing;
+		rating.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+		rating.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 		rating.screenCenter();
 		rating.x = coolText.x - 40;
 		rating.y -= 60;
@@ -639,6 +642,9 @@ class EditorPlayState extends MusicBeatSubstate
 		rating.y -= ClientPrefs.data.comboOffset[1];
 
 		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
+		comboSpr.antialiasing = ClientPrefs.data.antialiasing;
+		comboSpr.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+		comboSpr.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 		comboSpr.screenCenter();
 		comboSpr.x = coolText.x;
 		comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
@@ -760,6 +766,9 @@ class EditorPlayState extends MusicBeatSubstate
 			numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 			numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
 			numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
+			numScore.antialiasing = ClientPrefs.data.antialiasing;
+			numScore.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+			numScore.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 			numScore.visible = !ClientPrefs.data.hideHud;
 
 			// if (combo >= 10 || combo == 0)
