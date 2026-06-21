@@ -345,8 +345,8 @@ class StoryMenuState extends MusicBeatState
 		//read changeDiff function in freeplay for more info
 		if (curDifficulty == -1)
 		{
-			for (diff in Difficulty.list)
-				trace(diff);
+			//for (diff in Difficulty.list)
+			//	trace(diff);
 			final normalIndex:Int = Difficulty.list.indexOf(NORMAL);
 			curDifficulty = normalIndex != -1 ? normalIndex : 0;
 			trace(curDifficulty);
