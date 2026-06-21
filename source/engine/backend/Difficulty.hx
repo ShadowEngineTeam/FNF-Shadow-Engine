@@ -4,7 +4,8 @@ class Difficulty
 	public static var defaultList(default, never):Array<Diff> = [EASY, NORMAL, HARD];
 	public static var list:Array<Diff> = [];
 
-	inline public static function getByIndex(?index:Int):Diff {
+	inline public static function getByIndex(?index:Int):Diff
+	{
 		index ??= PlayState.storyDifficulty;
 
 		if (index < 0 || index >= list.length)
@@ -13,7 +14,8 @@ class Difficulty
 		return list[index];
 	}
 
-	inline public static function getFilePath(?index:Int):String {
+	inline public static function getFilePath(?index:Int):String
+	{
 		index ??= PlayState.storyDifficulty;
 
 		final diff:Diff = getByIndex(index);
@@ -22,7 +24,8 @@ class Difficulty
 		return Paths.formatToSongPath(fileSuffix);
 	}
 
-	inline public static function loadFromWeek(?week:WeekData):Void {
+	inline public static function loadFromWeek(?week:WeekData):Void
+	{
 		week ??= WeekData.getCurrentWeek();
 
 		final diffStr:Array<Diff> = week.difficulties;
@@ -35,7 +38,8 @@ class Difficulty
 	inline public static function copyFrom(diffs:Array<Diff>):Void
 		list = diffs.copy();
 
-	inline public static function getSongPrefix(?index:Int, ?includeDash:Bool = true):Null<String> {
+	inline public static function getSongPrefix(?index:Int, ?includeDash:Bool = true):Null<String>
+	{
 		index ??= PlayState.storyDifficulty;
 
 		final diff:Diff = getByIndex(index);
