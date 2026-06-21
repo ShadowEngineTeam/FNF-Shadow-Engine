@@ -206,7 +206,7 @@ class ChartingState extends MusicBeatState
 
 	public var mouseQuant:Bool = false;
 
-	private final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
+	private final isDiffErect:Bool = Difficulty.getByIndex(PlayState.storyDifficulty) == ERECT || Difficulty.getByIndex(PlayState.storyDifficulty) == NIGHTMARE;
 
 	override function create()
 	{
@@ -3506,19 +3506,8 @@ class ChartingState extends MusicBeatState
 		// make it look sexier if possible
 		try
 		{
-			if (Difficulty.getString() != Difficulty.getDefault())
-			{
-				if (Difficulty.getString() == null)
-				{
-					PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-				}
-				else
-				{
-					PlayState.SONG = Song.loadFromJson(song.toLowerCase() + "-" + Difficulty.getString(), song.toLowerCase());
-				}
-			}
-			else
-				PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
+			final fuckinDiff:String = Difficulty.getByIndex() != NORMAL ? '-${PlayState.storyDifficulty}' : '';
+			PlayState.SONG = Song.loadFromJson(song.toLowerCase() + fuckinDiff, song.toLowerCase());
 			Funkin.resetState();
 		}
 		catch (e)

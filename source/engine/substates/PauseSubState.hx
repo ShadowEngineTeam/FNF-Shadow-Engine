@@ -20,7 +20,7 @@ class PauseSubState extends MusicBeatSubstate
 		'Options',
 		'Exit to menu'
 	];
-	var difficultyChoices = [];
+	var difficultyChoices:Array<String> = [];
 	var curSelected:Int = 0;
 	var pauseTweens:Array<FlxTween> = [];
 
@@ -56,11 +56,9 @@ class PauseSubState extends MusicBeatSubstate
 		}
 		menuItems = menuItemsOG;
 
-		for (i in 0...Difficulty.list.length)
-		{
-			var diff:String = Difficulty.getString(i);
+		for (diff in Difficulty.list)
 			difficultyChoices.push(diff);
-		}
+
 		difficultyChoices.push('BACK');
 
 		pauseMusic = new FlxSound();
@@ -92,7 +90,8 @@ class PauseSubState extends MusicBeatSubstate
 		levelInfo.updateHitbox();
 		add(levelInfo);
 
-		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, Difficulty.getString().toUpperCase(), 32);
+		final diffka:String = Difficulty.getByIndex();
+		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, diffka.charAt(0).toUpperCase() + diffka.substr(1), 32); //cuz..
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.font('vcr.ttf'), 32);
 		levelDifficulty.updateHitbox();
