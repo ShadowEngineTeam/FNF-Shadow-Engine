@@ -153,6 +153,7 @@ class PlayState extends MusicBeatState
 	var songPercent:Float = 0;
 
 	public var ratingsData:Array<Rating> = Rating.loadDefault();
+	public var isErect:Bool;
 
 	private var generatedMusic:Bool = false;
 
@@ -318,7 +319,7 @@ class PlayState extends MusicBeatState
 			noteSkin = Note.defaultNoteSkin;
 
 		#if FEATURE_DISCORD_RPC
-		storyDifficultyText = Difficulty.getString();
+		storyDifficultyText = Difficulty.getByIndex();
 
 		if (isStoryMode)
 			detailsText = "Story Mode: " + WeekData.getCurrentWeek().weekName;
@@ -1384,12 +1385,12 @@ class PlayState extends MusicBeatState
 		// NEW SHIT
 		noteData = songData.notes;
 
-		final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
-		var file:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
-		
-		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events' + (isDiffErect ? '-erect' : ""))) || #end FileSystem.exists(file))
+		isErect = Difficulty.list[storyDifficulty] == ERECT || Difficulty.list[storyDifficulty] == NIGHTMARE;
+		var file:String = Paths.json(songName + '/events' + (isErect ? '-erect' : ""));
+
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson(songName + '/events' + (isErect ? '-erect' : ""))) || #end FileSystem.exists(file))
 		{
-			var eventsData:Array<Dynamic> = Song.loadFromJson('events' + (isDiffErect ? '-erect' : ""), songName).events;
+			var eventsData:Array<Dynamic> = Song.loadFromJson('events' + (isErect ? '-erect' : ""), songName).events;
 			for (event in eventsData) // Event Notes
 				for (i in 0...event[1].length)
 					makeEvent(event, i);

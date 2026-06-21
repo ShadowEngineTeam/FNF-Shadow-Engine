@@ -302,10 +302,12 @@ class WeekEditorState extends MusicBeatState
 
 		tab.add(new ShadowLabel(10, 135, "Difficulties:"));
 		difficultiesInputText = new ShadowTextInput(10, 155, 200, '');
-		difficultiesInputText.callback = function(text)
-		{
-			weekFile.difficulties = text.trim();
-		};
+		difficultiesInputText.callback = (text:String) -> {
+			weekFile.difficulties = [ //darlin baby darlin
+				for (d in text.toLowerCase().split(","))
+					if ((d = d.trim()).length > 0) d
+			];
+		}
 		blockPressWhileTypingOn.push(difficultiesInputText);
 		tab.add(difficultiesInputText);
 
@@ -331,9 +333,11 @@ class WeekEditorState extends MusicBeatState
 		hideCheckbox.checked = weekFile.hideStoryMode;
 		weekBeforeInputText.text = weekFile.weekBefore;
 
-		difficultiesInputText.text = '';
-		if (weekFile.difficulties != null)
-			difficultiesInputText.text = weekFile.difficulties;
+		final diffs:Array<Diff> = weekFile.difficulties;
+		if(diffs != null) {
+			final diffStr:Array<String> = [for(d in diffs) d];
+			difficultiesInputText.text = diffStr.join(", ");
+		}
 
 		lockedCheckbox.checked = !weekFile.startUnlocked;
 		lock.visible = lockedCheckbox.checked;

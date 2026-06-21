@@ -101,12 +101,15 @@ class FunkinLua
 			set('curStage', PlayState.SONG.stage);
 
 			set('isStoryMode', PlayState.isStoryMode);
+
 			set('difficulty', PlayState.storyDifficulty);
 			set('songLength', FlxG.sound.music.length);
 			set('startedCountdown', false);
 
-			set('difficultyName', Difficulty.getString());
-			set('difficultyPath', Paths.formatToSongPath(Difficulty.getString()));
+			final diff:String = Difficulty.getByIndex();
+			set('difficultyName', diff);
+			set('difficultyPath', Paths.formatToSongPath(diff));
+			set('isErect', game.isErect);
 			set('weekRaw', PlayState.storyWeek);
 			set('week', WeekData.weeksList[PlayState.storyWeek]);
 			set('seenCutscene', PlayState.seenCutscene);
