@@ -349,7 +349,7 @@ class StoryMenuState extends MusicBeatState
 			//	trace(diff);
 			final normalIndex:Int = Difficulty.list.indexOf(NORMAL);
 			curDifficulty = normalIndex != -1 ? normalIndex : 0;
-			trace(curDifficulty);
+			// trace(curDifficulty);
 		}
 		else
 			curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
