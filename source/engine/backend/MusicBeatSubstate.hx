@@ -283,6 +283,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		}
 		#end
 
+		scripts.destroy();
+
 		super.destroy();
 	}
 

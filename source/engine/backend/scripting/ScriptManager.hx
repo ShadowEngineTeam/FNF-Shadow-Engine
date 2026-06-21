@@ -16,19 +16,27 @@ typedef CallOptions =
 
 class ScriptManager
 {
+	public static var instance:ScriptManager;
+
 	public var luaArray:Array<FunkinLua> = [];
 	public var hscriptArray:Array<HScript> = [];
+	public var instancesExclude:Array<String> = [];
 
 	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
 	public final luaExtensions:Array<String> = ['lua', 'luau'];
-
-	public var instancesExclude:Array<String> = [];
 
 	var state:IMusicState;
 
 	public function new(state:IMusicState)
 	{
 		this.state = state;
+	}
+
+	public function rebind(newState:IMusicState):Void
+	{
+		if (this.state != null && Type.getClass(this.state) != Type.getClass(newState))
+			destroy();
+		this.state = newState;
 	}
 
 	public function call(funcToCall:String, args:Array<Dynamic> = null, ?opts:CallOptions):Dynamic
