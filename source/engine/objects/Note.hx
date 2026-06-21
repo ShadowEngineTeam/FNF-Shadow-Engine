@@ -135,6 +135,31 @@ class Note extends FlxSkewedSprite
 	public var hitsound:String = 'hitsound';
 
 	private static var _activeNotes:Array<Note> = [];
+	private static var notePool:Array<Note> = [];
+
+	public static function getNote(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null):Note
+	{
+		var note = notePool.pop();
+		if (note == null)
+			note = new Note();
+		note.resetNote(strumTime, noteData, prevNote, sustainNote, inEditor, createdFrom);
+		return note;
+	}
+
+	public static function clearPool():Void
+	{
+		for (note in notePool)
+			note.destroy();
+		notePool = [];
+		_activeNotes = [];
+	}
+
+	public function recycle():Void
+	{
+		_activeNotes.remove(this);
+		kill();
+		notePool.push(this);
+	}
 
 	private static function set_usePixelTextures(value:Null<Bool>):Null<Bool>
 	{
@@ -255,10 +280,16 @@ class Note extends FlxSkewedSprite
 		return value;
 	}
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
+	public function new(?strumTime:Float = 0, ?noteData:Int = 0, ?prevNote:Note = null, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
 	{
 		super();
+		if (prevNote != null || sustainNote || inEditor || createdFrom != null)
+			resetNote(strumTime, noteData, prevNote, sustainNote, inEditor, createdFrom);
+	}
 
+	function resetNote(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null):Void
+	{
+		revive();
 		_activeNotes.push(this);
 
 		antialiasing = ClientPrefs.data.antialiasing;
@@ -287,12 +318,16 @@ class Note extends FlxSkewedSprite
 			texture = '';
 			if (ClientPrefs.data.disableRGBNotes)
 			{
-				colorSwap = new ColorSwap();
-				shader = colorSwap.shader;
+				if (colorSwap == null)
+				{
+					colorSwap = new ColorSwap();
+					shader = colorSwap.shader;
+				}
 			}
 			else
 			{
-				rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
+				if (rgbShader == null)
+					rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
 				if (PlayState.SONG != null && PlayState.SONG.disableNoteCustomColor)
 					rgbShader.enabled = false;
 			}

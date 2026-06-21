@@ -6,6 +6,7 @@ import flixel.FlxObject;
 import states.StoryMenuState;
 import states.FreeplayState;
 import lime.ui.Haptic;
+import effects.RetroCameraFade;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
@@ -160,10 +161,25 @@ class GameOverSubstate extends MusicBeatSubstate
 			FlxG.sound.play(Paths.music(endSoundName));
 			new FlxTimer().start(0.7, function(tmr:FlxTimer)
 			{
-				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
+				if (PlayState.isPixelStage)
 				{
-					Funkin.resetState();
-				});
+					RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
+					new FlxTimer().start(2, function(_)
+					{
+						remove(boyfriend);
+						boyfriend.destroy();
+						Funkin.resetState();
+					});
+				}
+				else
+				{
+					FlxG.camera.fade(FlxColor.BLACK, 1.5, false, function()
+					{
+						remove(boyfriend);
+						boyfriend.destroy();
+						Funkin.resetState();
+					});
+				}
 			});
 			callOnScripts('onGameOverConfirm', [true]);
 		}

@@ -3,7 +3,9 @@ package substates;
 import backend.WeekData;
 import backend.Highscore;
 import backend.Song;
+import effects.RetroCameraFade;
 import flixel.addons.transition.FlxTransitionableState;
+import flixel.util.FlxTimer;
 import states.FreeplayState;
 import options.OptionsState;
 
@@ -371,12 +373,25 @@ class PauseSubState extends MusicBeatSubstate
 		FlxG.sound.music.volume = 0;
 		PlayState.instance.vocals.volume = 0;
 
-		if (noTrans)
+		if (PlayState.isPixelStage)
 		{
-			FlxTransitionableState.skipNextTransIn = true;
-			FlxTransitionableState.skipNextTransOut = true;
+			RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
+			new FlxTimer().start(2, function(_)
+			{
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+				Funkin.resetState();
+			});
 		}
-		Funkin.resetState();
+		else
+		{
+			if (noTrans)
+			{
+				FlxTransitionableState.skipNextTransIn = true;
+				FlxTransitionableState.skipNextTransOut = true;
+			}
+			Funkin.resetState();
+		}
 	}
 
 	override function destroy()

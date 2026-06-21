@@ -675,6 +675,13 @@ class SScript
 		return list;
 	}
 
+	public function stop():Void
+	{
+		active = false;
+		clear();
+		resetInterp();
+	}
+
 	public function destroy():Void
 	{
 		if (_destroyed)

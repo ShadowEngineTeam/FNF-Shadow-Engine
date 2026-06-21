@@ -1,5 +1,6 @@
 package psychlua;
 
+import backend.scripting.ScriptResult;
 import psychlua.LuaUtils;
 #if FEATURE_LUA
 import psychlua.FunkinLua;
@@ -370,11 +371,11 @@ class HScript extends SScript
 
 		set('buildTarget', LuaUtils.getBuildTarget());
 
-		set('Function_Stop', LuaUtils.Function_Stop);
-		set('Function_Continue', LuaUtils.Function_Continue);
-		set('Function_StopLua', LuaUtils.Function_StopLua); // doesnt do much cuz HScript has a lower priority than Lua
-		set('Function_StopHScript', LuaUtils.Function_StopHScript);
-		set('Function_StopAll', LuaUtils.Function_StopAll);
+		set('Function_Stop', ScriptResult.Stop);
+		set('Function_Continue', ScriptResult.Continue);
+		set('Function_StopLua', ScriptResult.StopLua); // doesnt do much cuz HScript has a lower priority than Lua
+		set('Function_StopHScript', ScriptResult.StopHScript);
+		set('Function_StopAll', ScriptResult.StopAll);
 
 		set('add', FlxG.state.add);
 		set('insert', FlxG.state.insert);
@@ -386,7 +387,7 @@ class HScript extends SScript
 			set('addBehindDad', PlayState.instance.addBehindDad);
 			set('addBehindBF', PlayState.instance.addBehindBF);
 		}
-		setSpecialObject(FunkinLua.getCurrentMusicState(), false, FunkinLua.getCurrentMusicState().instancesExclude);
+		setSpecialObject(FunkinLua.getCurrentMusicState(), false, FunkinLua.getCurrentMusicState().scripts.instancesExclude);
 
 		if (varsToBring != null)
 		{
@@ -530,6 +531,12 @@ class HScript extends SScript
 		});
 	}
 	#end
+
+	override public function stop():Void
+	{
+		super.stop();
+		#if FEATURE_LUA parentLua = null; #end
+	}
 
 	override public function destroy()
 	{

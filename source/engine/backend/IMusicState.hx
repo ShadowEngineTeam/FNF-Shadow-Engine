@@ -1,5 +1,6 @@
 package backend;
 
+import backend.scripting.ScriptManager;
 import flixel.FlxBasic;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxSave;
@@ -23,10 +24,10 @@ interface IMusicState
 	private var curDecStep:Float;
 	private var curDecBeat:Float;
 
+	public var scripts(default, null):ScriptManager;
+
 	#if FEATURE_HSCRIPT
-	public var hscriptArray:Array<HScript>;
-	public final hscriptExtensions:Array<String>;
-	public var instancesExclude:Array<String>;
+	public var hscriptArray(get, never):Array<HScript>;
 	#end
 
 	public var modchartTweens:Map<String, FlxTween>;
@@ -38,8 +39,7 @@ interface IMusicState
 	public var modchartCameras:Map<String, FlxCamera>;
 
 	#if FEATURE_LUA
-	public var luaArray:Array<FunkinLua>;
-	public final luaExtensions:Array<String>;
+	public var luaArray(get, never):Array<FunkinLua>;
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
@@ -100,15 +100,6 @@ interface IMusicState
 
 	public function getLuaObject(tag:String, text:Bool = true):FlxSprite;
 
-	#if FEATURE_LUA
-	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool):Bool;
-	#end
-
-	#if FEATURE_HSCRIPT
-	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool):Bool;
-	public function initHScript(file:String):Void;
-	#end
-
 	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null,
 		excludeValues:Array<Dynamic> = null):Dynamic;
 
@@ -121,4 +112,8 @@ interface IMusicState
 	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void;
 	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void;
 	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void;
+
+	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool):Bool;
+	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool):Bool;
+	public function initHScript(file:String):Void;
 }

@@ -1,6 +1,7 @@
 package psychlua;
 
 import backend.WeekData;
+import backend.scripting.ScriptResult;
 import objects.Character;
 import objects.Note;
 import openfl.display.BlendMode;
@@ -20,11 +21,16 @@ typedef LuaTweenOptions =
 
 class LuaUtils
 {
-	public static final Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";
-	public static final Function_Continue:Dynamic = "##PSYCHLUA_FUNCTIONCONTINUE";
-	public static final Function_StopLua:Dynamic = "##PSYCHLUA_FUNCTIONSTOPLUA";
-	public static final Function_StopHScript:Dynamic = "##PSYCHLUA_FUNCTIONSTOPHSCRIPT";
-	public static final Function_StopAll:Dynamic = "##PSYCHLUA_FUNCTIONSTOPALL";
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_Stop:Dynamic = ScriptResult.Stop;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_Continue:Dynamic = ScriptResult.Continue;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopLua:Dynamic = ScriptResult.StopLua;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopHScript:Dynamic = ScriptResult.StopHScript;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopAll:Dynamic = ScriptResult.StopAll;
 
 	public static function getLuaTween(options:Dynamic)
 	{

@@ -21,10 +21,11 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
+	public var scripts(default, null):ScriptManager;
+
 	#if FEATURE_HSCRIPT
-	public var hscriptArray:Array<HScript> = [];
-	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
-	public var instancesExclude:Array<String> = [];
+	public var hscriptArray(get, never):Array<HScript>;
+	inline function get_hscriptArray() return scripts.hscriptArray;
 	#end
 
 	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
@@ -36,8 +37,8 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	public var modchartCameras:Map<String, FlxCamera> = new Map<String, FlxCamera>();
 
 	#if FEATURE_LUA
-	public var luaArray:Array<FunkinLua> = [];
-	public final luaExtensions:Array<String> = ['lua', 'luau'];
+	public var luaArray(get, never):Array<FunkinLua>;
+	inline function get_luaArray() return scripts.luaArray;
 	#end
 
 	#if (FEATURE_LUA || FEATURE_HSCRIPT)
@@ -271,27 +272,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		removeMobileControls();
 		#end
 
-		#if FEATURE_LUA
-		for (lua in luaArray)
-		{
-			lua.call('onDestroy', []);
-			lua.stop();
-		}
-		luaArray = [];
-		FunkinLua.customFunctions.clear();
-		#end
-
-		#if FEATURE_HSCRIPT
-		for (script in hscriptArray)
-			if (script != null)
-			{
-				script.call('onDestroy');
-				script.destroy();
-			}
-
-		while (hscriptArray.length > 0)
-			hscriptArray.pop();
-		#end
+		scripts.destroy();
 
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		if (luaDebugCam != null)
@@ -309,6 +290,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	{
 		instance = this;
 		stateInstance = cast this;
+		scripts = new ScriptManager(this);
 
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
 		currentClassName = Std.string(Type.getClassName(Type.getClass(this)))
@@ -328,16 +310,16 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		ensureDebugGroup();
 		#end
 		#if FEATURE_LUA
-		startLuasNamed('substatescripts/' + currentClassName);
+		scripts.startLuasNamed('substatescripts/' + currentClassName);
 		#end
 		#if FEATURE_HSCRIPT
-		startHScriptsNamed('substatescripts/' + currentClassName);
+		scripts.startHScriptsNamed('substatescripts/' + currentClassName);
 		#end
 		super.create();
 		callOnScripts('onCreatePost');
 	}
 
-	@:deprecated("`MusicBeatSubstate.openSubState` is deprecated. Use `Funkin.switchSubState` or `MusicBeatSubstate.switchSubState` instead.")
+	@:deprecated("`MusicBeatSubState.openSubState` is deprecated. Use `Funkin.switchSubState` or `MusicBeatSubState.switchSubState` instead.")
 	override function openSubState(subState:FlxSubState)
 	{
 		callOnScripts('onOpenSubState');
@@ -357,7 +339,6 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 
 	override function update(elapsed:Float)
 	{
-		// everyStep();
 		if (!persistentUpdate)
 			MusicBeatState.timePassedOnState += elapsed;
 		var oldStep:Int = curStep;
@@ -528,312 +509,67 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 		return null;
 	}
 
-	#if FEATURE_LUA
-	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool)
-	{
-		function doFile(file:String):Bool
-		{
-			if (!luaExtensions.contains(Path.extension(file)))
-				return false;
-
-			if (doFileMethod != null)
-				return doFileMethod(luaFile);
-
-			var luaToLoad:String = file;
-			if (!FileSystem.exists(luaToLoad))
-			{
-				#if FEATURE_MODS
-				luaToLoad = Paths.modFolders(file);
-				if (!FileSystem.exists(luaToLoad))
-				#end
-					luaToLoad = Paths.getSharedPath(file);
-			}
-
-			if (FileSystem.exists(luaToLoad))
-			{
-				for (script in luaArray)
-					if (script.scriptName == luaToLoad)
-						return false;
-
-				new FunkinLua(luaToLoad);
-				return true;
-			}
-			else
-				return false;
-		}
-
-		var luaFileExt:String = Path.extension(luaFile);
-		if (luaFileExt != null && luaFileExt.length > 0 && luaExtensions.contains(luaFileExt))
-			return doFile(luaFile);
-
-		var loadedScripts:Bool = false;
-		for (ext in luaExtensions)
-			if (doFile(Path.withExtension(luaFile, ext)))
-				loadedScripts = true;
-
-		return loadedScripts;
-	}
-	#end
-
-	#if FEATURE_HSCRIPT
-	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool)
-	{
-		function doFile(file:String):Bool
-		{
-			if (!hscriptExtensions.contains(Path.extension(file)))
-				return false;
-
-			if (doFileMethod != null)
-				return doFileMethod(scriptFile);
-
-			var scriptToLoad:String = file;
-			if (!FileSystem.exists(scriptToLoad))
-			{
-				#if FEATURE_MODS
-				scriptToLoad = Paths.modFolders(file);
-				if (!FileSystem.exists(scriptToLoad))
-				#end
-					scriptToLoad = Paths.getSharedPath(file);
-			}
-
-			if (FileSystem.exists(scriptToLoad))
-			{
-				if (SScript.global.exists(scriptToLoad))
-					return false;
-
-				initHScript(scriptToLoad);
-				return true;
-			}
-			else
-				return false;
-		}
-
-		// if the script already has a set extension just load it directly
-		var scriptFileExt:String = Path.extension(scriptFile);
-		if (scriptFileExt != null && scriptFileExt.length > 0 && hscriptExtensions.contains(scriptFileExt))
-			return doFile(scriptFile);
-
-		// Try every ext and load what can be loaded
-		var loadedScripts:Bool = false;
-		for (ext in hscriptExtensions)
-			if (doFile(Path.withExtension(scriptFile, ext)))
-				loadedScripts = true;
-
-		return loadedScripts;
-	}
-
-	public function initHScript(file:String)
-	{
-		try
-		{
-			var newScript:HScript = new HScript(null, file);
-			if (newScript.parsingException != null)
-			{
-				addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
-				newScript.destroy();
-				return;
-			}
-
-			hscriptArray.push(newScript);
-			if (newScript.exists('onCreate'))
-			{
-				var callValue = newScript.call('onCreate');
-				if (!callValue.succeeded)
-				{
-					for (e in callValue.exceptions)
-					{
-						if (e != null)
-						{
-							var len:Int = e.message.indexOf('\n') + 1;
-							if (len <= 0)
-								len = e.message.length;
-							addTextToDebug('ERROR ($file: onCreate) - ${e.message.substr(0, len)}', FlxColor.RED);
-						}
-					}
-
-					newScript.destroy();
-					hscriptArray.remove(newScript);
-					trace('failed to initialize tea interp!!! ($file)');
-				}
-				else
-					trace('initialized tea interp successfully: $file');
-			}
-		}
-		catch (e)
-		{
-			var len:Int = e.message.indexOf('\n') + 1;
-			if (len <= 0)
-				len = e.message.length;
-			addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
-			var newScript:HScript = cast(SScript.global.get(file), HScript);
-			if (newScript != null)
-			{
-				newScript.destroy();
-				hscriptArray.remove(newScript);
-			}
-		}
-	}
-	#end
+	// ── Script delegation ─────────────────────────────────────────
 
 	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		if (args == null)
-			args = [];
-		if (exclusions == null)
-			exclusions = [];
-		if (excludeValues == null)
-			excludeValues = [LuaUtils.Function_Continue];
-
-		var luaResult:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		var hsResult:Dynamic = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		if (hsResult != null && !excludeValues.contains(hsResult))
-			return hsResult;
-		return luaResult;
+		return scripts.call(funcToCall, args, {
+			ignoreStops: ignoreStops,
+			exclusions: exclusions,
+			excludeValues: excludeValues
+		});
 	}
 
 	public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		#if FEATURE_LUA
-		if (args == null)
-			args = [];
-		if (exclusions == null)
-			exclusions = [];
-		if (excludeValues == null)
-			excludeValues = [LuaUtils.Function_Continue];
-
-		var arr:Array<FunkinLua> = [];
-		for (script in luaArray)
-		{
-			if (script.closed)
-			{
-				arr.push(script);
-				continue;
-			}
-
-			if (exclusions.contains(script.scriptName))
-				continue;
-
-			var myValue:Dynamic = script.call(funcToCall, args);
-			if ((myValue == LuaUtils.Function_StopLua || myValue == LuaUtils.Function_StopAll)
-				&& !excludeValues.contains(myValue)
-				&& !ignoreStops)
-			{
-				returnVal = myValue;
-				break;
-			}
-
-			if (myValue != null && !excludeValues.contains(myValue))
-				returnVal = myValue;
-
-			if (script.closed)
-				arr.push(script);
-		}
-
-		if (arr.length > 0)
-			for (script in arr)
-				luaArray.remove(script);
-		#end
-		return returnVal;
+		return scripts.callOnLuas(funcToCall, args, {
+			ignoreStops: ignoreStops,
+			exclusions: exclusions,
+			excludeValues: excludeValues
+		});
 	}
 
 	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null,
 			excludeValues:Array<Dynamic> = null):Dynamic
 	{
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-
-		#if FEATURE_HSCRIPT
-		if (exclusions == null)
-			exclusions = new Array();
-		if (excludeValues == null)
-			excludeValues = new Array();
-		excludeValues.push(LuaUtils.Function_Continue);
-
-		var len:Int = hscriptArray.length;
-		if (len < 1)
-			return returnVal;
-		for (i in 0...len)
-		{
-			var script:HScript = hscriptArray[i];
-			if (script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
-				continue;
-
-			var myValue:Dynamic = null;
-			try
-			{
-				var callValue = script.call(funcToCall, args);
-				if (!callValue.succeeded)
-				{
-					var e = callValue.exceptions[0];
-					if (e != null)
-					{
-						var len:Int = e.message.indexOf('\n') + 1;
-						if (len <= 0)
-							len = e.message.length;
-						addTextToDebug('ERROR (${callValue.calledFunction}) - ' + e.message.substr(0, len), FlxColor.RED);
-					}
-				}
-				else
-				{
-					myValue = callValue.returnValue;
-					if ((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll)
-						&& !excludeValues.contains(myValue)
-						&& !ignoreStops)
-					{
-						returnVal = myValue;
-						break;
-					}
-
-					if (myValue != null && !excludeValues.contains(myValue))
-						returnVal = myValue;
-				}
-			}
-		}
-		#end
-
-		return returnVal;
+		return scripts.callOnHScript(funcToCall, args, {
+			ignoreStops: ignoreStops,
+			exclusions: exclusions,
+			excludeValues: excludeValues
+		});
 	}
 
 	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		if (exclusions == null)
-			exclusions = [];
-		setOnLuas(variable, arg, exclusions);
-		setOnHScript(variable, arg, exclusions);
+		scripts.set(variable, arg, exclusions);
 	}
 
 	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if FEATURE_LUA
-		if (exclusions == null)
-			exclusions = [];
-		for (script in luaArray)
-		{
-			if (exclusions.contains(script.scriptName))
-				continue;
-
-			script.set(variable, arg);
-		}
-		#end
+		scripts.setOnLuas(variable, arg, exclusions);
 	}
 
 	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null)
 	{
-		#if FEATURE_HSCRIPT
-		if (exclusions == null)
-			exclusions = [];
-		for (script in hscriptArray)
-		{
-			if (exclusions.contains(script.origin))
-				continue;
+		scripts.setOnHScript(variable, arg, exclusions);
+	}
 
-			if (!instancesExclude.contains(variable))
-				instancesExclude.push(variable);
-			script.set(variable, arg);
-		}
+	public function startLuasNamed(luaFile:String, ?doFileMethod:String->Bool):Bool
+	{
+		return scripts.startLuasNamed(luaFile, doFileMethod);
+	}
+
+	public function startHScriptsNamed(scriptFile:String, ?doFileMethod:String->Bool):Bool
+	{
+		return scripts.startHScriptsNamed(scriptFile, doFileMethod);
+	}
+
+	public function initHScript(file:String):Void
+	{
+		#if FEATURE_HSCRIPT
+		scripts.initHScript(file);
 		#end
 	}
 }

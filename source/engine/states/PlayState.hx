@@ -7,6 +7,7 @@ import backend.WeekData;
 import backend.Song;
 import backend.Section;
 import backend.Rating;
+import backend.scripting.ScriptResult;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.addons.transition.FlxTransitionableState;
@@ -26,6 +27,7 @@ import objects.Note.EventNote;
 import objects.*;
 import states.stages.objects.*;
 import substates.ResultsScreen;
+import effects.RetroCameraFade;
 #if (target.threaded)
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -266,6 +268,8 @@ class PlayState extends MusicBeatState
 	{
 		// trace('Playback Rate: ' + playbackRate);
 		Paths.clearStoredMemory();
+
+		Note.clearPool();
 
 		startCallback = startCountdown;
 		endCallback = endSong;
@@ -635,6 +639,9 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		if (isPixelStage)
+			RetroCameraFade.fadeBlack(FlxG.camera, 10, 1);
+
 		startCallback();
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
@@ -959,7 +966,7 @@ class PlayState extends MusicBeatState
 		seenCutscene = true;
 		inCutscene = false;
 		var ret:Dynamic = callOnScripts('onStartCountdown', null, true);
-		if (ret != LuaUtils.Function_Stop)
+		if (ret != ScriptResult.Stop)
 		{
 			if (skipCountdown || startOnTime > 0)
 				skipArrowStartTween = true;
@@ -1136,7 +1143,7 @@ class PlayState extends MusicBeatState
 				if (!ClientPrefs.data.lowQuality || !ClientPrefs.data.popUpRating || !cpuControlled)
 					daNote.kill();
 				unspawnNotes.remove(daNote);
-				daNote.destroy();
+				daNote.recycle();
 			}
 			--i;
 		}
@@ -1163,7 +1170,7 @@ class PlayState extends MusicBeatState
 	public dynamic function updateScore()
 	{
 		var ret:Dynamic = callOnScripts('preUpdateScore', [], true);
-		if (ret == LuaUtils.Function_Stop)
+		if (ret == ScriptResult.Stop)
 			return;
 
 		var str:String = ratingName;
@@ -1426,7 +1433,7 @@ class PlayState extends MusicBeatState
 				else
 					oldNote = null;
 
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				var swagNote:Note = Note.getNote(daStrumTime, daNoteData, oldNote);
 				swagNote.mustPress = gottaHitNote;
 				if (!gottaHitNote && allowedNotes.contains(swagNote.noteType))
 					swagNote.texture = SONG.opponentArrowSkin;
@@ -1449,7 +1456,7 @@ class PlayState extends MusicBeatState
 					{
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
-						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
+						var sustainNote:Note = Note.getNote(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
 						sustainNote.mustPress = gottaHitNote;
 						sustainNote.gfNote = (section.gfSection && (songNotes[1] < 4));
 						sustainNote.noteType = swagNote.noteType;
@@ -1563,7 +1570,7 @@ class PlayState extends MusicBeatState
 	{
 		final args:Array<Dynamic> = [event.event, event.value1, event.value2, event.strumTime];
 		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', args, true, [], [0]);
-		if (returnedValue != null && returnedValue != 0 && returnedValue != LuaUtils.Function_Continue)
+		if (returnedValue != null && returnedValue != 0)
 		{
 			return returnedValue;
 		}
@@ -1789,7 +1796,7 @@ class PlayState extends MusicBeatState
 			&& (startedCountdown && canPause))
 		{
 			var ret:Dynamic = callOnScripts('onPause', null, true);
-			if (ret != LuaUtils.Function_Stop)
+			if (ret != ScriptResult.Stop)
 			{
 				openPauseMenu();
 			}
@@ -2145,7 +2152,7 @@ class PlayState extends MusicBeatState
 		if (((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead)
 		{
 			var ret:Dynamic = callOnScripts('onGameOver', null, true);
-			if (ret != LuaUtils.Function_Stop)
+			if (ret != ScriptResult.Stop)
 			{
 				FlxG.animationTimeScale = 1;
 				boyfriend.stunned = true;
@@ -2756,7 +2763,7 @@ class PlayState extends MusicBeatState
 		seenCutscene = false;
 
 		var ret:Dynamic = callOnScripts('onEndSong', null, true);
-		if (ret != LuaUtils.Function_Stop && !transitioning)
+		if (ret != ScriptResult.Stop && !transitioning)
 		{
 			var percent:Float = ratingPercent;
 			if (Math.isNaN(percent))
@@ -3156,7 +3163,7 @@ class PlayState extends MusicBeatState
 			return;
 
 		var ret:Dynamic = callOnScripts('onKeyPressPre', [key]);
-		if (ret == LuaUtils.Function_Stop)
+		if (ret == ScriptResult.Stop)
 			return;
 
 		// obtain notes that the player can hit
@@ -3231,7 +3238,7 @@ class PlayState extends MusicBeatState
 			return;
 
 		var ret:Dynamic = callOnScripts('onKeyReleasePre', [key]);
-		if (ret == LuaUtils.Function_Stop)
+		if (ret == ScriptResult.Stop)
 			return;
 
 		var spr:StrumNote = playerStrums.members[key];
@@ -3707,7 +3714,7 @@ class PlayState extends MusicBeatState
 		if (!ClientPrefs.data.lowQuality || !ClientPrefs.data.popUpRating || !cpuControlled)
 			note.kill();
 		notes.remove(note, true);
-		note.destroy();
+		note.recycle();
 	}
 
 	public function spawnHoldSplashOnNote(note:Note)
@@ -3927,7 +3934,7 @@ class PlayState extends MusicBeatState
 		setOnScripts('combo', combo);
 
 		var ret:Dynamic = callOnScripts('onRecalculateRating', null, true);
-		if (ret != LuaUtils.Function_Stop)
+		if (ret != ScriptResult.Stop)
 		{
 			ratingName = '?';
 			if (totalPlayed != 0) // Prevent divide by 0

@@ -995,7 +995,7 @@ class ChartingState extends MusicBeatState
 				#if FEATURE_HSCRIPT
 				if (!isValid)
 				{
-					for (dynamicExt in cast(hscriptExtensions, Array<Dynamic>))
+					for (dynamicExt in cast(scripts.hscriptExtensions, Array<Dynamic>))
 					{
 						final ext:String = cast(dynamicExt, String);
 						if (fileName.endsWith(ext))
