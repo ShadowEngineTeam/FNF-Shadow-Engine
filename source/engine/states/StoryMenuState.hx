@@ -18,7 +18,8 @@ class StoryMenuState extends MusicBeatState
 
 	private static var lastDifficultyName:String = '';
 
-	var curDifficulty:Int = 1;
+	//read freeplay for more info
+	static var curDifficulty:Int = -1;
 
 	var txtWeekTitle:FlxText;
 	var bgSprite:FlxSprite;
@@ -129,11 +130,6 @@ class StoryMenuState extends MusicBeatState
 		difficultySelectors.add(leftArrow);
 
 		Difficulty.resetList();
-		if (lastDifficultyName == '')
-		{
-			lastDifficultyName = Difficulty.getDefault();
-		}
-		curDifficulty = Math.round(Math.max(0, Difficulty.defaultList.indexOf(lastDifficultyName)));
 
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = ClientPrefs.data.antialiasing;
@@ -301,13 +297,8 @@ class StoryMenuState extends MusicBeatState
 
 				callOnScripts('onSelectWeek');
 
-				var diffic = Difficulty.getFilePath(curDifficulty);
-				if (diffic == null)
-					diffic = '';
-
 				PlayState.storyDifficulty = curDifficulty;
-
-				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
+				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + Difficulty.getFilePath(curDifficulty), PlayState.storyPlaylist[0].toLowerCase());
 				PlayState.campaignScore = 0;
 				PlayState.campaignMisses = 0;
 			}
@@ -351,17 +342,22 @@ class StoryMenuState extends MusicBeatState
 
 	function changeDifficulty(change:Int = 0):Void
 	{
-		curDifficulty += change;
-
-		if (curDifficulty < 0)
-			curDifficulty = Difficulty.list.length - 1;
-		if (curDifficulty >= Difficulty.list.length)
-			curDifficulty = 0;
+		//read changeDiff function in freeplay for more info
+		if (curDifficulty == -1)
+		{
+			//for (diff in Difficulty.list)
+			//	trace(diff);
+			final normalIndex:Int = Difficulty.list.indexOf(NORMAL);
+			curDifficulty = normalIndex != -1 ? normalIndex : 0;
+			trace(curDifficulty);
+		}
+		else
+			curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
 
 		callOnScripts('onChangeDifficulty');
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
-		var diff:String = Difficulty.getString(curDifficulty).toLowerCase();
+		var diff:String = Difficulty.list[curDifficulty];
 		var diffPath:String = 'menudifficulties/' + Paths.formatToSongPath(diff);
 		var spriteSheetExists:Bool = Paths.fileExists('images/menudifficulties/$diff.xml', TEXT);
 
@@ -450,18 +446,6 @@ class StoryMenuState extends MusicBeatState
 
 		Difficulty.loadFromWeek();
 		difficultySelectors.visible = unlocked;
-
-		if (Difficulty.list.contains(Difficulty.getDefault()))
-			curDifficulty = Math.round(Math.max(0, Difficulty.defaultList.indexOf(Difficulty.getDefault())));
-		else
-			curDifficulty = 0;
-
-		var newPos:Int = Difficulty.list.indexOf(lastDifficultyName);
-		// trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
-		if (newPos > -1)
-		{
-			curDifficulty = newPos;
-		}
 		updateText();
 	}
 
