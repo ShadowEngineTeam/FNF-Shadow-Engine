@@ -3504,12 +3504,14 @@ class ChartingState extends MusicBeatState
 	{
 		// shitty null fix, i fucking hate it when this happens
 		// make it look sexier if possible
-		try {
+		try
+		{
 			final fuckinDiff:String = Difficulty.getByIndex() != NORMAL ? '-${PlayState.storyDifficulty}' : '';
 			PlayState.SONG = Song.loadFromJson(song.toLowerCase() + fuckinDiff, song.toLowerCase());
 			Funkin.resetState();
 		}
-		catch (e) {
+		catch (e)
+		{
 			trace('ERROR! $e');
 
 			var errorStr:String = e.toString();
