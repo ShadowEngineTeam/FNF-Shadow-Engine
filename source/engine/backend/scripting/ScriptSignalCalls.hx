@@ -39,9 +39,11 @@ class ScriptSignalCalls
 		});
 		FlxG.signals.preStateCreate.add(function(state:flixel.FlxState)
 		{
-			var musicState:IMusicState = cast(state, IMusicState);
-			if (musicState != null)
+			if (Std.isOfType(state, IMusicState))
+			{
+				var musicState:IMusicState = cast state;
 				musicState.callOnScripts("onStateCreatePre", [state]);
+			}
 		});
 		FlxG.signals.preStateSwitch.add(function()
 		{
