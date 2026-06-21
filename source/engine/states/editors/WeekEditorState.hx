@@ -302,12 +302,14 @@ class WeekEditorState extends MusicBeatState
 
 		tab.add(new ShadowLabel(10, 135, "Difficulties:"));
 		difficultiesInputText = new ShadowTextInput(10, 155, 200, '');
-		difficultiesInputText.callback = (text:String) -> {
-			weekFile.difficulties = [ //darlin baby darlin
-				for (d in text.toLowerCase().split(","))
-					if ((d = d.trim()).length > 0) d
+		difficultiesInputText.callback = (text:String) ->
+		{
+			weekFile.difficulties = [
+				// darlin baby darlin
+				for (diff in text.toLowerCase().split(","))
+					if ((diff = diff.trim()).length > 0) diff
 			];
-		}
+		};
 		blockPressWhileTypingOn.push(difficultiesInputText);
 		tab.add(difficultiesInputText);
 
@@ -334,8 +336,9 @@ class WeekEditorState extends MusicBeatState
 		weekBeforeInputText.text = weekFile.weekBefore;
 
 		final diffs:Array<Diff> = weekFile.difficulties;
-		if(diffs != null) {
-			final diffStr:Array<String> = [for(d in diffs) d];
+		if (diffs != null)
+		{
+			final diffStr:Array<String> = [for (diff in diffs) diff];
 			difficultiesInputText.text = diffStr.join(", ");
 		}
 
