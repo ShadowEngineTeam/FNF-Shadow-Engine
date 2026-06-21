@@ -61,15 +61,18 @@ class FreeplayState extends MusicBeatState
 		WeekData.reloadWeekFiles(false);
 
 		#if FEATURE_DISCORD_RPC
+		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 
-		for (i in 0...WeekData.weeksList.length) {
+		for (i in 0...WeekData.weeksList.length)
+		{
 			if (weekIsLocked(WeekData.weeksList[i])) continue;
 			final leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			WeekData.setDirectoryFromWeek(leWeek);
 
-			for (song in leWeek.songs) {
+			for (song in leWeek.songs)
+			{
 				final colors:Array<Int> = song[2]?.length == 3 ? song[2] : [146, 113, 253];
 				addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
 			}
@@ -83,7 +86,8 @@ class FreeplayState extends MusicBeatState
 
 		add(grpSongs = new FlxTypedGroup<Alphabet>());
 
-		for (i in 0...songs.length) {
+		for (i in 0...songs.length)
+		{
 			final songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
 			songText.targetY = i;
 			grpSongs.add(songText);
@@ -135,9 +139,7 @@ class FreeplayState extends MusicBeatState
 		add(bottomBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000));
 		bottomBG.alpha = 0.6;
 
-		bottomString = Funkin.controls.mobileC ?
-		'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.' :
-		'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
+		bottomString = Funkin.controls.mobileC ? 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'X'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'C'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'Y'} to Reset your Score and Accuracy.' : 'Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(START).toUpperCase() : 'SPACE'} to listen to the Song / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(LEFT_STICK_CLICK).toUpperCase() : 'CTRL'} to open the Gameplay Changers Menu / Press ${Funkin.controls.controllerMode ? InputFormatter.getGamepadName(BACK).toUpperCase() : 'R'} to Reset your Score and Accuracy.';
 
 		add(bottomText = new FlxText(bottomBG.x, bottomBG.y + 4, FlxG.width, bottomString, 16));
 		bottomText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
@@ -156,7 +158,8 @@ class FreeplayState extends MusicBeatState
 		Paths.clearUnusedMemory();
 	}
 
-	override function closeSubState():Void {
+	override function closeSubState():Void
+	{
 		changeSelection(0, false);
 		persistentUpdate = true;
 		super.closeSubState();
@@ -170,12 +173,14 @@ class FreeplayState extends MusicBeatState
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int):Void
 		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
 
-	function weekIsLocked(name:String):Bool {
+	function weekIsLocked(name:String):Bool
+	{
 		final leWeek:WeekData = WeekData.weeksLoaded.get(name);
 		return !leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore));
 	}
 
-	override function update(elapsed:Float):Void {
+	override function update(elapsed:Float):Void
+	{
 		if (FlxG.sound.music.volume < 0.7)
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 
@@ -199,28 +204,34 @@ class FreeplayState extends MusicBeatState
 		if ((FlxG.keys.pressed.SHIFT #if FEATURE_MOBILE_CONTROLS || touchPad.buttonZ.pressed #end) && !player.playingMusic)
 			shiftMult = 3;
 
-		if (!player.playingMusic) {
+		if (!player.playingMusic)
+		{
 			scoreText.text = 'PERSONAL BEST: ' + FlxStringUtil.formatMoney(lerpScore, false) + ' (' + ratingSplit.join('.') + '%)';
 			positionHighscore();
 
-			if (songs.length > 1) {
-				if (FlxG.keys.justPressed.HOME) {
+			if (songs.length > 1)
+			{
+				if (FlxG.keys.justPressed.HOME)
+				{
 					curSelected = 0;
 					changeSelection();
 					holdTime = 0;
 				}
-				else if (FlxG.keys.justPressed.END) {
+				else if (FlxG.keys.justPressed.END)
+				{
 					curSelected = songs.length - 1;
 					changeSelection();
 					holdTime = 0;
 				}
 
-				if (Funkin.controls.UI_UP_P || Funkin.controls.UI_DOWN_P) {
+				if (Funkin.controls.UI_UP_P || Funkin.controls.UI_DOWN_P)
+				{
 					changeSelection(Funkin.controls.UI_UP_P ? -shiftMult : shiftMult);
 					holdTime = 0;
 				}
 
-				if (Funkin.controls.UI_DOWN || Funkin.controls.UI_UP) {
+				if (Funkin.controls.UI_DOWN || Funkin.controls.UI_UP)
+				{
 					final checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
 					holdTime += elapsed;
 					final checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
@@ -229,7 +240,8 @@ class FreeplayState extends MusicBeatState
 						changeSelection((checkNewHold - checkLastHold) * (Funkin.controls.UI_UP ? -shiftMult : shiftMult));
 				}
 
-				if (FlxG.mouse.deltaWheel.y != 0) {
+				if (FlxG.mouse.deltaWheel.y != 0)
+				{
 					FlxG.sound.play(Paths.sound('scrollMenu'), 0.2);
 					changeSelection(-shiftMult * Math.round(FlxG.mouse.deltaWheel.y), false);
 				}
@@ -239,8 +251,10 @@ class FreeplayState extends MusicBeatState
 				changeDiff(Funkin.controls.UI_LEFT_P ? -1 : 1);
 		}
 
-		if (Funkin.controls.BACK) {
-			if (player.playingMusic) {
+		if (Funkin.controls.BACK)
+		{
+			if (player.playingMusic)
+			{
 				FlxG.sound.music.stop();
 				destroyFreeplayVocals();
 				FlxG.sound.music.volume = 0;
@@ -251,7 +265,9 @@ class FreeplayState extends MusicBeatState
 
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
 				FlxTween.tween(FlxG.sound.music, {volume: 1}, 1);
-			} else {
+			}
+			else
+			{
 				persistentUpdate = false;
 				colorTween?.cancel();
 
@@ -260,42 +276,45 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK))
-			&& !player.playingMusic) {
+		if ((FlxG.keys.justPressed.CONTROL #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end || FlxG.gamepads.anyJustPressed(LEFT_STICK_CLICK)) && !player.playingMusic)
+		{
 			persistentUpdate = false;
 			switchSubState(GameplayChangersSubstate);
 			#if FEATURE_MOBILE_CONTROLS
 			removeTouchPad();
 			#end
 		}
-		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(START)) {
-			if (instPlaying != curSelected && !player.playingMusic) {
+		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(START))
+		{
+			if (instPlaying != curSelected && !player.playingMusic)
+			{
 				destroyFreeplayVocals();
 				FlxG.sound.music.volume = 0;
 
 				Mods.currentModDirectory = songs[curSelected].folder;
-				try {
+				try
+				{
 					var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 					PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 					/*if (PlayState.SONG.needsVoices)
-						{
-							vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-							FlxG.sound.list.add(vocals);
-							vocals.persist = true;
-							vocals.looped = true;
-						}
-						else if (vocals != null)
-						{
-							vocals.stop();
-							vocals.destroy();
-							vocals = null;
+					{
+						vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+						FlxG.sound.list.add(vocals);
+						vocals.persist = true;
+						vocals.looped = true;
+					}
+					else if (vocals != null)
+					{
+						vocals.stop();
+						vocals.destroy();
+						vocals = null;
 					}*/
 
 					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, Difficulty.getSongPrefix(curDifficulty, false)), 0.8);
 					/*if (vocals != null) // Sync vocals to Inst
-						{
-							vocals.play();
-							vocals.volume = 0.8;
+					{
+						vocals.play();
+						vocals.volume = 0.8;
 					}*/
 					instPlaying = curSelected;
 
@@ -303,7 +322,8 @@ class FreeplayState extends MusicBeatState
 					player.curTime = 0;
 					player.switchPlayMusic();
 				}
-				catch (e:Dynamic) {
+				catch (e:Dynamic)
+				{
 					trace('ERROR! $e');
 
 					missingText.text = 'ERROR WHILE LOADING CHART:\n${e.toString()}';
@@ -319,20 +339,23 @@ class FreeplayState extends MusicBeatState
 			else if (instPlaying == curSelected && player.playingMusic)
 				player.pauseOrResume(player.paused);
 		}
-		else if (Funkin.controls.ACCEPT && !player.playingMusic) {
+		else if (Funkin.controls.ACCEPT && !player.playingMusic)
+		{
 			persistentUpdate = false;
 
 			final songPath:String = Paths.formatToSongPath(songs[curSelected].songName);
 			final json:String = Highscore.formatSong(songPath, curDifficulty);
 
-			try {
+			try
+			{
 				PlayState.SONG = Song.loadFromJson(json, songPath);
 				PlayState.isStoryMode = false;
 				PlayState.storyDifficulty = curDifficulty;
 				trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
 				colorTween?.cancel();
 			}
-			catch (e:Dynamic) {
+			catch (e:Dynamic)
+			{
 				trace('ERROR! $e');
 				missingText.text = 'ERROR WHILE LOADING CHART:\n${e.toString()}';
 				missingText.screenCenter(Y);
@@ -353,7 +376,8 @@ class FreeplayState extends MusicBeatState
 			DiscordClient.loadModRPC();
 			#end
 		}
-		else if ((Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic) {
+		else if ((Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
+		{
 			persistentUpdate = false;
 			switchSubState(ResetScoreSubState, [songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter]);
 
@@ -367,24 +391,30 @@ class FreeplayState extends MusicBeatState
 		super.update(elapsed);
 	}
 
-	public static function destroyFreeplayVocals():Void {
-		if (vocals != null) {
+	public static function destroyFreeplayVocals():Void
+	{
+		if (vocals != null)
+		{
 			vocals.stop();
 			vocals.destroy();
 		}
 		vocals = null;
 	}
 
-	function changeDiff(change:Int = 0):Void {
+	function changeDiff(change:Int = 0):Void
+	{
 		if (player.playingMusic) return;
 
 		//readin week list if theres normal
 		//then we take index of normal, otherwise any first diff
 		//same for story menu
-		if (curDifficulty == -1) {
+		if (curDifficulty == -1)
+		{
 			final normalIndex:Int = Difficulty.list.indexOf(NORMAL);
 			curDifficulty = normalIndex != -1 ? normalIndex : 0;
-		} else curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
+		}
+		else
+			curDifficulty = (curDifficulty + change + Difficulty.list.length) % Difficulty.list.length;
 
 		callOnScripts('onChangeDifficulty');
 
@@ -398,8 +428,10 @@ class FreeplayState extends MusicBeatState
 		missingText.visible = missingTextBG.visible = false;
 	}
 
-	function changeSelection(change:Int = 0, playSound:Bool = true):Void {
-		if (player.playingMusic) return;
+	function changeSelection(change:Int = 0, playSound:Bool = true):Void
+	{
+		if (player.playingMusic)
+			return;
 
 		if (playSound)
 			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
@@ -409,7 +441,8 @@ class FreeplayState extends MusicBeatState
 		callOnScripts('onChangeSelection');
 
 		final newColor:Int = songs[curSelected].color;
-		if (newColor != intendedColor) {
+		if (newColor != intendedColor)
+		{
 			colorTween?.cancel();
 
 			intendedColor = newColor;
@@ -431,7 +464,8 @@ class FreeplayState extends MusicBeatState
 		changeDiff();
 	}
 
-	function positionHighscore():Void {
+	function positionHighscore():Void
+	{
 		scoreText.x = FlxG.width - scoreText.width - 6;
 		scoreBG.scale.x = FlxG.width - scoreText.x + 6;
 		scoreBG.x = FlxG.width - (scoreBG.scale.x / 2);
@@ -439,10 +473,12 @@ class FreeplayState extends MusicBeatState
 		diffText.x -= diffText.width / 2;
 	}
 
-	public function updateTexts(elapsed:Float = 0):Void {
+	public function updateTexts(elapsed:Float = 0):Void
+	{
 		lerpSelected = FlxMath.lerp(curSelected, lerpSelected, Math.exp(-elapsed * 9.6));
 
-		for (i in _lastVisibles) {
+		for (i in _lastVisibles)
+		{
 			grpSongs.members[i].visible = grpSongs.members[i].active = false;
 			iconArray[i].visible = iconArray[i].active = false;
 		}
@@ -452,7 +488,8 @@ class FreeplayState extends MusicBeatState
 		final min:Int = Math.round(Math.max(0, Math.min(songs.length, lerpSelected - _drawDistance)));
 		final max:Int = Math.round(Math.max(0, Math.min(songs.length, lerpSelected + _drawDistance)));
 
-		for (i in min...max) {
+		for (i in min...max)
+		{
 			final item:Alphabet = grpSongs.members[i];
 			item.visible = item.active = true;
 			item.x = ((item.targetY - lerpSelected) * item.distancePerItem.x) + item.startPosition.x;
@@ -464,7 +501,8 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
-	override function destroy():Void {
+	override function destroy():Void
+	{
 		super.destroy();
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;
@@ -482,7 +520,8 @@ class SongMetadata
 	public var color:Int = -7179779;
 	public var folder:String = "";
 
-	public function new(song:String, week:Int, songCharacter:String, color:Int) {
+	public function new(song:String, week:Int, songCharacter:String, color:Int)
+	{
 		this.songName = song;
 		this.week = week;
 		this.songCharacter = songCharacter;
