@@ -56,7 +56,7 @@ class PauseSubState extends MusicBeatSubstate
 		}
 		menuItems = menuItemsOG;
 
-		for(d in Difficulty.list)
+		for (d in Difficulty.list)
 			difficultyChoices.push(d);
 
 		difficultyChoices.push('BACK');
