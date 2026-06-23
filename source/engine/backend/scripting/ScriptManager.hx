@@ -349,6 +349,7 @@ class ScriptManager
 			}
 		}
 		hscriptArray.resize(0);
+		HScript.sharedStaticVariables.clear();
 		#end
 	}
 }
