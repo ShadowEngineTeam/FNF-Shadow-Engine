@@ -854,6 +854,9 @@ class ModsMenuState extends MusicBeatState
 	function reload()
 	{
 		callOnScripts('onReloadMods');
+		#if FEATURE_HSCRIPT
+		backend.scripting.GlobalScript.reload();
+		#end
 		saveTxt();
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		FlxTransitionableState.skipNextTransIn = true;

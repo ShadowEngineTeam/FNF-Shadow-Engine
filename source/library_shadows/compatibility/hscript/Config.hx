@@ -4,7 +4,10 @@ class Config {
 	// Runs support for custom classes in these
 	public static final ALLOWED_CUSTOM_CLASSES = [
 		"flixel",
+		"flixel.addons",
+		"openfl",
 		"animate",
+		"haxe",
 		#if FEATURE_VIDEOS
 		//"hxvlc",
 		#end
@@ -24,7 +27,9 @@ class Config {
 	// Runs support for abstract support in these
 	public static final ALLOWED_ABSTRACT_AND_ENUM = [
 		"flixel",
+		"flixel.addons",
 		"openfl",
+		"haxe",
 		"haxe.xml",
 		"haxe.CallStack",
 		"animate",

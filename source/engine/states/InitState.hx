@@ -37,6 +37,7 @@ class InitState extends FlxState
 
 		#if FEATURE_HSCRIPT
 		backend.scripting.ScriptSignalCalls.init();
+		backend.scripting.GlobalScript.init();
 		#end
 
 		#if FEATURE_DISCORD_RPC

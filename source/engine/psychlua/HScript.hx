@@ -47,7 +47,7 @@ class HScript extends SScript
 
 	public var origin:String;
 
-	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
+	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?sharedPublicVars:Map<String, Dynamic> = null)
 	{
 		if (file == null)
 			file = '';
@@ -79,6 +79,8 @@ class HScript extends SScript
 		}
 
 		interp.allowStaticVariables = interp.allowPublicVariables = true;
+		if (sharedPublicVars != null)
+			interp.publicVariables = sharedPublicVars;
 		preset();
 		execute();
 
@@ -381,13 +383,17 @@ class HScript extends SScript
 		set('insert', FlxG.state.insert);
 		set('remove', FlxG.state.remove);
 
-		if (FunkinLua.getCurrentMusicState() is PlayState)
+		var curState = FunkinLua.getCurrentMusicState();
+		if (curState != null)
 		{
-			set('addBehindGF', PlayState.instance.addBehindGF);
-			set('addBehindDad', PlayState.instance.addBehindDad);
-			set('addBehindBF', PlayState.instance.addBehindBF);
+			if (curState is PlayState)
+			{
+				set('addBehindGF', PlayState.instance.addBehindGF);
+				set('addBehindDad', PlayState.instance.addBehindDad);
+				set('addBehindBF', PlayState.instance.addBehindBF);
+			}
+			setSpecialObject(curState, false, curState.scripts.instancesExclude);
 		}
-		setSpecialObject(FunkinLua.getCurrentMusicState(), false, FunkinLua.getCurrentMusicState().scripts.instancesExclude);
 
 		if (varsToBring != null)
 		{

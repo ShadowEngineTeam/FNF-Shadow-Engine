@@ -19,6 +19,7 @@ class ScriptManager
 	public var luaArray:Array<FunkinLua> = [];
 	public var hscriptArray:Array<HScript> = [];
 	public var instancesExclude:Array<String> = [];
+	public var publicVariables:Map<String, Dynamic> = new Map();
 
 	public final hscriptExtensions:Array<String> = ['hx', 'hscript', 'hxs', 'hxc'];
 	public final luaExtensions:Array<String> = ['lua', 'luau'];
@@ -273,7 +274,7 @@ class ScriptManager
 	{
 		try
 		{
-			var newScript = new HScript(null, file);
+			var newScript = new HScript(null, file, null, publicVariables);
 			if (newScript.parsingException != null)
 			{
 				state.addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
