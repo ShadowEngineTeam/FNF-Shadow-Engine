@@ -12,6 +12,10 @@ import hscript.SScript.FunctionCall;
 class HScript extends SScript
 {
 	public var modFolder:String;
+	public static var sharedStaticVariables:Map<String, Dynamic> = new Map();
+	#if FEATURE_HSCRIPT
+	//var __importedPaths:Array<String> = [];
+	#end
 
 	#if FEATURE_LUA
 	public var parentLua:FunkinLua;
@@ -81,6 +85,42 @@ class HScript extends SScript
 		interp.allowStaticVariables = interp.allowPublicVariables = true;
 		if (sharedPublicVars != null)
 			interp.publicVariables = sharedPublicVars;
+		interp.staticVariables = sharedStaticVariables;
+		/*interp.importFailedCallback = function(cl:Array<String>, ?asName:String):Bool
+		{
+			var pathStr = cl.join("/");
+			for (ext in ['hx', 'hscript', 'hxs', 'hxc'])
+			{
+				var target = pathStr + "." + ext;
+				var found:String = null;
+				#if FEATURE_MODS
+				var modPath = Paths.modFolders(target);
+				if (modPath != null && FileSystem.exists(modPath))
+					found = modPath;
+				#end
+				if (found == null)
+				{
+					var sharedPath = Paths.getSharedPath(target);
+					if (sharedPath != null && FileSystem.exists(sharedPath))
+						found = sharedPath;
+				}
+				if (found != null)
+				{
+					if (__importedPaths.contains(found)) return true;
+					var code = File.getContent(found);
+					if (code == null || code.trim() == "") return true;
+					try
+					{
+						var expr = parser.parseString(code, found);
+						interp.expr(expr);
+						__importedPaths.push(found);
+						return true;
+					}
+					catch (e:Dynamic) {}
+				}
+			}
+			return false;
+		};*/
 		preset();
 		execute();
 
