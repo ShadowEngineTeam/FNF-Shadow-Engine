@@ -1057,7 +1057,7 @@ class FunkinLua
 			var isString:Bool = !FileSystem.exists(scriptName);
 			var status:Int = 0;
 			if (!isString)
-				status = #if MODS_ALLOWED sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
+				status = #if FEATURE_MODS sys.FileSystem.exists(scriptName) ? LuaL.dofile(lua, scriptName) : #end LuaL.dostring(lua, File.getContent(scriptName));
 			else
 				status = LuaL.dostring(lua, scriptName);
 
