@@ -39,6 +39,7 @@ class Project extends HXProject
 	static final FEATURE_TRACY:CompileFlag = CompileFlag.get("FEATURE_TRACY");
 	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
 	static final FEATURE_EMBED_ASSETS:CompileFlag = CompileFlag.get("EMBED_ASSETS");
+	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -239,11 +240,12 @@ class Project extends HXProject
 		FEATURE_DCE.integrate(false);
 		FEATURE_TRACY.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
+		FEATURE_EMBED_ASSETS.integrate(false);
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
 
-		FEATURE_EMBED_ASSETS.integrate(false);
+		USE_OPENFL_FILESYSTEM.integrate((FEATURE_MODS.isDisabled() || FEATURE_EMBED_ASSETS.isEnabled()) && !isMobile());
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
