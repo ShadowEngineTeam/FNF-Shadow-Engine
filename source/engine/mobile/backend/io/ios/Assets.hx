@@ -268,10 +268,10 @@ class Assets
 		return Bytes.ofData(data);
 	}
 
-	public static function read(file:String, ?binary:Bool):BytesInput
+	/*public static function read(file:String, ?binary:Bool):BytesInput
 	{
 		return new BytesInput(getBytes(file));
-	}
+	}*/
 
 	public static function exists(path:String):Bool
 	{
