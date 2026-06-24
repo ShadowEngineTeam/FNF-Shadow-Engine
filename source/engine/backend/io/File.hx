@@ -129,11 +129,14 @@ class File
 		#else
 		return SysFile.read(cwd(path), binary);
 		#end
-		#end
+		#else
 		#if mobile
-		return MobileAssets.read(path, binary);
-		#end
+		// return MobileAssets.read(path, binary);
 		return null;
+		#else
+		return null;
+		#end
+		#end
 	}
 
 	public static function write(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
