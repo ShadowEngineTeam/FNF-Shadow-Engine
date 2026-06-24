@@ -138,10 +138,8 @@ class File
 		#else
 		#if mobile
 		// return MobileAssets.read(path, binary);
-		return null;
-		#else
-		return null;
 		#end
+		return null;
 		#end
 	}
 
