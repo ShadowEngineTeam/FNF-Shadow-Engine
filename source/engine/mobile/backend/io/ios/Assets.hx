@@ -52,10 +52,11 @@ static std::string resolveAssetPath(const char* logicalPath)
 	const std::string& base = getBundleResourcePath();
 	if (base.empty())
 		return std::string();
-	// avoiding double-slash if logicalPath already starts
+	// iOS Xcode template hardcodes "assets/" root, causing double "assets/assets/..." structure
+	std::string iosPath = std::string("assets/") + logicalPath;
 	if (logicalPath[0] == \'/\')
-		return base + logicalPath;
-	return base + "/" + logicalPath;
+		return base + iosPath;
+	return base + "/" + iosPath;
 }
 
 bool Assets_obj::native_exists(::String path)
