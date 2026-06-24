@@ -335,7 +335,7 @@ class WeekEditorState extends MusicBeatState
 		hideCheckbox.checked = weekFile.hideStoryMode;
 		weekBeforeInputText.text = weekFile.weekBefore;
 
-		final diffs:Array<Diff> = weekFile.difficulties;
+		final diffs:Array<String> = weekFile.difficulties;
 		if (diffs != null)
 		{
 			final diffStr:Array<String> = [for (diff in diffs) diff];
