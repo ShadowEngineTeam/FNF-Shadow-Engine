@@ -131,7 +131,7 @@ class File
 		#end
 		#end
 		#if mobile
-		// SHADOW TODO
+		return MobileAssets.read(path, binary);
 		#end
 		return null;
 	}
