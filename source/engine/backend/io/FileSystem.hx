@@ -58,7 +58,7 @@ class FileSystem
 		#end
 
 		#if USE_OPENFL_FILESYSTEM
-		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+		if (OpenFLAssets.exists(openflcwd(path)) || OpenFLAssets.list().filter(asset -> asset.startsWith(path + "/") && asset != path).length > 0)
 			return true;
 		#end
 
@@ -233,7 +233,7 @@ class FileSystem
 		#end
 
 		#if USE_OPENFL_FILESYSTEM
-		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path) && asset != path).length > 0)
+		if (OpenFLAssets.list().filter(asset -> asset.startsWith(path + "/") && asset != path).length > 0)
 			return openflReadDirectory(path);
 		#end
 
@@ -248,7 +248,7 @@ class FileSystem
 	#if USE_OPENFL_FILESYSTEM
 	static function openflReadDirectory(path:String):Array<String>
 	{
-		var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path));
+		var filteredList:Array<String> = OpenFLAssets.list().filter(f -> f.startsWith(path + "/"));
 		var results:Array<String> = [];
 		for (i in filteredList.copy())
 		{

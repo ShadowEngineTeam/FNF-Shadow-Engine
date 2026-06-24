@@ -1,5 +1,9 @@
 package mobile.backend.io.ios;
 
+/**
+ * The code for this class is mostly taken from SDL2.
+ * This class implements IO methods from the CoreFoundation's CFBundle to read bundled app assets.
+ */
 #if ios
 import cpp.UInt8;
 import haxe.io.Bytes;
