@@ -13,6 +13,7 @@ class HScript extends SScript
 {
 	public var modFolder:String;
 	public static var sharedStaticVariables:Map<String, Dynamic> = new Map();
+	public static var sharedCustomClasses:Map<String, hscript.CustomClassHandler> = new Map();
 	#if FEATURE_HSCRIPT
 	//var __importedPaths:Array<String> = [];
 	#end
@@ -86,6 +87,7 @@ class HScript extends SScript
 		if (sharedPublicVars != null)
 			interp.publicVariables = sharedPublicVars;
 		interp.staticVariables = sharedStaticVariables;
+		interp.customClasses = sharedCustomClasses;
 		/*interp.importFailedCallback = function(cl:Array<String>, ?asName:String):Bool
 		{
 			var pathStr = cl.join("/");
