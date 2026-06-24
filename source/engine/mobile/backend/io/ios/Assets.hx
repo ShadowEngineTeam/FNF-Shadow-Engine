@@ -62,7 +62,7 @@ bool Assets_obj::native_exists(::String path)
 	if (!fullPath.empty())
 	{
 		struct stat st;
-		exists = (stat(fullPath.c_str(), &st) == 0);
+		exists = (::stat(fullPath.c_str(), &st) == 0);
 	}
 	hx::ExitGCFreeZone();
 	return exists;
@@ -125,7 +125,7 @@ Array<unsigned char> Assets_obj::native_getBytes(::String file)
 	if (!fullPath.empty())
 	{
 		struct stat st;
-		if (stat(fullPath.c_str(), &st) == 0 && S_ISREG(st.st_mode))
+		if (::stat(fullPath.c_str(), &st) == 0 && S_ISREG(st.st_mode))
 		{
 			len = st.st_size;
 			isFile = true;
@@ -170,7 +170,7 @@ bool Assets_obj::native_isDirectory(::String path)
 	if (!fullPath.empty())
 	{
 		struct stat st;
-		if (stat(fullPath.c_str(), &st) == 0)
+		if (::stat(fullPath.c_str(), &st) == 0)
 			isDir = S_ISDIR(st.st_mode);
 	}
 	hx::ExitGCFreeZone();
@@ -215,7 +215,7 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 	struct stat st;
 	memset(&st, 0, sizeof(st));
 	if (!fullPath.empty())
-		found = (stat(fullPath.c_str(), &st) == 0);
+		found = (::stat(fullPath.c_str(), &st) == 0);
 	hx::ExitGCFreeZone();
 
 	hx::Anon anon = hx::Anon_obj::Create();
