@@ -89,10 +89,6 @@ class FileSystem
 
 	public static function stat(path:String):Null<#if sys FileStat #else Dynamic #end>
 	{
-		#if mobile
-		if (MobileAssets.exists(path))
-			return MobileAssets.stat(path);
-		#end
 		#if FEATURE_MODS
 		#if linux
 		var actualPath:String = cwd(path);
@@ -106,6 +102,10 @@ class FileSystem
 			return SysFileSystem.stat(cwd(path));
 		#end
 		#else
+		#if mobile
+		if (MobileAssets.exists(path))
+			return MobileAssets.stat(path);
+		#end
 		return null;
 		#end
 	}
