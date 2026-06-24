@@ -570,7 +570,7 @@ class FunkinLua
 						Lua.getglobal(funk.lua, global);
 						var value:Dynamic = Convert.fromLua(funk.lua, -1);
 						Lua.pop(funk.lua, 1); // remove the global from funk.lua
-						return value; // push handleCallback and return the value
+						return value; // return the value
 					}
 				}
 			return null;
