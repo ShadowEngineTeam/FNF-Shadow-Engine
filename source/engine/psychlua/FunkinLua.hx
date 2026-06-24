@@ -558,23 +558,22 @@ class FunkinLua
 				}
 		});
 
-		set("getGlobalFromScript", function(luaFile:String, global:String) // returns the global from a script
+		set("getGlobalFromScript", function(luaFile:String, global:String):Dynamic // returns the global from a script
 		{
 			var foundScript:String = findScript(luaFile);
 			if (foundScript != null)
 				for (_luaInstance in cast(game.luaArray, Array<Dynamic>))
 				{
-					var luaInstance:FunkinLua = cast _luaInstance;
-					final funk:FunkinLua = cast(luaInstance, FunkinLua);
+					final funk:FunkinLua = cast(_luaInstance, FunkinLua);
 					if (funk.scriptName == foundScript)
 					{
 						Lua.getglobal(funk.lua, global);
 						var value:Dynamic = Convert.fromLua(funk.lua, -1);
 						Lua.pop(funk.lua, 1); // remove the global from funk.lua
-						Convert.toLua(lua, value); // push the value to the current lua state
-						return;
+						return value; // push handleCallback and return the value
 					}
 				}
+			return null;
 		});
 		set("setGlobalFromScript", function(luaFile:String, global:String, val:Dynamic) // returns the global from a script
 		{
