@@ -7,6 +7,7 @@ package mobile.backend.io.android;
 #if android
 import cpp.UInt8;
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 import lime.system.JNI;
 import sys.FileStat;
 
@@ -14,6 +15,8 @@ import sys.FileStat;
 #ifndef INCLUDED_Date
 #include <Date.h>
 #endif
+#include <vector>
+#include <string>
 ')
 @:cppNamespaceCode('
 #include <jni.h>
@@ -37,7 +40,7 @@ static struct LocalReferenceHolder LocalReferenceHolder_Setup(const char *func)
 	struct LocalReferenceHolder refholder;
 	refholder.m_env = NULL;
 	refholder.m_func = func;
-	__android_log_print (ANDROID_LOG_DEBUG, "Shadow Engine", "Entering function %s", func);
+	__android_log_print(ANDROID_LOG_DEBUG, "Shadow Engine", "Entering function %s", func);
 	return refholder;
 }
 
@@ -46,7 +49,7 @@ static bool LocalReferenceHolder_Init(struct LocalReferenceHolder *refholder, JN
 	const int capacity = 16;
 	if ((*env).PushLocalFrame(capacity) < 0)
 	{
-		__android_log_print (ANDROID_LOG_ERROR, "Shadow Engine", "Failed to allocate enough JVM local references");
+		__android_log_print(ANDROID_LOG_ERROR, "Shadow Engine", "Failed to allocate enough JVM local references");
 		return false;
 	}
 	refholder->m_env = env;
@@ -55,7 +58,7 @@ static bool LocalReferenceHolder_Init(struct LocalReferenceHolder *refholder, JN
 
 static void LocalReferenceHolder_Cleanup(struct LocalReferenceHolder *refholder)
 {
-	__android_log_print (ANDROID_LOG_DEBUG, "Shadow Engine", "Leaving function %s", refholder->m_func);
+	__android_log_print(ANDROID_LOG_DEBUG, "Shadow Engine", "Leaving function %s", refholder->m_func);
 	if (refholder->m_env)
 	{
 		JNIEnv *env = refholder->m_env;
@@ -68,7 +71,7 @@ void Assets_obj::native_init(::Dynamic jni_env)
 	JNIEnv* env = (JNIEnv*)(uintptr_t)jni_env;
 	jclass cls = env->FindClass("org/libsdl/app/SDLActivity");
 	mActivityClass = (jclass)((*env).NewGlobalRef(cls));
-	
+
 	struct LocalReferenceHolder refs = LocalReferenceHolder_Setup(__FUNCTION__);
 	jmethodID mid;
 	jobject context;
@@ -81,7 +84,7 @@ void Assets_obj::native_init(::Dynamic jni_env)
 	}
 
 	// context = SDLActivity.getContext();
-	midGetContext = (*env).GetStaticMethodID(mActivityClass, "getContext","()Landroid/content/Context;");
+	midGetContext = (*env).GetStaticMethodID(mActivityClass, "getContext", "()Landroid/content/Context;");
 	context = (*env).CallStaticObjectMethod(mActivityClass, midGetContext);
 
 	// javaAssetManager = context.getAssets();
@@ -90,7 +93,7 @@ void Assets_obj::native_init(::Dynamic jni_env)
 
 	/**
 	 * Given a Dalvik AssetManager object, obtain the corresponding native AAssetManager
-	 * object.  Note that the caller is responsible for obtaining and holding a VM reference
+	 * object. Note that the caller is responsible for obtaining and holding a VM reference
 	 * to the jobject to prevent its being garbage collected while the native object is
 	 * in use.
 	 */
@@ -100,9 +103,9 @@ void Assets_obj::native_init(::Dynamic jni_env)
 	if (asset_manager == NULL)
 	{
 		(*env).DeleteGlobalRef(javaAssetManagerRef);
-		__android_log_print (ANDROID_LOG_DEBUG, "Shadow Engine", "Failed to create Android Assets Manager");
+		__android_log_print(ANDROID_LOG_ERROR, "Shadow Engine", "Failed to create Android Assets Manager");
 	}
-	
+
 	LocalReferenceHolder_Cleanup(&refs);
 }
 
@@ -119,46 +122,49 @@ void Assets_obj::native_destroy(::Dynamic jni_env)
 
 bool Assets_obj::native_exists(::String path)
 {
+	if (!asset_manager)
+		return false;
+
 	hx::EnterGCFreeZone();
+
 	AAsset* file = AAssetManager_open(asset_manager, path.__s, AASSET_MODE_UNKNOWN);
 	if (file != NULL)
 	{
-        AAsset_close(file);
+		AAsset_close(file);
 		hx::ExitGCFreeZone();
-        return true;
-    }
-
-	if (file)
-        AAsset_close(file);
+		return true;
+	}
 
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
 	if (dir && AAssetDir_getNextFileName(dir) != NULL)
 	{
-        AAssetDir_close(dir);
+		AAssetDir_close(dir);
 		hx::ExitGCFreeZone();
-        return true;
-    }
+		return true;
+	}
 
 	if (dir)
-        AAssetDir_close(dir);
+		AAssetDir_close(dir);
 
 	hx::ExitGCFreeZone();
 	return false;
 }
 
-::String Assets_obj::native_getContent(::String file) {
-	std::vector<char> buffer;
-	
+::String Assets_obj::native_getContent(::String file)
+{
+	if (!asset_manager)
+		return ::String(null());
+
 	hx::EnterGCFreeZone();
 	AAsset* asset = AAssetManager_open(asset_manager, file.__s, AASSET_MODE_BUFFER);
-	
+
 	if (!asset)
 	{
 		hx::ExitGCFreeZone();
 		return ::String(null());
 	}
 
-	int len = AAsset_getLength(asset);
+	off64_t len = AAsset_getLength64(asset);
 	if (len <= 0)
 	{
 		AAsset_close(asset);
@@ -166,62 +172,111 @@ bool Assets_obj::native_exists(::String path)
 		return ::String::emptyString;
 	}
 
+	std::vector<char> buffer((size_t)len);
+
 	const char* src = (const char*)AAsset_getBuffer(asset);
-	
-	buffer.resize(len);
-	memcpy(&buffer[0], src, len);
+	if (src != NULL)
+	{
+		memcpy(&buffer[0], src, (size_t)len);
+	}
+	else
+	{
+		off64_t totalRead = 0;
+		while (totalRead < len)
+		{
+			int bytesRead = AAsset_read(asset, &buffer[totalRead], (size_t)(len - totalRead));
+			if (bytesRead <= 0)
+			{
+				AAsset_close(asset);
+				hx::ExitGCFreeZone();
+				return ::String(null());
+			}
+			totalRead += bytesRead;
+		}
+	}
 
 	AAsset_close(asset);
 	hx::ExitGCFreeZone();
 
-	return ::String::create(&buffer[0], buffer.size());
+	return ::String::create(&buffer[0], (int)buffer.size());
 }
 
-Array<unsigned char> Assets_obj::native_getBytes(::String file) {
+Array<unsigned char> Assets_obj::native_getBytes(::String file)
+{
+	if (!asset_manager)
+		return null();
+
 	hx::EnterGCFreeZone();
 	AAsset* asset = AAssetManager_open(asset_manager, file.__s, AASSET_MODE_STREAMING);
-	
+
 	if (!asset)
 	{
 		hx::ExitGCFreeZone();
-		return null(); 
+		return null();
 	}
+
+	off64_t len = AAsset_getLength64(asset);
+	if (len == 0)
+	{
+		AAsset_close(asset);
+		hx::ExitGCFreeZone();
+		return Array_obj<unsigned char>::__new(0, 0);
+	}
+	if (len < 0)
+	{
+		AAsset_close(asset);
+		hx::ExitGCFreeZone();
+		return null();
+	}
+
+	Array<unsigned char> buffer = Array_obj<unsigned char>::__new((int)len, (int)len);
 
 	int fd;
 	off_t outStart;
 	off_t outLength;
-	fd = AAsset_openFileDescriptor (asset, &outStart, &outLength);
+	fd = AAsset_openFileDescriptor(asset, &outStart, &outLength);
 
-	if (fd < 0) {
-		AAsset_close(asset);
-		hx::ExitGCFreeZone();
-        return null();
-    }
-
-	Array<unsigned char> buffer = Array_obj<unsigned char>::__new(outLength, outLength);
-
-	if (lseek(fd, outStart, SEEK_SET) == -1) {
-        close(fd);
-		AAsset_close(asset);
-		hx::ExitGCFreeZone();
-        return null();
-    }
-
-	int totalRead = 0;
-    while (totalRead < outLength) {
-        int bytesRead = read(fd, buffer->getBase() + totalRead, outLength - totalRead);
-
-        if (bytesRead <= 0) {
-            close(fd);
+	if (fd >= 0)
+	{
+		if (lseek(fd, outStart, SEEK_SET) == -1)
+		{
+			close(fd);
 			AAsset_close(asset);
 			hx::ExitGCFreeZone();
-	        return null();
-        }
-		
-        totalRead += bytesRead;
-    }
+			return null();
+		}
 
-    close(fd);
+		off64_t totalRead = 0;
+		while (totalRead < len)
+		{
+			int bytesRead = read(fd, buffer->getBase() + totalRead, (size_t)(len - totalRead));
+			if (bytesRead <= 0)
+			{
+				close(fd);
+				AAsset_close(asset);
+				hx::ExitGCFreeZone();
+				return null();
+			}
+			totalRead += bytesRead;
+		}
+		close(fd);
+	}
+	else
+	{
+		off64_t totalRead = 0;
+		while (totalRead < len)
+		{
+			int bytesRead = AAsset_read(asset, buffer->getBase() + totalRead, (size_t)(len - totalRead));
+			if (bytesRead <= 0)
+			{
+				AAsset_close(asset);
+				hx::ExitGCFreeZone();
+				return null();
+			}
+			totalRead += bytesRead;
+		}
+	}
+
 	AAsset_close(asset);
 	hx::ExitGCFreeZone();
 	return buffer;
@@ -229,6 +284,9 @@ Array<unsigned char> Assets_obj::native_getBytes(::String file) {
 
 bool Assets_obj::native_isDirectory(::String path)
 {
+	if (!asset_manager)
+		return false;
+
 	hx::EnterGCFreeZone();
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
 
@@ -248,24 +306,27 @@ bool Assets_obj::native_isDirectory(::String path)
 
 Array<::String> Assets_obj::native_readDirectory(::String path)
 {
-	Array<::String> result = Array_obj<::String>::__new(0, 0);
+	if (!asset_manager)
+		return Array_obj<::String>::__new(0, 0);
+
+	std::vector<std::string> names;
+
 	hx::EnterGCFreeZone();
 	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
-	const char* filename;
 
-	if (!dir)
+	if (dir)
 	{
-		hx::ExitGCFreeZone();
-		return result;
+		const char* filename;
+		while ((filename = AAssetDir_getNextFileName(dir)) != NULL)
+			names.push_back(filename);
+		AAssetDir_close(dir);
 	}
-	
-	while ((filename = AAssetDir_getNextFileName(dir)) != NULL)
-	{
-		result->push(::String(filename));
-	}
-
-	AAssetDir_close(dir);
 	hx::ExitGCFreeZone();
+
+	Array<::String> result = Array_obj<::String>::__new(0, 0);
+	for (size_t i = 0; i < names.size(); i++)
+		result->push(::String(names[i].c_str()));
+
 	return result;
 }
 
@@ -276,29 +337,29 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 	int fileSize = 0;
 	int mode = isDir ? 0x4000 : 0x8000;
 
-	if (!isDir)
+	if (!isDir && asset_manager)
 	{
 		hx::EnterGCFreeZone();
 		AAsset* asset = AAssetManager_open(asset_manager, path.__s, AASSET_MODE_UNKNOWN);
 		if (asset)
 		{
-			fileSize = AAsset_getLength(asset);
+			fileSize = (int)AAsset_getLength64(asset);
 			AAsset_close(asset);
 		}
 		hx::ExitGCFreeZone();
 	}
 
-	anon->Add(HX_CSTRING("gid"), 0);
-	anon->Add(HX_CSTRING("uid"), 0);
+	anon->Add(HX_CSTRING("gid"),   0);
+	anon->Add(HX_CSTRING("uid"),   0);
 	anon->Add(HX_CSTRING("atime"), ::Date_obj::fromTime(0.0));
 	anon->Add(HX_CSTRING("mtime"), ::Date_obj::fromTime(0.0));
 	anon->Add(HX_CSTRING("ctime"), ::Date_obj::fromTime(0.0));
-	anon->Add(HX_CSTRING("size"), fileSize);
-	anon->Add(HX_CSTRING("dev"), 0);
-	anon->Add(HX_CSTRING("ino"), 0);
+	anon->Add(HX_CSTRING("size"),  fileSize);
+	anon->Add(HX_CSTRING("dev"),   0);
+	anon->Add(HX_CSTRING("ino"),   0);
 	anon->Add(HX_CSTRING("nlink"), 0);
-	anon->Add(HX_CSTRING("rdev"), 0);
-	anon->Add(HX_CSTRING("mode"), mode);
+	anon->Add(HX_CSTRING("rdev"),  0);
+	anon->Add(HX_CSTRING("mode"),  mode);
 
 	return anon;
 }
@@ -339,10 +400,20 @@ class Assets
 	{
 		final data:Array<UInt8> = __getBytes(file);
 
-		if (data == null || data.length <= 0)
+		if (data == null)
 			throw 'file_contents, $file';
 
 		return Bytes.ofData(data);
+	}
+
+	public static function read(file:String):BytesInput
+	{
+		return new BytesInput(getBytes(file));
+	}
+
+	public static function exists(path:String):Bool
+	{
+		return __exists(path);
 	}
 
 	public static function isDirectory(path:String):Bool
@@ -360,16 +431,6 @@ class Assets
 		return __stat(path);
 	}
 
-	public static function exists(path:String):Bool
-	{
-		return __exists(path);
-	}
-
-	@:noCompletion
-	@:native('mobile::backend::io::android::Assets_obj::native_exists')
-	public static function __exists(path:String):Bool
-		return false;
-
 	@:noCompletion
 	@:native('mobile::backend::io::android::Assets_obj::native_init')
 	private static function __init(jni_env:Dynamic):Void
@@ -381,8 +442,13 @@ class Assets
 		return;
 
 	@:noCompletion
+	@:native('mobile::backend::io::android::Assets_obj::native_exists')
+	private static function __exists(path:String):Bool
+		return false;
+
+	@:noCompletion
 	@:native('mobile::backend::io::android::Assets_obj::native_getContent')
-	public static function __getContent(file:String):String
+	private static function __getContent(file:String):String
 		return null;
 
 	@:noCompletion
