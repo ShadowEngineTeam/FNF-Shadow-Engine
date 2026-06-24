@@ -7,7 +7,7 @@ import openfl.Assets as OpenFLAssets;
 #if mobile
 import mobile.backend.io.Assets as MobileAssets;
 #end
-#if (sys && MODS_ALLOWED)
+#if (sys && FEATURE_MODS)
 import sys.FileSystem as SysFileSystem;
 import sys.FileStat;
 #end

@@ -8,7 +8,7 @@ import openfl.utils.ByteArray as OpenFLByteArray;
 #if mobile
 import mobile.backend.io.Assets as MobileAssets;
 #end
-#if (sys && MODS_ALLOWED)
+#if (sys && FEATURE_MODS)
 import sys.FileSystem as SysFileSystem;
 import sys.FileStat;
 import sys.io.File as SysFile;
