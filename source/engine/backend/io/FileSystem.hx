@@ -101,12 +101,14 @@ class FileSystem
 		if (SysFileSystem.exists(cwd(path)))
 			return SysFileSystem.stat(cwd(path));
 		#end
-		#end
+		#else
 		#if mobile
 		if (MobileAssets.exists(path))
 			return MobileAssets.stat(path);
-		#end
+		#else
 		return null;
+		#end
+		#end
 	}
 
 	public static function fullPath(path:String):String

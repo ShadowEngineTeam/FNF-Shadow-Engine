@@ -63,7 +63,7 @@ class File
 
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
-			return OpenFLByteArray.fromFile(openflcwd(path)).toString();
+			return OpenFLAssets.getText(openflcwd(path));
 		#end
 
 		#if mobile
@@ -92,7 +92,13 @@ class File
 
 		#if USE_OPENFL_FILESYSTEM
 		if (OpenFLAssets.exists(openflcwd(path)))
-			return OpenFLByteArray.fromFile(openflcwd(path));
+			switch (haxe.io.Path.extension(path).toLowerCase())
+			{
+				case 'otf' | 'ttf':
+					return OpenFLByteArray.fromFile(openflcwd(path));
+				default:
+					return OpenFLAssets.getBytes(openflcwd(path));
+			}
 		#end
 
 		#if mobile
