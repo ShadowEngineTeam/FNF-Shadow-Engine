@@ -14,6 +14,8 @@
 - Fixed float imprecision
 - Added Tracy profiler support
 - Improved cleaning memory
+- Improved hscript a bit
+- Use Native File System for Mobile instead of relaying in OpenFL
 - Added `startLuasNamed`
 - Added TITLE_IOS
 - Added iOS simulator building (main only)
