@@ -66,7 +66,7 @@ class ControlsSubState extends MusicBeatSubstate
 	{
 		super();
 
-		onKeyboardMode = !controls.controllerMode;
+		onKeyboardMode = !Funkin.controls.controllerMode;
 
 		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Controls Menu", null);
@@ -109,7 +109,7 @@ class ControlsSubState extends MusicBeatSubstate
 		controllerSpr.animation.play(onKeyboardMode ? 'keyboard' : 'gamepad');
 		add(controllerSpr);
 
-		var text:Alphabet = new Alphabet(60, 90, controls.controllerMode ? '${InputFormatter.getGamepadName(LEFT_SHOULDER).toUpperCase()}/${InputFormatter.getGamepadName(RIGHT_SHOULDER).toUpperCase()}' : controls.mobileC ? 'C' : 'CTRL', false);
+		var text:Alphabet = new Alphabet(60, 90, Funkin.controls.controllerMode ? '${InputFormatter.getGamepadName(LEFT_SHOULDER).toUpperCase()}/${InputFormatter.getGamepadName(RIGHT_SHOULDER).toUpperCase()}' : Funkin.controls.mobileC ? 'C' : 'CTRL', false);
 		text.alignment = CENTERED;
 		text.setScale(0.4);
 		add(text);
@@ -194,13 +194,13 @@ class ControlsSubState extends MusicBeatSubstate
 			var key:String = null;
 			if (onKeyboardMode)
 			{
-				var savKey:Array<Null<FlxKey>> = ClientPrefs.keyBinds.get(option[2]);
-				key = InputFormatter.getKeyName((savKey[n] != null) ? savKey[n] : NONE);
+				var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option[2]);
+				key = InputFormatter.getKeyName((savKey != null && savKey.length > n) ? savKey[n] : FlxKey.NONE);
 			}
 			else
 			{
-				var savKey:Array<Null<FlxGamepadInputID>> = ClientPrefs.gamepadBinds.get(option[2]);
-				key = InputFormatter.getGamepadName((savKey[n] != null) ? savKey[n] : NONE);
+				var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option[2]);
+				key = InputFormatter.getGamepadName((savKey != null && savKey.length > n) ? savKey[n] : FlxGamepadInputID.NONE);
 			}
 
 			var attach:Alphabet = new Alphabet(textX + 210, 248, key, false);
@@ -331,7 +331,7 @@ class ControlsSubState extends MusicBeatSubstate
 					bindingText.alignment = CENTERED;
 					add(bindingText);
 
-					bindingText2 = new Alphabet(FlxG.width / 2, 340, (controls.mobileC) ? "Hold B to Cancel\nHold C to Delete" : "Hold ESC to Cancel\nHold Backspace to Delete", true);
+					bindingText2 = new Alphabet(FlxG.width / 2, 340, (Funkin.controls.mobileC) ? "Hold B to Cancel\nHold C to Delete" : "Hold ESC to Cancel\nHold Backspace to Delete", true);
 					bindingText2.alignment = CENTERED;
 					add(bindingText2);
 
@@ -466,13 +466,13 @@ class ControlsSubState extends MusicBeatSubstate
 						var key:String = null;
 						if (onKeyboardMode)
 						{
-							var savKey:Array<Null<FlxKey>> = ClientPrefs.keyBinds.get(option);
-							key = InputFormatter.getKeyName(savKey[n] != null ? savKey[n] : NONE);
+							var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option);
+							key = InputFormatter.getKeyName((savKey != null && savKey.length > n) ? savKey[n] : FlxKey.NONE);
 						}
 						else
 						{
-							var savKey:Array<Null<FlxGamepadInputID>> = ClientPrefs.gamepadBinds.get(option);
-							key = InputFormatter.getGamepadName(savKey[n] != null ? savKey[n] : NONE);
+							var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option);
+							key = InputFormatter.getGamepadName((savKey != null && savKey.length > n) ? savKey[n] : FlxGamepadInputID.NONE);
 						}
 						updateBind(Math.floor(curSelected * 2) + n, key);
 					}

@@ -212,10 +212,10 @@ class ShadowStepper extends FlxSpriteGroup
 		if (valueText != null && valueText.textField != null)
 			valueText.textField.scrollH = Std.int(_textScroll);
 
-		if (overBg && FlxG.mouse.wheel != 0 && !inputBlocked)
+		if (overBg && FlxG.mouse.deltaWheel.y != 0 && !inputBlocked)
 		{
 			var multiplier = FlxG.keys.pressed.SHIFT ? 10 : 1;
-			value += step * FlxG.mouse.wheel * multiplier;
+			value += step * FlxG.mouse.deltaWheel.y * multiplier;
 			if (callback != null)
 				callback(_value);
 		}

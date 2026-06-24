@@ -141,6 +141,8 @@ class NoteSplash extends FlxSprite
 			antialiasing = false;
 
 		_textureLoaded = (PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture;
+		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, maxAnims);

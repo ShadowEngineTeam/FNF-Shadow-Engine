@@ -1,15 +1,11 @@
 package psychlua;
 
-#if !flash
 import openfl.filters.ShaderFilter;
 import flixel.addons.display.FlxRuntimeShader;
-#end
 
 class ShaderFunctions
 {
-	#if !flash
 	private static var storedFilters:Map<String, ShaderFilter> = [];
-	#end
 
 	public static function implement(funk:FunkinLua)
 	{
@@ -19,12 +15,7 @@ class ShaderFunctions
 			if (!ClientPrefs.data.shaders)
 				return false;
 
-			#if !flash
 			return funk.initLuaShader(name);
-			#else
-			FunkinLua.luaTrace("initLuaShader: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			#end
-			return false;
 		});
 
 		funk.addLocalCallback("addShaderToCam", function(cam:String, shader:String, ?index:String)
@@ -35,7 +26,6 @@ class ShaderFunctions
 			if (index == null || index.length < 1)
 				index = shader;
 
-			#if !flash
 			if (!funk.runtimeShaders.exists(shader) && !funk.initLuaShader(shader))
 			{
 				FunkinLua.luaTrace('addShaderToCam: Shader $shader is missing!', false, false, FlxColor.RED);
@@ -54,15 +44,10 @@ class ShaderFunctions
 				camera._filters.push(filter);
 			}
 			return true;
-			#else
-			FunkinLua.luaTrace("addShaderToCam: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			#end
-			return false;
 		});
 
 		funk.addLocalCallback("removeCamShader", function(cam:String, shader:String)
 		{
-			#if !flash
 			var camera = getCam(cam);
 			@:privateAccess {
 				if (!storedFilters.exists(shader))
@@ -81,9 +66,6 @@ class ShaderFunctions
 				storedFilters.remove(shader);
 				return true;
 			}
-			#else
-			FunkinLua.luaTrace('removeCamShader: Platform unsupported for Runtime Shaders!', false, false, FlxColor.RED);
-			#end
 			return false;
 		});
 
@@ -94,7 +76,6 @@ class ShaderFunctions
 			if (!ClientPrefs.data.shaders)
 				return false;
 
-			#if !flash
 			if (!funk.runtimeShaders.exists(shader) && !funk.initLuaShader(shader))
 			{
 				FunkinLua.luaTrace('setSpriteShader: Shader $shader is missing!', false, false, FlxColor.RED);
@@ -114,9 +95,6 @@ class ShaderFunctions
 				leObj.shader = new FlxRuntimeShader(arr[0], arr[1]);
 				return true;
 			}
-			#else
-			FunkinLua.luaTrace("setSpriteShader: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			#end
 			return false;
 		});
 
@@ -139,7 +117,6 @@ class ShaderFunctions
 
 		funk.set("getShaderBool", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -147,15 +124,10 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getBool(prop);
-			#else
-			FunkinLua.luaTrace("getShaderBool: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 
 		funk.set("getShaderBoolArray", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -163,14 +135,9 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getBoolArray(prop);
-			#else
-			FunkinLua.luaTrace("getShaderBoolArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 		funk.set("getShaderInt", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -178,14 +145,9 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getInt(prop);
-			#else
-			FunkinLua.luaTrace("getShaderInt: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 		funk.set("getShaderIntArray", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -193,14 +155,9 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getIntArray(prop);
-			#else
-			FunkinLua.luaTrace("getShaderIntArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 		funk.set("getShaderFloat", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -208,14 +165,9 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getFloat(prop);
-			#else
-			FunkinLua.luaTrace("getShaderFloat: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 		funk.set("getShaderFloatArray", function(obj:String, prop:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -223,15 +175,10 @@ class ShaderFunctions
 				return null;
 			}
 			return shader.getFloatArray(prop);
-			#else
-			FunkinLua.luaTrace("getShaderFloatArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return null;
-			#end
 		});
 
 		funk.set("setShaderBool", function(obj:String, prop:String, value:Bool)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -240,14 +187,9 @@ class ShaderFunctions
 			}
 			shader.setBool(prop, value);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderBool: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 		funk.set("setShaderBoolArray", function(obj:String, prop:String, values:Dynamic)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -256,14 +198,9 @@ class ShaderFunctions
 			}
 			shader.setBoolArray(prop, values);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderBoolArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 		funk.set("setShaderInt", function(obj:String, prop:String, value:Int)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -272,14 +209,9 @@ class ShaderFunctions
 			}
 			shader.setInt(prop, value);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderInt: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 		funk.set("setShaderIntArray", function(obj:String, prop:String, values:Dynamic)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -288,14 +220,9 @@ class ShaderFunctions
 			}
 			shader.setIntArray(prop, values);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderIntArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 		funk.set("setShaderFloat", function(obj:String, prop:String, value:Float)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -304,14 +231,9 @@ class ShaderFunctions
 			}
 			shader.setFloat(prop, value);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderFloat: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 		funk.set("setShaderFloatArray", function(obj:String, prop:String, values:Dynamic)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -321,15 +243,10 @@ class ShaderFunctions
 
 			shader.setFloatArray(prop, values);
 			return true;
-			#else
-			FunkinLua.luaTrace("setShaderFloatArray: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return true;
-			#end
 		});
 
 		funk.set("setShaderSampler2D", function(obj:String, prop:String, bitmapdataPath:String)
 		{
-			#if !flash
 			var shader:FlxRuntimeShader = getShader(obj);
 			if (shader == null)
 			{
@@ -346,14 +263,9 @@ class ShaderFunctions
 				return true;
 			}
 			return false;
-			#else
-			FunkinLua.luaTrace("setShaderSampler2D: Platform unsupported for Runtime Shaders!", false, false, FlxColor.RED);
-			return false;
-			#end
 		});
 	}
 
-	#if !flash
 	public static function getShader(obj:String):FlxRuntimeShader
 	{
 		if (storedFilters.exists(obj))
@@ -380,5 +292,4 @@ class ShaderFunctions
 			return FlxG.game;
 		return LuaUtils.cameraFromString(obj);
 	}
-	#end
 }

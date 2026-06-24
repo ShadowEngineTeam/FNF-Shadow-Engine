@@ -26,19 +26,24 @@ class LoadingState extends MusicBeatState
 	static var loadedMutex:Mutex = new Mutex();
 	#end
 
-	function new(target:FlxState, stopMusic:Bool)
+	function new(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic:Bool)
 	{
 		this.target = target;
+		this.args = args;
 		this.stopMusic = stopMusic;
 		startThreads();
 
 		super();
 	}
 
-	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, intrusive:Bool = true)
-		MusicBeatState.switchState(getNextState(target, stopMusic, intrusive));
+	inline static public function loadAndSwitchState(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic = false, intrusive:Bool = true)
+	{
+		var loading = getNextState(target, args, stopMusic, intrusive);
+		Funkin.switchState(loading.state, loading.args);
+	}
 
-	var target:FlxState = null;
+	var target:Class<FlxState> = null;
+	var args:Array<Dynamic> = null;
 	var stopMusic:Bool = false;
 	var dontUpdate:Bool = false;
 
@@ -128,7 +133,7 @@ class LoadingState extends MusicBeatState
 
 		FlxG.camera.visible = false;
 		// FlxTransitionableState.skipNextTransIn = true;
-		MusicBeatState.switchState(target);
+		Funkin.switchState(target, args);
 		transitioning = true;
 		finishedLoading = true;
 	}
@@ -146,7 +151,7 @@ class LoadingState extends MusicBeatState
 		return (loaded == loadMax);
 	}
 
-	static function getNextState(target:FlxState, stopMusic = false, intrusive:Bool = true):FlxState
+	static function getNextState(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic = false, intrusive:Bool = true):{state:Class<FlxState>, args:Array<Dynamic>}
 	{
 		var directory:String = 'shared';
 		var weekDir:String = StageData.forceNextDirectory;
@@ -162,7 +167,7 @@ class LoadingState extends MusicBeatState
 			if (intrusive)
 			{
 				if (imagesToPrepare.length > 0 || soundsToPrepare.length > 0 || musicToPrepare.length > 0 || songsToPrepare.length > 0)
-					return new LoadingState(target, stopMusic);
+					return {state: LoadingState, args: [target, args, stopMusic]};
 			}
 			else
 				doPrecache = true;
@@ -188,7 +193,7 @@ class LoadingState extends MusicBeatState
 					#if sys Sys.sleep(0.01); #else haxe.Timer.delay(() -> {}, 10); #end
 			}
 		}
-		return target;
+		return {state: target, args: args};
 	}
 
 	static var imagesToPrepare:Array<String> = [];
@@ -250,7 +255,7 @@ class LoadingState extends MusicBeatState
 		var player2:String = song.player2;
 		var gfVersion:String = song.gfVersion;
 		var needsVoices:Bool = song.needsVoices;
-		var prefixVocals:String = needsVoices ? '$folder/Voices' + Difficulty.getSongPrefix() : null;
+		var prefixVocals:String = needsVoices ? '$folder/Voices' : null;
 		if (gfVersion == null)
 			gfVersion = 'gf';
 
@@ -267,18 +272,18 @@ class LoadingState extends MusicBeatState
 
 	public static function clearInvalids()
 	{
-		clearInvalidFrom(imagesToPrepare, 'images', '.png', IMAGE); // leaving this as is
-		// clearInvalidFrom(imagesToPrepare, 'images', '.${Paths.IMAGE_EXT}', Paths.IMAGE_ASSETTYPE);
-		clearInvalidFrom(soundsToPrepare, 'sounds', '.ogg', SOUND);
-		clearInvalidFrom(musicToPrepare, 'music', ' .ogg', SOUND);
-		clearInvalidFrom(songsToPrepare, 'songs', '.ogg', SOUND);
+		clearInvalidFrom(imagesToPrepare, 'images', ['.png'], IMAGE); // leaving this as is
+		// clearInvalidFrom(imagesToPrepare, 'images', ['.${Paths.IMAGE_EXT}'], Paths.IMAGE_ASSETTYPE);
+		clearInvalidFrom(soundsToPrepare, 'sounds', Paths.SOUND_EXTS, SOUND);
+		clearInvalidFrom(musicToPrepare, 'music', Paths.SOUND_EXTS, SOUND);
+		clearInvalidFrom(songsToPrepare, 'songs', Paths.SOUND_EXTS, SOUND);
 
 		for (arr in [imagesToPrepare, soundsToPrepare, musicToPrepare, songsToPrepare])
 			while (arr.contains(null))
 				arr.remove(null);
 	}
 
-	static function clearInvalidFrom(arr:Array<String>, prefix:String, ext:String, type:AssetType, ?library:String = null)
+	static function clearInvalidFrom(arr:Array<String>, prefix:String, exts:Array<String>, type:AssetType, ?library:String = null)
 	{
 		for (i in 0...arr.length)
 		{
@@ -287,8 +292,12 @@ class LoadingState extends MusicBeatState
 			{
 				for (subfolder in Mods.directoriesWithFile(Paths.getSharedPath(), '$prefix/$folder'))
 					for (file in FileSystem.readDirectory(subfolder))
-						if (file.endsWith(ext))
-							arr.push(folder + file.substr(0, file.length - ext.length));
+						for (ext in exts)
+							if (file.endsWith(ext))
+							{
+								arr.push(folder + file.substr(0, file.length - ext.length));
+								break;
+							}
 
 				// trace('Folder detected! ' + folder);
 			}
@@ -298,14 +307,21 @@ class LoadingState extends MusicBeatState
 		while (i < arr.length)
 		{
 			var member:String = arr[i];
-			var myKey = '$prefix/$member$ext';
+			var valid:Bool = false;
+			for (ext in exts)
+			{
+				var myKey = '$prefix/$member$ext';
+				if (Paths.fileExists(myKey, type, false, library))
+				{
+					valid = true;
+					break;
+				}
+			}
 
-			// trace('attempting on $prefix: $myKey');
-			var doTrace:Bool = false;
-			if (member.endsWith('/') || (!Paths.fileExists(myKey, type, false, library) && (doTrace = true)))
+			if (member.endsWith('/') || !valid)
 			{
 				arr.remove(member);
-				if (doTrace)
+				if (!member.endsWith('/'))
 					trace('Removed invalid $prefix: $member');
 			}
 			else
@@ -384,7 +400,7 @@ class LoadingState extends MusicBeatState
 					loaded++;
 					continue;
 				}
-				else if (FileSystem.exists(file))
+				else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 					bitmap = BitmapData.fromBytes(File.getBytes(file));
 				else
 				#end
@@ -395,7 +411,7 @@ class LoadingState extends MusicBeatState
 						loaded++;
 						continue;
 					}
-					else if (FileSystem.exists(file))
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					{
@@ -451,7 +467,7 @@ class LoadingState extends MusicBeatState
 						#end
 						return;
 					}
-					else if (FileSystem.exists(file))
+					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 						bitmap = BitmapData.fromBytes(File.getBytes(file));
 					else
 					#end
@@ -469,7 +485,7 @@ class LoadingState extends MusicBeatState
 							#end
 							return;
 						}
-						else if (FileSystem.exists(file))
+						else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
 							bitmap = BitmapData.fromBytes(File.getBytes(file));
 						else
 						{

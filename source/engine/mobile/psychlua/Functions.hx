@@ -1,6 +1,5 @@
 package mobile.psychlua;
 
-import psychlua.CustomSubstate;
 #if FEATURE_LUA
 import lime.ui.Haptic;
 import psychlua.FunkinLua;
@@ -100,17 +99,11 @@ class MobileFunctions
 			return Haptic.vibrate(period, duration);
 		});
 
-		funk.set("addTouchPad", (DPadMode:String, ActionMode:String, ?addToCustomSubstate:Bool = false, ?posAtCustomSubstate:Int = -1) ->
+		funk.set("addTouchPad", (DPadMode:String, ActionMode:String) ->
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			FunkinLua.getCurrentMusicState().makeLuaTouchPad(DPadMode, ActionMode);
-			if (addToCustomSubstate)
-			{
-				if (FunkinLua.getCurrentMusicState().luaTouchPad != null || !FunkinLua.getCurrentMusicState().members.contains(FunkinLua.getCurrentMusicState().luaTouchPad))
-					CustomSubstate.insertLuaTpad(posAtCustomSubstate);
-			}
-			else
-				FunkinLua.getCurrentMusicState().addLuaTouchPad();
+			FunkinLua.getCurrentMusicState().addLuaTouchPad();
 			#end
 		});
 

@@ -108,24 +108,66 @@ class Option
 
 	dynamic public function getValue():Dynamic
 	{
-		var value = Reflect.getProperty(ClientPrefs.data, variable);
-		if (type == 'keybind')
-			return !Controls.instance.controllerMode ? value.keyboard : value.gamepad;
-		return value;
+		var value:Dynamic = Reflect.getProperty(ClientPrefs.data, variable);
+
+		switch (type)
+		{
+			case 'bool':
+				return value == true;
+
+			case 'int':
+				return value == null ? 0 : Std.int(value);
+
+			case 'float' | 'percent':
+				return value == null ? 0.0 : (Std.isOfType(value, Float) ? value : Std.parseFloat(Std.string(value)));
+
+			case 'string':
+				return value == null ? '' : Std.string(value);
+
+			case 'keybind':
+				var keys = value;
+				if (keys == null)
+					return 'NONE';
+
+				return !Controls.instance.controllerMode ? (keys.keyboard == null ? 'NONE' : keys.keyboard) : (keys.gamepad == null ? 'NONE' : keys.gamepad);
+
+			default:
+				return value;
+		}
 	}
 
 	dynamic public function setValue(value:Dynamic)
 	{
-		if (type == 'keybind')
+		switch (type)
 		{
-			var keys = Reflect.getProperty(ClientPrefs.data, variable);
-			if (!Controls.instance.controllerMode)
-				keys.keyboard = value;
-			else
-				keys.gamepad = value;
-			return value;
+			case 'bool':
+				return Reflect.setProperty(ClientPrefs.data, variable, value == true);
+
+			case 'int':
+				return Reflect.setProperty(ClientPrefs.data, variable, Std.int(value));
+
+			case 'float' | 'percent':
+				return Reflect.setProperty(ClientPrefs.data, variable, Std.parseFloat(value));
+
+			case 'string':
+				return Reflect.setProperty(ClientPrefs.data, variable, Std.string(value));
+
+			case 'keybind':
+				var keys = Reflect.getProperty(ClientPrefs.data, variable);
+				if (keys == null)
+				{
+					keys = {keyboard: 'NONE', gamepad: 'NONE'};
+					Reflect.setProperty(ClientPrefs.data, variable, keys);
+				}
+
+				if (!Controls.instance.controllerMode)
+					keys.keyboard = value;
+				else
+					keys.gamepad = value;
+
+			default:
+				return Reflect.setProperty(ClientPrefs.data, variable, value);
 		}
-		return Reflect.setProperty(ClientPrefs.data, variable, value);
 	}
 
 	private function get_text()

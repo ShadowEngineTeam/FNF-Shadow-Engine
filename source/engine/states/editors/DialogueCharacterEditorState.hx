@@ -84,7 +84,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 		box.updateHitbox();
 		hudGroup.add(box);
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			TIP_TEXT_MAIN = '\nX - Reset Camera
 				\nY - Toggle Speech Bubble
@@ -833,7 +833,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
 				transitioning = true;
 			}
@@ -860,7 +860,6 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	function onLoadComplete(_):Void
 	{
-		#if sys
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
@@ -896,9 +895,6 @@ class DialogueCharacterEditorState extends MusicBeatState
 			}
 		}
 		_file = null;
-		#else
-		trace("File couldn't be loaded! You aren't on Desktop, are you?");
-		#end
 	}
 
 	/**

@@ -1,19 +1,10 @@
 package states;
 
-import backend.WeekData;
-import backend.Highscore;
 import flixel.input.keyboard.FlxKey;
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
-import openfl.Assets;
-import openfl.display.Bitmap;
-import openfl.display.BitmapData;
 import shaders.ColorSwap;
-import backend.ui.ShadowStyle;
-import states.StoryMenuState;
 import states.MainMenuState;
 
 typedef TitleData =
@@ -34,7 +25,7 @@ class TitleState extends MusicBeatState
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
-	public static var initialized:Bool = false;
+	public static var showIntro:Bool = false;
 
 	public static var ignoreCopy:Bool = false;
 
@@ -57,70 +48,14 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		Paths.clearStoredMemory();
-
-		#if FEATURE_LUA
-		Mods.pushGlobalMods();
-		#end
-		Mods.loadTopMod();
-
-		FlxG.fixedTimestep = false;
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.keys.preventDefaultKeys = [TAB];
-
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		super.create();
 
-		FlxG.save.bind('funkin', CoolUtil.getSavePath());
-
-		ClientPrefs.loadPrefs();
-		ShadowStyle.applySavedTheme();
-
-		Highscore.load();
-
 		// IGNORE THIS!!!
-		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'), 'images/gfDanceTitle.json'); // this becoming like this as we can't get the path here
+		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'), 'images/gfDanceTitle.json');
 
-		if (!initialized)
-		{
-			if (FlxG.save.data != null && FlxG.save.data.fullscreen)
-			{
-				FlxG.fullscreen = FlxG.save.data.fullscreen;
-				// trace('LOADED FULLSCREEN SETTING!!');
-			}
-			persistentUpdate = true;
-			persistentDraw = true;
-			#if FEATURE_MOBILE_CONTROLS
-			MobileData.init();
-			#end
-		}
-
-		if (FlxG.save.data.weekCompleted != null)
-		{
-			StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
-		}
-
-		FlxG.mouse.visible = false;
-		if (FlxG.save.data.flashing == null && !FlashingState.leftState)
-		{
-			controls.isInSubstate = false; // idfk what's wrong
-			FlxTransitionableState.skipNextTransIn = true;
-			FlxTransitionableState.skipNextTransOut = true;
-			MusicBeatState.switchState(new FlashingState());
-		}
-		else
-		{
-			if (initialized)
-				startIntro();
-			else
-			{
-				new FlxTimer().start(1, function(tmr:FlxTimer)
-				{
-					startIntro();
-				});
-			}
-		}
+		startIntro();
 	}
 
 	var logoBl:FlxSprite;
@@ -131,7 +66,7 @@ class TitleState extends MusicBeatState
 
 	function startIntro()
 	{
-		if (!initialized)
+		if (showIntro)
 		{
 			if (FlxG.sound.music == null)
 			{
@@ -239,10 +174,10 @@ class TitleState extends MusicBeatState
 
 		callOnScripts('onStartIntro');
 
-		if (initialized)
+		if (!showIntro)
 			skipIntro();
 		else
-			initialized = true;
+			showIntro = false;
 
 		Paths.clearUnusedMemory();
 		// credGroup.add(credTextShit);
@@ -274,9 +209,9 @@ class TitleState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;
+		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || Funkin.controls.ACCEPT;
 
-		#if FLX_TOUCH
+		#if FEATURE_MOBILE_CONTROLS
 		for (touch in FlxG.touches.list)
 		{
 			if (touch.justPressed)
@@ -293,10 +228,8 @@ class TitleState extends MusicBeatState
 			if (gamepad.justPressed.START)
 				pressedEnter = true;
 
-			#if switch
 			if (gamepad.justPressed.B)
 				pressedEnter = true;
-			#end
 		}
 
 		if (newTitle)
@@ -306,7 +239,7 @@ class TitleState extends MusicBeatState
 				titleTimer -= 2;
 		}
 
-		if (initialized && !transitioning && skippedIntro)
+		if (!transitioning && skippedIntro)
 		{
 			if (newTitle && !pressedEnter)
 			{
@@ -336,23 +269,22 @@ class TitleState extends MusicBeatState
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
-					MusicBeatState.switchState(new MainMenuState());
-					closedState = true;
+					Funkin.switchState(MainMenuState);
 				});
 				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 			}
 		}
 
-		if (initialized && pressedEnter && !skippedIntro)
+		if (pressedEnter && !skippedIntro)
 		{
 			skipIntro();
 		}
 
 		if (swagShader != null)
 		{
-			if (controls.UI_LEFT)
+			if (Funkin.controls.UI_LEFT)
 				swagShader.hue -= elapsed * 0.1;
-			if (controls.UI_RIGHT)
+			if (Funkin.controls.UI_RIGHT)
 				swagShader.hue += elapsed * 0.1;
 		}
 
@@ -395,9 +327,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private var sickBeats:Int = 0; // Basically curBeat but won't be skipped if you hold the tab or resize the screen
-
-	public static var closedState:Bool = false;
+	private var sickBeats:Int = 0;
 
 	override function beatHit()
 	{
@@ -415,7 +345,7 @@ class TitleState extends MusicBeatState
 				gfDance.animation.play('danceLeft');
 		}
 
-		if (!closedState)
+		if (!skippedIntro)
 		{
 			sickBeats++;
 			switch (sickBeats)

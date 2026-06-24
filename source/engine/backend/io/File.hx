@@ -34,10 +34,12 @@ class File
 	#if USE_OPENFL_FILESYSTEM
 	static function openflcwd(path:String):String
 	{
+		#if !FEATURE_EMBED_ASSETS
 		@:privateAccess
 		for (library in LimeAssets.libraries.keys())
 			if (OpenFLAssets.exists('$library:$path') && !path.startsWith('$library:'))
 				return '$library:$path';
+		#end
 
 		return path;
 	}
@@ -200,7 +202,7 @@ class File
 		#end
 	}
 
-	#if (linux && FEATURE_MODS)
+	#if ((linux || ios) && FEATURE_MODS)
 	static function getCaseInsensitivePath(path:String):String
 	{
 		if (SysFileSystem.exists(path))

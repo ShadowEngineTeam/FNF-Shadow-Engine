@@ -65,7 +65,7 @@ class Song
 			songJson.player3 = null;
 		}
 
-		// backwards compability
+		// backwards compatibility
 		if (songJson.arrowSkin != null && (songJson.playerArrowSkin == null || songJson.opponentArrowSkin == null))
 		{
 			songJson.playerArrowSkin = songJson.opponentArrowSkin = songJson.arrowSkin;

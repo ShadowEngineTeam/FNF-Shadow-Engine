@@ -1,6 +1,7 @@
 name: Bug report
 description: Report bugs with the recreation here
 labels: [bug]
+
 body:
   - type: textarea
     id: description
@@ -10,22 +11,39 @@ body:
       required: true
 
   - type: textarea
-    id: terminal
+    id: logs
     attributes:
-      label: "Crash Log or logcat logs (if existing)"
+      label: "Crash Log or System Log (if existing)"
       render: bash
     validations:
       required: false
 
   - type: dropdown
-    id: btarget
+    id: platform
     attributes:
-      label: "What platfrom are you playing on?"
+      label: Platform
       options:
-        - "Windows"
-        - "Linux"
-        - "Mac"
-        - "Android"
-        - "iOS"
+        - Windows
+        - Linux
+        - macOS
+        - Android
+        - iOS
+    validations:
+      required: true
+
+  - type: input
+    id: platform_details
+    attributes:
+      label: Platform Version / Edition
+      description: |
+        Examples:
+        - Windows 11 Pro 25H2
+        - Windows 10 Home 22H2
+        - Arch Linux
+        - Debian 13
+        - macOS 15.7
+        - Android 15
+        - iOS 18.5
+      placeholder: "Windows 11 Pro 25H2"
     validations:
       required: true

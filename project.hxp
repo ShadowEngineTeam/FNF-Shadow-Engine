@@ -16,16 +16,18 @@ class Project extends HXProject
 	static var COLOR_ERROR = ESC + "[31m";
 
 	static final TITLE:String = "Friday Night Funkin': Shadow Engine";
-	static final TITLE_MOBILE:String = "FNF: Shadow Engine";
+	static final TITLE_ANDROID:String = "FNF: Shadow Engine";
+	static final TITLE_IOS:String = "FNF\u2002Shadow\u2002Engine";
 	static final EXECUTABLE:String = "ShadowEngine";
-	static final VERSION:String = "0.7.0";
+	static final VERSION:String = "0.9.0";
+	static final BUILD_NUMBER:Int = 850;
 	static final COMPANY:String = "ShadowEngineTeam";
 	static final PACKAGE:String = "org.shadowengineteam.fnf";
 	static final MAIN_CLASS:String = "backend.Main";
 
-	static final PRELOADER:String = "backend.FunkinPreloader";
+	static var PRELOADER:String = "backend.FunkinPreloader";
 	static final SOURCE_FOLDERS:Array<String> = ["source/engine", "source/haxe_std_shadows"];
-	static final LIBRARY_SHADOWS_LIST:Array<String> = ["audio", "compatibility", "flixel_animate", "gpu_textures"];
+	static final LIBRARY_SHADOWS_LIST:Array<String> = ["compatibility"];
 
 	static final FEATURE_MODS:CompileFlag = CompileFlag.get("FEATURE_MODS");
 	static final FEATURE_HSCRIPT:CompileFlag = CompileFlag.get("FEATURE_HSCRIPT");
@@ -34,7 +36,9 @@ class Project extends HXProject
 	static final FEATURE_DISCORD_RPC:CompileFlag = CompileFlag.get("FEATURE_DISCORD_RPC");
 	static final FEATURE_MOBILE_CONTROLS:CompileFlag = CompileFlag.get("FEATURE_MOBILE_CONTROLS");
 	static final FEATURE_DCE:CompileFlag = CompileFlag.get("FEATURE_DCE");
+	static final FEATURE_TRACY:CompileFlag = CompileFlag.get("FEATURE_TRACY");
 	static final FEATURE_FUNKIN_CONTENT:CompileFlag = CompileFlag.get("FEATURE_FUNKIN_CONTENT");
+	static final FEATURE_EMBED_ASSETS:CompileFlag = CompileFlag.get("EMBED_ASSETS");
 	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 
 	static final ENABLE_ASCII_ART:Bool = true;
@@ -42,6 +46,14 @@ class Project extends HXProject
 	public function new():Void
 	{
 		super();
+
+		#if !target.unicode
+		if (isWindowsHost())
+		{
+			// Enable code page 65001 for unicode support
+			Sys.command("chcp 65001 > nul");
+		}
+		#end
 
 		CompileFlag.project = this;
 
@@ -156,28 +168,35 @@ class Project extends HXProject
 		trace(StringTools.lpad("", "=", width));
 		trace('');
 
-		if (targetPlatform.startsWith("Web") || targetPlatform.startsWith("Hashlink") || targetPlatform == "Unknown")
+		final supportedPlatforms = ["Windows", "Mac", "Linux", "Android", "iOS", "Simulator (iOS)", "Simulator (Android)"];
+
+		if (!supportedPlatforms.contains(targetPlatform))
 		{
-			trace('Unsupported platform: ${targetPlatform}');
-			Sys.exit(1);
+			warn('Unsupported platform: ${targetPlatform}');
 		}
 	}
 
 	function configureApp():Void
 	{
 		if (isIOS())
-			meta.title = ~/ /ig.replace(TITLE_MOBILE, "\u2002");
+			meta.title = TITLE_IOS;
+		else if (isAndroid())
+			meta.title = TITLE_ANDROID;
 		else
-			meta.title = isMobile() ? TITLE_MOBILE : TITLE;
+			meta.title = TITLE;
 		meta.version = VERSION;
+		meta.buildNumber = Std.string(BUILD_NUMBER);
 		meta.company = COMPANY;
 		meta.packageName = PACKAGE;
 
 		app.main = MAIN_CLASS;
 		app.file = EXECUTABLE;
+
+		if (isHashLink())
+			PRELOADER = "flixel.system.FlxBasePreloader";
 		app.preloader = PRELOADER;
 
-		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}/';
+		var buildDir = 'export/${isDebug() ? 'debug' : 'release'}${FEATURE_TRACY.isEnabled() ? "-tracy" : ""}/' ;
 		app.path = buildDir;
 
 		for (shadowName in LIBRARY_SHADOWS_LIST)
@@ -219,28 +238,53 @@ class Project extends HXProject
 		FEATURE_DISCORD_RPC.integrate((isDesktop() && !isHashLink()));
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
 		FEATURE_DCE.integrate(false);
+		FEATURE_TRACY.integrate(false);
 		FEATURE_FUNKIN_CONTENT.integrate(true);
 		USE_OPENFL_FILESYSTEM.integrate(FEATURE_MODS.isDisabled() && !isMobile());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
 
+		FEATURE_EMBED_ASSETS.integrate(false);
+
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
 			setHaxedef("FLX_NO_DEBUG");
 
 		setHaxedef("message.reporting", "pretty");
-		setHaxedef("no-deprecation-warnings");
 		setHaxedef("lime_disable_assets_version");
 		setHaxedef("openfl_dpi_aware");
 		setHaxedef("openfl_pool_events");
+		if (isHashLink())
+			setHaxedef("openfl_enable_handle_error");
 
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
+
+		setHaxedef("USING_SHADOW_ENGINE");
+
 		if (FEATURE_DCE.isDisabled())
 			setHaxedef("HXCPP_DEBUG_LINK");
+
+		if (FEATURE_TRACY.isEnabled())
+		{
+			setHaxedef("HXCPP_TELEMETRY");
+			setHaxedef("HXCPP_TRACY");
+			setHaxedef("HXCPP_TRACY_MEMORY");
+			setHaxedef("HXCPP_TRACY_ON_DEMAND");
+			// setHaxedef("HXCPP_TRACY_INCLUDE_CALLSTACKS");
+
+			setHaxedef("absolute-paths"); // Fix source locations so Tracy can see them
+		}
+
+		if (FEATURE_HSCRIPT.isEnabled())
+		{
+			setHaxedef("hscriptPos");
+			setHaxedef("HSCRIPT_ABSTRACT_SUPPORT");
+			setHaxedef("CUSTOM_CLASSES");
+		}
 
 		if (isAndroid() && !isDebug())
 		{
@@ -299,9 +343,6 @@ class Project extends HXProject
 
 		if (isMobile())
 			setHaxedef("SHARE_MOBILE_FILES");
-		setHaxedef("loop_unroll_max_cost", "25");
-		if (isAndroid())
-			setHaxedef("DISABLED_MACRO_SUPERLATIVE");
 
 		if (FEATURE_DCE.isDisabled())
 		{
@@ -312,8 +353,6 @@ class Project extends HXProject
 		// see https://haxe.org/manual/cr-static-analyzer.html
 		// setHaxedef("analyzer-optimize");
 
-		if (FEATURE_DISCORD_RPC.isEnabled())
-			setHaxedef("DISCORD_DISABLE_IO_THREAD");
 
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
@@ -321,17 +360,20 @@ class Project extends HXProject
 
 	function configureAssets()
 	{
+		final embed:Bool = FEATURE_EMBED_ASSETS.isEnabled();
+
 		includeAssetLibrary("default", true, false);
 		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
-		addAssetPath("assets/shared");
+		addAssetPath("assets/shared", null, embed);
+
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
-			addAssetPath("assets/mobile", 'assets/shared/mobile', false);
+			addAssetPath("assets/mobile", 'assets/shared/mobile', embed);
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 		{
-			addAssetPath("assets/funkin_resources/embed", 'assets/embed', true);
+			addAssetPath("assets/funkin_resources/embed", 'assets/embed', embed);
 			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
-			addAssetPath("assets/funkin_resources/shared", 'assets/shared', false);
+			addAssetPath("assets/funkin_resources/shared", 'assets/shared', embed);
 		}
 
 		final textureFormats:Array<String> = ["ASTC", "BC"];
@@ -348,20 +390,20 @@ class Project extends HXProject
 			{
 				needsPNG = false;
 				if (FEATURE_MOBILE_CONTROLS.isEnabled())
-					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', false);
+					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', embed);
 				if (FEATURE_FUNKIN_CONTENT.isEnabled())
-					addAssetPath('assets/funkin_resources/images-${format.toLowerCase()}', 'assets/shared/images', false);
-				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images');
+					addAssetPath('assets/funkin_resources/images-${format.toLowerCase()}', 'assets/shared/images', embed);
+				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images', embed);
 			}
 		}
 
 		if (needsPNG)
 		{
 			if (FEATURE_MOBILE_CONTROLS.isEnabled())
-				addAssetPath('assets/mobile-images/png', 'assets/shared/images', false);
+				addAssetPath('assets/mobile-images/png', 'assets/shared/images', embed);
 			if (FEATURE_FUNKIN_CONTENT.isEnabled())
-				addAssetPath('assets/funkin_resources/images-png', 'assets/shared/images', false);
-			addAssetPath('assets/images-png', 'assets/shared/images');
+				addAssetPath('assets/funkin_resources/images-png', 'assets/shared/images', embed);
+			addAssetPath('assets/images-png', 'assets/shared/images', embed);
 		}
 
 		if (isLinux() && !isDebug())
@@ -375,7 +417,7 @@ class Project extends HXProject
 		includeHaxelib("flixel-animate");
 
 		if (FEATURE_LUA.isEnabled())
-			includeHaxelib("hxluajit");
+			includeHaxelib("hxluau");
 		if (FEATURE_HSCRIPT.isEnabled())
 			includeHaxelib("SScript");
 		if (FEATURE_VIDEOS.isEnabled())
@@ -670,6 +712,15 @@ class Project extends HXProject
 
 	inline function isDisplay():Bool
 		return command == "display";
+
+	inline function isWindowsHost():Bool
+		return System.hostPlatform == WINDOWS;
+
+	inline function isMacHost():Bool
+		return System.hostPlatform == MAC;
+
+  	inline function isLinuxHost():Bool
+		return System.hostPlatform == LINUX;
 
 	inline function isWeb():Bool
 		return platformType == PlatformType.WEB;

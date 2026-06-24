@@ -6,15 +6,17 @@
 - Uses some code from [P-Slice](https://github.com/Psych-Slice/P-Slice), [Leather Engine (R.I.P.)](https://github.com/Vortex2Oblivion/LeatherEngine), [Codename Engine](https://github.com/CodenameCrew/CodenameEngine)
 - Replaced [`flxanimate`](https://github.com/Dot-Stuff/flxanimate) with [`flixel-animate`](https://github.com/MaybeMaru/flixel-animate) for better performance for texture atlases
 - Replaced [`hxCodec`](https://github.com/polybiusproxy/hxCodec) with [`hxvlc`](https://github.com/ShadowEngineTeam/hxvlc) for better customizability in video cutscenes
+- Replaced [`SScript`](https://github.com/ShadowEngineTeam/SScript) with [`ShadowScript`](https://github.com/ShadowEngineTeam/SScript) for better compatibility in HScripting
+- Replaced [`linc_luajit`](https://github.com/ShadowEngineTeam/linc_luajit) with [`hxluau`](https://github.com/ShadowEngineTeam/hxluau) for better performance and compatibility in Lua scripting (we are so roblox)
 - Mobile Support (duh)
 - Applies OpenAL Soft Config For better audio
 - Slightly more accurate FPS and less RAM Usage
-- ACTUALLY accurate memory usage (Psych and other FNF engines gets GC memory which isn't accurate, see [memory.h](https://github.com/ShadowEngineTeam/FNF-Shadow-Engine/blob/main/source/engine/external/memory/include/memory.h))
+- ACTUALLY accurate memory usage (Psych and other FNF engines gets GC memory which isn't accurate, see [here](https://github.com/ShadowEngineTeam/FNF-Shadow-Engine/blob/804030f027dd294809029fedf35d6fcf018b5c41/source/engine/debug/codename/MemoryCounter.hx#L20-L92))
 - Unironically winning icons support
 - Uses PBOT1 scoring system instead of fixed scoring (like 300 for every sick)
 - Improved Controller Support
 - Removes 9999 combo limit
-- Some 0.6.3 and 1.0 compability
+- Some 0.6.3 and 1.0 compatibility
 - Little bit Null Safety
 - Linux ARM support (FNF on Raspberry Pi baby)
 - Kade Engine Results Screen

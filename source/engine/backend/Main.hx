@@ -1,24 +1,16 @@
 package backend;
 
 import flixel.addons.transition.FlxTransitionableState;
-import states.MainMenuState;
 import flixel.input.keyboard.FlxKey;
 import debug.codename.Framerate;
-import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
 import haxe.io.Path;
-import openfl.Assets;
-import openfl.system.System;
 import openfl.Lib;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 import lime.system.System as LimeSystem;
-import lime.app.Application;
-#if native
-import lime.ui.WindowVSyncMode;
-#end
-import states.TitleState;
+import states.InitState;
 import openfl.events.KeyboardEvent;
 
 class Main extends Sprite
@@ -26,7 +18,7 @@ class Main extends Sprite
 	public static final game = {
 		width: 1280, // game width
 		height: 720, // game height
-		initialState: TitleState, // initial game state
+		initialState: InitState, // initial game state
 		zoom: -1.0, // game state bounds
 		framerate: 60, // default framerate
 		skipSplash: true, // if the flixel splash screen should be skipped
@@ -47,7 +39,9 @@ class Main extends Sprite
 
 	public function new()
 	{
+		#if !hl
 		backend.CrashHandler.init();
+		#end
 		#if mobile
 		Sys.setCwd(StorageUtil.getStorageDirectory());
 		#if android
@@ -75,9 +69,9 @@ class Main extends Sprite
 		}
 
 		#if android
-		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt"))
+		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt"))
 		{
-			File.saveContent(haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt", 'false');
+			File.saveContent(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt", 'false');
 			Sys.setCwd(StorageUtil.getStorageDirectory());
 		}
 		#end
@@ -90,29 +84,25 @@ class Main extends Sprite
 		if (game.zoom == -1.0)
 			game.zoom = 1.0;
 
-		#if FEATURE_VIDEOS
-		hxvlc.util.Handle.init();
-		#end
-
-		Controls.instance = new Controls();
-		ClientPrefs.loadDefaultKeys();
-
 		untyped FlxG.cameras = new backend.rendering.ShadowCameraFrontEnd();
 
-		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate,
-			game.framerate, game.skipSplash, game.startFullscreen);
+		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash,
+			game.startFullscreen);
 
+		#if !html5
 		@:privateAccess
-		{
-			final soundFrontEnd:flixel.system.frontEnds.SoundFrontEnd = new objects.CustomSoundTray.CustomSoundFrontEnd();
-			FlxG.sound = soundFrontEnd;
-			funkinGame._customSoundTray = objects.CustomSoundTray.CustomSoundTray;
-		}
+		funkinGame._customSoundTray = objects.CustomSoundTray;
+		#end
 
 		addChild(funkinGame);
 
-		FlxG.game.addChild(fpsVar = new Framerate());
+		@:privateAccess
+		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
 		debug.codename.SystemInfo.init();
+
+		final mouseSprite:Sprite = new Sprite();
+        FlxG.game.addChildAt(mouseSprite, FlxG.game.getChildIndex(fpsVar) + 1);
+        untyped FlxG.mouse.cursorContainer = mouseSprite;
 
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -127,24 +117,6 @@ class Main extends Sprite
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, emergencyEject);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, hotReload);
 		#end
-
-		#if FEATURE_DISCORD_RPC
-		DiscordClient.prepare();
-		#end
-
-		#if mobile
-		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
-		#end
-
-		#if android
-		FlxG.android.preventDefaultKeys = [flixel.input.android.FlxAndroidKey.BACK];
-		#end
-
-		#if native
-		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
-		#end
-
-		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function(w, h)
@@ -174,7 +146,7 @@ class Main extends Sprite
 
 	function toggleFullScreen(event:KeyboardEvent):Void
 	{
-		if (Controls.instance.justReleased('fullscreen'))
+		if (Controls.instance?.justReleased('fullscreen'))
 			FlxG.fullscreen = !FlxG.fullscreen;
 	}
 
@@ -183,8 +155,8 @@ class Main extends Sprite
 		if (event.shiftKey && event.keyCode == FlxKey.F4)
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
-			FlxG.switchState(new MainMenuState());
 			Paths.clearStoredMemory();
+			Funkin.switchState(states.MainMenuState);
 		}
 	}
 

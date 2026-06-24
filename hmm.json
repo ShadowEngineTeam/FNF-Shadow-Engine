@@ -3,38 +3,38 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "1bc481a42589859f6720397e7cfc3f0af40f6105",
+      "ref": "edcd9730fc99560ac99018b2e729fd90b19f3085",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "88534506595a32c3f02b21b3987e789a24074ae7",
-      "url": "https://github.com/FunkinCrew/openfl"
+      "ref": "cfefdcdd7ad3bb6332c0806f5992eb9f3a6ee224",
+      "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
-      "ref": "075a8ac67989952d9ed34ec5d5c92c50f779239e",
-      "url": "https://github.com/FunkinCrew/flixel"
+      "ref": "f6d34814660685ae9752b1d50e20e7a510d4aa96",
+      "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
-      "ref": "187f93b34f93c6a405d634a42913c745e443463a",
+      "ref": "7628435364c4a45440d1e5db656741b66a8cd2ec",
       "url": "https://github.com/FunkinCrew/flixel-addons"
     },
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "5a6e7d075d0e0a27fa5053701c714d43318f2a92",
+      "ref": "d7a918d20fb426998b4f11459cb8cb45481ab6a6",
       "url": "https://github.com/ShadowEngineTeam/hxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
-      "ref": "bdcda5c1eac91399ab28f2612c2ac2070a69ec1c",
-      "url": "https://github.com/ShadowEngineTeam/SScript"
+      "ref": "53ba5336f69b4c1dda03cdeedb558e631405f12f",
+      "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
       "name": "hxdiscord_rpc",
@@ -43,10 +43,10 @@
       "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
-      "name": "hxluajit",
+      "name": "hxluau",
       "type": "git",
-      "ref": "e5284b7649989634a1f98b40ee7af910065b0ef7",
-      "url": "https://github.com/ShadowEngineTeam/hxluajit"
+      "ref": "6bceeff4b611e50fc4ca9462ac0f2a4425a6fc7a",
+      "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
       "name": "hxgamemode",
@@ -60,7 +60,7 @@
       "ref": "9d69fb342d030fa120d2deafafbbffad248332b8",
       "url": "https://github.com/HaxeFoundation/format"
     },
-	{
+    {
       "name": "funkin.vis",
       "type": "git",
       "ref": "02bada154b474c2554709b9d12aef0cbf0da3ec9",
@@ -81,14 +81,19 @@
     {
       "name": "hxvlc",
       "type": "git",
-      "ref": "f87241f139b3de31840f56862a29cdcd065a914b",
+      "ref": "a7fad909ae7a21dcc0f70f98aab932a610e86884",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "605612ecfeeb47f27af34bceb9f841c28b936653",
+      "ref": "75870e160677ca4d310df94d775e7fad43c767ae",
       "url": "https://github.com/MaybeMaru/flixel-animate"
+    },
+    {
+      "name": "tink_core",
+      "type": "haxelib",
+      "version": "1.26.0"
     }
   ]
 }

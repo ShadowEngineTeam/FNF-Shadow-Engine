@@ -57,7 +57,7 @@ class ModsMenuState extends MusicBeatState
 	{
 		var daButton:String = "BACKSPACE";
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			daButton = 'B';
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
@@ -104,7 +104,7 @@ class ModsMenuState extends MusicBeatState
 		var buttonWidth = Std.int(bgList.width);
 		var buttonHeight = 80;
 		var daY = 0;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			daY = 70;
 		else
 			daY = 20;
@@ -144,7 +144,7 @@ class ModsMenuState extends MusicBeatState
 		buttonEnableAll.bg.color = FlxColor.GREEN;
 		buttonEnableAll.focusChangeCallback = function(focus:Bool) if (!focus)
 			buttonEnableAll.bg.color = FlxColor.GREEN;
-		if (!controls.mobileC)
+		if (!Funkin.controls.mobileC)
 			add(buttonEnableAll);
 
 		buttonDisableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, "DISABLE ALL", function()
@@ -167,7 +167,7 @@ class ModsMenuState extends MusicBeatState
 		buttonDisableAll.bg.color = 0xFFFF6666;
 		buttonDisableAll.focusChangeCallback = function(focus:Bool) if (!focus)
 			buttonDisableAll.bg.color = 0xFFFF6666;
-		if (!controls.mobileC)
+		if (!Funkin.controls.mobileC)
 			add(buttonDisableAll);
 		checkToggleButtons();
 
@@ -265,7 +265,7 @@ class ModsMenuState extends MusicBeatState
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			if (curMod != null && curMod.settings != null && curMod.settings.length > 0)
 			{
-				openSubState(new ModSettingsSubState(curMod.settings, curMod.folder, curMod.name));
+				switchSubState(ModSettingsSubState, [curMod.settings, curMod.folder, curMod.name]);
 			}
 		}, 54, 54);
 
@@ -319,7 +319,7 @@ class ModsMenuState extends MusicBeatState
 
 		add(bgList);
 		add(modsGroup);
-		_lastControllerMode = controls.controllerMode;
+		_lastControllerMode = Funkin.controls.controllerMode;
 
 		changeSelectedMod();
 
@@ -335,7 +335,7 @@ class ModsMenuState extends MusicBeatState
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("UP_DOWN", "B");
 		touchPad.y -= 215; // so that you can press the buttons.
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			touchPad.alpha = 0.3;
 		#end
 		super.create();
@@ -352,7 +352,7 @@ class ModsMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.BACK && hoveringOnMods && !exiting)
+		if (Funkin.controls.BACK && hoveringOnMods && !exiting)
 		{
 			exiting = true;
 			if (colorTween != null)
@@ -364,9 +364,7 @@ class ModsMenuState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if (waitingToRestart)
 			{
-				// MusicBeatState.switchState(new TitleState());
-				TitleState.initialized = false;
-				TitleState.closedState = false;
+				TitleState.showIntro = true;
 				FlxG.sound.music.fadeOut(0.3);
 				if (FreeplayState.vocals != null)
 				{
@@ -376,7 +374,7 @@ class ModsMenuState extends MusicBeatState
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
 			}
 			else
-				MusicBeatState.switchState(new MainMenuState());
+				Funkin.switchState(MainMenuState);
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;
@@ -386,24 +384,24 @@ class ModsMenuState extends MusicBeatState
 
 		if (Math.abs(FlxG.mouse.deltaX) > 10 || Math.abs(FlxG.mouse.deltaY) > 10)
 		{
-			controls.controllerMode = false;
+			Funkin.controls.controllerMode = false;
 			if (!FlxG.mouse.visible)
 				FlxG.mouse.visible = true;
 		}
 
-		if (controls.controllerMode != _lastControllerMode)
+		if (Funkin.controls.controllerMode != _lastControllerMode)
 		{
-			if (controls.controllerMode)
+			if (Funkin.controls.controllerMode)
 				FlxG.mouse.visible = false;
-			_lastControllerMode = controls.controllerMode;
+			_lastControllerMode = Funkin.controls.controllerMode;
 		}
 
-		if (controls.UI_DOWN_R || controls.UI_UP_R)
+		if (Funkin.controls.UI_DOWN_R || Funkin.controls.UI_UP_R)
 			holdTime = 0;
 
 		if (modsList.all.length > 0)
 		{
-			if (controls.controllerMode && holdingMod)
+			if (Funkin.controls.controllerMode && holdingMod)
 			{
 				holdingMod = false;
 				holdingElapsed = 0;
@@ -412,7 +410,7 @@ class ModsMenuState extends MusicBeatState
 			var lastMode = hoveringOnMods;
 			if (modsList.all.length > 1)
 			{
-				if (!controls.mobileC && FlxG.mouse.justPressed)
+				if (!Funkin.controls.mobileC && FlxG.mouse.justPressed)
 				{
 					for (i in centerMod - 2...centerMod + 3)
 					{
@@ -440,12 +438,12 @@ class ModsMenuState extends MusicBeatState
 					var shiftMult:Int = (FlxG.keys.pressed.SHIFT
 						|| FlxG.gamepads.anyPressed(LEFT_SHOULDER)
 						|| FlxG.gamepads.anyPressed(RIGHT_SHOULDER)) ? 4 : 1;
-					if (controls.UI_DOWN_P)
+					if (Funkin.controls.UI_DOWN_P)
 						changeSelectedMod(shiftMult);
-					else if (controls.UI_UP_P)
+					else if (Funkin.controls.UI_UP_P)
 						changeSelectedMod(-shiftMult);
-					else if (FlxG.mouse.wheel != 0)
-						changeSelectedMod(-FlxG.mouse.wheel * shiftMult, true);
+					else if (FlxG.mouse.deltaWheel.y != 0)
+						changeSelectedMod(-Math.round(FlxG.mouse.deltaWheel.y) * shiftMult, true);
 					else if (FlxG.keys.justPressed.HOME
 						|| FlxG.keys.justPressed.END
 						|| FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)
@@ -457,14 +455,14 @@ class ModsMenuState extends MusicBeatState
 							curSelectedMod = 0;
 						changeSelectedMod();
 					}
-					else if (controls.UI_UP || controls.UI_DOWN)
+					else if (Funkin.controls.UI_UP || Funkin.controls.UI_DOWN)
 					{
 						var lastHoldTime:Float = holdTime;
 						holdTime += elapsed;
 						if (holdTime > 0.5 && Math.floor(lastHoldTime * 8) != Math.floor(holdTime * 8))
-							changeSelectedMod(shiftMult * (controls.UI_UP ? -1 : 1));
+							changeSelectedMod(shiftMult * (Funkin.controls.UI_UP ? -1 : 1));
 					}
-					else if (FlxG.mouse.pressed && !controls.mobileC && !gottaClickAgain)
+					else if (FlxG.mouse.pressed && !Funkin.controls.mobileC && !gottaClickAgain)
 					{
 						var curMod:ModItem = modsGroup.members[curSelectedMod];
 						if (curMod != null)
@@ -514,7 +512,7 @@ class ModsMenuState extends MusicBeatState
 							}
 						}
 					}
-					else if (FlxG.mouse.justReleased && !controls.mobileC && holdingMod)
+					else if (FlxG.mouse.justReleased && !Funkin.controls.mobileC && holdingMod)
 					{
 						holdingMod = false;
 						holdingElapsed = 0;
@@ -527,7 +525,7 @@ class ModsMenuState extends MusicBeatState
 			{
 				if (hoveringOnMods)
 				{
-					if (controls.UI_RIGHT_P)
+					if (Funkin.controls.UI_RIGHT_P)
 					{
 						hoveringOnMods = false;
 						var button = getButton();
@@ -538,14 +536,14 @@ class ModsMenuState extends MusicBeatState
 				}
 				else
 				{
-					if (controls.BACK)
+					if (Funkin.controls.BACK)
 					{
 						hoveringOnMods = true;
 						var button = getButton();
 						button.ignoreCheck = button.onFocus = false;
 						changeSelectedMod();
 					}
-					else if (controls.ACCEPT)
+					else if (Funkin.controls.ACCEPT)
 					{
 						var button = getButton();
 						if (button.onClick != null)
@@ -553,7 +551,7 @@ class ModsMenuState extends MusicBeatState
 					}
 					else if (curSelectedButton < 0)
 					{
-						if (controls.UI_UP_P)
+						if (Funkin.controls.UI_UP_P)
 						{
 							switch (curSelectedButton)
 							{
@@ -567,7 +565,7 @@ class ModsMenuState extends MusicBeatState
 									changeSelectedButton(-1);
 							}
 						}
-						else if (controls.UI_DOWN_P)
+						else if (Funkin.controls.UI_DOWN_P)
 						{
 							switch (curSelectedButton)
 							{
@@ -581,7 +579,7 @@ class ModsMenuState extends MusicBeatState
 									changeSelectedMod();
 							}
 						}
-						else if (controls.UI_RIGHT_P)
+						else if (Funkin.controls.UI_RIGHT_P)
 						{
 							var button = getButton();
 							button.ignoreCheck = button.onFocus = false;
@@ -589,9 +587,9 @@ class ModsMenuState extends MusicBeatState
 							changeSelectedButton();
 						}
 					}
-					else if (controls.UI_LEFT_P)
+					else if (Funkin.controls.UI_LEFT_P)
 						changeSelectedButton(-1);
-					else if (controls.UI_RIGHT_P)
+					else if (Funkin.controls.UI_RIGHT_P)
 						changeSelectedButton(1);
 				}
 			}
@@ -696,7 +694,7 @@ class ModsMenuState extends MusicBeatState
 			limited = true;
 		}
 		callOnScripts('onChangeSelectedMod');
-		if (!controls.mobileC && !isMouseWheel && limited && Math.abs(add) == 1)
+		if (!Funkin.controls.mobileC && !isMouseWheel && limited && Math.abs(add) == 1)
 		{
 			if (add < 0) // pressed up on first mod
 			{
@@ -856,12 +854,15 @@ class ModsMenuState extends MusicBeatState
 	function reload()
 	{
 		callOnScripts('onReloadMods');
+		#if FEATURE_HSCRIPT
+		backend.scripting.GlobalScript.reload();
+		#end
 		saveTxt();
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		FlxTransitionableState.skipNextTransIn = true;
 		FlxTransitionableState.skipNextTransOut = true;
 		var curMod:ModItem = modsGroup.members[curSelectedMod];
-		MusicBeatState.switchState(new ModsMenuState(curMod != null ? curMod.folder : null));
+		Funkin.switchState(ModsMenuState, [curMod != null ? curMod.folder : null]);
 	}
 
 	function saveTxt()

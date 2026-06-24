@@ -5,6 +5,7 @@ import openfl.Assets;
 import openfl.utils.Promise;
 import lime.app.Future;
 import openfl.events.MouseEvent;
+import openfl.events.TouchEvent;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.Lib;
@@ -58,6 +59,7 @@ class FunkinPreloader extends FlxBasePreloader
 
 	var logo:Bitmap;
 	#if TOUCH_HERE_TO_PLAY
+	var touchedHereToPlay:Bool = false;
 	var touchHereToPlay:Bitmap;
 	var touchHereSprite:Sprite;
 	#end
@@ -354,10 +356,7 @@ class FunkinPreloader extends FlxBasePreloader
 				touchHereSprite.buttonMode = true;
 				touchHereToPlay.alpha = 1.0;
 				removeChild(vfdBitmap);
-				addEventListener(MouseEvent.CLICK, onTouchHereToPlay);
-				touchHereSprite.addEventListener(MouseEvent.MOUSE_OVER, overTouchHereToPlay);
-				touchHereSprite.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownTouchHereToPlay);
-				touchHereSprite.addEventListener(MouseEvent.MOUSE_OUT, outTouchHereToPlay);
+				touchHereSprite.addEventListener(#if mobile TouchEvent.TOUCH_TAP #else MouseEvent.MOUSE_DOWN #end, mouseDownTouchHereToPlay);
 			}
 			return 1.0;
 		}
@@ -367,34 +366,18 @@ class FunkinPreloader extends FlxBasePreloader
 	}
 
 	#if TOUCH_HERE_TO_PLAY
-	function overTouchHereToPlay(e:MouseEvent):Void
+	function mouseDownTouchHereToPlay(_):Void
 	{
-		touchHereToPlay.scaleX = touchHereToPlay.scaleY = ratio * 1.1;
-		touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
-		touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
-	}
+		if (touchedHereToPlay)
+			return;
 
-	function outTouchHereToPlay(e:MouseEvent):Void
-	{
-		touchHereToPlay.scaleX = touchHereToPlay.scaleY = ratio;
-		touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
-		touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
-	}
+		touchedHereToPlay = true;
 
-	function mouseDownTouchHereToPlay(e:MouseEvent):Void
-	{
-		touchHereToPlay.y += 10;
-	}
-
-	function onTouchHereToPlay(e:MouseEvent):Void
-	{
-		touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
-		touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
-		removeEventListener(MouseEvent.CLICK, onTouchHereToPlay);
-		touchHereSprite.removeEventListener(MouseEvent.MOUSE_OVER, overTouchHereToPlay);
-		touchHereSprite.removeEventListener(MouseEvent.MOUSE_OUT, outTouchHereToPlay);
-		touchHereSprite.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDownTouchHereToPlay);
-		immediatelyStartGame();
+		haxe.Timer.delay(function():Void
+		{
+			touchHereSprite.removeEventListener(#if mobile TouchEvent.TOUCH_TAP #else MouseEvent.MOUSE_DOWN #end, mouseDownTouchHereToPlay);
+			immediatelyStartGame();
+		}, 1000);
 	}
 	#end
 
@@ -442,6 +425,24 @@ class FunkinPreloader extends FlxBasePreloader
 
 		updateProgressLeftText(statusText);
 		progressRightText.text = '$percentage%';
+
+		#if TOUCH_HERE_TO_PLAY
+		if (currentState == STATE_TOUCH_HERE_TO_PLAY && touchHereToPlay != null)
+		{
+			var targetScale:Float = ratio;
+
+			if (touchedHereToPlay)
+				targetScale = ratio * 0.9;
+			else if (touchHereSprite.hitTestPoint(Lib.current.stage.mouseX, Lib.current.stage.mouseY))
+				targetScale = ratio * 1.1;
+
+			var newScale:Float = touchHereToPlay.scaleX + (targetScale - touchHereToPlay.scaleX) * 0.15;
+			touchHereToPlay.scaleX = touchHereToPlay.scaleY = newScale;
+			touchHereToPlay.x = (this._width - touchHereToPlay.width) / 2;
+			touchHereToPlay.y = (this._height - touchHereToPlay.height) / 2;
+		}
+		#end
+
 		super.update(percent);
 	}
 

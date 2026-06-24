@@ -43,8 +43,18 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 	/**
 	 * Current "delta" value of mouse wheel. If the wheel was just scrolled up,
 	 * it will have a positive value and vice versa. Otherwise the value will be 0.
+	 *
+	 * **You should use `deltaWheel` instead as it exposes the x-axis scrolling direction**
+	 * **To keep compatability `wheel` returns to the old behavior of OpenFL which is the rounded wheel delta, for decimal wheel use `deltaWheel.y`**
 	 */
 	public var wheel(default, null):Int = 0;
+
+	/**
+	 * Accurate current "delta" value of mouse wheel. If the wheel was scrolled in any direction,
+	 * it will have a value on the the respective axis (can be both x and y on some hardware like trackpacds and such).
+	 * Otherwise it is assigned to 0 on the X and Y axis.
+	 */
+	public var deltaWheel(default, null):FlxPoint = FlxPoint.get();
 
 	/**
 	 * A display container for the mouse cursor. It is a child of FlxGame and
@@ -176,6 +186,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 	 */
 	#if FLX_POINTER_INPUT
 	public var flickManager(default, null):FlxFlick = new FlxFlick();
+	public var wheelFlickManager(default, null):FlxFlick = new FlxFlick();
 	#end
 
 	#if FLX_MOUSE_ADVANCED
@@ -265,7 +276,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 	 */
 	var _lastX:Int = 0;
 	var _lastY:Int = 0;
-	var _lastWheel:Int = 0;
+	var _lastWheel:Float = 0;
 	var _lastLeftButtonState:FlxInputState;
 
 	/**
@@ -517,6 +528,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 
 		#if FLX_POINTER_INPUT
 		flickManager.destroy();
+		wheelFlickManager.destroy();
 		#end
 	}
 
@@ -601,9 +613,21 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 		_rightButton.update();
 		#end
 
+		#if FLX_POINTER_INPUT
+		if (!_wheelUsed)
+		{
+			wheelFlickManager.initFlick(deltaWheel);
+		}
+		else
+		{
+			wheelFlickManager.destroy();
+		}
+		#end
+
 		// Update the wheel
 		if (!_wheelUsed)
 		{
+			deltaWheel.set(0, 0);
 			wheel = 0;
 		}
 		_wheelUsed = false;
@@ -624,7 +648,8 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 			flickManager.destroy();
 		}
 
-			flickManager.update(FlxG.elapsed);
+		flickManager.update(FlxG.elapsed);
+		wheelFlickManager.update(FlxG.elapsed);
 		#end
 	}
 
@@ -683,6 +708,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 		if (enabled)
 		{
 			_wheelUsed = true;
+			deltaWheel.set(flashEvent.deltaX, flashEvent.deltaY);
 			wheel = flashEvent.delta;
 		}
 	}
@@ -928,7 +954,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 		if ((_lastX == gameX)
 			&& (_lastY == gameY)
 			&& (_lastLeftButtonState == _leftButton.current)
-			&& (_lastWheel == wheel))
+			&& (_lastWheel == deltaWheel.y))
 		{
 			return null;
 		}
@@ -936,7 +962,7 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 		_lastX = gameX;
 		_lastY = gameY;
 		_lastLeftButtonState = _leftButton.current;
-		_lastWheel = wheel;
+		_lastWheel = deltaWheel.y;
 		return new MouseRecord(_lastX, _lastY, _leftButton.current, _lastWheel);
 	}
 
@@ -952,7 +978,8 @@ class FlxMouse extends FlxPointer implements IFlxInputManager
 			_stage.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP, true, false, record.x, record.y));
 		}
 		_lastLeftButtonState = _leftButton.current = record.button;
-		wheel = record.wheel;
+		deltaWheel.y = record.wheel;
+		wheel = Std.int(record.wheel);
 		_rawX = record.x;
 		_rawY = record.y;
 		updatePositions();

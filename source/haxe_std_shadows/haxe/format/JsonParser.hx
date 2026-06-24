@@ -64,6 +64,10 @@ class JsonParser
 		var c;
 		while (!StringTools.isEof(c = nextChar()))
 		{
+			if (checkComments(c))
+			{
+				continue;
+			}
 			switch (c)
 			{
 				case ' '.code, '\r'.code, '\n'.code, '\t'.code:
@@ -75,11 +79,65 @@ class JsonParser
 		return result;
 	}
 
+	var inComment = false;
+	var blockComment = false;
+
+	inline function checkComments(c:Int)
+	{
+		var ret = false;
+		if (!inComment)
+		{
+			if (c == '/'.code)
+			{
+				var d = nextChar();
+				if (d == '/'.code || (blockComment = (d == '*'.code)))
+				{
+					inComment = true;
+				}
+				else
+				{
+					pos--;
+				}
+			}
+		}
+		else
+		{
+			if (blockComment)
+			{
+				if (c == '*'.code)
+				{
+					var d = nextChar();
+					if (d == '/'.code)
+					{
+						inComment = blockComment = false;
+						ret = true;
+					}
+					else
+					{
+						pos--;
+					}
+				}
+			}
+			else
+			{
+				if (c == '\n'.code)
+				{
+					inComment = false;
+				}
+			}
+		}
+		return ret || inComment;
+	}
+
 	function parseRec():Dynamic
 	{
 		while (true)
 		{
 			var c = nextChar();
+			if (checkComments(c))
+			{
+				continue;
+			}
 			switch (c)
 			{
 				case ' '.code, '\r'.code, '\n'.code, '\t'.code:
@@ -89,6 +147,10 @@ class JsonParser
 					while (true)
 					{
 						var c = nextChar();
+						if (checkComments(c))
+						{
+							continue;
+						}
 						switch (c)
 						{
 							case ' '.code, '\r'.code, '\n'.code, '\t'.code:
@@ -118,6 +180,10 @@ class JsonParser
 					while (true)
 					{
 						var c = nextChar();
+						if (checkComments(c))
+						{
+							continue;
+						}
 						switch (c)
 						{
 							case ' '.code, '\r'.code, '\n'.code, '\t'.code:
@@ -362,11 +428,41 @@ class JsonParser
 	function invalidChar()
 	{
 		pos--; // rewind
-		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " at position " + pos;
+		var col = 1;
+		var line = 1;
+		for (i in 0...pos)
+		{
+			var c = StringTools.fastCodeAt(str, i);
+			if (c == '\n'.code)
+			{
+				col = 1;
+				line++;
+			}
+			else
+			{
+				col++;
+			}
+		}
+		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid char " + StringTools.fastCodeAt(str, pos) + " ('" + str.charAt(pos) + "')" + " at line " + line + " col " + col;
 	}
 
 	function invalidNumber(start:Int)
 	{
-		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid number at position " + start + ": " + str.substr(start, pos - start);
+		var col = 1;
+		var line = 1;
+		for (i in 0...start)
+		{
+			var c = StringTools.fastCodeAt(str, i);
+			if (c == '\n'.code)
+			{
+				col = 1;
+				line++;
+			}
+			else
+			{
+				col++;
+			}
+		}
+		throw(file != null && file != '' ? 'in JSON file: $file\n' : '') + "Invalid number at line " + line + " col " + col + ": " + str.substr(start, pos - start);
 	}
 }

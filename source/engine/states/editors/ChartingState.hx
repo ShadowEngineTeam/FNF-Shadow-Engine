@@ -206,7 +206,7 @@ class ChartingState extends MusicBeatState
 
 	public var mouseQuant:Bool = false;
 
-	private final isDiffErect:Bool = Difficulty.getString().toLowerCase() == "erect" || Difficulty.getString().toLowerCase() == "nightmare";
+	private final isDiffErect:Bool = Difficulty.getByIndex(PlayState.storyDifficulty) == ERECT || Difficulty.getByIndex(PlayState.storyDifficulty) == NIGHTMARE;
 
 	override function create()
 	{
@@ -359,7 +359,7 @@ class ChartingState extends MusicBeatState
 
 		UI_infoPanel.x = (FlxG.width - UI_infoPanel.width - UI_box.width) - (ShadowStyle.SPACING_LG * 2);
 
-		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(controls.mobileC) ? "F" : "F1"} for Help', 16);
+		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, 'Press ${(Funkin.controls.mobileC) ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
 		tipText.borderColor = FlxColor.BLACK;
 		tipText.scrollFactor.set();
@@ -414,9 +414,7 @@ class ChartingState extends MusicBeatState
 	var playSoundDad:ShadowCheckbox = null;
 	var UI_songTitle:ShadowTextInput;
 	var stageDropDown:ShadowDropdown;
-	#if FLX_PITCH
 	var sliderRate:ShadowSlider;
-	#end
 
 	var stepperBPM:ShadowStepper;
 	var stepperSpeed:ShadowStepper;
@@ -611,17 +609,17 @@ class ChartingState extends MusicBeatState
 		var row5:Int = row4 + rowStep;
 		var reloadSongJson:ShadowButton = new ShadowButton(pad, row5, "Reload JSON", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				loadJson(_song.song.toLowerCase());
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(reloadSongJson);
 
 		var loadAutosaveBtn:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row5, "Load Auto", function()
 		{
 			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			MusicBeatState.resetState();
+			Funkin.resetState();
 		}, 70);
 		tab_group.add(loadAutosaveBtn);
 
@@ -660,20 +658,20 @@ class ChartingState extends MusicBeatState
 
 		var clear_events:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap, row6, "Clear Events", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings));
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, clearEvents, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_events);
 
 		var clear_notes:ShadowButton = new ShadowButton(pad + (buttonWidth + buttonGap) * 2, row6, "Clear Notes", function()
 		{
-			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
 				for (sec in 0..._song.notes.length)
 				{
 					_song.notes[sec].sectionNotes = [];
 				}
 				updateGrid();
-			}, null, ignoreWarnings));
+			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(clear_notes);
 
@@ -980,7 +978,6 @@ class ChartingState extends MusicBeatState
 			key++;
 		}
 
-		#if sys
 		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'custom_notetypes/');
 		for (folder in foldersToCheck)
 			for (file in FileSystem.readDirectory(folder))
@@ -991,14 +988,14 @@ class ChartingState extends MusicBeatState
 				var isValid:Bool = false;
 
 				#if FEATURE_LUA
-				if (fileName.endsWith('.lua'))
+				if (fileName.endsWith('.lua') || fileName.endsWith('.luau'))
 					isValid = true;
 				#end
 
 				#if FEATURE_HSCRIPT
 				if (!isValid)
 				{
-					for (dynamicExt in cast(hscriptExtensions, Array<Dynamic>))
+					for (dynamicExt in cast(scripts.hscriptExtensions, Array<Dynamic>))
 					{
 						final ext:String = cast(dynamicExt, String);
 						if (fileName.endsWith(ext))
@@ -1024,7 +1021,6 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
-		#end
 
 		var displayNameList:Array<String> = curNoteTypes.copy();
 		for (i in 1...displayNameList.length)
@@ -1441,14 +1437,12 @@ class ChartingState extends MusicBeatState
 		tab_group.add(waveformUseOppVoices);
 		#end
 
-		#if FLX_PITCH
 		tab_group.add(new ShadowLabel(pad, row3, "Playback Rate:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		sliderRate = new ShadowSlider(pad, row3 + labelOffset, 0.5, 3, 1, function(value:Float)
 		{
 			playbackSpeed = value;
 		}, 200, 2, true);
 		tab_group.add(sliderRate);
-		#end
 
 		check_warnings = new ShadowCheckbox(columnX(1), row4, "Ignore Warnings", FlxG.save.data.ignoreWarnings, function(checked:Bool)
 		{
@@ -1621,11 +1615,11 @@ class ChartingState extends MusicBeatState
 		UI_help.add(titleLabel);
 
 		var helpStr:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			helpStr = "Up/Down - Change Conductor's strum time\nLeft/Right - Go to the previous/next section\n"
-				+ #if FLX_PITCH "G - Reset Song Playback Rate\n"
-				+ #end "Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
+				+ "G - Reset Song Playback Rate\n"
+				+ "Hold Y to move 4x faster\nHold H and touch on an arrow to select it\nV/D - Zoom in/out\n\n" +
 				"C - Test your chart inside Chart Editor\nA - Play your chart\n" +
 				"Up/Down (On The Right) - Decrease/Increase Note Sustain Length\nX - Stop/Resume Song";
 		}
@@ -1633,16 +1627,16 @@ class ChartingState extends MusicBeatState
 		{
 			helpStr = "W/S or Mouse Wheel - Change Conductor's strum time\nA/D - Go to the previous/next section\n"
 				+ "Left/Right - Change Snap\nUp/Down - Change Conductor's Strum Time with Snapping\n"
-				+ #if FLX_PITCH "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n"
+				+ "Left Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)\n"
 				+ "ALT + Left Bracket / Right Bracket - Reset Song Playback Rate\n"
-				+ #end "Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
+				+ "Hold Shift to move 4x faster\nHold Control and click on an arrow to select it\nZ/X - Zoom in/out\n\n" +
 				"Esc - Test your chart inside Chart Editor\nEnter - Play your chart\n" + "Q/E - Decrease/Increase Note Sustain Length\nSpace - Stop/Resume song";
 		}
 
 		var helpText:ShadowLabel = new ShadowLabel(pad, pad + 40, helpStr, ShadowStyle.FONT_SIZE_LG, ShadowStyle.TEXT_PRIMARY, panelWidth - (pad * 2));
 		UI_help.add(helpText);
 
-		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
+		var closeText:ShadowLabel = new ShadowLabel(pad, panelHeight - pad - 24, 'Press ${Funkin.controls.mobileC ? "F" : "ESC or F1"} to close', ShadowStyle.FONT_SIZE_MD, ShadowStyle.TEXT_SECONDARY);
 		UI_help.add(closeText);
 	}
 
@@ -1693,7 +1687,7 @@ class ChartingState extends MusicBeatState
 		// trace(_song.notes.length);
 		if (_song.notes.length <= 1) // First load ever
 		{
-			trace('first load ever!!');
+			// trace('first load ever!!');
 			while (curTime < FlxG.sound.music.length)
 			{
 				addSection();
@@ -1743,6 +1737,7 @@ class ChartingState extends MusicBeatState
 			DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 			#end
 		}
+		persistentUpdate = true;
 		#if FEATURE_MOBILE_CONTROLS
 		removeTouchPad();
 		addTouchPad("LEFT_FULL", "CHART_EDITOR");
@@ -1829,7 +1824,7 @@ class ChartingState extends MusicBeatState
 			if ((FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end) || FlxG.keys.justPressed.ESCAPE)
 			{
 				#if FEATURE_MOBILE_CONTROLS
-				if (controls.mobileC)
+				if (Funkin.controls.mobileC)
 				{
 					touchPad.forEachAlive(function(button:TouchButton)
 					{
@@ -1851,7 +1846,7 @@ class ChartingState extends MusicBeatState
 		if (FlxG.keys.justPressed.F1 #if FEATURE_MOBILE_CONTROLS || touchPad.buttonF.justPressed #end)
 		{
 			#if FEATURE_MOBILE_CONTROLS
-			if (controls.mobileC)
+			if (Funkin.controls.mobileC)
 			{
 				touchPad.forEachAlive(function(button:TouchButton)
 				{
@@ -1910,7 +1905,7 @@ class ChartingState extends MusicBeatState
 		FlxG.watch.addQuick('daBeat', curBeat);
 		FlxG.watch.addQuick('daStep', curStep);
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			for (touch in FlxG.touches.list)
 			{
@@ -2059,7 +2054,8 @@ class ChartingState extends MusicBeatState
 				#if FEATURE_MOBILE_CONTROLS
 				touchPad.alpha = 0;
 				#end
-				openSubState(new states.editors.EditorPlayState(playbackSpeed));
+				persistentUpdate = false;
+				switchSubState(states.editors.EditorPlayState, [playbackSpeed]);
 			}
 			else if (FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end)
 			{
@@ -2074,7 +2070,7 @@ class ChartingState extends MusicBeatState
 
 				// if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
 				StageData.loadDirectory(_song);
-				LoadingState.loadAndSwitchState(new PlayState());
+				LoadingState.loadAndSwitchState(PlayState);
 			}
 
 			if (curSelectedNote != null && curSelectedNote[1] > -1)
@@ -2093,10 +2089,9 @@ class ChartingState extends MusicBeatState
 			{
 				// Protect against lost data when quickly leaving the chart editor.
 				autosaveSong();
-				PlayState.chartingMode = false;
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				persistentUpdate = PlayState.chartingMode = FlxG.mouse.visible = false;
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
-				FlxG.mouse.visible = false;
 				return;
 			}
 
@@ -2164,20 +2159,20 @@ class ChartingState extends MusicBeatState
 					resetSection();
 			}
 
-			if (!controls.mobileC)
+			if (!Funkin.controls.mobileC)
 			{
-				if (FlxG.mouse.wheel != 0)
+				if (FlxG.mouse.deltaWheel.y != 0)
 				{
 					FlxG.sound.music.pause();
 					if (!mouseQuant)
-						FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.8);
+						FlxG.sound.music.time -= (FlxG.mouse.deltaWheel.y * Conductor.stepCrochet * 0.8);
 					else
 					{
 						var time:Float = FlxG.sound.music.time;
 						var beat:Float = curDecBeat;
 						var snap:Float = quantization / 4;
 						var increase:Float = 1 / snap;
-						if (FlxG.mouse.wheel > 0)
+						if (FlxG.mouse.deltaWheel.y > 0)
 						{
 							var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
 							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
@@ -2390,7 +2385,6 @@ class ChartingState extends MusicBeatState
 			strumLineNotes.members[i].alpha = FlxG.sound.music.playing ? 1 : 0.35;
 		}
 
-		#if FLX_PITCH
 		// PLAYBACK SPEED CONTROLS
 		var holdingShift:Bool = FlxG.keys.pressed.SHIFT;
 		var holdingLB:Bool = FlxG.keys.pressed.LBRACKET;
@@ -2413,7 +2407,6 @@ class ChartingState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackSpeed;
 		vocals.pitch = playbackSpeed;
 		opponentVocals.pitch = playbackSpeed;
-		#end
 
 		bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
 			+ " / "
@@ -2687,7 +2680,7 @@ class ChartingState extends MusicBeatState
 	function waveformData(buffer:AudioBuffer, bytes:Bytes, time:Float, endTime:Float, multiply:Float = 1, ?array:Array<Array<Array<Float>>>,
 			?steps:Float):Array<Array<Array<Float>>>
 	{
-		#if (lime_cffi && !macro)
+		#if lime_openal
 		if (buffer == null || buffer.data == null)
 			return [[[0], [0]], [[0], [0]]];
 
@@ -3390,7 +3383,7 @@ class ChartingState extends MusicBeatState
 
 		var noteStrum = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
 		var noteData = 0;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			for (touch in FlxG.touches.list)
 				noteData = Math.floor((touch.x - GRID_SIZE) / GRID_SIZE);
 		else
@@ -3513,20 +3506,9 @@ class ChartingState extends MusicBeatState
 		// make it look sexier if possible
 		try
 		{
-			if (Difficulty.getString() != Difficulty.getDefault())
-			{
-				if (Difficulty.getString() == null)
-				{
-					PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-				}
-				else
-				{
-					PlayState.SONG = Song.loadFromJson(song.toLowerCase() + "-" + Difficulty.getString(), song.toLowerCase());
-				}
-			}
-			else
-				PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
-			MusicBeatState.resetState();
+			final fuckinDiff:String = Difficulty.getByIndex() != NORMAL ? '-${PlayState.storyDifficulty}' : '';
+			PlayState.SONG = Song.loadFromJson(song.toLowerCase() + fuckinDiff, song.toLowerCase());
+			Funkin.resetState();
 		}
 		catch (e)
 		{

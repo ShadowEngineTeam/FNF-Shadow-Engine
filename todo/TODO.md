@@ -1,5 +1,5 @@
-- Switch SScript to RuleScript or hscript-improved(?) [in a nutshell screw SScript]
 - Switch Game Res from 720p to 1080p(?)
+- Rewrite Paths
 - Add hxfmod
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Menus(?) and Wide Screen Support
@@ -7,6 +7,6 @@
 - Add Base Game Files
 - Add multikey support(?)
 - Rewrite the Input System(?)
-- Refactor/Redo Scriptable States Support(?)
 - HSV Note Skin Textures
 - Rewrite Source with Null Safety and Haxe 4.3 features(?) 
+- Find Artist for our Credits icon and GitHub banner

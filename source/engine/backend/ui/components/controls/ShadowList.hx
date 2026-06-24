@@ -120,9 +120,9 @@ class ShadowList extends FlxSpriteGroup
 			}
 		}
 
-		if (isOverList && FlxG.mouse.wheel != 0)
+		if (isOverList && FlxG.mouse.deltaWheel.y != 0)
 		{
-			scrollOffset -= FlxG.mouse.wheel;
+			scrollOffset -= Math.round(FlxG.mouse.deltaWheel.y);
 			if (scrollOffset < 0)
 				scrollOffset = 0;
 

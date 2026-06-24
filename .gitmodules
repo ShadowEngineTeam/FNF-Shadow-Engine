@@ -1,3 +1,4 @@
 [submodule "assets"]
 	path = assets
 	url = https://github.com/ShadowEngineTeam/FNF-SE-Assets
+	depth = 1

@@ -30,7 +30,7 @@ class NotesSubStateOld extends MusicBeatSubstate
 
 	public function new()
 	{
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 
 		super();
 
@@ -143,26 +143,26 @@ class NotesSubStateOld extends MusicBeatSubstate
 		{
 			if (holdTime < 0.5)
 			{
-				if (controls.UI_LEFT_P)
+				if (Funkin.controls.UI_LEFT_P)
 				{
 					updateValue(-1);
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 				}
-				else if (controls.UI_RIGHT_P)
+				else if (Funkin.controls.UI_RIGHT_P)
 				{
 					updateValue(1);
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 				}
-				else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET)
+				else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end Funkin.controls.RESET)
 				{
 					resetValue(curSelected, typeSelected);
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 				}
-				if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
+				if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 				{
 					holdTime = 0;
 				}
-				else if (controls.UI_LEFT || controls.UI_RIGHT)
+				else if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 				{
 					holdTime += elapsed;
 				}
@@ -175,15 +175,15 @@ class NotesSubStateOld extends MusicBeatSubstate
 					case 1 | 2:
 						add = 50;
 				}
-				if (controls.UI_LEFT)
+				if (Funkin.controls.UI_LEFT)
 				{
 					updateValue(elapsed * -add);
 				}
-				else if (controls.UI_RIGHT)
+				else if (Funkin.controls.UI_RIGHT)
 				{
 					updateValue(elapsed * add);
 				}
-				if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
+				if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 					holdTime = 0;
@@ -192,27 +192,27 @@ class NotesSubStateOld extends MusicBeatSubstate
 		}
 		else
 		{
-			if (controls.UI_UP_P)
+			if (Funkin.controls.UI_UP_P)
 			{
 				changeSelection(-1);
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
-			if (controls.UI_DOWN_P)
+			if (Funkin.controls.UI_DOWN_P)
 			{
 				changeSelection(1);
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
-			if (controls.UI_LEFT_P)
+			if (Funkin.controls.UI_LEFT_P)
 			{
 				changeType(-1);
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
-			if (controls.UI_RIGHT_P)
+			if (Funkin.controls.UI_RIGHT_P)
 			{
 				changeType(1);
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
-			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET)
+			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end Funkin.controls.RESET)
 			{
 				for (i in 0...3)
 				{
@@ -220,7 +220,7 @@ class NotesSubStateOld extends MusicBeatSubstate
 				}
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 			}
-			if (controls.ACCEPT && nextAccept <= 0)
+			if (Funkin.controls.ACCEPT && nextAccept <= 0)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				changingNote = true;
@@ -248,7 +248,7 @@ class NotesSubStateOld extends MusicBeatSubstate
 			}
 		}
 
-		if (controls.BACK || (changingNote && controls.ACCEPT))
+		if (Funkin.controls.BACK || (changingNote && Funkin.controls.ACCEPT))
 		{
 			if (!changingNote)
 			{

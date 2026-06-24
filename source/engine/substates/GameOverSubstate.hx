@@ -6,6 +6,7 @@ import flixel.FlxObject;
 import states.StoryMenuState;
 import states.FreeplayState;
 import lime.ui.Haptic;
+import effects.RetroCameraFade;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
@@ -92,12 +93,12 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		callOnScripts('onUpdate', [elapsed]);
 
-		if (controls.ACCEPT)
+		if (Funkin.controls.ACCEPT)
 		{
 			endBullshit();
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 			FlxG.sound.music.stop();
@@ -107,9 +108,9 @@ class GameOverSubstate extends MusicBeatSubstate
 
 			Mods.loadTopMod();
 			if (PlayState.isStoryMode)
-				MusicBeatState.switchState(new StoryMenuState());
+				Funkin.switchState(StoryMenuState);
 			else
-				MusicBeatState.switchState(new FreeplayState());
+				Funkin.switchState(FreeplayState);
 
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			callOnScripts('onGameOverConfirm', [false]);
@@ -160,10 +161,25 @@ class GameOverSubstate extends MusicBeatSubstate
 			FlxG.sound.play(Paths.music(endSoundName));
 			new FlxTimer().start(0.7, function(tmr:FlxTimer)
 			{
-				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
+				if (PlayState.isPixelStage)
 				{
-					MusicBeatState.resetState();
-				});
+					RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
+					new FlxTimer().start(2, function(_)
+					{
+						remove(boyfriend);
+						boyfriend.destroy();
+						Funkin.resetState();
+					});
+				}
+				else
+				{
+					FlxG.camera.fade(FlxColor.BLACK, 1.5, false, function()
+					{
+						remove(boyfriend);
+						boyfriend.destroy();
+						Funkin.resetState();
+					});
+				}
 			});
 			callOnScripts('onGameOverConfirm', [true]);
 		}

@@ -134,7 +134,7 @@ class EditorPlayState extends MusicBeatSubstate
 		add(dataTxt);
 
 		var daButton:String;
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 			daButton = "P";
 		else
 			daButton = "ESC";
@@ -173,9 +173,15 @@ class EditorPlayState extends MusicBeatSubstate
 		recalculateRating();
 	}
 
+	var started:Bool = false;
+
 	override function update(elapsed:Float)
 	{
-		if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
+		if (!started)
+		{
+			started = true;
+		}
+		else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonP.justPressed || #end FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end)
 		{
 			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = false;
@@ -322,7 +328,7 @@ class EditorPlayState extends MusicBeatSubstate
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
 		FlxG.sound.music.time = startPos;
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.onComplete = finishSong;
 		vocals.volume = 1;
 		vocals.time = startPos;
@@ -376,11 +382,8 @@ class EditorPlayState extends MusicBeatSubstate
 
 		vocals.volume = 0;
 		opponentVocals.volume = 0;
-
-		#if FLX_PITCH
 		vocals.pitch = playbackRate;
 		opponentVocals.pitch = playbackRate;
-		#end
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
 
@@ -625,6 +628,9 @@ class EditorPlayState extends MusicBeatSubstate
 		var pixelShitPart2:String = '';
 
 		rating.loadGraphic(Paths.image(pixelShitPart1 + daRating.image + pixelShitPart2));
+		rating.antialiasing = ClientPrefs.data.antialiasing;
+		rating.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+		rating.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 		rating.screenCenter();
 		rating.x = coolText.x - 40;
 		rating.y -= 60;
@@ -636,6 +642,9 @@ class EditorPlayState extends MusicBeatSubstate
 		rating.y -= ClientPrefs.data.comboOffset[1];
 
 		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
+		comboSpr.antialiasing = ClientPrefs.data.antialiasing;
+		comboSpr.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+		comboSpr.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 		comboSpr.screenCenter();
 		comboSpr.x = coolText.x;
 		comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
@@ -757,6 +766,9 @@ class EditorPlayState extends MusicBeatSubstate
 			numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 			numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
 			numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
+			numScore.antialiasing = ClientPrefs.data.antialiasing;
+			numScore.pixelPerfectRender = !ClientPrefs.data.antialiasing;
+			numScore.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
 			numScore.visible = !ClientPrefs.data.hideHud;
 
 			// if (combo >= 10 || combo == 0)
@@ -806,7 +818,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
 		// trace('Pressed: ' + eventKey);
 
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 		{
 			#if debug
 			// Prevents crash specifically on debug without needing to try catch shit
@@ -878,7 +890,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
 		// trace('Pressed: ' + eventKey);
 
-		if (!controls.controllerMode && key > -1)
+		if (!Funkin.controls.controllerMode && key > -1)
 			keyReleased(key);
 	}
 
@@ -923,16 +935,16 @@ class EditorPlayState extends MusicBeatSubstate
 		var releaseArray:Array<Bool> = [];
 		for (key in keysArray)
 		{
-			holdArray.push(controls.pressed(key));
-			if (controls.controllerMode)
+			holdArray.push(Funkin.controls.pressed(key));
+			if (Funkin.controls.controllerMode)
 			{
-				pressArray.push(controls.justPressed(key));
-				releaseArray.push(controls.justReleased(key));
+				pressArray.push(Funkin.controls.justPressed(key));
+				releaseArray.push(Funkin.controls.justReleased(key));
 			}
 		}
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && pressArray.contains(true))
+		if (Funkin.controls.controllerMode && pressArray.contains(true))
 			for (i in 0...pressArray.length)
 				if (pressArray[i])
 					keyPressed(i);
@@ -964,7 +976,7 @@ class EditorPlayState extends MusicBeatSubstate
 				SustainSplash.hideAtData(i);
 
 		// TO DO: Find a better way to handle controller inputs, this should work for now
-		if (controls.controllerMode && releaseArray.contains(true))
+		if (Funkin.controls.controllerMode && releaseArray.contains(true))
 			for (i in 0...releaseArray.length)
 				if (releaseArray[i])
 					keyReleased(i);
@@ -1137,18 +1149,18 @@ class EditorPlayState extends MusicBeatSubstate
 			return;
 
 		FlxG.sound.music.play();
-		#if FLX_PITCH FlxG.sound.music.pitch = playbackRate; #end
+		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time;
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = Conductor.songPosition;
-			#if FLX_PITCH vocals.pitch = playbackRate; #end
+			vocals.pitch = playbackRate;
 		}
 
 		if (Conductor.songPosition <= opponentVocals.length)
 		{
 			opponentVocals.time = Conductor.songPosition;
-			#if FLX_PITCH opponentVocals.pitch = playbackRate; #end
+			opponentVocals.pitch = playbackRate;
 		}
 		vocals.play();
 		opponentVocals.play();

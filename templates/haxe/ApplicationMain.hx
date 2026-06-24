@@ -26,8 +26,19 @@ import backend.Native;
 class ApplicationMain
 {
 	#if !macro
-	public static function main()
+	public static function main():Void
 	{
+		#if (windows && cpp)
+		// Disable the Windows "ghosting" effect that dims unresponsive windows.
+		Native.disableWindowsGhosting();
+
+		// Disable Windows error reporting (avoids sending bug reports to Microsoft).
+		Native.disableErrorReporting();
+
+		// Set the console output to UTF-8 on Windows to support Unicode characters.
+		Native.setConsoleOutputToUTF8();
+		#end
+
 		lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
 		#if android
@@ -35,7 +46,7 @@ class ApplicationMain
 		#end
 
 		#if (js && html5)
-		#if (munit || (utest && openfl_enable_utest_legacy_mode))
+		#if (utest && openfl_enable_utest_legacy_mode)
 		lime.system.System.embed("::APP_FILE::", null, ::WIN_WIDTH::, ::WIN_HEIGHT::);
 		#end
 		#else
@@ -45,8 +56,6 @@ class ApplicationMain
 
 	public static function create(config):Void
 	{
-		var app = new openfl.display.Application();
-
 		#if (linux && cpp)
 		GamemodeClient.request_start();
 		#end
@@ -55,19 +64,23 @@ class ApplicationMain
 		lime.system.System.setHint("ORIENTATIONS", ::if (WIN_ORIENTATION == "portrait")::"Portrait PortraitUpsideDown"::else::"LandscapeLeft LandscapeRight"::end::);
 		::end::
 
-		app.meta.set("build", "::meta.buildNumber::");
-		app.meta.set("company", "::meta.company::");
-		app.meta.set("file", "::APP_FILE::");
-		app.meta.set("name", "::meta.title::");
-		app.meta.set("packageName", "::meta.packageName::");
-		app.meta.set("version", "::meta.version::");
+		final appMeta:Map<String, String> = [];
+
+		appMeta.set("build", "::meta.buildNumber::");
+		appMeta.set("company", "::meta.company::");
+		appMeta.set("file", "::APP_FILE::");
+		appMeta.set("name", "::meta.title::");
+		appMeta.set("packageName", "::meta.packageName::");
+		appMeta.set("version", "::meta.version::");
 
 		#if hxtelemetry
 		::if (config.hxtelemetry != null)::
-		app.meta.set("hxtelemetry-allocations", "::config.hxtelemetry.allocations::");
-		app.meta.set("hxtelemetry-host", "::config.hxtelemetry.host::");
+		appMeta.set("hxtelemetry-allocations", "::config.hxtelemetry.allocations::");
+		appMeta.set("hxtelemetry-host", "::config.hxtelemetry.host::");
 		::end::
 		#end
+
+		var app = new openfl.display.Application(appMeta);
 
 		#if (linux || mac)
 		app.onCreateWindow.add(function(window:lime.ui.Window):Void
@@ -87,11 +100,14 @@ class ApplicationMain
 			alwaysOnTop: ::alwaysOnTop::,
 			transparent: ::transparent::,
 			borderless: ::borderless::,
+			// display: ::display::,
 			element: null,
 			frameRate: ::fps::,
-			#if !web fullscreen: ::fullscreen::, #end
+			#if !web
+			fullscreen: ::fullscreen::,
+			#end
 			height: ::height::,
-			hidden: #if munit true #else ::hidden:: #end,
+			hidden: ::hidden::,
 			maximized: ::maximized::,
 			minimized: ::minimized::,
 			parameters: ::parameters::,
@@ -109,6 +125,9 @@ class ApplicationMain
 			colorDepth: ::colorDepth::,
 			depth: ::depthBuffer::,
 			hardware: ::hardware::,
+			#if web
+			preserveDrawingBuffer: true,
+			#end
 			stencil: ::stencilBuffer::,
 			type: null,
 			vsync: ::vsync::
@@ -145,12 +164,6 @@ class ApplicationMain
 		app.window.frameRate = ::WIN_FPS::;
 		#end
 
-		#if (windows && cpp)
-		Native.setConsoleOutputToUTF8();
-		Native.disableWindowsGhosting();
-		Native.disableErrorReporting();
-		#end
-		
 		var preloader = getPreloader();
 		app.preloader.onProgress.add(function(loaded, total)
 		{
@@ -328,6 +341,8 @@ class ApplicationMain
 		var init = lime.app.Application;
 
 		#if neko
+		// Copy from https://github.com/HaxeFoundation/haxe/blob/development/std/neko/_std/Sys.hx#L164
+		// since Sys.programPath () isn't available in __init__
 		var sys_program_path =
 		{
 			var m = neko.vm.Module.local().name;
@@ -337,6 +352,7 @@ class ApplicationMain
 			}
 			catch (e:Dynamic)
 			{
+				// maybe the neko module name was supplied without .n extension...
 				if (!StringTools.endsWith(m, ".n"))
 				{
 					try

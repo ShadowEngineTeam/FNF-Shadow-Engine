@@ -49,7 +49,7 @@ class NotesSubState extends MusicBeatSubstate
 
 	public function new()
 	{
-		controls.isInSubstate = true;
+		Funkin.controls.isInSubstate = true;
 
 		super();
 
@@ -95,7 +95,7 @@ class NotesSubState extends MusicBeatSubstate
 		var sigh:String;
 		var sighPosX:Int;
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			sigh = "PRESS";
 			sighPosX = 44;
@@ -165,7 +165,7 @@ class NotesSubState extends MusicBeatSubstate
 		var tipY = 660;
 		var tipText:String;
 
-		if (controls.mobileC)
+		if (Funkin.controls.mobileC)
 		{
 			tipText = "Press C to Reset the selected Note Part.";
 			tipY = 0;
@@ -192,22 +192,26 @@ class NotesSubState extends MusicBeatSubstate
 		controllerPointer.alpha = 0.6;
 		add(controllerPointer);
 
-		FlxG.mouse.visible = !controls.controllerMode;
-		controllerPointer.visible = controls.controllerMode;
-		_lastControllerMode = controls.controllerMode;
+		FlxG.mouse.visible = !Funkin.controls.controllerMode;
+		controllerPointer.visible = Funkin.controls.controllerMode;
+		_lastControllerMode = Funkin.controls.controllerMode;
 
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "B_C");
 		touchPad.buttonB.x = FlxG.width - 132;
 		touchPad.buttonC.x = 0;
 		touchPad.buttonC.y = FlxG.height - 135;
+		touchPad.active = false;
+		new FlxTimer().start(0.05, function(tmr:FlxTimer) {
+			touchPad.active = true;
+		});
 		#end
 	}
 
 	function updateTip()
 	{
-		if (!controls.mobileC)
-			tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
+		if (!Funkin.controls.mobileC)
+			tipTxt.text = 'Hold ' + (!Funkin.controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
 	}
 
 	var _storedColor:FlxColor;
@@ -244,12 +248,12 @@ class NotesSubState extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			FlxG.mouse.visible = false;
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			ClientPrefs.saveSettings();
-			controls.isInSubstate = false;
+			Funkin.controls.isInSubstate = false;
 			close();
 			return;
 		}
@@ -258,19 +262,19 @@ class NotesSubState extends MusicBeatSubstate
 
 		// Early controller checking
 		if (FlxG.gamepads.anyJustPressed(ANY))
-			controls.controllerMode = true;
+			Funkin.controls.controllerMode = true;
 		else if (FlxG.mouse.justPressed || FlxG.mouse.deltaViewX != 0 || FlxG.mouse.deltaViewY != 0)
-			controls.controllerMode = false;
+			Funkin.controls.controllerMode = false;
 
 		var changedToController:Bool = false;
-		if (controls.controllerMode != _lastControllerMode)
+		if (Funkin.controls.controllerMode != _lastControllerMode)
 		{
 			// trace('changed controller mode');
-			FlxG.mouse.visible = !controls.controllerMode;
-			controllerPointer.visible = controls.controllerMode;
+			FlxG.mouse.visible = !Funkin.controls.controllerMode;
+			controllerPointer.visible = Funkin.controls.controllerMode;
 
 			// changed to controller mid state
-			if (controls.controllerMode)
+			if (Funkin.controls.controllerMode)
 			{
 				controllerPointer.x = FlxG.mouse.x;
 				controllerPointer.y = FlxG.mouse.y;
@@ -284,7 +288,7 @@ class NotesSubState extends MusicBeatSubstate
 				}
 				// apparently theres no easy way to change mouse position that i know, oh well
 			 */
-			_lastControllerMode = controls.controllerMode;
+			_lastControllerMode = Funkin.controls.controllerMode;
 			updateTip();
 		}
 
@@ -292,7 +296,7 @@ class NotesSubState extends MusicBeatSubstate
 		var analogX:Float = 0;
 		var analogY:Float = 0;
 		var analogMoved:Bool = false;
-		if (controls.controllerMode && (changedToController || FlxG.gamepads.anyInput()))
+		if (Funkin.controls.controllerMode && (changedToController || FlxG.gamepads.anyInput()))
 		{
 			for (gamepad in FlxG.gamepads.getActiveGamepads())
 			{
@@ -305,7 +309,7 @@ class NotesSubState extends MusicBeatSubstate
 			controllerPointer.x = Math.max(0, Math.min(FlxG.width, controllerPointer.x + analogX * 1000 * elapsed));
 			controllerPointer.y = Math.max(0, Math.min(FlxG.height, controllerPointer.y + analogY * 1000 * elapsed));
 		}
-		var controllerPressed:Bool = (controls.controllerMode && controls.ACCEPT);
+		var controllerPressed:Bool = (Funkin.controls.controllerMode && Funkin.controls.ACCEPT);
 
 		if (FlxG.keys.justPressed.CONTROL)
 		{
@@ -370,13 +374,13 @@ class NotesSubState extends MusicBeatSubstate
 			var add:Int = 0;
 			if (analogX == 0 && !changedToController)
 			{
-				if (controls.UI_LEFT_P)
+				if (Funkin.controls.UI_LEFT_P)
 					add = -1;
-				else if (controls.UI_RIGHT_P)
+				else if (Funkin.controls.UI_RIGHT_P)
 					add = 1;
 			}
 
-			if (analogY == 0 && !changedToController && (controls.UI_UP_P || controls.UI_DOWN_P))
+			if (analogY == 0 && !changedToController && (Funkin.controls.UI_UP_P || Funkin.controls.UI_DOWN_P))
 			{
 				onModeColumn = !onModeColumn;
 				modeBG.visible = onModeColumn;
@@ -494,7 +498,6 @@ class NotesSubState extends MusicBeatSubstate
 			}
 			else if (pointerY() >= hexTypeLine.y && pointerY() < hexTypeLine.y + hexTypeLine.height && Math.abs(pointerX() - 1000) <= 84)
 			{
-				FlxG.stage.window.textInputEnabled = true;
 				hexTypeNum = 0;
 				for (letter in alphabetHex.letters)
 				{
@@ -514,7 +517,7 @@ class NotesSubState extends MusicBeatSubstate
 		// holding
 		if (holdingOnObj != null)
 		{
-			if (FlxG.mouse.justReleased || (controls.controllerMode && controls.justReleased('accept')))
+			if (FlxG.mouse.justReleased || (Funkin.controls.controllerMode && Funkin.controls.justReleased('accept')))
 			{
 				holdingOnObj = null;
 				_storedColor = getShaderColor();
@@ -548,7 +551,7 @@ class NotesSubState extends MusicBeatSubstate
 				}
 			}
 		}
-		else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end controls.RESET && hexTypeNum < 0)
+		else if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonC.justPressed || #end Funkin.controls.RESET && hexTypeNum < 0)
 		{
 			if (FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER))
 			{
@@ -576,28 +579,28 @@ class NotesSubState extends MusicBeatSubstate
 
 	function pointerOverlaps(obj:Dynamic)
 	{
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 			return FlxG.mouse.overlaps(obj);
 		return FlxG.overlap(controllerPointer, obj);
 	}
 
 	function pointerX():Float
 	{
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 			return FlxG.mouse.x;
 		return controllerPointer.x;
 	}
 
 	function pointerY():Float
 	{
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 			return FlxG.mouse.y;
 		return controllerPointer.y;
 	}
 
 	function pointerFlxPoint():FlxPoint
 	{
-		if (!controls.controllerMode)
+		if (!Funkin.controls.controllerMode)
 			return FlxG.mouse.getViewPosition();
 		return controllerPointer.getScreenPosition();
 	}

@@ -3,7 +3,7 @@ package psychlua;
 #if FEATURE_LUA
 import haxe.Constraints.IMap;
 import psychlua.FunkinLua.State;
-import hxluajit.Types;
+import hxluau.Types;
 
 /**
  * Some borrowed code from hxluajit-wrapper.
@@ -20,7 +20,7 @@ class Convert
 			callbacks.set(name, func);
 
 		Lua.pushstring(l, name);
-		Lua.pushcclosure(l, cpp.Callable.fromStaticFunction(handleCallback), 1);
+		Lua.pushcclosure(l, cpp.Callable.fromStaticFunction(handleCallback), name, 1);
 		Lua.setglobal(l, name);
 	}
 
@@ -47,14 +47,26 @@ class Convert
 				Lua.pushboolean(l, v == true ? 1 : 0);
 			case TObject:
 				final fields:Array<String> = Reflect.fields(v);
-
-				Lua.createtable(l, fields.length, 0);
-
-				for (field in fields)
+				final vx:Dynamic = Reflect.field(v, 'x');
+				final vy:Dynamic = Reflect.field(v, 'y');
+				final vz:Dynamic = Reflect.field(v, 'z');
+				if (fields.length == 3 && vx != null && vy != null && vz != null
+						&& (Type.typeof(vx) == TFloat || Type.typeof(vx) == TInt)
+						&& (Type.typeof(vy) == TFloat || Type.typeof(vy) == TInt)
+						&& (Type.typeof(vz) == TFloat || Type.typeof(vz) == TInt))
 				{
-					Lua.pushstring(l, field);
-					toLua(l, Reflect.field(v, field));
-					Lua.settable(l, -3);
+					Lua.pushvector(l, cast(vx, Float), cast(vy, Float), cast(vz, Float));
+				}
+				else
+				{
+					Lua.createtable(l, fields.length, 0);
+
+					for (field in fields)
+					{
+						Lua.pushstring(l, field);
+						toLua(l, Reflect.field(v, field));
+						Lua.settable(l, -3);
+					}
 				}
 			case TClass(String):
 				Lua.pushstring(l, cast(v, String));
@@ -69,7 +81,7 @@ class Convert
 					toLua(l, elements[i]);
 					Lua.settable(l, -3);
 				}
-			case TClass(IMap):
+			case TClass(_) if (Std.isOfType(v, IMap)):
 				final map:IMap<Dynamic, Dynamic> = cast v;
 
 				Lua.createtable(l, 0, Lambda.count(map));
@@ -83,7 +95,7 @@ class Convert
 			case TNull:
 				Lua.pushnil(l);
 			default:
-				// trace('toLua: ${Type.typeof(v)}');
+				//trace('toLua: ${Type.typeof(v)}');
 				Lua.pushnil(l);
 				return false;
 		}
@@ -105,7 +117,22 @@ class Convert
 			case type if (type == Lua.TTABLE):
 				ret = convertTable(l, idx);
 			case type if (type == Lua.TFUNCTION):
-				ret = new LuaFunction(cpp.Pointer.fromRaw(l), LuaL.ref(l, Lua.REGISTRYINDEX));
+				ret = new LuaFunction(cpp.Pointer.fromRaw(l), Lua.ref(l, idx));
+			case type if (type == Lua.TINTEGER):
+				var isInteger:Int = 0;
+				final i64:haxe.Int64 = Lua.tointeger64(l, idx, cpp.Pointer.addressOf(isInteger).raw);
+				ret = i64.high * 4294967296.0 + ((i64.low < 0) ? i64.low + 4294967296.0 : i64.low);
+			case type if (type == Lua.TVECTOR):
+				final vec:cpp.RawConstPointer<Single> = Lua.tovector(l, idx);
+				if (vec != null)
+					ret = {x: (vec[0] : Float), y: (vec[1] : Float), z: (vec[2] : Float)};
+				else
+					ret = null;
+			case type if (type == Lua.TBUFFER):
+				var size:cpp.SizeT = 0;
+				var sizePtr = cpp.Pointer.addressOf(size);
+				var bufPtr:cpp.RawPointer<cpp.Void> = Lua.tobuffer(l, idx, sizePtr.raw);
+				ret = bufPtr != null ? cpp.Pointer.fromRaw(bufPtr) : null;
 			case type if (type == Lua.TUSERDATA || type == Lua.TLIGHTUSERDATA):
 				ret = cpp.Pointer.fromRaw(Lua.touserdata(l, idx));
 			case type if (type == Lua.TNIL):
@@ -127,7 +154,8 @@ class Convert
 
 		if (status != Lua.OK)
 		{
-			var error = Lua.tostring(l, -1);
+			final rawErr = Lua.tostring(l, -1);
+			final error:String = rawErr != null ? rawErr.toString() : 'Unknown error';
 			trace('Error calling a function without name: $error');
 			Lua.pop(l, 1);
 
@@ -154,35 +182,39 @@ class Convert
 		var isArray:Bool = true;
 
 		var count:Int = 0;
+		var maxIndex:Int = 0;
 
 		iterateTable(l, idx, function():Void
 		{
+			count++;
+
 			if (isArray)
 			{
 				if (Lua.type(l, -2) == Lua.TNUMBER)
 				{
-					final index:Lua_Integer = Lua.tointeger(l, -2);
+					final key:Float = Lua.tonumber(l, -2);
+					final index:Int = Std.int(key);
 
-					if (index < 0)
+					if (index < 1 || index != key) // not a positive whole number
 						isArray = false;
+					else if (index > maxIndex)
+						maxIndex = index;
 				}
 				else
 					isArray = false;
 			}
-
-			count++;
 		});
 
 		if (count == 0)
 			return {};
 
-		if (isArray)
+		if (isArray && maxIndex == count)
 		{
 			final obj:Array<Dynamic> = [];
 
 			iterateTable(l, idx, function():Void
 			{
-				obj[Lua.tointeger(l, -2) - 1] = fromLua(l, -1);
+				obj[Std.int(Lua.tonumber(l, -2)) - 1] = fromLua(l, -1);
 			});
 
 			return obj;

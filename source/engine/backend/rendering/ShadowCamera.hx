@@ -1,7 +1,7 @@
 package backend.rendering;
 
 import animate.internal.RenderTexture;
-import flash.geom.ColorTransform;
+import openfl.geom.ColorTransform;
 import flixel.FlxCamera;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxFrame;
@@ -55,12 +55,8 @@ class ShadowCamera extends FlxCamera
 
 	static inline function get_hasKhronosExtension():Bool
 	{
-		#if android
-		return false;
-		#else
 		@:privateAccess
 		return OpenGLRenderer.__complexBlendsSupported ?? false;
-		#end
 	}
 
 	/**

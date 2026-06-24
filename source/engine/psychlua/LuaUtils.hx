@@ -1,6 +1,7 @@
 package psychlua;
 
 import backend.WeekData;
+import backend.scripting.ScriptResult;
 import objects.Character;
 import objects.Note;
 import openfl.display.BlendMode;
@@ -20,11 +21,16 @@ typedef LuaTweenOptions =
 
 class LuaUtils
 {
-	public static final Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";
-	public static final Function_Continue:Dynamic = "##PSYCHLUA_FUNCTIONCONTINUE";
-	public static final Function_StopLua:Dynamic = "##PSYCHLUA_FUNCTIONSTOPLUA";
-	public static final Function_StopHScript:Dynamic = "##PSYCHLUA_FUNCTIONSTOPHSCRIPT";
-	public static final Function_StopAll:Dynamic = "##PSYCHLUA_FUNCTIONSTOPALL";
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_Stop:Dynamic = ScriptResult.Stop;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_Continue:Dynamic = ScriptResult.Continue;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopLua:Dynamic = ScriptResult.StopLua;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopHScript:Dynamic = ScriptResult.StopHScript;
+	@:deprecated("Use ScriptResult enum instead")
+	public static final Function_StopAll:Dynamic = ScriptResult.StopAll;
 
 	public static function getLuaTween(options:Dynamic)
 	{
@@ -187,6 +193,24 @@ class LuaUtils
 		#else
 		FlxG.log.warn('getModSetting: "$saveTag" could not be found inside $modName\'s settings!');
 		#end
+		#end
+		return null;
+	}
+
+	public static function setModSetting(saveTag:String, value:Dynamic, ?modName:String = null)
+	{
+		#if FEATURE_MODS
+		if (FlxG.save.data.modSettings == null)
+			FlxG.save.data.modSettings = new Map<String, Dynamic>();
+
+		var settings:Map<String, Dynamic> = FlxG.save.data.modSettings.get(modName);
+		if (settings == null)
+			settings = new Map<String, Dynamic>();
+
+		settings.set(saveTag, value);
+		FlxG.save.data.modSettings.set(modName, settings);
+		FlxG.save.flush();
+		return value;
 		#end
 		return null;
 	}
@@ -645,6 +669,12 @@ class LuaUtils
 				return "table";
 			case type if (type == Lua.TFUNCTION):
 				return "function";
+			case type if (type == Lua.TINTEGER):
+				return "integer";
+			case type if (type == Lua.TVECTOR):
+				return "vector";
+			case type if (type == Lua.TBUFFER):
+				return "buffer";
 			case type if (type <= Lua.TNIL):
 				return "nil";
 		}

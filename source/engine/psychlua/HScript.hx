@@ -1,18 +1,22 @@
 package psychlua;
 
-import flixel.FlxBasic;
-import objects.Character;
+import backend.scripting.ScriptResult;
 import psychlua.LuaUtils;
-import psychlua.CustomSubstate;
 #if FEATURE_LUA
 import psychlua.FunkinLua;
 #end
 #if FEATURE_HSCRIPT
-import tea.SScript;
+import hscript.SScript;
+import hscript.SScript.FunctionCall;
 
 class HScript extends SScript
 {
 	public var modFolder:String;
+	public static var sharedStaticVariables:Map<String, Dynamic> = new Map();
+	public static var sharedCustomClasses:Map<String, hscript.CustomClassHandler> = new Map();
+	#if FEATURE_HSCRIPT
+	//var __importedPaths:Array<String> = [];
+	#end
 
 	#if FEATURE_LUA
 	public var parentLua:FunkinLua;
@@ -48,7 +52,7 @@ class HScript extends SScript
 
 	public var origin:String;
 
-	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
+	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?sharedPublicVars:Map<String, Dynamic> = null)
 	{
 		if (file == null)
 			file = '';
@@ -79,6 +83,46 @@ class HScript extends SScript
 			#end
 		}
 
+		interp.allowStaticVariables = interp.allowPublicVariables = true;
+		if (sharedPublicVars != null)
+			interp.publicVariables = sharedPublicVars;
+		interp.staticVariables = sharedStaticVariables;
+		interp.customClasses = sharedCustomClasses;
+		/*interp.importFailedCallback = function(cl:Array<String>, ?asName:String):Bool
+		{
+			var pathStr = cl.join("/");
+			for (ext in ['hx', 'hscript', 'hxs', 'hxc'])
+			{
+				var target = pathStr + "." + ext;
+				var found:String = null;
+				#if FEATURE_MODS
+				var modPath = Paths.modFolders(target);
+				if (modPath != null && FileSystem.exists(modPath))
+					found = modPath;
+				#end
+				if (found == null)
+				{
+					var sharedPath = Paths.getSharedPath(target);
+					if (sharedPath != null && FileSystem.exists(sharedPath))
+						found = sharedPath;
+				}
+				if (found != null)
+				{
+					if (__importedPaths.contains(found)) return true;
+					var code = File.getContent(found);
+					if (code == null || code.trim() == "") return true;
+					try
+					{
+						var expr = parser.parseString(code, found);
+						interp.expr(expr);
+						__importedPaths.push(found);
+						return true;
+					}
+					catch (e:Dynamic) {}
+				}
+			}
+			return false;
+		};*/
 		preset();
 		execute();
 
@@ -102,24 +146,48 @@ class HScript extends SScript
 		set('FlxTween', flixel.tweens.FlxTween);
 		set('FlxEase', flixel.tweens.FlxEase);
 		set('FlxColor', CustomFlxColor);
+		set('FlxTypedGroup', flixel.group.FlxGroup.FlxTypedGroup);
+		set('FlxSpriteGroup', flixel.group.FlxSpriteGroup);
+		set('FlxSound', flixel.sound.FlxSound);
+		set('FlxBasic', flixel.FlxBasic);
+		set('FlxObject', flixel.FlxObject);
+		set('FlxSubState', flixel.FlxSubState);
+		set('FlxRandom', flixel.math.FlxRandom);
+		set('FlxSave', flixel.util.FlxSave);
 		set('Countdown', backend.BaseStage.Countdown);
-		set('PlayState', PlayState);
-		set('Paths', Paths);
-		set('CoolUtil', CoolUtil);
-		set('StorageUtil', StorageUtil);
-		set('Conductor', Conductor);
-		set('ClientPrefs', ClientPrefs);
-		set('Character', Character);
-		set('Alphabet', Alphabet);
+		set('PlayState', states.PlayState);
+		set('MusicBeatState', backend.MusicBeatState);
+		set('MusicBeatSubstate', backend.MusicBeatSubstate);
+		set('Paths', backend.Paths);
+		set('CoolUtil', backend.CoolUtil);
+		set('StorageUtil', mobile.backend.StorageUtil);
+		set('Conductor', backend.Conductor);
+		set('ClientPrefs', backend.ClientPrefs);
+		set('Character', objects.Character);
+		set('Alphabet', objects.Alphabet);
 		set('Note', objects.Note);
 		set('NoteSplash', objects.NoteSplash);
 		set('SustainSplash', objects.SustainSplash);
-		set('CustomSubstate', CustomSubstate);
-		#if !flash
+		set('StrumNote', objects.StrumNote);
+		set('HealthIcon', objects.HealthIcon);
+		set('Bar', objects.Bar);
+		set('AttachedSprite', objects.AttachedSprite);
+		set('AttachedText', objects.AttachedText);
+		set('CheckboxThingie', objects.CheckboxThingie);
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
-		#end
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
+		set('ScriptedState', psychlua.ScriptedState);
+		set('ScriptedSubState', psychlua.ScriptedSubState);
+		set('Mods', backend.Mods);
+		set('Difficulty', backend.Difficulty);
+		set('Highscore', backend.Highscore);
+		set('Controls', backend.Controls);
+		set('Song', backend.Song);
+		set('Section', backend.Section);
+		set('StageData', backend.StageData);
+		set('WeekData', backend.WeekData);
+		set('InputFormatter', backend.InputFormatter);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
@@ -161,6 +229,19 @@ class HScript extends SScript
 				modName = this.modFolder;
 			}
 			return LuaUtils.getModSetting(saveTag, modName);
+		});
+		set('setModSetting', function(saveTag:String, value:Dynamic, ?modName:String = null)
+		{
+			if (modName == null)
+			{
+				if (this.modFolder == null)
+				{
+					FunkinLua.getCurrentMusicState().addTextToDebug('setModSetting: Argument #3 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					return null;
+				}
+				modName = this.modFolder;
+			}
+			return LuaUtils.setModSetting(saveTag, value, modName);
 		});
 
 		// Keyboard & Gamepads
@@ -333,26 +414,28 @@ class HScript extends SScript
 		set('controls', Controls.instance);
 
 		set('buildTarget', LuaUtils.getBuildTarget());
-		set('customSubstate', CustomSubstate.instance);
-		set('customSubstateName', CustomSubstate.name);
 
-		set('Function_Stop', LuaUtils.Function_Stop);
-		set('Function_Continue', LuaUtils.Function_Continue);
-		set('Function_StopLua', LuaUtils.Function_StopLua); // doesnt do much cuz HScript has a lower priority than Lua
-		set('Function_StopHScript', LuaUtils.Function_StopHScript);
-		set('Function_StopAll', LuaUtils.Function_StopAll);
+		set('Function_Stop', ScriptResult.Stop);
+		set('Function_Continue', ScriptResult.Continue);
+		set('Function_StopLua', ScriptResult.StopLua); // doesnt do much cuz HScript has a lower priority than Lua
+		set('Function_StopHScript', ScriptResult.StopHScript);
+		set('Function_StopAll', ScriptResult.StopAll);
 
 		set('add', FlxG.state.add);
 		set('insert', FlxG.state.insert);
 		set('remove', FlxG.state.remove);
 
-		if (FunkinLua.getCurrentMusicState() is PlayState)
+		var curState = FunkinLua.getCurrentMusicState();
+		if (curState != null)
 		{
-			set('addBehindGF', PlayState.instance.addBehindGF);
-			set('addBehindDad', PlayState.instance.addBehindDad);
-			set('addBehindBF', PlayState.instance.addBehindBF);
+			if (curState is PlayState)
+			{
+				set('addBehindGF', PlayState.instance.addBehindGF);
+				set('addBehindDad', PlayState.instance.addBehindDad);
+				set('addBehindBF', PlayState.instance.addBehindBF);
+			}
+			setSpecialObject(curState, false, curState.scripts.instancesExclude);
 		}
-		setSpecialObject(FunkinLua.getCurrentMusicState(), false, FunkinLua.getCurrentMusicState().instancesExclude);
 
 		if (varsToBring != null)
 		{
@@ -367,7 +450,7 @@ class HScript extends SScript
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):TeaCall
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -403,7 +486,7 @@ class HScript extends SScript
 		return callValue;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):TeaCall
+	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):FunctionCall
 	{
 		if (funcToRun == null)
 			return null;
@@ -418,7 +501,7 @@ class HScript extends SScript
 			{
 				#if FEATURE_HSCRIPT
 				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				final retVal:TeaCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				final retVal:FunctionCall = funk.hscript.executeCode(funcToRun, funcArgs);
 				if (retVal != null)
 				{
 					if (retVal.succeeded)
@@ -496,6 +579,12 @@ class HScript extends SScript
 		});
 	}
 	#end
+
+	override public function stop():Void
+	{
+		super.stop();
+		#if FEATURE_LUA parentLua = null; #end
+	}
 
 	override public function destroy()
 	{

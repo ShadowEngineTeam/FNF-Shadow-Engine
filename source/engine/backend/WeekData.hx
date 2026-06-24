@@ -1,7 +1,5 @@
 package backend;
 
-import openfl.utils.Assets as OpenFlAssets;
-
 typedef WeekFile =
 {
 	// JSON variables
@@ -16,7 +14,7 @@ typedef WeekFile =
 	var hiddenUntilUnlocked:Bool;
 	var hideStoryMode:Bool;
 	var hideFreeplay:Bool;
-	var difficulties:String;
+	var difficulties:Array<Diff>;
 }
 
 class WeekData
@@ -38,7 +36,7 @@ class WeekData
 	public var hiddenUntilUnlocked:Bool;
 	public var hideStoryMode:Bool;
 	public var hideFreeplay:Bool;
-	public var difficulties:String;
+	public var difficulties:Array<Diff>;
 
 	public var fileName:String;
 
@@ -60,7 +58,7 @@ class WeekData
 			hiddenUntilUnlocked: false,
 			hideStoryMode: false,
 			hideFreeplay: false,
-			difficulties: ''
+			difficulties: ['']
 		};
 		return weekFile;
 	}

@@ -307,7 +307,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			ClientPrefs.toggleVolumeKeys(true);
 			if (FlxG.keys.justPressed.ESCAPE #if android || FlxG.android.justPressed.BACK #end #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+				Funkin.switchState(states.editors.MasterEditorMenu);
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 
@@ -373,7 +373,6 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function onLoadComplete(_):Void
 	{
-		#if sys
 		_file.removeEventListener(Event.COMPLETE, onLoadComplete);
 		_file.removeEventListener(Event.CANCEL, onLoadCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
@@ -406,9 +405,6 @@ class MenuCharacterEditorState extends MusicBeatState
 			}
 		}
 		_file = null;
-		#else
-		trace("File couldn't be loaded! You aren't on Desktop, are you?");
-		#end
 	}
 
 	/**

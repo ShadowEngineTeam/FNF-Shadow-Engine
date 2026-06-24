@@ -7,7 +7,6 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets;
 import backend.Song;
 import backend.Section;
-import animate.FlxAnimate;
 
 typedef CharacterFile =
 {
@@ -38,6 +37,12 @@ typedef AnimArray =
 	var offsets:Array<Int>;
 	@:optional
 	var isFrameLabel:Bool;
+	@:optional
+	var isAnimate:Null<Bool>;
+	@:optional
+	var flipX:Null<Bool>;
+	@:optional
+	var flipY:Null<Bool>;
 }
 
 enum CharacterSpriteType
@@ -84,6 +89,7 @@ class Character extends FlxAnimate
 
 	// Used on Character Editor
 	public var imageFile:String = '';
+	public var imageFiles:Array<String> = [];
 	public var jsonScale:Float = 1;
 	public var noAntialiasing:Bool = false;
 	public var originalFlipX:Bool = false;
@@ -133,7 +139,7 @@ class Character extends FlxAnimate
 
 	override public function isOnScreen(?camera:FlxCamera):Bool
 	{
-		if (spriteType == MULTI_ATLAS)
+		if (isMultiAtlas)
 			return true; // flixel is stoobid
 
 		if (camera == null)
@@ -147,39 +153,92 @@ class Character extends FlxAnimate
 		scale.set(1, 1);
 		updateHitbox();
 
-		if (!(json.image is String))
+		if (json.animations != null && json.animations.length > 0 && json.animations[0].prefix != null)
 		{
-			spriteType = MULTI_ATLAS;
-			isAnimateAtlas = false;
-			isMultiAtlas = true;
-			frames = Paths.getAtlas(json.image[0]);
-			final split:Array<String> = json.image;
-			if (frames != null)
-				for (imgFile in split)
+			trace('V-Slice character JSON detected for character ' + curCharacter);
+
+			if (json.assetPath != null)
+			{
+				var cleanPath:String = json.assetPath;
+				if (cleanPath.startsWith('shared:'))
+					cleanPath = cleanPath.substring(7);
+
+				json.image = cleanPath;
+			}
+
+			if (json.flipX != null)
+				json.flip_x = json.flipX;
+			if (json.cameraOffsets != null)
+				json.camera_position = json.cameraOffsets;
+			if (json.singTime != null)
+				json.sing_duration = json.singTime;
+			if (json.isPixel != null)
+				json.no_antialiasing = json.isPixel;
+
+			if (json.healthIcon != null && json.healthIcon.id != null)
+				json.healthicon = json.healthIcon.id;
+
+			if (json.offsets != null)
+				json.position = json.offsets;
+
+			if (json.animations != null)
+			{
+				var anims:Array<Dynamic> = (json.animations : Array<Dynamic>);
+				var newAnims:Array<Dynamic> = new Array<Dynamic>();
+				var assetPaths:Array<String> = [];
+
+				for (a in anims)
 				{
-					final daAtlas = Paths.getAtlas(imgFile);
-					if (daAtlas != null)
-						cast(frames, flixel.graphics.frames.FlxAtlasFrames).addAtlas(daAtlas);
+					var na:Dynamic = {
+						anim: (a.name != null && a.name != '') ? a.name : (a.anim != null ? a.anim : ''),
+						name: (a.prefix != null && a.prefix != '') ? a.prefix : (a.animation != null ? a.animation : ''),
+						fps: (a.frameRate != null) ? a.frameRate : (a.fps != null ? a.fps : 24),
+						loop: (a.looped != null) ? a.looped : (a.loop != null ? a.loop : false),
+						indices: (a.frameIndices != null) ? a.frameIndices : (a.indices != null ? a.indices : []),
+						offsets: (a.offsets != null) ? a.offsets : [0, 0]
+					};
+
+					if (a.assetPath != null)
+					{
+						var cleanPath:String = a.assetPath;
+						if (cleanPath.startsWith('shared:'))
+							cleanPath = cleanPath.substring(7);
+						if (assetPaths.indexOf(cleanPath) < 0)
+							assetPaths.push(cleanPath);
+					}
+
+					newAnims.push(na);
 				}
-			imageFile = json.image[0];
+
+				json.animations = newAnims;
+
+				if (assetPaths.length > 0)
+				{
+					var imgs:Array<String> = [];
+					if (json.image is String)
+						imgs.push(json.image);
+					else if (json.image != null)
+						imgs = imgs.concat(json.image);
+					for (p in assetPaths)
+						if (imgs.indexOf(p) < 0)
+							imgs.push(p);
+					json.image = imgs;
+				}
+			}
 		}
+
+		var images:Array<String>;
+		if (json.image is String)
+			images = [json.image];
 		else
-		{
-			if (!Paths.fileExists('images/${haxe.io.Path.withExtension(json.image, 'png')}', IMAGE))
-			{
-				spriteType = TEXTURE_ATLAS;
-				isAnimateAtlas = true;
-				isMultiAtlas = false;
-				frames = Paths.getTextureAtlas(json.image);
-			}
-			else
-			{
-				spriteType = SPRITE;
-				isMultiAtlas = isAnimateAtlas = false;
-				frames = Paths.getAtlas(json.image);
-			}
-			imageFile = json.image;
-		}
+			images = json.image;
+		frames = Paths.getMixedAtlas(images);
+
+		isAnimateAtlas = (frames is FlxAnimateFrames);
+		isMultiAtlas = images.length > 1;
+		spriteType = isAnimateAtlas ? TEXTURE_ATLAS : (isMultiAtlas ? MULTI_ATLAS : SPRITE);
+		imageFiles = images;
+		imageFile = images[0];
 
 		jsonScale = json.scale;
 		if (json.scale != 1)
@@ -211,35 +270,7 @@ class Character extends FlxAnimate
 		{
 			for (anim in animationsArray)
 			{
-				var animAnim:String = '' + anim.anim;
-				var animName:String = '' + anim.name;
-				var animFps:Int = anim.fps;
-				var animLoop:Bool = !!anim.loop; // bruh?
-				var animIndices:Array<Int> = anim.indices;
-
-				switch (spriteType)
-				{
-					case TEXTURE_ATLAS:
-						if (anim.isFrameLabel)
-						{
-							if (animIndices != null && animIndices.length > 0)
-								this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop);
-							else
-								this.anim.addByFrameLabel(animAnim, animName, animFps, animLoop);
-						}
-						else
-						{
-							if (animIndices != null && animIndices.length > 0)
-								this.anim.addBySymbolIndices(animAnim, animName, animIndices, animFps, animLoop);
-							else
-								this.anim.addBySymbol(animAnim, animName, animFps, animLoop);
-						}
-					default:
-						if (animIndices != null && animIndices.length > 0)
-							this.anim.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
-						else
-							this.anim.addByPrefix(animAnim, animName, animFps, animLoop);
-				}
+				addAnimByType(anim);
 
 				if (anim.offsets != null && anim.offsets.length > 1)
 					addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
@@ -455,9 +486,72 @@ class Character extends FlxAnimate
 
 	public function quickAnimAdd(name:String, anim:String)
 	{
-		if (spriteType == TEXTURE_ATLAS)
+		if (isAnimateAtlas && (!isMultiAtlas || symbolExists(name)))
 			this.anim.addBySymbol(name, name, 24, false);
 		else
 			this.anim.addByPrefix(name, anim, 24, false);
+	}
+
+	public function addAnimByType(anim:AnimArray):Void
+	{
+		var animAnim:String = '' + anim.anim;
+		var animName:String = '' + anim.name;
+		var animFps:Int = anim.fps;
+		var animLoop:Bool = !!anim.loop; // bruh?
+		var animIndices:Array<Int> = anim.indices;
+
+		var asAnimate:Bool;
+		if (anim.isAnimate != null)
+			asAnimate = (anim.isAnimate == true) && isAnimateAtlas;
+		else if (anim.isFrameLabel == true)
+			asAnimate = isAnimateAtlas;
+		else if (!isMultiAtlas)
+			asAnimate = isAnimateAtlas;
+		else
+			asAnimate = isAnimateAtlas && symbolExists(animName);
+
+		if (asAnimate)
+		{
+			if (anim.isFrameLabel == true)
+			{
+				if (animIndices != null && animIndices.length > 0)
+					this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop);
+				else
+					this.anim.addByFrameLabel(animAnim, animName, animFps, animLoop);
+			}
+			else
+			{
+				if (animIndices != null && animIndices.length > 0)
+					this.anim.addBySymbolIndices(animAnim, animName, animIndices, animFps, animLoop);
+				else
+					this.anim.addBySymbol(animAnim, animName, animFps, animLoop);
+			}
+		}
+		else
+		{
+			if (animIndices != null && animIndices.length > 0)
+				this.anim.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
+			else
+				this.anim.addByPrefix(animAnim, animName, animFps, animLoop);
+		}
+
+		if (anim.flipX != null || anim.flipY != null)
+		{
+			var theAnim = animation.getByName(animName);
+			if (theAnim != null)
+			{
+				if (anim.flipX != null)
+					theAnim.flipX = anim.flipX == true;
+				if (anim.flipY != null)
+					theAnim.flipY = anim.flipY == true;
+			}
+		}
+	}
+
+	public function symbolExists(name:String):Bool
+	{
+		if (!(frames is FlxAnimateFrames))
+			return false;
+		return cast(frames, FlxAnimateFrames).getSymbol(name) != null;
 	}
 }

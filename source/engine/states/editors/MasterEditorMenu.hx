@@ -81,48 +81,48 @@ class MasterEditorMenu extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_UP_P)
+		if (Funkin.controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (Funkin.controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
 		#if FEATURE_MODS
-		if (controls.UI_LEFT_P)
+		if (Funkin.controls.UI_LEFT_P)
 		{
 			changeDirectory(-1);
 		}
-		if (controls.UI_RIGHT_P)
+		if (Funkin.controls.UI_RIGHT_P)
 		{
 			changeDirectory(1);
 		}
 		#end
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
-			MusicBeatState.switchState(new MainMenuState());
+			Funkin.switchState(MainMenuState);
 		}
 
-		if (controls.ACCEPT)
+		if (Funkin.controls.ACCEPT)
 		{
 			switch (options[curSelected])
 			{
 				case 'Chart Editor': // felt it would be cool maybe
-					LoadingState.loadAndSwitchState(new ChartingState(), false);
+					LoadingState.loadAndSwitchState(ChartingState, false);
 				case 'Character Editor':
-					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
+					LoadingState.loadAndSwitchState(CharacterEditorState, [Character.DEFAULT_CHARACTER, false]);
 				case 'Week Editor':
-					MusicBeatState.switchState(new WeekEditorState());
+					Funkin.switchState(WeekEditorState);
 				case 'Menu Character Editor':
-					MusicBeatState.switchState(new MenuCharacterEditorState());
+					Funkin.switchState(MenuCharacterEditorState);
 				case 'Dialogue Editor':
-					LoadingState.loadAndSwitchState(new DialogueEditorState(), false);
+					LoadingState.loadAndSwitchState(DialogueEditorState, false);
 				case 'Dialogue Portrait Editor':
-					LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), false);
+					LoadingState.loadAndSwitchState(DialogueCharacterEditorState, false);
 				case 'Note Splash Debug':
-					MusicBeatState.switchState(new NoteSplashDebugState());
+					Funkin.switchState(NoteSplashDebugState);
 			}
 			FlxG.sound.music.volume = 0;
 			FreeplayState.destroyFreeplayVocals();

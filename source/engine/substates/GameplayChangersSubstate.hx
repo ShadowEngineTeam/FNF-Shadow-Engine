@@ -36,7 +36,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		}
 		optionsArray.push(option);
 
-		#if FLX_PITCH
 		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
@@ -45,7 +44,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		option.displayFormat = '%vX';
 		option.decimals = 2;
 		optionsArray.push(option);
-		#end
 
 		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
 		option.scrollSpeed = 2.5;
@@ -148,16 +146,16 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
-		if (controls.UI_UP_P)
+		if (Funkin.controls.UI_UP_P)
 		{
 			changeSelection(-1);
 		}
-		if (controls.UI_DOWN_P)
+		if (Funkin.controls.UI_DOWN_P)
 		{
 			changeSelection(1);
 		}
 
-		if (controls.BACK)
+		if (Funkin.controls.BACK)
 		{
 			ClientPrefs.saveSettings();
 			close();
@@ -174,7 +172,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 			if (usesCheckbox)
 			{
-				if (controls.ACCEPT)
+				if (Funkin.controls.ACCEPT)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'));
 					curOption.setValue((curOption.getValue() == true) ? false : true);
@@ -184,9 +182,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			}
 			else
 			{
-				if (controls.UI_LEFT || controls.UI_RIGHT)
+				if (Funkin.controls.UI_LEFT || Funkin.controls.UI_RIGHT)
 				{
-					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
+					var pressed = (Funkin.controls.UI_LEFT_P || Funkin.controls.UI_RIGHT_P);
 					if (holdTime > 0.5 || pressed)
 					{
 						if (pressed)
@@ -194,7 +192,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 							var add:Dynamic = null;
 							if (curOption.type != 'string')
 							{
-								add = controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
+								add = Funkin.controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
 							}
 
 							switch (curOption.type)
@@ -219,7 +217,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 								case 'string':
 									var num:Int = curOption.curOption; // lol
-									if (controls.UI_LEFT_P)
+									if (Funkin.controls.UI_LEFT_P)
 										--num;
 									else
 										num++;
@@ -265,7 +263,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 						else if (curOption.type != 'string')
 						{
 							holdValue = Math.max(curOption.minValue,
-								Math.min(curOption.maxValue, holdValue + curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1)));
+								Math.min(curOption.maxValue, holdValue + curOption.scrollSpeed * elapsed * (Funkin.controls.UI_LEFT ? -1 : 1)));
 
 							switch (curOption.type)
 							{
@@ -287,13 +285,13 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 						holdTime += elapsed;
 					}
 				}
-				else if (controls.UI_LEFT_R || controls.UI_RIGHT_R)
+				else if (Funkin.controls.UI_LEFT_R || Funkin.controls.UI_RIGHT_R)
 				{
 					clearHold();
 				}
 			}
 
-			if (controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
+			if (Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonC.justPressed #end)
 			{
 				for (i in 0...optionsArray.length)
 				{
@@ -346,7 +344,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (option.type == 'percent')
 			val *= 100;
 		var def:Dynamic = option.defaultValue;
-		option.text = text.replace('%v', val).replace('%d', def);
+		option.text = text.replace('%v', Std.string(val)).replace('%d', Std.string(def));
 	}
 
 	function clearHold()
