@@ -19,7 +19,7 @@ import sys.FileStat;
 #include <vector>
 #include <string>
 ')
-@:cppNamespaceCode('
+@:cppNamespaceCode('''
 static const std::string& getBundleResourcePath()
 {
 	static std::string cached;
@@ -192,7 +192,7 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 			while ((entry = readdir(dir)) != NULL)
 			{
 				const char* name = entry->d_name;
-				if (name[0] == '.' && (name[1] == 0 || (name[1] == '.' && name[2] == 0)))
+				if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))
 					continue;
 				names.push_back(name);
 			}
@@ -234,7 +234,7 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 	anon->Add(HX_CSTRING("mode"),  mode);
 	return anon;
 }
-')
+''')
 @:headerClassCode('
 	static bool native_exists(::String path);
 	static ::String native_getContent(::String file);
