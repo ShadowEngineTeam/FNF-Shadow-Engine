@@ -101,6 +101,7 @@ class FileSystem
 		if (SysFileSystem.exists(cwd(path)))
 			return SysFileSystem.stat(cwd(path));
 		#end
+		return null;
 		#else
 		#if mobile
 		if (MobileAssets.exists(path))
