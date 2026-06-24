@@ -20,7 +20,7 @@
 - Added TITLE_IOS
 - Added iOS simulator building (main only)
 - Enabled hxdiscord_rpc IO thread
-- Updated hxluau, ShadowScript, lime, hxcpp refs
+- Updated some haxelib refs
 - Updated gamemode config
 - Updated touchpad assets
 
