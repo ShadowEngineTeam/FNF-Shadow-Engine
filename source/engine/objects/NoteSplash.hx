@@ -2,7 +2,7 @@ package objects;
 
 import shaders.ColorSwap;
 import shaders.RGBPalette;
-import shaders.PixelSplashShader.PixelSplashShaderRef;
+
 import flixel.graphics.frames.FlxFrame;
 
 using backend.CoolUtil;
@@ -18,7 +18,7 @@ typedef NoteSplashConfig =
 class NoteSplash extends FlxSprite
 {
 	public var colorSwap:ColorSwap = null;
-	public var rgbShader:PixelSplashShaderRef;
+	public var rgbShader:RGBPalette;
 
 	private var idleAnim:String;
 	private var _textureLoaded:String = null;
@@ -48,7 +48,7 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			rgbShader = new PixelSplashShaderRef();
+			rgbShader = new RGBPalette();
 			shader = rgbShader.shader;
 		}
 
