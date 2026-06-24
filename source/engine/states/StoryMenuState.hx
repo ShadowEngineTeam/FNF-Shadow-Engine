@@ -357,7 +357,7 @@ class StoryMenuState extends MusicBeatState
 		callOnScripts('onChangeDifficulty');
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
-		var diff:String = Difficulty.list[curDifficulty];
+		var diff:String = Difficulty.diffToString(Difficulty.list[curDifficulty]);
 		var diffPath:String = 'menudifficulties/' + Paths.formatToSongPath(diff);
 		var spriteSheetExists:Bool = Paths.fileExists('images/menudifficulties/$diff.xml', TEXT);
 

@@ -425,7 +425,7 @@ class FreeplayState extends MusicBeatState
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
 
-		final diffStr:String = Difficulty.getByIndex(curDifficulty);
+		final diffStr:String = Difficulty.diffToString(Difficulty.getByIndex(curDifficulty));
 		diffText.text = Difficulty.list.length > 1 ? '< ${diffStr.toUpperCase()} >' : diffStr.toUpperCase();
 
 		positionHighscore();

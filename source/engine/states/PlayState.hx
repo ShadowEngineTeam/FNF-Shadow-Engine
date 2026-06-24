@@ -323,7 +323,7 @@ class PlayState extends MusicBeatState
 			noteSkin = Note.defaultNoteSkin;
 
 		#if FEATURE_DISCORD_RPC
-		storyDifficultyText = Difficulty.getByIndex();
+		storyDifficultyText = Difficulty.diffToString(Difficulty.getByIndex());
 
 		if (isStoryMode)
 			detailsText = "Story Mode: " + WeekData.getCurrentWeek().weekName;

@@ -14,7 +14,7 @@ typedef WeekFile =
 	var hiddenUntilUnlocked:Bool;
 	var hideStoryMode:Bool;
 	var hideFreeplay:Bool;
-	var difficulties:Array<Diff>;
+	var difficulties:Array<String>;
 }
 
 class WeekData
@@ -36,7 +36,7 @@ class WeekData
 	public var hiddenUntilUnlocked:Bool;
 	public var hideStoryMode:Bool;
 	public var hideFreeplay:Bool;
-	public var difficulties:Array<Diff>;
+	public var difficulties:Array<String>;
 
 	public var fileName:String;
 
