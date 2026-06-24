@@ -256,8 +256,8 @@ jobs:
       - name: Publish The Release
         uses: softprops/action-gh-release@v3.0.0
         with:
-          name: "0.9.0"
-          tag_name: "0.9.0"
+          name: "0.10.0"
+          tag_name: "0.10.0"
           prerelease: false
           files: |
             /home/runner/*.apk

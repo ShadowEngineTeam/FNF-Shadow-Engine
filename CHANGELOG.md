@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 - Unreleased
 
 - New framerate design (moveable, behind cursor)
 - Overhauled custom classes/states support, added state redirect
