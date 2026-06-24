@@ -192,7 +192,7 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 			while ((entry = readdir(dir)) != NULL)
 			{
 				const char* name = entry->d_name;
-				if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))
+				if (name[0] == '.' && (name[1] == 0 || (name[1] == '.' && name[2] == 0)))
 					continue;
 				names.push_back(name);
 			}
