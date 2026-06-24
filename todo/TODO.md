@@ -1,6 +1,6 @@
 - Switch Game Res from 720p to 1080p(?)
 - Rewrite Paths
-- Add hxfmod
+- Add hxfmod(?)
 - Add ShadowLua and Deprecate PsychLua (OOP Lua)
 - Add V-Slice Menus(?) and Wide Screen Support
 - Add editors for V-Slice Menus(?)
@@ -9,4 +9,4 @@
 - Rewrite the Input System(?)
 - HSV Note Skin Textures
 - Rewrite Source with Null Safety and Haxe 4.3 features(?) 
-- Find Artist for our Credits icon and GitHub banner
+- Find Artist for our Credits icons
