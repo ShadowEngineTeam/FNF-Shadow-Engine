@@ -4,7 +4,6 @@ package objects;
 
 import shaders.ColorSwap;
 import shaders.RGBPalette;
-import shaders.PixelSplashShader.PixelSplashShaderRef;
 
 using backend.CoolUtil;
 
@@ -29,11 +28,11 @@ class SustainSplash extends FlxSprite
 	public var targetStrumTime(default, null):Float;
 	public var mustPress(default, null):Bool = true;
 	public var colorSwap:ColorSwap;
-	public var rgbShaders(default, null):Array<Array<PixelSplashShaderRef>> = [[], []];
+	public var rgbShaders(default, null):Array<Array<RGBPalette>> = [[], []];
 
 	private var curTexture:String = null;
 	private var reachedEnd:Bool = false;
-	private var rgbShader:PixelSplashShaderRef;
+	private var rgbShader:RGBPalette;
 
 	public static function init(group:FlxTypedGroup<SustainSplash>, startCrochet:Float, frameRate:Int):Void
 	{
@@ -199,7 +198,7 @@ class SustainSplash extends FlxSprite
 			{
 				if (rgbShaders[shaderID][noteData] == null)
 				{
-					rgbShader = new PixelSplashShaderRef();
+					rgbShader = new RGBPalette();
 					rgbShaders[shaderID][noteData] = rgbShader;
 				}
 

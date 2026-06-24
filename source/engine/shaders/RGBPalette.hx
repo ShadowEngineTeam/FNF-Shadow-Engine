@@ -45,6 +45,19 @@ class RGBPalette
 		b = 0xFF0000FF;
 		mult = 1.0;
 	}
+
+	public function copyValues(from:RGBPalette):Void
+	{
+		if (from != null)
+		{
+			r = from.r;
+			g = from.g;
+			b = from.b;
+			mult = from.mult;
+		}
+		else
+			mult = 0;
+	}
 }
 
 // automatic handler for easy usability
@@ -135,8 +148,6 @@ class RGBShaderReference
 class RGBPaletteShader extends FlxShader
 {
 	@:glFragmentHeader('
-		#pragma header
-		
 		uniform vec3 r;
 		uniform vec3 g;
 		uniform vec3 b;
