@@ -245,6 +245,9 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 ')
 class Assets
 {
+	public static function init():Void {}
+	public static function destroy():Void {}
+
 	public static function getContent(file:String):String
 	{
 		final content:String = __getContent(file);
