@@ -272,7 +272,7 @@ class LoadingState extends MusicBeatState
 
 	public static function clearInvalids()
 	{
-		clearInvalidFrom(imagesToPrepare, 'images', ['.png'], IMAGE); // leaving this as is
+		clearInvalidFrom(imagesToPrepare, 'images', ['png'], IMAGE); // leaving this as is
 		// clearInvalidFrom(imagesToPrepare, 'images', ['.${Paths.IMAGE_EXT}'], Paths.IMAGE_ASSETTYPE);
 		clearInvalidFrom(soundsToPrepare, 'sounds', Paths.SOUND_EXTS, SOUND);
 		clearInvalidFrom(musicToPrepare, 'music', Paths.SOUND_EXTS, SOUND);
@@ -310,7 +310,7 @@ class LoadingState extends MusicBeatState
 			var valid:Bool = false;
 			for (ext in exts)
 			{
-				var myKey = '$prefix/$member$ext';
+				var myKey = '$prefix/$member.$ext';
 				if (Paths.fileExists(myKey, type, false, library))
 				{
 					valid = true;
