@@ -389,7 +389,7 @@ class HScript extends SScript
 			}
 			catch (e:Dynamic)
 			{
-				var msg:String = e.message.substr(0, e.message.indexOf('\n'));
+				var msg:String = e.details().substr(0, e.details().indexOf('\n'));
 				#if FEATURE_LUA
 				if (parentLua != null)
 				{
@@ -532,7 +532,7 @@ class HScript extends SScript
 			{
 				var e = callValue.exceptions[0];
 				if (e != null)
-					FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false,
+					FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.details().substr(0, e.details().indexOf('\n')), false,
 						false, FlxColor.RED);
 				return null;
 			}

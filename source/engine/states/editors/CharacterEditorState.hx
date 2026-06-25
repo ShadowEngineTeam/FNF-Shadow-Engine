@@ -1672,7 +1672,12 @@ class CharacterEditorState extends MusicBeatState
 	function saveCharacter()
 	{
 		if (_file != null)
-			return;
+		{
+			_file.removeEventListener(Event.COMPLETE, onSaveComplete);
+			_file.removeEventListener(Event.CANCEL, onSaveCancel);
+			_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file = null;
+		}
 
 		var imageValue:Dynamic = (character.imageFiles != null && character.imageFiles.length > 1) ? character.imageFiles : character.imageFile;
 		var json:Dynamic = {

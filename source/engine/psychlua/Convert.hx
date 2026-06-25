@@ -332,7 +332,7 @@ class Convert
 		}
 		catch (e:Dynamic)
 		{
-			LuaL.error(l, 'CALLBACK ERROR! ${if (e.message != null) e.message else e}');
+			LuaL.error(l, 'CALLBACK ERROR! ${if (e.details() != null) e.details() else e}');
 			return 0;
 		}
 

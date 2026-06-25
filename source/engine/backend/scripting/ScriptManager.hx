@@ -123,7 +123,7 @@ class ScriptManager
 				{
 					var e = callValue.exceptions[0];
 					if (e != null)
-						state.addTextToDebug('ERROR (${callValue.calledFunction}) - ' + e.message, FlxColor.RED);
+						state.addTextToDebug('ERROR (${callValue.calledFunction}) - ' + e.details(), FlxColor.RED);
 				}
 				else
 				{
@@ -291,7 +291,7 @@ class ScriptManager
 					for (e in callValue.exceptions)
 					{
 						if (e != null)
-							state.addTextToDebug('ERROR ($file: onCreate) - ${e.message}', FlxColor.RED);
+							state.addTextToDebug('ERROR ($file: onCreate) - ${e.details()}', FlxColor.RED);
 					}
 					newScript.destroy();
 					hscriptArray.remove(newScript);
@@ -300,7 +300,7 @@ class ScriptManager
 		}
 		catch (e)
 		{
-			state.addTextToDebug('ERROR - ' + e.message, FlxColor.RED);
+			state.addTextToDebug('ERROR - ' + e.details(), FlxColor.RED);
 			var old = cast(SScript.global.get(file), HScript);
 			if (old != null)
 			{
