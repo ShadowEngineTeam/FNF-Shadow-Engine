@@ -70,6 +70,7 @@ class Difficulty
 			case HARD: return "hard";
 			case ERECT: return "erect";
 			case NIGHTMARE: return "nightmare";
+			case CUSTOM(name): return name;
 		}
 	}
 
@@ -82,7 +83,7 @@ class Difficulty
 			case "hard": return HARD;
 			case "erect": return ERECT;
 			case "nightmare": return NIGHTMARE;
-			default: return NORMAL;
+			default: return CUSTOM(str);
 		}
 	}
 }
@@ -94,4 +95,5 @@ enum Diff
 	HARD;
 	ERECT;
 	NIGHTMARE;
+	CUSTOM(name:String);
 }
