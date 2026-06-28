@@ -3,6 +3,7 @@ package backend;
 import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
+import objects.Note;
 import states.TitleState;
 
 // Add a variable here and it will get automatically saved
@@ -54,6 +55,12 @@ import states.TitleState;
 		[0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
 	];
 
+	// per-mania note colours for every supported key count except 4 (which uses arrowRGB above).
+	// kept empty here and filled lazily (see ClientPrefs.getArrowRGB / loadPrefs) so this struct can be
+	// constructed during static init, before objects.Note's own statics are ready.
+	public var arrowRGBMap:Map<String, Array<Array<FlxColor>>> = new Map<String, Array<Array<FlxColor>>>();
+	public var arrowRGBPixelMap:Map<String, Array<Array<FlxColor>>> = new Map<String, Array<Array<FlxColor>>>();
+
 	public var ghostTapping:Bool = true;
 	public var timeBarType:String = 'Time Left';
 	public var scoreZoom:Bool = true;
@@ -81,7 +88,9 @@ import states.TitleState;
 		'instakill' => false,
 		'practice' => false,
 		'botplay' => false,
-		'opponentplay' => false
+		'opponentplay' => false,
+		'mania' => '(Chart)',
+		'scrollspeedbymania' => false
 	];
 
 	public var comboOffset:Array<Int> = [0, 0, 0, 0];
@@ -116,6 +125,48 @@ class ClientPrefs
 		'note_left' => [D, LEFT],
 		'note_down' => [F, DOWN],
 		'note_right' => [K, RIGHT],
+
+		// MULTIKEY / MANIA lane binds (4k uses note_left/down/up/right above)
+		'5k_note_1' => [D],
+		'5k_note_2' => [F],
+		'5k_note_3' => [G, SPACE],
+		'5k_note_4' => [J],
+		'5k_note_5' => [K],
+
+		'6k_note_1' => [S],
+		'6k_note_2' => [D],
+		'6k_note_3' => [F],
+		'6k_note_4' => [J],
+		'6k_note_5' => [K],
+		'6k_note_6' => [L],
+
+		'7k_note_1' => [S],
+		'7k_note_2' => [D],
+		'7k_note_3' => [F],
+		'7k_note_4' => [G, SPACE],
+		'7k_note_5' => [J],
+		'7k_note_6' => [K],
+		'7k_note_7' => [L],
+
+		'8k_note_1' => [A],
+		'8k_note_2' => [S],
+		'8k_note_3' => [D],
+		'8k_note_4' => [F],
+		'8k_note_5' => [H],
+		'8k_note_6' => [J],
+		'8k_note_7' => [K],
+		'8k_note_8' => [L],
+
+		'9k_note_1' => [A],
+		'9k_note_2' => [S],
+		'9k_note_3' => [D],
+		'9k_note_4' => [F],
+		'9k_note_5' => [G, SPACE],
+		'9k_note_6' => [H],
+		'9k_note_7' => [J],
+		'9k_note_8' => [K],
+		'9k_note_9' => [L],
+
 		'ui_up' => [W, UP],
 		'ui_left' => [A, LEFT],
 		'ui_down' => [S, DOWN],
@@ -137,6 +188,48 @@ class ClientPrefs
 		'note_left' => [DPAD_LEFT, X],
 		'note_down' => [DPAD_DOWN, A],
 		'note_right' => [DPAD_RIGHT, B],
+
+		// MULTIKEY / MANIA lane binds
+		'5k_note_1' => [DPAD_LEFT, X],
+		'5k_note_2' => [DPAD_DOWN, A],
+		'5k_note_3' => [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'5k_note_4' => [DPAD_UP, Y],
+		'5k_note_5' => [DPAD_RIGHT, B],
+
+		'6k_note_1' => [DPAD_LEFT],
+		'6k_note_2' => [DPAD_DOWN],
+		'6k_note_3' => [DPAD_RIGHT],
+		'6k_note_4' => [X],
+		'6k_note_5' => [Y],
+		'6k_note_6' => [B],
+
+		'7k_note_1' => [DPAD_LEFT],
+		'7k_note_2' => [DPAD_DOWN],
+		'7k_note_3' => [DPAD_RIGHT],
+		'7k_note_4' => [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'7k_note_5' => [X],
+		'7k_note_6' => [Y],
+		'7k_note_7' => [B],
+
+		'8k_note_1' => [DPAD_LEFT],
+		'8k_note_2' => [DPAD_DOWN],
+		'8k_note_3' => [DPAD_UP],
+		'8k_note_4' => [DPAD_RIGHT],
+		'8k_note_5' => [X],
+		'8k_note_6' => [A],
+		'8k_note_7' => [Y],
+		'8k_note_8' => [B],
+
+		'9k_note_1' => [DPAD_LEFT],
+		'9k_note_2' => [DPAD_DOWN],
+		'9k_note_3' => [DPAD_UP],
+		'9k_note_4' => [DPAD_RIGHT],
+		'9k_note_5' => [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'9k_note_6' => [X],
+		'9k_note_7' => [A],
+		'9k_note_8' => [Y],
+		'9k_note_9' => [B],
+
 		'ui_up' => [DPAD_UP, LEFT_STICK_DIGITAL_UP],
 		'ui_left' => [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT],
 		'ui_down' => [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN],
@@ -232,6 +325,20 @@ class ClientPrefs
 			if (key != 'gameplaySettings' && Reflect.hasField(FlxG.save.data, key))
 				Reflect.setField(data, key, Reflect.field(FlxG.save.data, key));
 
+		// eagerly populate the per-mania colour caches now that objects.Note is initialised
+		data.arrowRGBMap ??= new Map<String, Array<Array<FlxColor>>>();
+		data.arrowRGBPixelMap ??= new Map<String, Array<Array<FlxColor>>>();
+		for (keys in Note.maniaKeysList)
+		{
+			if (keys == 4)
+				continue;
+			var key:String = '${keys}k';
+			if (!data.arrowRGBMap.exists(key))
+				data.arrowRGBMap.set(key, genArrowColors(keys, false));
+			if (!data.arrowRGBPixelMap.exists(key))
+				data.arrowRGBPixelMap.set(key, genArrowColors(keys, true));
+		}
+
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 
 		if (FlxG.save.data.framerate == null)
@@ -276,15 +383,16 @@ class ClientPrefs
 			if (save.data.keyboard != null)
 			{
 				var loadedControls:Map<String, Array<FlxKey>> = save.data.keyboard;
+				// also accept mania lane binds ('<keys>k_note_<n>'), which aren't all in the default map
 				for (control => keys in loadedControls)
-					if (keyBinds.exists(control))
+					if (keyBinds.exists(control) || control.indexOf('k_note_') > -1)
 						keyBinds.set(control, keys);
 			}
 			if (save.data.gamepad != null)
 			{
 				var loadedControls:Map<String, Array<FlxGamepadInputID>> = save.data.gamepad;
 				for (control => keys in loadedControls)
-					if (gamepadBinds.exists(control))
+					if (gamepadBinds.exists(control) || control.indexOf('k_note_') > -1)
 						gamepadBinds.set(control, keys);
 			}
 			#if FEATURE_MOBILE_CONTROLS
@@ -300,8 +408,22 @@ class ClientPrefs
 		}
 	}
 
-	inline public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic
+	public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic
 	{
+		if (data.gameplaySettings.get('scrollspeedbymania') == true && (name == 'scrollspeed' || name == 'scrolltype'))
+		{
+			var perMania:Dynamic = getGameplaySetting(name + '_' + Note.maniaKeys + 'k');
+			if (perMania != null)
+				return perMania;
+			switch (name)
+			{
+				case 'scrollspeed':
+					return 1.0;
+				case 'scrolltype':
+					return 'multiplicative';
+			}
+		}
+
 		if (!customDefaultValue)
 			defaultValue = defaultData.gameplaySettings.get(name);
 		return /*PlayState.isStoryMode ? defaultValue : */ (data.gameplaySettings.exists(name) ? data.gameplaySettings.get(name) : defaultValue);
@@ -320,5 +442,67 @@ class ClientPrefs
 		FlxG.sound.muteKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.muteKeys : [];
 		FlxG.sound.volumeDownKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeDownKeys : [];
 		FlxG.sound.volumeUpKeys = (turnOn && !Controls.instance.mobileC) ? TitleState.volumeUpKeys : [];
+	}
+
+	public static function getArrowRGB(?pixel:Bool = false):Array<Array<FlxColor>>
+	{
+		if (Note.maniaKeys == 4)
+			return pixel ? data.arrowRGBPixel : data.arrowRGB;
+
+		var map:Map<String, Array<Array<FlxColor>>> = pixel ? data.arrowRGBPixelMap : data.arrowRGBMap;
+		var key:String = Note.maniaKeys + 'k';
+
+		if (map == null)
+		{
+			map = new Map<String, Array<Array<FlxColor>>>();
+			if (pixel)
+				data.arrowRGBPixelMap = map;
+			else
+				data.arrowRGBMap = map;
+		}
+
+		// generate + cache this key count's colours on first use (Note is guaranteed ready by now)
+		if (!map.exists(key))
+			map.set(key, genArrowColors(Note.maniaKeys, pixel));
+		return map.get(key);
+	}
+
+	public static function genArrowColors(keys:Int, ?isPixel:Bool = false):Array<Array<FlxColor>>
+	{
+		var colColors:Map<String, Array<FlxColor>> = isPixel ? [
+			'purple' => [0xFFE276FF, 0xFFFFF9FF, 0xFF60008D],
+			'blue' => [0xFF3DCAFF, 0xFFF4FFFF, 0xFF003060],
+			'odd' => [0xFFFFE600, 0xFFFFF5F0, 0xFF754D10],
+			'green' => [0xFF71E300, 0xFFF6FFE6, 0xFF003100],
+			'red' => [0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
+		] : [
+			'purple' => [0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
+			'blue' => [0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7],
+			'odd' => [0xFFFFE600, 0xFFFFFFFF, 0xFF754D10],
+			'green' => [0xFF12FA05, 0xFFFFFFFF, 0xFF0A4447],
+			'red' => [0xFFF9393F, 0xFFFFFFFF, 0xFF651038]
+		];
+
+		var fallback:Array<FlxColor> = [0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF];
+		var arr:Array<Array<FlxColor>> = [];
+		var colArray:Array<String> = Note.getColArrayFromKeys(false, keys);
+		for (key in 0...keys)
+		{
+			var color:Null<Array<FlxColor>> = colColors.get(colArray[key]);
+			arr.push(color != null ? color : fallback);
+		}
+		return arr;
+	}
+
+	public static function genArrowColorsExtraMap(?isPixel:Bool = false):Map<String, Array<Array<FlxColor>>>
+	{
+		var map:Map<String, Array<Array<FlxColor>>> = new Map<String, Array<Array<FlxColor>>>();
+		for (keys in Note.maniaKeysList)
+		{
+			if (keys == 4)
+				continue;
+			map.set('${keys}k', genArrowColors(keys, isPixel));
+		}
+		return map;
 	}
 }

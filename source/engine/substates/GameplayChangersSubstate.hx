@@ -2,6 +2,7 @@ package substates;
 
 import objects.AttachedText;
 import objects.CheckboxThingie;
+import objects.Note;
 import flixel.addons.transition.FlxTransitionableState;
 
 class GameplayChangersSubstate extends MusicBeatSubstate
@@ -65,6 +66,10 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', 'bool', false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', 'bool', false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', 'bool', false));
+
+		// MULTIKEY / MANIA: '(Chart)' keeps the song's native key count, anything else remaps the chart on load
+		optionsArray.push(new GameplayOption('Mania', 'mania', 'string', '(Chart)', ['(Chart)'].concat(Note.maniaKeysStringList)));
+		optionsArray.push(new GameplayOption('Scroll Speed By Mania', 'scrollspeedbymania', 'bool', false));
 	}
 
 	public function getOptionByName(name:String)

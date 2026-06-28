@@ -118,7 +118,8 @@ class SustainSplash extends FlxSprite
 		this.targetStrumTime = targetStrumTime;
 		this.mustPress = mustPress;
 		this.reachedEnd = false;
-		this.visible = true;
+		// hold splashes only ship 4-lane assets, so suppress them for other key counts
+		this.visible = (Note.maniaKeys == 4);
 
 		initRGBShader();
 

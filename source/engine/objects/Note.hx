@@ -89,6 +89,92 @@ class Note extends FlxSkewedSprite
 	public static var SUSTAIN_SIZE:Int = 44;
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
+
+	// MULTIKEY / MANIA
+	// the key counts that count towards leaderboards/ranked play
+	public static var rankedManiaKeysList:Array<Int> = [4, 5, 6, 7, 8, 9];
+	// every supported key count (lane amount)
+	public static var maniaKeysList:Array<Int> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 20, 21, 26, 50, 55, 61];
+	public static var maniaKeysStringList:Array<String> = [for (keys in maniaKeysList) '${keys}k'];
+
+	// the currently active lane amount; rebuilds colArray on change
+	public static var maniaKeys(default, set):Int = 4;
+
+	static function set_maniaKeys(value:Int):Int
+	{
+		maniaKeys = (maniaKeysList.contains(value) ? value : 4);
+		colArray = getColArrayFromKeys();
+		return value;
+	}
+
+	// note/strum graphics shrink as the lane count grows so wide manias still fit on screen
+	public static var swagScaledWidth(get, never):Float;
+
+	static function get_swagScaledWidth():Float
+		return swagWidth * noteScale;
+
+	public static var noteScale(get, default):Float = 1;
+
+	static function get_noteScale():Float
+		return (swagWidth * 4) / (swagWidth * Math.max(4, maniaKeys)) * (1 + (0.1 * (Math.min(9, Math.max(4, maniaKeys)) - 4)));
+
+	public static function getNoteOffsetX():Float
+		return (swagScaledWidth / 30.0) * (Math.min(9, Math.max(4, maniaKeys)) - 4);
+
+	/**
+	 * Maps each lane index to a colour/direction token for the current (or given) key count.
+	 * Tokens: `purple`(LEFT) `blue`(DOWN) `green`(UP) `red`(RIGHT) `odd`(5th/centre lane).
+	 * @param regularOnly collapses `odd` to `green` for skins that lack an ODD frame.
+	**/
+	public static function getColArrayFromKeys(?regularOnly:Bool = false, ?keys:Null<Int> = null):Array<String>
+	{
+		keys ??= Note.maniaKeys;
+		var specialCol:String = regularOnly ? 'green' : 'odd';
+		switch (keys)
+		{
+			case 5:
+				return ['purple', 'blue', specialCol, 'green', 'red'];
+			case 6:
+				return ['purple', 'blue', 'red', 'purple', 'green', 'red'];
+			case 7:
+				return ['purple', 'blue', 'red', specialCol, 'purple', 'green', 'red'];
+			case 8:
+				return ['purple', 'blue', 'green', 'red', 'purple', 'blue', 'green', 'red'];
+			case 9:
+				return ['purple', 'blue', 'green', 'red', specialCol, 'purple', 'blue', 'green', 'red'];
+			case 2:
+				return ['purple', 'red'];
+			case 3:
+				return ['purple', specialCol, 'red'];
+			default:
+				{
+					var isOdd:Bool = keys % 2 != 0;
+					var arr:Array<String> = [];
+					var ki:Int = 0;
+					for (key in 0...keys)
+					{
+						if (isOdd && key == Std.int(keys / 2))
+						{
+							arr.push(specialCol);
+							ki = 0;
+							continue;
+						}
+						arr.push(['purple', 'blue', 'green', 'red'][ki % 4]);
+						ki++;
+					}
+					return arr;
+				}
+		}
+	}
+
+	/** Base 0-3 slot for a colour token (used for pixel frame indices and splash anim ids). **/
+	public static function colToIndex(col:String):Int
+	{
+		if (col == 'odd')
+			return Note.colArray.contains('odd') ? 0 : 1;
+		return ['purple', 'blue', 'green', 'red'].indexOf(col);
+	}
+
 	public static var defaultNoteSkin(get, never):String;
 
 	public static var usePixelTextures(default, set):Null<Bool>;
@@ -208,11 +294,10 @@ class Note extends FlxSkewedSprite
 
 	public function defaultRGB()
 	{
-		var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[noteData];
-		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-			arr = ClientPrefs.data.arrowRGBPixel[noteData];
+		var colors:Array<Array<FlxColor>> = PlayState.isPixelStage.priorityBool(usePixelTextures) ? ClientPrefs.getArrowRGB(true) : ClientPrefs.getArrowRGB();
+		var arr:Array<FlxColor> = (noteData > -1 && noteData < colors.length) ? colors[noteData] : null;
 
-		if (noteData > -1 && noteData <= arr.length)
+		if (arr != null && arr.length >= 3)
 		{
 			rgbShader.r = arr[0];
 			rgbShader.g = arr[1];
@@ -224,12 +309,15 @@ class Note extends FlxSkewedSprite
 	{
 		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
 		if (ClientPrefs.data.disableRGBNotes)
+		{
+			// arrowHSV is only configured for the first 4 lanes; extra mania lanes simply get no tint
 			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
 			{
 				colorSwap.hue = noteSplashHue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
 				colorSwap.saturation = noteSplashSaturation = ClientPrefs.data.arrowHSV[noteData][1] / 100;
 				colorSwap.brightness = noteSplashBrightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
 			}
+		}
 		else
 			defaultRGB();
 
@@ -339,7 +427,7 @@ class Note extends FlxSkewedSprite
 					rgbShader.enabled = false;
 			}
 
-			x += swagWidth * (noteData);
+			x += swagScaledWidth * (noteData);
 			if (!isSustainNote && noteData < colArray.length) // Doing this 'if' check to fix the warnings on Senpai songs
 			{
 				var animToPlay:String = '';
@@ -410,8 +498,9 @@ class Note extends FlxSkewedSprite
 			var newRGB:RGBPalette = new RGBPalette();
 			globalRgbShaders[noteData] = newRGB;
 
-			var arr:Array<FlxColor> = (!PlayState.isPixelStage.priorityBool(usePixelTextures)) ? ClientPrefs.data.arrowRGB[noteData] : ClientPrefs.data.arrowRGBPixel[noteData];
-			if (noteData > -1 && noteData <= arr.length)
+			var colors:Array<Array<FlxColor>> = (!PlayState.isPixelStage.priorityBool(usePixelTextures)) ? ClientPrefs.getArrowRGB() : ClientPrefs.getArrowRGB(true);
+			var arr:Array<FlxColor> = (noteData > -1 && noteData < colors.length) ? colors[noteData] : null;
+			if (arr != null && arr.length >= 3)
 			{
 				newRGB.r = arr[0];
 				newRGB.g = arr[1];
@@ -458,37 +547,55 @@ class Note extends FlxSkewedSprite
 		if (Paths.fileExists(fullPath + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 
-		var graphic:FlxGraphic;
+		// rebuild the lane->colour map for the current key count before we resolve animations
+		Note.colArray = Note.getColArrayFromKeys();
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 		{
-			var imgPath = 'pixelUI/' + skinPixel + (skinPostfix != '' ? skinPostfix : '');
+			var imgPath:String = 'pixelUI/' + skinPixel + (skinPostfix != '' ? skinPostfix : '');
+			var graphic:Null<FlxGraphic> = null;
 			if (isSustainNote)
 			{
 				graphic = Paths.image(imgPath + 'ENDS');
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
-				originalHeight = graphic.height / 2;
+				if (graphic != null)
+				{
+					loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
+					originalHeight = graphic.height / 2;
+				}
 			}
-			else
+			else if (colArray[noteData] == 'odd')
 			{
+				graphic = Paths.image(imgPath + '_ODD');
+				if (graphic != null)
+					loadGraphic(graphic, true, Math.floor(graphic.width), Math.floor(graphic.height / 5));
+			}
+
+			if (graphic == null)
+			{
+				// no ODD sheet for this skin: fall back to the regular (odd->green) lane mapping
+				Note.colArray = getColArrayFromKeys(true);
 				graphic = Paths.image(imgPath);
 				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
 			}
 
-			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom * noteScale));
 			loadPixelNoteAnims();
 			antialiasing = false;
 
 			if (isSustainNote)
 			{
 				offsetX += _lastNoteOffX;
-				_lastNoteOffX = (width - 7) * (PlayState.daPixelZoom / 2);
+				_lastNoteOffX = (width - 7) * (PlayState.daPixelZoom / 2) * noteScale;
 				offsetX -= _lastNoteOffX;
 			}
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas(skin);
+			frames = Paths.getSparrowAtlas(skin + (colArray[noteData] == 'odd' ? '_ODD' : ''));
+			if (frames == null && colArray[noteData] == 'odd')
+				Note.colArray = getColArrayFromKeys(true);
+			if (frames == null)
+				frames = Paths.getSparrowAtlas(skin);
 			loadNoteAnims();
 			if (!isSustainNote)
 			{
@@ -525,19 +632,20 @@ class Note extends FlxSkewedSprite
 		else
 			animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
 
-		setGraphicSize(Std.int(width * 0.7));
+		setGraphicSize(Std.int(width * 0.7 * noteScale));
 		updateHitbox();
 	}
 
 	function loadPixelNoteAnims()
 	{
+		// pixel sheets only have 4 (or 5 w/ ODD) columns, so map the lane colour back to a base frame index
 		if (isSustainNote)
 		{
-			animation.add(colArray[noteData] + 'holdend', [noteData + 4], 24, true);
-			animation.add(colArray[noteData] + 'hold', [noteData], 24, true);
+			animation.add(colArray[noteData] + 'holdend', [colToIndex(colArray[noteData]) + 4], 24, true);
+			animation.add(colArray[noteData] + 'hold', [colToIndex(colArray[noteData])], 24, true);
 		}
 		else
-			animation.add(colArray[noteData] + 'Scroll', [noteData + 4], 24, true);
+			animation.add(colArray[noteData] + 'Scroll', [colToIndex(colArray[noteData]) + 4], 24, true);
 	}
 
 	function attemptToAddAnimationByPrefix(name:String, prefix:String, framerate:Float = 24, doLoop:Bool = true)
@@ -612,14 +720,14 @@ class Note extends FlxSkewedSprite
 				{
 					y -= PlayState.daPixelZoom * 9.5;
 				}
-				y -= (frameHeight * scale.y) - (Note.swagWidth / 2);
+				y -= (frameHeight * scale.y) - (Note.swagScaledWidth / 2);
 			}
 		}
 	}
 
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
-		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
+		var center:Float = myStrum.y + offsetY + Note.swagScaledWidth / 2;
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
 			var swagRect:FlxRect = clipRect;

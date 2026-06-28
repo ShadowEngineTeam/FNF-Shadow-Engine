@@ -51,6 +51,9 @@ class NotesSubState extends MusicBeatSubstate
 	{
 		Funkin.controls.isInSubstate = true;
 
+		// this editor tweaks the 4-lane base colours, so render previews at 4k regardless of any lingering mania
+		Note.maniaKeys = 4;
+
 		super();
 
 		#if FEATURE_DISCORD_RPC

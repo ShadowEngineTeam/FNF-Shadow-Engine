@@ -2,6 +2,7 @@ package backend;
 
 import openfl.utils.Assets;
 import backend.Section;
+import objects.Note;
 
 typedef SwagSong =
 {
@@ -28,6 +29,10 @@ typedef SwagSong =
 	@:optional var playerArrowSkin:String;
 	@:optional var opponentArrowSkin:String;
 	@:optional var splashSkin:String;
+
+	// MULTIKEY / MANIA: 'keyCount' is the modern lane amount; legacy 'mania' is the old index-based field
+	@:optional var keyCount:Null<Int>;
+	@:optional var mania:Null<Int>;
 
 	@:optional var format:String;
 }
@@ -105,6 +110,46 @@ class Song
 				}
 			}
 		}
+	}
+
+	public static function updateManiaKeys(songData:SwagSong, ?noUpdate:Bool = false):Int
+	{
+		if (songData == null)
+			return noUpdate ? 4 : (Note.maniaKeys = 4);
+
+		var keys:Null<Int> = null;
+
+		if (songData.mania != null)
+		{
+			if (StringTools.startsWith(songData.format ?? '', 'psych_v1') || songData.splashSkin != null)
+				keys = songData.mania + 1;
+			else
+			{
+				switch (songData.mania)
+				{
+					case 0: // 4k
+						keys = 4;
+					case 4: // 5k
+						keys = 5;
+					case 1, 5, 6: // 6k
+						keys = 6;
+					case 2, 7: // 7k
+						keys = 7;
+					case 3, 8: // 9k
+						keys = 9;
+					default:
+						keys = songData.mania;
+				}
+			}
+		}
+
+		if (keys == null && songData.keyCount != null)
+			keys = songData.keyCount;
+
+		if (noUpdate)
+			return keys ?? 4;
+
+		return Note.maniaKeys = keys ?? 4;
 	}
 
 	public function new(song, notes, bpm)

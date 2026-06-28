@@ -98,6 +98,10 @@ class EditorPlayState extends MusicBeatSubstate
 		bg.alpha = 0.9;
 		add(bg);
 
+		// resolve the chart's key count so the editor preview matches the song's mania
+		Note.maniaKeys = Song.updateManiaKeys(PlayState.SONG);
+		keysArray = PlayState.getKeysArray(Note.maniaKeys);
+
 		/**** NOTES ****/
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		add(strumLineNotes);
@@ -406,10 +410,10 @@ class EditorPlayState extends MusicBeatSubstate
 				if (daStrumTime < startPos)
 					continue;
 
-				var daNoteData:Int = Std.int(songNotes[1] % 4);
+				var daNoteData:Int = Std.int(songNotes[1] % Note.maniaKeys);
 				var gottaHitNote:Bool = section.mustHitSection;
 
-				if (songNotes[1] > 3)
+				if (songNotes[1] > Note.maniaKeys - 1)
 				{
 					gottaHitNote = !section.mustHitSection;
 				}
@@ -500,9 +504,19 @@ class EditorPlayState extends MusicBeatSubstate
 
 	private function generateStaticArrows(player:Int):Void
 	{
-		var strumLineX:Float = ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X;
+		var strumWidth:Float = Note.maniaKeys * Note.swagScaledWidth - (Note.getNoteOffsetX() * (Note.maniaKeys - 1));
+		var strumLineX:Float;
+
+		if (ClientPrefs.data.middleScroll)
+			strumLineX = FlxG.width / 2 - strumWidth / 2;
+		else
+		{
+			strumLineX = (FlxG.width / 2 - strumWidth) / 2;
+			strumLineX += (FlxG.width / 2) * (player == 1 ? 1 : 0);
+		}
+
 		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
-		for (i in 0...4)
+		for (i in 0...Note.maniaKeys)
 		{
 			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
@@ -518,20 +532,19 @@ class EditorPlayState extends MusicBeatSubstate
 			babyArrow.downScroll = ClientPrefs.data.downScroll;
 			babyArrow.alpha = targetAlpha;
 
+			if (player < 1 && ClientPrefs.data.middleScroll)
+			{
+				babyArrow.x = strumLineX / 2 - strumWidth / 4;
+				if (i > Note.maniaKeys / 2 - 1)
+					babyArrow.x += strumLineX + strumWidth / 2;
+				if (Note.maniaKeys % 2 != 0 && i == Std.int(Note.maniaKeys / 2))
+					babyArrow.visible = false;
+			}
+
 			if (player == 1)
 				playerStrums.add(babyArrow);
 			else
-			{
-				if (ClientPrefs.data.middleScroll)
-				{
-					babyArrow.x += 310;
-					if (i > 1) // Up and Right
-					{
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
-				}
 				opponentStrums.add(babyArrow);
-			}
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();

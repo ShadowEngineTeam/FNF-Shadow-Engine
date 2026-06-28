@@ -65,10 +65,15 @@ class NoteSplash extends FlxSprite
 	}
 
 	var maxAnims:Int = 2;
+	var regularColArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 
 	public function setupNoteSplash(x:Float, y:Float, direction:Int = 0, ?note:Note = null)
 	{
-		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
+		// map the raw lane index down to a base colour slot (0-3) so multikey notes pick a valid splash anim/colour
+		direction = Note.colToIndex(Note.getColArrayFromKeys(true)[direction % Note.maniaKeys]);
+		regularColArray = Note.getColArrayFromKeys(true);
+
+		setPosition(x - Note.swagScaledWidth * 0.95, y - Note.swagScaledWidth);
 		aliveTime = 0;
 
 		var texture:String = null;
@@ -141,8 +146,11 @@ class NoteSplash extends FlxSprite
 			antialiasing = false;
 
 		_textureLoaded = (PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture;
+		// scale from the unscaled frameWidth (not the already-scaled `width`) so recycled splashes don't compound noteScale
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+			setGraphicSize(Std.int(frameWidth * PlayState.daPixelZoom * Note.noteScale));
+		else
+			setGraphicSize(Std.int(frameWidth * Note.noteScale));
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, maxAnims);
@@ -152,7 +160,7 @@ class NoteSplash extends FlxSprite
 		var maxFps:Int = 26;
 		if (config != null)
 		{
-			var animID:Int = direction + ((animNum - 1) * Note.colArray.length);
+			var animID:Int = direction + ((animNum - 1) * regularColArray.length);
 			// trace('anim: ${animation.curAnim.name}, $animID');
 			var offs:Array<Float> = config.offsets[FlxMath.wrap(animID, 0, config.offsets.length - 1)];
 			offset.x += offs[0];
@@ -165,6 +173,10 @@ class NoteSplash extends FlxSprite
 			offset.x += -58;
 			offset.y += -55;
 		}
+
+		// keep the splash offsets in step with the shrunken note size at higher key counts
+		offset.x *= Note.noteScale;
+		offset.y *= Note.noteScale;
 
 		if (animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
@@ -199,12 +211,13 @@ class NoteSplash extends FlxSprite
 		if (animName == null)
 			animName = config != null ? config.anim : 'note splash';
 
+		var cols:Array<String> = (regularColArray != null) ? regularColArray : Note.getColArrayFromKeys(true);
 		while (true)
 		{
 			var animID:Int = maxAnims + 1;
-			for (i in 0...Note.colArray.length)
+			for (i in 0...cols.length)
 			{
-				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', 24, false))
+				if (!addAnimAndCheck('note$i-$animID', '$animName ${cols[i]} $animID', 24, false))
 				{
 					// trace('maxAnims: $maxAnims');
 					return config;

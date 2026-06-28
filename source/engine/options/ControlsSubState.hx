@@ -4,6 +4,8 @@ import backend.InputFormatter;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import objects.AttachedSprite;
+import objects.Note;
+import states.PlayState;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
@@ -15,39 +17,74 @@ class ControlsSubState extends MusicBeatSubstate
 	var curAlt:Bool = false;
 
 	// Show on gamepad - Display name - Save file key - Rebind display name
-	var options:Array<Dynamic> = [
-		[true, 'NOTES'],
-		[true, 'Left', 'note_left', 'Note Left'],
-		[true, 'Down', 'note_down', 'Note Down'],
-		[true, 'Up', 'note_up', 'Note Up'],
-		[true, 'Right', 'note_right', 'Note Right'],
-		[true],
-		[true, 'UI'],
-		[true, 'Left', 'ui_left', 'UI Left'],
-		[true, 'Down', 'ui_down', 'UI Down'],
-		[true, 'Up', 'ui_up', 'UI Up'],
-		[true, 'Right', 'ui_right', 'UI Right'],
-		[true],
-		[true, 'Reset', 'reset', 'Reset'],
-		[true, 'Accept', 'accept', 'Accept'],
-		[true, 'Back', 'back', 'Back'],
-		[true, 'Pause', 'pause', 'Pause'],
-		[true, 'Fullscreen', 'fullscreen', 'Fullscreen Toggle'],
-		[true, 'FPS Counter', 'fpsCounter', 'FPS Counter Toggle'],
-		[false],
-		[false, 'VOLUME'],
-		[false, 'Mute', 'volume_mute', 'Volume Mute'],
-		[false, 'Up', 'volume_up', 'Volume Up'],
-		[false, 'Down', 'volume_down', 'Volume Down'],
-		[false],
-		[false, 'DEBUG'],
-		[false, 'Key 1', 'debug_1', 'Debug Key #1'],
-		[false, 'Key 2', 'debug_2', 'Debug Key #2']
-	];
+	// built in buildOptions() so the NOTES section can reflect the current key count
+	var options:Array<Dynamic> = [];
 	var curOptions:Array<Int>;
 	var curOptionsValid:Array<Int>;
 
 	static var defaultKey:String = 'Reset to Default Keys';
+	static var switchMania:String = 'Switch Note Mania';
+
+	// (Show on gamepad - Display name - Save file key - Rebind display name)
+	function buildOptions():Void
+	{
+		options = [[true, 'NOTES (${Note.maniaKeys}k)']];
+		if (Note.maniaKeys == 4)
+		{
+			options.push([true, 'Left', 'note_left', 'Note Left']);
+			options.push([true, 'Down', 'note_down', 'Note Down']);
+			options.push([true, 'Up', 'note_up', 'Note Up']);
+			options.push([true, 'Right', 'note_right', 'Note Right']);
+		}
+		else
+		{
+			ensureManiaBinds(Note.maniaKeys);
+			var binds:Array<String> = PlayState.getKeysArray(Note.maniaKeys);
+			for (i in 0...binds.length)
+				options.push([true, 'Note ${i + 1}', binds[i], '${Note.maniaKeys}k Note ${i + 1}']);
+		}
+
+		options.push([true]);
+		options.push([true, 'UI']);
+		options.push([true, 'Left', 'ui_left', 'UI Left']);
+		options.push([true, 'Down', 'ui_down', 'UI Down']);
+		options.push([true, 'Up', 'ui_up', 'UI Up']);
+		options.push([true, 'Right', 'ui_right', 'UI Right']);
+		options.push([true]);
+		options.push([true, 'Reset', 'reset', 'Reset']);
+		options.push([true, 'Accept', 'accept', 'Accept']);
+		options.push([true, 'Back', 'back', 'Back']);
+		options.push([true, 'Pause', 'pause', 'Pause']);
+		options.push([true, 'Fullscreen', 'fullscreen', 'Fullscreen Toggle']);
+		options.push([true, 'FPS Counter', 'fpsCounter', 'FPS Counter Toggle']);
+		options.push([false]);
+		options.push([false, 'VOLUME']);
+		options.push([false, 'Mute', 'volume_mute', 'Volume Mute']);
+		options.push([false, 'Up', 'volume_up', 'Volume Up']);
+		options.push([false, 'Down', 'volume_down', 'Volume Down']);
+		options.push([false]);
+		options.push([false, 'DEBUG']);
+		options.push([false, 'Key 1', 'debug_1', 'Debug Key #1']);
+		options.push([false, 'Key 2', 'debug_2', 'Debug Key #2']);
+
+		// trailing centred actions MUST stay at the end so the bind<->option ID mapping holds
+		options.push([true]);
+		options.push([true, switchMania]);
+		options.push([true]);
+		options.push([true, defaultKey]);
+	}
+
+	// lazily create bind entries for key counts that ship no defaults, so they can be rebound + persist
+	function ensureManiaBinds(keys:Int):Void
+	{
+		for (bind in PlayState.getKeysArray(keys))
+		{
+			if (!ClientPrefs.keyBinds.exists(bind))
+				ClientPrefs.keyBinds.set(bind, [FlxKey.NONE, FlxKey.NONE]);
+			if (!ClientPrefs.gamepadBinds.exists(bind))
+				ClientPrefs.gamepadBinds.set(bind, [FlxGamepadInputID.NONE, FlxGamepadInputID.NONE]);
+		}
+	}
 
 	var bg:FlxSprite;
 	var grpDisplay:FlxTypedGroup<Alphabet>;
@@ -72,9 +109,7 @@ class ControlsSubState extends MusicBeatSubstate
 		DiscordClient.changePresence("Controls Menu", null);
 		#end
 
-		options.push([true]);
-		options.push([true]);
-		options.push([true, defaultKey]);
+		buildOptions();
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = onKeyboardMode ? keyboardColor : gamepadColor;
@@ -146,7 +181,9 @@ class ControlsSubState extends MusicBeatSubstate
 				{
 					var isCentered:Bool = (option.length < 3);
 					var isDefaultKey:Bool = (option[1] == defaultKey);
-					var isDisplayKey:Bool = (isCentered && !isDefaultKey);
+					var isSwitchMania:Bool = (option[1] == switchMania);
+					// defaultKey and switchMania are centred but still selectable actions
+					var isDisplayKey:Bool = (isCentered && !isDefaultKey && !isSwitchMania);
 
 					var text:Alphabet = new Alphabet(200, 300, option[1], !isDisplayKey);
 					text.isMenuItem = true;
@@ -293,6 +330,7 @@ class ControlsSubState extends MusicBeatSubstate
 			if ((FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end) || FlxG.gamepads.anyJustPressed(B))
 			{
 				ClientPrefs.saveSettings();
+				Note.maniaKeys = 4; // don't leak the previewed mania into other menus
 				close();
 				return;
 			}
@@ -318,7 +356,11 @@ class ControlsSubState extends MusicBeatSubstate
 
 			if ((FlxG.keys.justPressed.ENTER #if FEATURE_MOBILE_CONTROLS || touchPad.buttonA.justPressed #end) || FlxG.gamepads.anyJustPressed(START) || FlxG.gamepads.anyJustPressed(A))
 			{
-				if (options[curOptions[curSelected]][1] != defaultKey)
+				if (options[curOptions[curSelected]][1] == switchMania)
+				{
+					cycleMania();
+				}
+				else if (options[curOptions[curSelected]][1] != defaultKey)
 				{
 					bindingBlack = new FlxSprite().makeGraphic(1, 1, /*FlxColor.BLACK*/ FlxColor.WHITE);
 					bindingBlack.scale.set(FlxG.width, FlxG.height);
@@ -536,6 +578,26 @@ class ControlsSubState extends MusicBeatSubstate
 		});
 
 		updateAlt();
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+	}
+
+	function cycleMania():Void
+	{
+		var idx:Int = Note.maniaKeysList.indexOf(Note.maniaKeys);
+		idx = (idx + 1) % Note.maniaKeysList.length;
+		Note.maniaKeys = Note.maniaKeysList[idx];
+
+		buildOptions();
+		createTexts();
+
+		// keep the cursor parked on the mania switcher so repeated presses keep cycling
+		for (i in 0...curOptions.length)
+			if (options[curOptions[i]][1] == switchMania)
+			{
+				curSelected = i;
+				break;
+			}
+		updateText();
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 	}
 

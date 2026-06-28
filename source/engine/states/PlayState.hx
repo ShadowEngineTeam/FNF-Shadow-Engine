@@ -208,7 +208,30 @@ class PlayState extends MusicBeatState
 	// how big to stretch the pixel art assets
 	public static var daPixelZoom:Float = 6;
 
-	private var singAnimations:Array<String> = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
+	// sing animations are rebuilt per key count from the lane->colour map (odd/centre lanes sing UP)
+	private var singAnimations(get, never):Array<String>;
+
+	var _singAnimations:Array<String> = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
+	var _singAnimationsKeys:Int = 4;
+
+	static var _singColDirs:Map<String, String> = [
+		'purple' => 'singLEFT',
+		'blue' => 'singDOWN',
+		'green' => 'singUP',
+		'red' => 'singRIGHT',
+		'odd' => 'singUP'
+	];
+
+	function get_singAnimations():Array<String>
+	{
+		if (Note.maniaKeys == _singAnimationsKeys && _singAnimations != null)
+			return _singAnimations;
+
+		_singAnimationsKeys = Note.maniaKeys;
+		var cols:Array<String> = Note.getColArrayFromKeys();
+		_singAnimations = [for (i in 0...Note.maniaKeys) (_singColDirs.get(cols[i]) ?? 'singUP')];
+		return _singAnimations;
+	}
 
 	public var inCutscene:Bool = false;
 	public var skipCountdown:Bool = false;
@@ -1326,8 +1349,120 @@ class PlayState extends MusicBeatState
 	private var noteTypes:Array<String> = [];
 	private var eventsPushed:Array<String> = [];
 
+	/** Returns the control bind names for each lane of a given key count (4k uses the named note binds). **/
+	public static function getKeysArray(keys:Int):Array<String>
+	{
+		if (keys == 4)
+			return ['note_left', 'note_down', 'note_up', 'note_right'];
+		return [for (i in 0...keys) '${keys}k_note_${i + 1}'];
+	}
+
+	/**
+	 * If the player picked a specific mania in Gameplay Changers, remaps the loaded chart's notes from its
+	 * native key count to the chosen one (ported from Funkin-Psych-Online's multikey conversion algorithm),
+	 * then updates `Note.maniaKeys`. A '(Chart)' selection leaves the chart untouched.
+	**/
+	function applyManiaModifier():Void
+	{
+		var maniaSetting:Dynamic = ClientPrefs.getGameplaySetting('mania');
+		if (!(maniaSetting is String))
+			return;
+
+		var maniaStr:String = cast maniaSetting;
+		if (!Note.maniaKeysStringList.contains(maniaStr))
+			return; // '(Chart)' or unknown: keep the chart's native key count
+
+		var parsed:Null<Int> = Std.parseInt(maniaStr.split('k')[0]);
+		if (parsed == null)
+			return;
+
+		var maniaModifier:Int = parsed;
+		var sourceKeys:Int = Note.maniaKeys;
+		if (maniaModifier == sourceKeys)
+			return;
+
+		// the scaling math divides by (keys - 1); skip degenerate single-lane conversions and keep the chart's count
+		if (sourceKeys <= 1 || maniaModifier <= 1)
+			return;
+
+		// flatten every note across sections, sorted by time
+		var dataNotes:Array<Array<Dynamic>> = [];
+		for (section in SONG.notes)
+			for (note in section.sectionNotes)
+				dataNotes.push(note);
+		haxe.ds.ArraySort.sort(dataNotes, function(a:Array<Dynamic>, b:Array<Dynamic>):Int return Std.int(a[0] - b[0]));
+
+		// build the lane -> lane(s) mapping between the two key counts
+		var friendNotes:Array<Array<Int>> = [];
+		inline function scaleKeyToNew(noteData:Int):Int
+			return Math.round(noteData * ((maniaModifier - 1) / (sourceKeys - 1))) % maniaModifier;
+		inline function scaleKeyBack(noteData:Int):Int
+			return Math.round(noteData * ((sourceKeys - 1) / (maniaModifier - 1))) % sourceKeys;
+
+		if (sourceKeys > maniaModifier)
+		{
+			for (noteData in 0...sourceKeys)
+			{
+				if (friendNotes[noteData] == null)
+					friendNotes[noteData] = [];
+				friendNotes[noteData].push(scaleKeyToNew(noteData));
+			}
+		}
+		else
+		{
+			for (newNoteData in 0...maniaModifier)
+			{
+				var back:Int = scaleKeyBack(newNoteData);
+				if (friendNotes[back] == null)
+					friendNotes[back] = [];
+				friendNotes[back].push(newNoteData);
+			}
+		}
+
+		var notesCount:Array<Int> = [for (_ in 0...sourceKeys * 2) 0];
+		var jackStack:Array<Int> = [-1, -1];
+
+		function nextNoteData(daNoteData:Int, side:Int):Int
+		{
+			var noteMaps:Array<Int> = friendNotes[daNoteData];
+			if (noteMaps == null || noteMaps.length == 0)
+				return daNoteData % maniaModifier;
+
+			var fullIndex:Int = daNoteData + (sourceKeys * side);
+			if (jackStack[side] == -1 || jackStack[side] != daNoteData)
+				notesCount[fullIndex]++;
+			jackStack[side] = daNoteData;
+			return noteMaps[notesCount[fullIndex] % noteMaps.length];
+		}
+
+		for (note in dataNotes)
+		{
+			var raw:Int = Std.int(note[1]);
+			if (raw < 0)
+				continue; // safety: events live elsewhere, but never remap a negative
+
+			var side:Int = Std.int(raw / sourceKeys);
+			var lane:Int = raw % sourceKeys;
+			note[1] = nextNoteData(lane, side) + maniaModifier * side;
+		}
+
+		Note.maniaKeys = maniaModifier;
+	}
+
 	private function generateSong(dataPath:String):Void
 	{
+		// resolve the chart's key count first, then optionally remap it to the player's chosen mania.
+		// (this must run before the scroll-speed calc since "Scroll Speed By Mania" reads Note.maniaKeys)
+		Note.maniaKeys = Song.updateManiaKeys(SONG);
+		applyManiaModifier();
+		keysArray = getKeysArray(Note.maniaKeys);
+		// key counts without default binds would otherwise leave a null bind array and crash input lookups
+		for (key in keysArray)
+			if (!ClientPrefs.keyBinds.exists(key))
+				ClientPrefs.keyBinds.set(key, [FlxKey.NONE, FlxKey.NONE]);
+		strumsBlocked = [for (_ in 0...Note.maniaKeys) false];
+		anas = [for (_ in 0...Note.maniaKeys) null];
+
 		// FlxG.log.add(ChartParser.parse());
 		songSpeed = PlayState.SONG.speed;
 		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
@@ -1411,19 +1546,19 @@ class PlayState extends MusicBeatState
 			for (songNotes in section.sectionNotes)
 			{
 				var daStrumTime:Float = songNotes[0];
-				var daNoteData:Int = Std.int(songNotes[1] % 4);
+				var daNoteData:Int = Std.int(songNotes[1] % Note.maniaKeys);
 				var gottaHitNote:Bool = section.mustHitSection;
 
 				if (!isPsychRelease)
 				{
-					if (songNotes[1] > 3)
+					if (songNotes[1] > Note.maniaKeys - 1)
 					{
 						gottaHitNote = !section.mustHitSection;
 					}
 				}
 				else
 				{
-					gottaHitNote = songNotes[1] < 4;
+					gottaHitNote = songNotes[1] < Note.maniaKeys;
 				}
 
 				if (characterPlayingAsDad)
@@ -1440,7 +1575,7 @@ class PlayState extends MusicBeatState
 				if (!gottaHitNote && allowedNotes.contains(swagNote.noteType))
 					swagNote.texture = SONG.opponentArrowSkin;
 				swagNote.sustainLength = songNotes[2];
-				swagNote.gfNote = (section.gfSection && (songNotes[1] < 4));
+				swagNote.gfNote = (section.gfSection && (songNotes[1] < Note.maniaKeys));
 				swagNote.noteType = songNotes[3];
 				if (!Std.isOfType(songNotes[3], String))
 					swagNote.noteType = ChartingState.noteTypeList[songNotes[3]]; // Backward compatibility + compatibility with Week 7 charts
@@ -1460,7 +1595,7 @@ class PlayState extends MusicBeatState
 
 						var sustainNote:Note = Note.getNote(daStrumTime + (Conductor.stepCrochet * susNote), daNoteData, oldNote, true);
 						sustainNote.mustPress = gottaHitNote;
-						sustainNote.gfNote = (section.gfSection && (songNotes[1] < 4));
+						sustainNote.gfNote = (section.gfSection && (songNotes[1] < Note.maniaKeys));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
 						sustainNote.parent = swagNote;
@@ -1605,9 +1740,21 @@ class PlayState extends MusicBeatState
 
 	private function generateStaticArrows(player:Int, skin:String):Void
 	{
-		var strumLineX:Float = ClientPrefs.data.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X;
+		// total width of one side's strum field, accounting for the per-mania note shrink
+		var strumWidth:Float = Note.maniaKeys * Note.swagScaledWidth - (Note.getNoteOffsetX() * (Note.maniaKeys - 1));
+		var strumLineX:Float;
+
+		if (ClientPrefs.data.middleScroll)
+			strumLineX = FlxG.width / 2 - strumWidth / 2;
+		else
+		{
+			// centre each field inside its own screen half (player on the right, opponent on the left)
+			strumLineX = (FlxG.width / 2 - strumWidth) / 2;
+			strumLineX += (FlxG.width / 2) * (player == 1 ? 1 : 0);
+		}
+
 		var strumLineY:Float = ClientPrefs.data.downScroll ? (FlxG.height - 150) : 50;
-		for (i in 0...4)
+		for (i in 0...Note.maniaKeys)
 		{
 			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
@@ -1625,25 +1772,26 @@ class PlayState extends MusicBeatState
 			{
 				// babyArrow.y -= 10;
 				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1,
+					{ease: FlxEase.circOut, startDelay: 0.5 + 4 / Note.maniaKeys * 0.2 * i});
 			}
 			else
 				babyArrow.alpha = targetAlpha;
 
+			// middlescroll pushes the dimmed opponent lanes out to either side of the centred player field
+			if (player < 1 && ClientPrefs.data.middleScroll)
+			{
+				babyArrow.x = strumLineX / 2 - strumWidth / 4;
+				if (i > Note.maniaKeys / 2 - 1)
+					babyArrow.x += strumLineX + strumWidth / 2;
+				if (Note.maniaKeys % 2 != 0 && i == Std.int(Note.maniaKeys / 2))
+					babyArrow.visible = false;
+			}
+
 			if (player == 1)
 				playerStrums.add(babyArrow);
 			else
-			{
-				if (ClientPrefs.data.middleScroll)
-				{
-					babyArrow.x += 310;
-					if (i > 1) // Up and Right
-					{
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
-				}
 				opponentStrums.add(babyArrow);
-			}
 
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
@@ -2771,7 +2919,8 @@ class PlayState extends MusicBeatState
 			var percent:Float = ratingPercent;
 			if (Math.isNaN(percent))
 				percent = 0;
-			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
+			// namespace non-4k scores so multikey runs don't overwrite the 4k highscore for the same song
+			Highscore.saveScore(SONG.song + (Note.maniaKeys == 4 ? '' : "$" + Note.maniaKeys + 'k'), songScore, storyDifficulty, percent);
 
 			playbackRate = 1;
 
@@ -3267,6 +3416,8 @@ class PlayState extends MusicBeatState
 			for (i in 0...arr.length)
 			{
 				var note:Array<FlxKey> = Controls.instance.keyboardBinds[arr[i]];
+				if (note == null)
+					continue;
 				for (noteKey in note)
 					if (key == noteKey)
 						return i;
