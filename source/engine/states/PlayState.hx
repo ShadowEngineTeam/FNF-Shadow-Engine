@@ -3117,6 +3117,7 @@ class PlayState extends MusicBeatState
 				FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
 					onComplete: function(tween:FlxTween)
 					{
+						numScore.container = null;
 						numScore.destroy();
 					},
 					startDelay: Conductor.crochet * 0.002 / playbackRate,
@@ -3130,12 +3131,18 @@ class PlayState extends MusicBeatState
 			comboSpr.x = xThing + 50;
 			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
 				startDelay: Conductor.crochet * 0.001 / playbackRate,
+				onComplete: function(tween:FlxTween)
+				{
+					rating.container = null;
+					rating.destroy();
+				},
 				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 
 			FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
 				onComplete: function(tween:FlxTween)
 				{
+					comboSpr.container = null;
 					comboSpr.destroy();
 					rating.destroy();
 				},
