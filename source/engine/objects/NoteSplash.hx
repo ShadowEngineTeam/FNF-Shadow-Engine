@@ -73,7 +73,6 @@ class NoteSplash extends FlxSprite
 		direction = Note.colToIndex(Note.getColArrayFromKeys(true)[direction % Note.maniaKeys]);
 		regularColArray = Note.getColArrayFromKeys(true);
 
-		setPosition(x - Note.swagScaledWidth * 0.95, y - Note.swagScaledWidth);
 		aliveTime = 0;
 
 		var texture:String = null;
@@ -151,6 +150,8 @@ class NoteSplash extends FlxSprite
 			setGraphicSize(Std.int(frameWidth * PlayState.daPixelZoom * Note.noteScale));
 		else
 			setGraphicSize(Std.int(frameWidth * Note.noteScale));
+		// keep a centred pivot; the final position (below) re-centres the scaled splash on the shrunken note
+		centerOrigin();
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, maxAnims);
@@ -174,9 +175,11 @@ class NoteSplash extends FlxSprite
 			offset.y += -55;
 		}
 
-		// keep the splash offsets in step with the shrunken note size at higher key counts
-		offset.x *= Note.noteScale;
-		offset.y *= Note.noteScale;
+		// Scale the whole splash toward the strum anchor (x, y) so it stays centred on the (possibly shrunken) note.
+		// A centred origin makes the visual centre scale-independent, so this works for normal AND pixel/daPixelZoom scales.
+		var centre4kX:Float = (x - Note.swagWidth * 0.95) - offset.x + origin.x;
+		var centre4kY:Float = (y - Note.swagWidth) - offset.y + origin.y;
+		setPosition(x + (centre4kX - x) * Note.noteScale - origin.x + offset.x, y + (centre4kY - y) * Note.noteScale - origin.y + offset.y);
 
 		if (animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);

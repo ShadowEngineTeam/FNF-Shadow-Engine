@@ -118,8 +118,7 @@ class SustainSplash extends FlxSprite
 		this.targetStrumTime = targetStrumTime;
 		this.mustPress = mustPress;
 		this.reachedEnd = false;
-		// hold splashes only ship 4-lane assets, so suppress them for other key counts
-		this.visible = (Note.maniaKeys == 4);
+		this.visible = true;
 
 		initRGBShader();
 
@@ -164,14 +163,17 @@ class SustainSplash extends FlxSprite
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);
 		animation.play('start', true, false, 0);
 
-		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
-		{
-			setGraphicSize(Std.int(width * PlayState.daPixelZoom / 2.5));
-			updateHitbox();
-		}
+		// scale the hold cover to match the note size at higher key counts (frameWidth, not the already-scaled
+		// width, keeps recycled splashes from compounding noteScale). updateHitbox re-centres the origin; the
+		// per-frame setPosition in update() re-centres the scaled cover on the strum.
+		// pixel hold covers have tiny looping frames (vs big start/end frames), so the loop renders small at the
+		// usual daPixelZoom/2.5; scale by the full daPixelZoom so the on-screen loop is ~note-sized (start/end pop bigger).
+		final isPixel:Bool = PlayState.isPixelStage.priorityBool(usePixelTextures);
+		setGraphicSize(Std.int(frameWidth * (isPixel ? PlayState.daPixelZoom : 1) * Note.noteScale));
+		updateHitbox();
 
-		antialiasing = PlayState.isPixelStage.priorityBool(usePixelTextures) ? false : ClientPrefs.data.antialiasing;
-		offset.set(PlayState.isPixelStage.priorityBool(usePixelTextures) ? -46 : 106.25, PlayState.isPixelStage.priorityBool(usePixelTextures) ? -40 : 100);
+		antialiasing = isPixel ? false : ClientPrefs.data.antialiasing;
+		offset.set(isPixel ? -46 : 106.25, isPixel ? -40 : 100);
 	}
 
 	private function initRGBShader():Void
@@ -261,6 +263,15 @@ class SustainSplash extends FlxSprite
 			return tex;
 	}
 
+	// scale the cover toward the strum so it stays centred on the (possibly shrunken) note at higher key counts
+	function updatePosition():Void
+	{
+		if (strumNote == null)
+			return;
+		final ns:Float = Note.noteScale;
+		setPosition(strumNote.x - (origin.x - offset.x) * (1 - ns), strumNote.y - (origin.y - offset.y) * (1 - ns));
+	}
+
 	override function update(elapsed:Float)
 	{
 		if (strumNote != null)
@@ -269,7 +280,7 @@ class SustainSplash extends FlxSprite
 				alpha = strumNote.alpha;
 			else
 				alpha = ClientPrefs.data.splashAlpha;
-			setPosition(strumNote.x, strumNote.y);
+			updatePosition();
 		}
 
 		if (Conductor.songPosition >= targetStrumTime && !reachedEnd)
@@ -289,8 +300,9 @@ class SustainSplash extends FlxSprite
 		if (strumNote == null)
 			return;
 
-		if ((x != strumNote.x || y != strumNote.y) && visible && active && alive && exists)
-			update(FlxG.elapsed);
+		// refresh only the position before drawing in case the strum moved this frame.
+		// (calling update() here would advance the animation a second time and double its speed)
+		updatePosition();
 
 		super.draw();
 	}

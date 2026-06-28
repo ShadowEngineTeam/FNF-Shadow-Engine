@@ -1357,37 +1357,41 @@ class PlayState extends MusicBeatState
 		return [for (i in 0...keys) '${keys}k_note_${i + 1}'];
 	}
 
-	/**
-	 * If the player picked a specific mania in Gameplay Changers, remaps the loaded chart's notes from its
-	 * native key count to the chosen one (ported from Funkin-Psych-Online's multikey conversion algorithm),
-	 * then updates `Note.maniaKeys`. A '(Chart)' selection leaves the chart untouched.
-	**/
-	function applyManiaModifier():Void
+	function getManiaModifiedNotes():Array<SwagSection>
 	{
 		var maniaSetting:Dynamic = ClientPrefs.getGameplaySetting('mania');
 		if (!(maniaSetting is String))
-			return;
+			return SONG.notes;
 
 		var maniaStr:String = cast maniaSetting;
 		if (!Note.maniaKeysStringList.contains(maniaStr))
-			return; // '(Chart)' or unknown: keep the chart's native key count
+			return SONG.notes; // '(Chart)' or unknown: keep the chart's native key count
 
 		var parsed:Null<Int> = Std.parseInt(maniaStr.split('k')[0]);
 		if (parsed == null)
-			return;
+			return SONG.notes;
 
 		var maniaModifier:Int = parsed;
 		var sourceKeys:Int = Note.maniaKeys;
+		// nothing to convert if the counts already match. (the per-lane divisions below are safe: scaleKeyToNew's
+		// /(sourceKeys-1) only runs when sourceKeys>maniaModifier>=1 so sourceKeys>=2, and scaleKeyBack's
+		// /(maniaModifier-1) only runs when maniaModifier>sourceKeys>=1 so maniaModifier>=2 — so 1k works fine.)
 		if (maniaModifier == sourceKeys)
-			return;
+			return SONG.notes;
 
-		// the scaling math divides by (keys - 1); skip degenerate single-lane conversions and keep the chart's count
-		if (sourceKeys <= 1 || maniaModifier <= 1)
-			return;
-
-		// flatten every note across sections, sorted by time
-		var dataNotes:Array<Array<Dynamic>> = [];
+		// deep-copy the sections so the persistent SONG.notes is never mutated; otherwise restarting the song
+		// would re-remap already-remapped data and scramble the chart
+		var sections:Array<SwagSection> = [];
 		for (section in SONG.notes)
+		{
+			var newSection:SwagSection = Reflect.copy(section);
+			newSection.sectionNotes = [for (note in section.sectionNotes) note.copy()];
+			sections.push(newSection);
+		}
+
+		// flatten the copies, sorted by time
+		var dataNotes:Array<Array<Dynamic>> = [];
+		for (section in sections)
 			for (note in section.sectionNotes)
 				dataNotes.push(note);
 		haxe.ds.ArraySort.sort(dataNotes, function(a:Array<Dynamic>, b:Array<Dynamic>):Int return Std.int(a[0] - b[0]));
@@ -1447,6 +1451,7 @@ class PlayState extends MusicBeatState
 		}
 
 		Note.maniaKeys = maniaModifier;
+		return sections;
 	}
 
 	private function generateSong(dataPath:String):Void
@@ -1454,7 +1459,8 @@ class PlayState extends MusicBeatState
 		// resolve the chart's key count first, then optionally remap it to the player's chosen mania.
 		// (this must run before the scroll-speed calc since "Scroll Speed By Mania" reads Note.maniaKeys)
 		Note.maniaKeys = Song.updateManiaKeys(SONG);
-		applyManiaModifier();
+		// remapped copy of the chart for the chosen mania (or SONG.notes unchanged for '(Chart)'); SONG stays pristine
+		var maniaNotes:Array<SwagSection> = getManiaModifiedNotes();
 		keysArray = getKeysArray(Note.maniaKeys);
 		// key counts without default binds would otherwise leave a null bind array and crash input lookups
 		for (key in keysArray)
@@ -1525,8 +1531,8 @@ class PlayState extends MusicBeatState
 
 		var noteData:Array<SwagSection>;
 
-		// NEW SHIT
-		noteData = songData.notes;
+		// NEW SHIT — spawn from the (possibly mania-remapped) copy, not the pristine SONG.notes
+		noteData = maniaNotes;
 
 		isErect = Difficulty.list[storyDifficulty] == ERECT || Difficulty.list[storyDifficulty] == NIGHTMARE;
 		var file:String = Paths.json(songName + '/events' + (isErect ? '-erect' : ""));
