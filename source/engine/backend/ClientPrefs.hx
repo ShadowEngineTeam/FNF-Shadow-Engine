@@ -55,9 +55,6 @@ import states.TitleState;
 		[0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
 	];
 
-	// per-mania note colours for every supported key count except 4 (which uses arrowRGB above).
-	// kept empty here and filled lazily (see ClientPrefs.getArrowRGB / loadPrefs) so this struct can be
-	// constructed during static init, before objects.Note's own statics are ready.
 	public var arrowRGBMap:Map<String, Array<Array<FlxColor>>> = new Map<String, Array<Array<FlxColor>>>();
 	public var arrowRGBPixelMap:Map<String, Array<Array<FlxColor>>> = new Map<String, Array<Array<FlxColor>>>();
 
@@ -126,7 +123,7 @@ class ClientPrefs
 		'note_down' => [F, DOWN],
 		'note_right' => [K, RIGHT],
 
-		// MULTIKEY / MANIA lane binds (4k uses note_left/down/up/right above)
+		// mania lane binds (4k uses note_left/down/up/right above)
 		'5k_note_1' => [D],
 		'5k_note_2' => [F],
 		'5k_note_3' => [G, SPACE],
@@ -189,7 +186,7 @@ class ClientPrefs
 		'note_down' => [DPAD_DOWN, A],
 		'note_right' => [DPAD_RIGHT, B],
 
-		// MULTIKEY / MANIA lane binds
+		// mania lane binds
 		'5k_note_1' => [DPAD_LEFT, X],
 		'5k_note_2' => [DPAD_DOWN, A],
 		'5k_note_3' => [LEFT_SHOULDER, RIGHT_SHOULDER],
@@ -325,7 +322,6 @@ class ClientPrefs
 			if (key != 'gameplaySettings' && Reflect.hasField(FlxG.save.data, key))
 				Reflect.setField(data, key, Reflect.field(FlxG.save.data, key));
 
-		// eagerly populate the per-mania colour caches now that objects.Note is initialised
 		data.arrowRGBMap ??= new Map<String, Array<Array<FlxColor>>>();
 		data.arrowRGBPixelMap ??= new Map<String, Array<Array<FlxColor>>>();
 		for (keys in Note.maniaKeysList)
@@ -383,7 +379,6 @@ class ClientPrefs
 			if (save.data.keyboard != null)
 			{
 				var loadedControls:Map<String, Array<FlxKey>> = save.data.keyboard;
-				// also accept mania lane binds ('<keys>k_note_<n>'), which aren't all in the default map
 				for (control => keys in loadedControls)
 					if (keyBinds.exists(control) || control.indexOf('k_note_') > -1)
 						keyBinds.set(control, keys);
@@ -461,7 +456,6 @@ class ClientPrefs
 				data.arrowRGBMap = map;
 		}
 
-		// generate + cache this key count's colours on first use (Note is guaranteed ready by now)
 		if (!map.exists(key))
 			map.set(key, genArrowColors(Note.maniaKeys, pixel));
 		return map.get(key);

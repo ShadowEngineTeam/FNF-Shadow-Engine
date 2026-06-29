@@ -163,11 +163,6 @@ class SustainSplash extends FlxSprite
 		animation.addByPrefix('end', 'holdCoverEnd0', 24, false);
 		animation.play('start', true, false, 0);
 
-		// scale the hold cover to match the note size at higher key counts (frameWidth, not the already-scaled
-		// width, keeps recycled splashes from compounding noteScale). updateHitbox re-centres the origin; the
-		// per-frame setPosition in update() re-centres the scaled cover on the strum.
-		// pixel hold covers have tiny looping frames (vs big start/end frames), so the loop renders small at the
-		// usual daPixelZoom/2.5; scale by the full daPixelZoom so the on-screen loop is ~note-sized (start/end pop bigger).
 		final isPixel:Bool = PlayState.isPixelStage.priorityBool(usePixelTextures);
 		setGraphicSize(Std.int(frameWidth * (isPixel ? PlayState.daPixelZoom : 1) * Note.noteScale));
 		updateHitbox();
@@ -263,7 +258,6 @@ class SustainSplash extends FlxSprite
 			return tex;
 	}
 
-	// scale the cover toward the strum so it stays centred on the (possibly shrunken) note at higher key counts
 	function updatePosition():Void
 	{
 		if (strumNote == null)

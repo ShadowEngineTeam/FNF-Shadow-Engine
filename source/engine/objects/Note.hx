@@ -90,14 +90,10 @@ class Note extends FlxSkewedSprite
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 
-	// MULTIKEY / MANIA
-	// the key counts that count towards leaderboards/ranked play
 	public static var rankedManiaKeysList:Array<Int> = [4, 5, 6, 7, 8, 9];
-	// every supported key count (lane amount)
 	public static var maniaKeysList:Array<Int> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 20, 21, 26, 50, 55, 61];
 	public static var maniaKeysStringList:Array<String> = [for (keys in maniaKeysList) '${keys}k'];
 
-	// the currently active lane amount; rebuilds colArray on change
 	public static var maniaKeys(default, set):Int = 4;
 
 	static function set_maniaKeys(value:Int):Int
@@ -107,7 +103,6 @@ class Note extends FlxSkewedSprite
 		return value;
 	}
 
-	// note/strum graphics shrink as the lane count grows so wide manias still fit on screen
 	public static var swagScaledWidth(get, never):Float;
 
 	static function get_swagScaledWidth():Float
@@ -121,11 +116,6 @@ class Note extends FlxSkewedSprite
 	public static function getNoteOffsetX():Float
 		return (swagScaledWidth / 30.0) * (Math.min(9, Math.max(4, maniaKeys)) - 4);
 
-	/**
-	 * Maps each lane index to a colour/direction token for the current (or given) key count.
-	 * Tokens: `purple`(LEFT) `blue`(DOWN) `green`(UP) `red`(RIGHT) `odd`(5th/centre lane).
-	 * @param regularOnly collapses `odd` to `green` for skins that lack an ODD frame.
-	**/
 	public static function getColArrayFromKeys(?regularOnly:Bool = false, ?keys:Null<Int> = null):Array<String>
 	{
 		keys ??= Note.maniaKeys;
@@ -167,7 +157,6 @@ class Note extends FlxSkewedSprite
 		}
 	}
 
-	/** Base 0-3 slot for a colour token (used for pixel frame indices and splash anim ids). **/
 	public static function colToIndex(col:String):Int
 	{
 		if (col == 'odd')
@@ -245,8 +234,6 @@ class Note extends FlxSkewedSprite
 		_activeNotes.remove(this);
 		kill();
 
-		// don't carry over shader/colorSwap state from the note's previous life -
-		// the next reuse may have a different noteData/skin and needs to rebind
 		colorSwap = null;
 		rgbShader = null;
 		shader = null;
@@ -310,7 +297,6 @@ class Note extends FlxSkewedSprite
 		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
 		if (ClientPrefs.data.disableRGBNotes)
 		{
-			// arrowHSV is only configured for the first 4 lanes; extra mania lanes simply get no tint
 			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
 			{
 				colorSwap.hue = noteSplashHue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
@@ -547,7 +533,6 @@ class Note extends FlxSkewedSprite
 		if (Paths.fileExists(fullPath + '.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
 			skin = customSkin;
 
-		// rebuild the lane->colour map for the current key count before we resolve animations
 		Note.colArray = Note.getColArrayFromKeys();
 
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
@@ -572,7 +557,6 @@ class Note extends FlxSkewedSprite
 
 			if (graphic == null)
 			{
-				// no ODD sheet for this skin: fall back to the regular (odd->green) lane mapping
 				Note.colArray = getColArrayFromKeys(true);
 				graphic = Paths.image(imgPath);
 				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
@@ -638,7 +622,6 @@ class Note extends FlxSkewedSprite
 
 	function loadPixelNoteAnims()
 	{
-		// pixel sheets only have 4 (or 5 w/ ODD) columns, so map the lane colour back to a base frame index
 		if (isSustainNote)
 		{
 			animation.add(colArray[noteData] + 'holdend', [colToIndex(colArray[noteData]) + 4], 24, true);

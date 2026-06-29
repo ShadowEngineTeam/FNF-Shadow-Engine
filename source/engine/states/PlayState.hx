@@ -208,7 +208,6 @@ class PlayState extends MusicBeatState
 	// how big to stretch the pixel art assets
 	public static var daPixelZoom:Float = 6;
 
-	// sing animations are rebuilt per key count from the lane->colour map (odd/centre lanes sing UP)
 	private var singAnimations(get, never):Array<String>;
 
 	var _singAnimations:Array<String> = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
@@ -1349,7 +1348,6 @@ class PlayState extends MusicBeatState
 	private var noteTypes:Array<String> = [];
 	private var eventsPushed:Array<String> = [];
 
-	/** Returns the control bind names for each lane of a given key count (4k uses the named note binds). **/
 	public static function getKeysArray(keys:Int):Array<String>
 	{
 		if (keys == 4)
@@ -1365,7 +1363,7 @@ class PlayState extends MusicBeatState
 
 		var maniaStr:String = cast maniaSetting;
 		if (!Note.maniaKeysStringList.contains(maniaStr))
-			return SONG.notes; // '(Chart)' or unknown: keep the chart's native key count
+			return SONG.notes;
 
 		var parsed:Null<Int> = Std.parseInt(maniaStr.split('k')[0]);
 		if (parsed == null)
@@ -1373,14 +1371,9 @@ class PlayState extends MusicBeatState
 
 		var maniaModifier:Int = parsed;
 		var sourceKeys:Int = Note.maniaKeys;
-		// nothing to convert if the counts already match. (the per-lane divisions below are safe: scaleKeyToNew's
-		// /(sourceKeys-1) only runs when sourceKeys>maniaModifier>=1 so sourceKeys>=2, and scaleKeyBack's
-		// /(maniaModifier-1) only runs when maniaModifier>sourceKeys>=1 so maniaModifier>=2 — so 1k works fine.)
 		if (maniaModifier == sourceKeys)
 			return SONG.notes;
 
-		// deep-copy the sections so the persistent SONG.notes is never mutated; otherwise restarting the song
-		// would re-remap already-remapped data and scramble the chart
 		var sections:Array<SwagSection> = [];
 		for (section in SONG.notes)
 		{
@@ -1396,7 +1389,6 @@ class PlayState extends MusicBeatState
 				dataNotes.push(note);
 		haxe.ds.ArraySort.sort(dataNotes, function(a:Array<Dynamic>, b:Array<Dynamic>):Int return Std.int(a[0] - b[0]));
 
-		// build the lane -> lane(s) mapping between the two key counts
 		var friendNotes:Array<Array<Int>> = [];
 		inline function scaleKeyToNew(noteData:Int):Int
 			return Math.round(noteData * ((maniaModifier - 1) / (sourceKeys - 1))) % maniaModifier;
@@ -1456,13 +1448,9 @@ class PlayState extends MusicBeatState
 
 	private function generateSong(dataPath:String):Void
 	{
-		// resolve the chart's key count first, then optionally remap it to the player's chosen mania.
-		// (this must run before the scroll-speed calc since "Scroll Speed By Mania" reads Note.maniaKeys)
 		Note.maniaKeys = Song.updateManiaKeys(SONG);
-		// remapped copy of the chart for the chosen mania (or SONG.notes unchanged for '(Chart)'); SONG stays pristine
 		var maniaNotes:Array<SwagSection> = getManiaModifiedNotes();
 		keysArray = getKeysArray(Note.maniaKeys);
-		// key counts without default binds would otherwise leave a null bind array and crash input lookups
 		for (key in keysArray)
 			if (!ClientPrefs.keyBinds.exists(key))
 				ClientPrefs.keyBinds.set(key, [FlxKey.NONE, FlxKey.NONE]);
@@ -1531,7 +1519,6 @@ class PlayState extends MusicBeatState
 
 		var noteData:Array<SwagSection>;
 
-		// NEW SHIT — spawn from the (possibly mania-remapped) copy, not the pristine SONG.notes
 		noteData = maniaNotes;
 
 		isErect = Difficulty.list[storyDifficulty] == ERECT || Difficulty.list[storyDifficulty] == NIGHTMARE;
@@ -1746,7 +1733,6 @@ class PlayState extends MusicBeatState
 
 	private function generateStaticArrows(player:Int, skin:String):Void
 	{
-		// total width of one side's strum field, accounting for the per-mania note shrink
 		var strumWidth:Float = Note.maniaKeys * Note.swagScaledWidth - (Note.getNoteOffsetX() * (Note.maniaKeys - 1));
 		var strumLineX:Float;
 
@@ -1754,7 +1740,6 @@ class PlayState extends MusicBeatState
 			strumLineX = FlxG.width / 2 - strumWidth / 2;
 		else
 		{
-			// centre each field inside its own screen half (player on the right, opponent on the left)
 			strumLineX = (FlxG.width / 2 - strumWidth) / 2;
 			strumLineX += (FlxG.width / 2) * (player == 1 ? 1 : 0);
 		}
@@ -1784,7 +1769,6 @@ class PlayState extends MusicBeatState
 			else
 				babyArrow.alpha = targetAlpha;
 
-			// middlescroll pushes the dimmed opponent lanes out to either side of the centred player field
 			if (player < 1 && ClientPrefs.data.middleScroll)
 			{
 				babyArrow.x = strumLineX / 2 - strumWidth / 4;

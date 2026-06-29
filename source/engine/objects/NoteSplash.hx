@@ -145,12 +145,10 @@ class NoteSplash extends FlxSprite
 			antialiasing = false;
 
 		_textureLoaded = (PlayState.isPixelStage.priorityBool(usePixelTextures) ? 'pixelUI/' : '') + texture;
-		// scale from the unscaled frameWidth (not the already-scaled `width`) so recycled splashes don't compound noteScale
 		if (PlayState.isPixelStage.priorityBool(usePixelTextures))
 			setGraphicSize(Std.int(frameWidth * PlayState.daPixelZoom * Note.noteScale));
 		else
 			setGraphicSize(Std.int(frameWidth * Note.noteScale));
-		// keep a centred pivot; the final position (below) re-centres the scaled splash on the shrunken note
 		centerOrigin();
 		offset.set(10, 10);
 
@@ -175,8 +173,6 @@ class NoteSplash extends FlxSprite
 			offset.y += -55;
 		}
 
-		// Scale the whole splash toward the strum anchor (x, y) so it stays centred on the (possibly shrunken) note.
-		// A centred origin makes the visual centre scale-independent, so this works for normal AND pixel/daPixelZoom scales.
 		var centre4kX:Float = (x - Note.swagWidth * 0.95) - offset.x + origin.x;
 		var centre4kY:Float = (y - Note.swagWidth) - offset.y + origin.y;
 		setPosition(x + (centre4kX - x) * Note.noteScale - origin.x + offset.x, y + (centre4kY - y) * Note.noteScale - origin.y + offset.y);

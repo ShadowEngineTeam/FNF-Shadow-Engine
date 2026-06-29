@@ -17,7 +17,6 @@ class ControlsSubState extends MusicBeatSubstate
 	var curAlt:Bool = false;
 
 	// Show on gamepad - Display name - Save file key - Rebind display name
-	// built in buildOptions() so the NOTES section can reflect the current key count
 	var options:Array<Dynamic> = [];
 	var curOptions:Array<Int>;
 	var curOptionsValid:Array<Int>;
@@ -67,14 +66,12 @@ class ControlsSubState extends MusicBeatSubstate
 		options.push([false, 'Key 1', 'debug_1', 'Debug Key #1']);
 		options.push([false, 'Key 2', 'debug_2', 'Debug Key #2']);
 
-		// trailing centred actions MUST stay at the end so the bind<->option ID mapping holds
 		options.push([true]);
 		options.push([true, switchMania]);
 		options.push([true]);
 		options.push([true, defaultKey]);
 	}
 
-	// lazily create bind entries for key counts that ship no defaults, so they can be rebound + persist
 	function ensureManiaBinds(keys:Int):Void
 	{
 		for (bind in PlayState.getKeysArray(keys))
@@ -182,7 +179,6 @@ class ControlsSubState extends MusicBeatSubstate
 					var isCentered:Bool = (option.length < 3);
 					var isDefaultKey:Bool = (option[1] == defaultKey);
 					var isSwitchMania:Bool = (option[1] == switchMania);
-					// defaultKey and switchMania are centred but still selectable actions
 					var isDisplayKey:Bool = (isCentered && !isDefaultKey && !isSwitchMania);
 
 					var text:Alphabet = new Alphabet(200, 300, option[1], !isDisplayKey);
@@ -330,7 +326,7 @@ class ControlsSubState extends MusicBeatSubstate
 			if ((FlxG.keys.justPressed.ESCAPE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonB.justPressed #end) || FlxG.gamepads.anyJustPressed(B))
 			{
 				ClientPrefs.saveSettings();
-				Note.maniaKeys = 4; // don't leak the previewed mania into other menus
+				Note.maniaKeys = 4;
 				close();
 				return;
 			}
@@ -590,7 +586,6 @@ class ControlsSubState extends MusicBeatSubstate
 		buildOptions();
 		createTexts();
 
-		// keep the cursor parked on the mania switcher so repeated presses keep cycling
 		for (i in 0...curOptions.length)
 			if (options[curOptions[i]][1] == switchMania)
 			{

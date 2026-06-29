@@ -29,7 +29,6 @@ class StrumNote extends FlxSkewedSprite
 	{
 		if (texture != value)
 		{
-			// route odd/centre lanes to the '_ODD' atlas variant when one exists for this skin
 			Note.colArray = Note.getColArrayFromKeys();
 			if (Note.colArray[noteData % Note.maniaKeys] == 'odd' && !value.endsWith('_ODD'))
 				value = value + '_ODD';
@@ -118,7 +117,6 @@ class StrumNote extends FlxSkewedSprite
 			var graphic:Null<FlxGraphic> = Paths.image('pixelUI/' + texture);
 			if (graphic == null && texture.endsWith('_ODD'))
 			{
-				// no ODD pixel sheet for this skin: drop the suffix and use the regular (odd->green) mapping
 				@:bypassAccessor texture = texture.substring(0, texture.length - '_ODD'.length);
 				graphic = Paths.image('pixelUI/' + texture);
 				Note.colArray = Note.getColArrayFromKeys(true);
@@ -250,7 +248,6 @@ class StrumNote extends FlxSkewedSprite
 
 	function addOdd()
 	{
-		// fall back to the UP arrow when the skin has no dedicated ODD/centre frames
 		if (!Note.colArray.contains('odd'))
 		{
 			addUp();
@@ -271,7 +268,6 @@ class StrumNote extends FlxSkewedSprite
 
 	public function postAddedToGroup()
 	{
-		// only the per-lane spread lives here; the strum field's base X is set in generateStaticArrows
 		playAnim('static');
 		x += Note.swagScaledWidth * noteData;
 		x -= Note.getNoteOffsetX() * noteData;

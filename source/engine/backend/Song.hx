@@ -30,7 +30,6 @@ typedef SwagSong =
 	@:optional var opponentArrowSkin:String;
 	@:optional var splashSkin:String;
 
-	// MULTIKEY / MANIA: 'keyCount' is the modern lane amount; legacy 'mania' is the old index-based field
 	@:optional var keyCount:Null<Int>;
 	@:optional var mania:Null<Int>;
 

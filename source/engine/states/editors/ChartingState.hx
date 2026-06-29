@@ -288,7 +288,6 @@ class ChartingState extends MusicBeatState
 
 		updateJsonData();
 
-		// MULTIKEY / MANIA: size the grid (lanes per side + 1 event column) to the chart's key count
 		Note.maniaKeys = Song.updateManiaKeys(_song);
 		columns = Note.maniaKeys * 2 + 1;
 		CAM_OFFSET = GRID_SIZE * columns;
@@ -576,7 +575,6 @@ class ChartingState extends MusicBeatState
 		});
 		tab_group.add(check_voices);
 
-		// MULTIKEY / MANIA: pick the chart's lane count (rebuilds the grid live)
 		tab_group.add(new ShadowLabel(pad + 230, row1, "Keys:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		var maniaDropDown:ShadowDropdown = new ShadowDropdown(pad + 230, row1 + labelOffset, Note.maniaKeysStringList, function(index:Int)
 		{
@@ -1546,7 +1544,6 @@ class ChartingState extends MusicBeatState
 	var noteSkinInputText2:ShadowTextInput;
 	var noteSplashesInputText:ShadowTextInput;
 
-	// Editor-only note skins (do NOT store inside song data)
 	var editorPlayerArrowSkin:String = '';
 	var editorOpponentArrowSkin:String = '';
 
@@ -2545,7 +2542,6 @@ class ChartingState extends MusicBeatState
 		if (newKeys == Note.maniaKeys || !Note.maniaKeysList.contains(newKeys))
 			return;
 
-		// store as the modern key count and clear the legacy field so it takes effect
 		_song.keyCount = newKeys;
 		_song.mania = null;
 
@@ -2553,7 +2549,6 @@ class ChartingState extends MusicBeatState
 		columns = newKeys * 2 + 1;
 		CAM_OFFSET = GRID_SIZE * columns;
 
-		// rebuild the strum bar + per-lane strums for the new key count
 		strumLine.makeGraphic(Std.int(GRID_SIZE * columns), 4);
 		for (s in strumLineNotes.members)
 			if (s != null)
@@ -2569,7 +2564,6 @@ class ChartingState extends MusicBeatState
 			note.scrollFactor.set(1, 1);
 		}
 
-		// re-centre the bf/dad icons over their halves
 		var playGridWidth:Float = GRID_SIZE * (newKeys * 2);
 		leftIcon.setPosition(GRID_SIZE + (playGridWidth / 4 - leftIcon.width / 2), -100);
 		rightIcon.setPosition(GRID_SIZE + (playGridWidth * 3 / 4 - rightIcon.width / 2), -100);
@@ -3401,7 +3395,6 @@ class ChartingState extends MusicBeatState
 
 	public function doANoteThing(cs, d, style)
 	{
-		// the vortex hotkeys cover 8 lanes; ignore presses that fall outside this chart's lane count
 		if (d >= strumLineNotes.length)
 			return;
 

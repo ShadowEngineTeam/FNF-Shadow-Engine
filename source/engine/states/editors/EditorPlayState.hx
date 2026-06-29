@@ -98,7 +98,6 @@ class EditorPlayState extends MusicBeatSubstate
 		bg.alpha = 0.9;
 		add(bg);
 
-		// resolve the chart's key count so the editor preview matches the song's mania
 		Note.maniaKeys = Song.updateManiaKeys(PlayState.SONG);
 		keysArray = PlayState.getKeysArray(Note.maniaKeys);
 
