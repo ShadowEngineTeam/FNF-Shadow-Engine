@@ -49,6 +49,13 @@ class Config {
 		"substates",
 	];
 
+	// Runs support for typedef support in these
+	public static final ALLOWED_TYPEDEFS = [
+		"flixel",
+		"flixel.addons",
+		"openfl",
+	];
+
 	// Incase any of your files fail
 	// These are the module names
 	public static final DISALLOW_CUSTOM_CLASSES = [
@@ -59,5 +66,11 @@ class Config {
 	// These are the module names
 	public static final DISALLOW_ABSTRACT_AND_ENUM = [
 
+	];
+
+	// Incase any of your files fail
+	// These are the module names
+	public static final DISALLOW_TYPEDEFS = [
+		"haxe"
 	];
 }

@@ -283,6 +283,7 @@ class Project extends HXProject
 		{
 			setHaxedef("hscriptPos");
 			setHaxedef("HSCRIPT_ABSTRACT_SUPPORT");
+			setHaxedef("HSCRIPT_TYPEDEF_SUPPORT");
 			setHaxedef("CUSTOM_CLASSES");
 		}
 
