@@ -101,7 +101,7 @@ class ShadowTextInput extends FlxSpriteGroup
 	function set_text(value:String):String
 	{
 		if (input != null)
-			input.text = value;
-		return value;
+			input.text = value != null ? value : '';
+		return value != null ? value : '';
 	}
 }
