@@ -143,7 +143,7 @@ class HScript extends SScript
 		staticPresetDone = true;
 
 		function setGlobal(key:String, obj:Dynamic)
-			globalVariables.set(key, obj);
+			SScript.globalVariables.set(key, obj);
 
 		// Some very commonly used classes
 		setGlobal('FlxG', flixel.FlxG);
