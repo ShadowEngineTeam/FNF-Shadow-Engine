@@ -274,6 +274,7 @@ class ScriptManager
 	{
 		try
 		{
+			var times:Float = Date.now().getTime();
 			var newScript = new HScript(null, file, null, publicVariables);
 			if (newScript.parsingException != null)
 			{
@@ -282,6 +283,7 @@ class ScriptManager
 				return;
 			}
 
+			trace('initialized hscript interp successfully: $file (${Std.int(Date.now().getTime() - times)}ms)');
 			hscriptArray.push(newScript);
 			if (newScript.exists('onCreate'))
 			{

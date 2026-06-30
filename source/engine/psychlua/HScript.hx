@@ -54,6 +54,10 @@ class HScript extends SScript
 
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?sharedPublicVars:Map<String, Dynamic> = null)
 	{
+		// must run before super(), since SScript's constructor copies
+		// globalVariables into this instance before our preset() runs
+		presetStaticOnce();
+
 		if (file == null)
 			file = '';
 
@@ -131,63 +135,75 @@ class HScript extends SScript
 
 	var varsToBring:Any = null;
 
+	static var staticPresetDone:Bool = false;
+	static function presetStaticOnce()
+	{
+		if (staticPresetDone)
+			return;
+		staticPresetDone = true;
+
+		function setGlobal(key:String, obj:Dynamic)
+			globalVariables.set(key, obj);
+
+		// Some very commonly used classes
+		setGlobal('FlxG', flixel.FlxG);
+		setGlobal('FlxMath', flixel.math.FlxMath);
+		setGlobal('FlxSprite', flixel.FlxSprite);
+		setGlobal('FlxText', flixel.text.FlxText);
+		setGlobal('FlxCamera', flixel.FlxCamera);
+		setGlobal('PsychCamera', backend.rendering.PsychCamera);
+		setGlobal('FlxTimer', flixel.util.FlxTimer);
+		setGlobal('FlxTween', flixel.tweens.FlxTween);
+		setGlobal('FlxEase', flixel.tweens.FlxEase);
+		setGlobal('FlxColor', CustomFlxColor);
+		setGlobal('FlxTypedGroup', flixel.group.FlxGroup.FlxTypedGroup);
+		setGlobal('FlxSpriteGroup', flixel.group.FlxSpriteGroup);
+		setGlobal('FlxSound', flixel.sound.FlxSound);
+		setGlobal('FlxBasic', flixel.FlxBasic);
+		setGlobal('FlxObject', flixel.FlxObject);
+		setGlobal('FlxSubState', flixel.FlxSubState);
+		setGlobal('FlxRandom', flixel.math.FlxRandom);
+		setGlobal('FlxSave', flixel.util.FlxSave);
+		setGlobal('Countdown', backend.BaseStage.Countdown);
+		setGlobal('PlayState', states.PlayState);
+		setGlobal('MusicBeatState', backend.MusicBeatState);
+		setGlobal('MusicBeatSubstate', backend.MusicBeatSubstate);
+		setGlobal('Paths', backend.Paths);
+		setGlobal('CoolUtil', backend.CoolUtil);
+		setGlobal('StorageUtil', mobile.backend.StorageUtil);
+		setGlobal('Conductor', backend.Conductor);
+		setGlobal('ClientPrefs', backend.ClientPrefs);
+		setGlobal('Character', objects.Character);
+		setGlobal('Alphabet', objects.Alphabet);
+		setGlobal('Note', objects.Note);
+		setGlobal('NoteSplash', objects.NoteSplash);
+		setGlobal('SustainSplash', objects.SustainSplash);
+		setGlobal('StrumNote', objects.StrumNote);
+		setGlobal('HealthIcon', objects.HealthIcon);
+		setGlobal('Bar', objects.Bar);
+		setGlobal('AttachedSprite', objects.AttachedSprite);
+		setGlobal('AttachedText', objects.AttachedText);
+		setGlobal('CheckboxThingie', objects.CheckboxThingie);
+		setGlobal('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
+		setGlobal('ShaderFilter', openfl.filters.ShaderFilter);
+		setGlobal('StringTools', StringTools);
+		setGlobal('ScriptedState', psychlua.ScriptedState);
+		setGlobal('ScriptedSubState', psychlua.ScriptedSubState);
+		setGlobal('Mods', backend.Mods);
+		setGlobal('Difficulty', backend.Difficulty);
+		setGlobal('Highscore', backend.Highscore);
+		setGlobal('Controls', backend.Controls);
+		setGlobal('Song', backend.Song);
+		setGlobal('Section', backend.Section);
+		setGlobal('StageData', backend.StageData);
+		setGlobal('WeekData', backend.WeekData);
+		setGlobal('InputFormatter', backend.InputFormatter);
+	}
+
 	override function preset()
 	{
 		super.preset();
-
-		// Some very commonly used classes
-		set('FlxG', flixel.FlxG);
-		set('FlxMath', flixel.math.FlxMath);
-		set('FlxSprite', flixel.FlxSprite);
-		set('FlxText', flixel.text.FlxText);
-		set('FlxCamera', flixel.FlxCamera);
-		set('PsychCamera', backend.rendering.PsychCamera);
-		set('FlxTimer', flixel.util.FlxTimer);
-		set('FlxTween', flixel.tweens.FlxTween);
-		set('FlxEase', flixel.tweens.FlxEase);
-		set('FlxColor', CustomFlxColor);
-		set('FlxTypedGroup', flixel.group.FlxGroup.FlxTypedGroup);
-		set('FlxSpriteGroup', flixel.group.FlxSpriteGroup);
-		set('FlxSound', flixel.sound.FlxSound);
-		set('FlxBasic', flixel.FlxBasic);
-		set('FlxObject', flixel.FlxObject);
-		set('FlxSubState', flixel.FlxSubState);
-		set('FlxRandom', flixel.math.FlxRandom);
-		set('FlxSave', flixel.util.FlxSave);
-		set('Countdown', backend.BaseStage.Countdown);
-		set('PlayState', states.PlayState);
-		set('MusicBeatState', backend.MusicBeatState);
-		set('MusicBeatSubstate', backend.MusicBeatSubstate);
-		set('Paths', backend.Paths);
-		set('CoolUtil', backend.CoolUtil);
-		set('StorageUtil', mobile.backend.StorageUtil);
-		set('Conductor', backend.Conductor);
-		set('ClientPrefs', backend.ClientPrefs);
-		set('Character', objects.Character);
-		set('Alphabet', objects.Alphabet);
-		set('Note', objects.Note);
-		set('NoteSplash', objects.NoteSplash);
-		set('SustainSplash', objects.SustainSplash);
-		set('StrumNote', objects.StrumNote);
-		set('HealthIcon', objects.HealthIcon);
-		set('Bar', objects.Bar);
-		set('AttachedSprite', objects.AttachedSprite);
-		set('AttachedText', objects.AttachedText);
-		set('CheckboxThingie', objects.CheckboxThingie);
-		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
-		set('ShaderFilter', openfl.filters.ShaderFilter);
-		set('StringTools', StringTools);
-		set('ScriptedState', psychlua.ScriptedState);
-		set('ScriptedSubState', psychlua.ScriptedSubState);
-		set('Mods', backend.Mods);
-		set('Difficulty', backend.Difficulty);
-		set('Highscore', backend.Highscore);
-		set('Controls', backend.Controls);
-		set('Song', backend.Song);
-		set('Section', backend.Section);
-		set('StageData', backend.StageData);
-		set('WeekData', backend.WeekData);
-		set('InputFormatter', backend.InputFormatter);
+		presetStaticOnce(); // first instance ever created pushes the static stuff into globalVariables; every instance (incl. this one) then picks it up automatically
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic)
