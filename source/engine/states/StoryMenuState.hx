@@ -133,11 +133,11 @@ class StoryMenuState extends MusicBeatState
 		add(txtTracklist = new FlxText(FlxG.width * 0.05, tracksSprite.y + 60, 0, "", 32));
 		txtTracklist.setFormat(Paths.font("vcr.ttf"), 32, 0xFFE55777, CENTER);
 
-		add(scoreText = new FlxText(10, 10, 0, "WEEK SCORE: 1234567890", 36));
-		scoreText.setFormat("VCR OSD Mono", 32);
+		add(scoreText = new FlxText(10, 10, 0, "WEEK SCORE: 0", 36));
+		scoreText.setFormat(Paths.font("vcr.ttf"), 32);
 
 		add(txtWeekTitle = new FlxText(FlxG.width * 0.7, 10, 0, "", 32));
-		txtWeekTitle.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, RIGHT);
+		txtWeekTitle.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
 
 		changeWeek();
