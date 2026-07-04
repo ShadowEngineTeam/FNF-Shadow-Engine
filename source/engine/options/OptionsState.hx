@@ -97,7 +97,7 @@ class OptionsState extends MusicBeatState
 		#end
 
 		tipText = new FlxText(150, tipY, 0, mobileText + dataText, 16);
-		tipText.setFormat("VCR OSD Mono", 17, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		tipText.setFormat(Paths.font("vcr.ttf"), 17, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tipText.borderSize = 1.25;
 		tipText.scrollFactor.set();
 		tipText.antialiasing = ClientPrefs.data.antialiasing;
