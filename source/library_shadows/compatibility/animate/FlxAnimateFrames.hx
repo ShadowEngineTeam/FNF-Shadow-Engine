@@ -353,7 +353,7 @@ class FlxAnimateFrames extends FlxAtlasFrames
 			var imageFile = spritemapList.filter((file) -> file.startsWith('spritemap$id') && !file.endsWith(".json"))[0];
 
 			spritemaps.push({
-				source: getGraphic('$path/$imageFile', key),
+				source: getGraphic('$path/$imageFile'),
 				json: getTextFromPath('$path/$sm')
 			});
 		}
