@@ -87,8 +87,8 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "75870e160677ca4d310df94d775e7fad43c767ae",
-      "url": "https://github.com/MaybeMaru/flixel-animate"
+      "ref": "0cd74483afae145ee2126eabbbdc33780aaab1ec",
+      "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {
       "name": "tink_core",
