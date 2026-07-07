@@ -5,12 +5,19 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 
 #if cpp
+#if windows
+@:buildXml('
+<target id="haxe">
+    <lib name="ntdll.lib" unless="mingw" />
+	<lib name="-lntdll" if="mingw" />
+</target>
+')
+#end
 @:cppFileCode('
 #if defined(_WIN32)
   #include <windows.h>
   #include <psapi.h>
   #include <winternl.h>
-  #pragma comment(lib, "ntdll.lib")
 #elif defined(__APPLE__) && defined(__MACH__)
   #include <mach/mach.h>
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
