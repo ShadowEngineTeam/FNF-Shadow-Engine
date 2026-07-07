@@ -21,8 +21,8 @@
     {
       "name": "flixel-addons",
       "type": "git",
-      "ref": "7628435364c4a45440d1e5db656741b66a8cd2ec",
-      "url": "https://github.com/FunkinCrew/flixel-addons"
+      "ref": "a01a58ee6531a4c63c95bf5473db96a4d3f33348",
+      "url": "https://github.com/ShadowEngineTeam/flixel-addons"
     },
     {
       "name": "hxcpp",
