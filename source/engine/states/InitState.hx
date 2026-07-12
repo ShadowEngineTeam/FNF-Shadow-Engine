@@ -2,6 +2,10 @@ package states;
 
 import backend.Highscore;
 import backend.ui.ShadowStyle;
+#if DIRECT_NULL
+import backend.WeekData;
+import backend.Song;
+#end
 import flixel.addons.transition.FlxTransitionableState;
 import lime.system.System as LimeSystem;
 
@@ -81,6 +85,42 @@ class InitState extends FlxState
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
 		#end
 
+
+		#if DIRECT_NULL
+		// TEMP: boot straight into the null-and-void mod song for bgfx render
+		// debugging, skipping the whole menu flow. Build with -D DIRECT_NULL.
+		{
+			// force shaders on: the menu (where it's toggled) is skipped here
+			ClientPrefs.data.shaders = true;
+
+			Mods.currentModDirectory = "null-and-void";
+			WeekData.reloadWeekFiles(false);
+			var week = WeekData.weeksLoaded.get("null-and-void");
+			WeekData.setDirectoryFromWeek(week);
+			Difficulty.loadFromWeek(week);
+
+			var diff:Int = Difficulty.list.indexOf(Difficulty.stringToDiff("hard"));
+			if (diff < 0) diff = 0;
+
+			PlayState.isStoryMode = false;
+			PlayState.storyDifficulty = diff;
+
+			var songPath:String = Paths.formatToSongPath("Null-and-Void");
+			var json:String = Highscore.formatSong(songPath, diff);
+			PlayState.SONG = Song.loadFromJson(json, songPath);
+
+			// normal flow always has (persistent) menu music playing when
+			// PlayState starts; the skipped menus leave FlxG.sound.music null and
+			// the Lua setup reads FlxG.sound.music.length. Play the base menu
+			// track silently so a real, transition-surviving music exists, just
+			// like coming from a menu (PlayState stops+replaces it afterward).
+			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0, false);
+
+			LoadingState.prepareToSong();
+			LoadingState.loadAndSwitchState(PlayState);
+			return;
+		}
+		#end
 
 		TitleState.showIntro = true;
 		var nextState:Class<FlxState> = FlxG.save.data.flashing == null && !FlashingState.leftState ? FlashingState : TitleState;

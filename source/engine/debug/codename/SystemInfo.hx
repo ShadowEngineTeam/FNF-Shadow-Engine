@@ -149,6 +149,35 @@ class SystemInfo extends FramerateCategory
 		@:privateAccess
 		if (FlxG.renderTile) // Blit doesn't enable the gpu. Idk if we should fix this
 		{
+			#if (lime && !js)
+			// bgfx renderer: there is no GL context to query, so take the API
+			// label from the bgfx renderer type and the adapter name from the
+			// OS (display adapter registry key on Windows)
+			var api = switch (lime.graphics.bgfx.BGFX.rendererType)
+			{
+				case DIRECT3D11: "Direct3D 11";
+				case DIRECT3D12: "Direct3D 12";
+				case VULKAN: "Vulkan";
+				case METAL: "Metal";
+				case OPENGL: "OpenGL";
+				case OPENGLES: "OpenGL ES";
+				default: "BGFX";
+			}
+
+			var adapterName:String = null;
+
+			#if windows
+			// the first display adapter's driver description; matches what GL's
+			// RENDERER string reported for the common single-GPU case
+			adapterName = RegistryUtil.get(HKEY_LOCAL_MACHINE,
+				"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000", "DriverDesc");
+			#end
+
+			if (adapterName != null && adapterName != "")
+				gpuName = '$adapterName ($api)';
+			else
+				gpuName = api;
+			#else
 			if (flixel.FlxG.stage.context3D != null && flixel.FlxG.stage.context3D.gl != null)
 			{
 				gpuName = Std.string(flixel.FlxG.stage.context3D.gl.getParameter(flixel.FlxG.stage.context3D.gl.RENDERER)).split("/")[0].trim();
@@ -166,6 +195,7 @@ class SystemInfo extends FramerateCategory
 			}
 			else
 				Log.error('Unable to grab GPU Info');
+			#end
 		}
 
 		#if cpp

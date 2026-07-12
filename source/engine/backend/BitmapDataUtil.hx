@@ -125,16 +125,23 @@ class BitmapDataUtil
 		if (texture.__width == width && texture.__height == height)
 			return;
 
-		var context:Context3D = texture.__context;
-
 		texture.__width = width;
 		texture.__height = height;
+
+		#if (lime && !js)
+		// bgfx textures are immutable in size: __ensureBGFXTexture destroys and
+		// recreates the handle (and any framebuffer) when the dimensions
+		// change; pass the current RT flag so a render-target stays one
+		texture.__ensureBGFXTexture(texture.__bgfxIsRenderTarget, width, height);
+		#else
+		var context:Context3D = texture.__context;
 
 		context.__bindGLTexture2D(texture.__textureID);
 		context.gl.texImage2D(context.gl.TEXTURE_2D, 0, texture.__internalFormat, width, height, 0, texture.__format, context.gl.UNSIGNED_BYTE, null);
 
 		@:nullSafety(Off)
 		context.__bindGLTexture2D(null);
+		#end
 	}
 
 	/**
