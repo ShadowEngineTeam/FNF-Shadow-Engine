@@ -445,18 +445,19 @@ class PlayState extends MusicBeatState
 		startHScriptsNamed('stages/' + curStage);
 		#end
 
+		if (SONG.gfVersion == null || SONG.gfVersion.length < 1)
+			SONG.gfVersion = 'gf'; // Fix for the Chart Editor
 		if (!stageData.hide_girlfriend && !ClientPrefs.data.lowQuality)
-		{
-			if (SONG.gfVersion == null || SONG.gfVersion.length < 1)
-				SONG.gfVersion = 'gf'; // Fix for the Chart Editor
 			gf = new Character(0, 0, SONG.gfVersion);
-			startCharacterPos(gf);
-			gf.scrollFactor.set(0.95, 0.95);
-			gfGroup.add(gf);
-			startCharacterScripts(gf.curCharacter);
-		}
 		else
-			gf = null;
+		{
+			gf = new Character(0, 0, '');
+			gf.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+		}
+		startCharacterPos(gf);
+		gf.scrollFactor.set(0.95, 0.95);
+		gfGroup.add(gf);
+		startCharacterScripts(gf.curCharacter);
 
 		dad = new Character(0, 0, SONG.player2, characterPlayingAsDad);
 		if (characterPlayingAsDad)
