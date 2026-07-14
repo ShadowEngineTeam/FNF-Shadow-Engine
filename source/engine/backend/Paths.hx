@@ -22,7 +22,7 @@ class Paths
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
 	#end
-	public static final SOUND_EXTS:Array<String> = ['ogg', 'opus', 'mp3', 'flac', 'wav'];
+	public static final SOUND_EXTS:Array<String> = ['ogg', 'mp3']; // ['ogg', 'opus', 'mp3', 'flac', 'wav']
 
 	public static final dumpExclusions:Array<String> = [
 		'assets/shared/images/touchpad/bg.$IMAGE_EXT',
