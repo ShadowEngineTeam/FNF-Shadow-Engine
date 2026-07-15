@@ -450,10 +450,7 @@ class PlayState extends MusicBeatState
 		if (!stageData.hide_girlfriend && !ClientPrefs.data.lowQuality)
 			gf = new Character(0, 0, SONG.gfVersion);
 		else
-		{
-			gf = new Character(0, 0, '');
-			gf.makeGraphic(1, 1, FlxColor.TRANSPARENT);
-		}
+			gf = new Character(0, 0, 'gf-empty');
 		startCharacterPos(gf);
 		gf.scrollFactor.set(0.95, 0.95);
 		gfGroup.add(gf);
