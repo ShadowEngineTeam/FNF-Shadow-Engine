@@ -26,7 +26,7 @@ class InitState extends FlxState
 		#end
 
 		#if FEATURE_VIDEOS
-		hxvlc.util.Handle.init();
+		hxvlc.util.Handle.initAsync();
 		#end
 
 		#if FEATURE_MODS

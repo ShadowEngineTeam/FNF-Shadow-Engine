@@ -81,7 +81,7 @@ class VideoFunctions
 		funk.set("setLuaVideoVolume", function(tag:String, volume:Float)
 		{
 			var video = getLuaVideo(tag);
-			if (video != null) video.bitmap.volume = Std.int(volume * 100);
+			if (video != null) video.bitmap.volumeAdjust = volume;
 		});
 
 		funk.set("getLuaVideoDuration", function(tag:String):Float
