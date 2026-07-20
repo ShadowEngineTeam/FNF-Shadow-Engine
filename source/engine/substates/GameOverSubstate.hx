@@ -108,10 +108,6 @@ class GameOverSubstate extends MusicBeatSubstate
 				targetZoom *= json.gameover.zoom;
 		}
 
-		// Tracks the character's midpoint every frame rather than being pinned once, so the camera
-		// eases onto them from wherever gameplay left it and keeps up as the death frames change size.
-		// The character's own `cameraPosition` is deliberately ignored -- that frames them for gameplay,
-		// off to one side, but here they're the only thing on screen.
 		camFollow = new FlxObject(0, 0, 1, 1);
 		updateCamFollow();
 		add(camFollow);
@@ -221,8 +217,11 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	function updateCamFollow():Void
 	{
-		var midpoint:FlxPoint = boyfriend.getGraphicMidpoint();
-		camFollow.setPosition(midpoint.x + camOffsetX, midpoint.y + camOffsetY);
+		var midpoint:FlxPoint = boyfriend.getMidpoint();
+		var stageOffset:Array<Float> = PlayState.instance != null ? PlayState.instance.boyfriendCameraOffset : [0, 0];
+		camFollow.setPosition(midpoint.x - 100, midpoint.y - 100);
+		camFollow.x -= boyfriend.cameraPosition[0] - stageOffset[0] - camOffsetX;
+		camFollow.y += boyfriend.cameraPosition[1] + stageOffset[1] + camOffsetY;
 		midpoint.put();
 	}
 

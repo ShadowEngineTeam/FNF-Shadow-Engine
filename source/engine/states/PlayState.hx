@@ -186,6 +186,8 @@ class PlayState extends MusicBeatState
 	public var camOther:ShadowCamera;
 	public var cameraSpeed:Float = 1;
 
+	static inline final RIGID_FOLLOW_LERP:Float = 10000;
+
 	public var songScore:Int = 0;
 
 	public var songHits:Int = 0;
@@ -1782,7 +1784,7 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		if (!inCutscene && !paused && !freezeCamera)
-			FlxG.camera.followLerp = 2.4 * cameraSpeed * playbackRate;
+			FlxG.camera.followLerp = (camTween != null) ? RIGID_FOLLOW_LERP : 2.4 * cameraSpeed * playbackRate;
 		else
 			FlxG.camera.followLerp = 0;
 
