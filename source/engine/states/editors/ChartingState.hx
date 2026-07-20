@@ -99,6 +99,10 @@ class ChartingState extends MusicBeatState
 		[
 			'Focus Camera',
 			"Focus camera on the specific point.\nThis will also lock the camera (like Camera Follow Pos)\n\nValue1:character to focus\nValue2: separated with ',' x, y, duration, ease"
+		],
+		[
+			'Dadbattle Spotlight',
+			"Exclusive to Week 1's \"stage\" (and its Erect variant).\n\nValue 1: Spotlight to target\n(Dad, BF, GF, BG, Smoke)\nNote: it won't disable the other spotlights\nunless you set their Value 2 alpha too.\n\nValue 2: separated with ',' Alpha, Duration (in steps), Ease\nLeave the ease blank (or \"classic\") to change instantly."
 		]
 	];
 

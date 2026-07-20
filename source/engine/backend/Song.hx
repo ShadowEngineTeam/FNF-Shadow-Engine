@@ -19,6 +19,10 @@ typedef SwagSong =
 
 	@:optional var disableNoteCustomColor:Bool;
 
+	@:optional var artist:String;
+	@:optional var charter:String;
+	@:optional var variant:String;
+
 	@:optional var gameOverChar:String;
 	@:optional var gameOverSound:String;
 	@:optional var gameOverLoop:String;

@@ -1,24 +1,28 @@
 package substates;
 
-import backend.WeekData;
 import objects.Character;
 import flixel.FlxObject;
 import states.StoryMenuState;
 import states.FreeplayState;
 import lime.ui.Haptic;
 import effects.RetroCameraFade;
+import backend.StageData;
+import haxe.Json;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
 	public var boyfriend:Character;
 
 	var camFollow:FlxObject;
-	var moveCamera:Bool = false;
-	var playingDeathSound:Bool = false;
+	var targetZoom:Float = 1;
+	var suffix:String = '';
 
-	var stageSuffix:String = "";
+	var camOffsetX:Float = 0;
+	var camOffsetY:Float = 0;
 
-	public static var characterName:String = 'bf-dead';
+	var usingLiveBoyfriend:Bool = false;
+
+	public static var characterName:String = 'bf';
 	public static var deathSoundName:String = 'fnf_loss_sfx';
 	public static var loopSoundName:String = 'gameOver';
 	public static var endSoundName:String = 'gameOverEnd';
@@ -27,7 +31,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	public static function resetVariables()
 	{
-		characterName = PlayState.SONG.player1.startsWith("pico") ? 'pico-dead' : 'bf-dead';
+		//characterName = PlayState.SONG.player1.startsWith("pico") ? 'pico-dead' : 'bf-dead';
 		deathSoundName = 'fnf_loss_sfx';
 		loopSoundName = 'gameOver';
 		endSoundName = 'gameOverEnd';
@@ -46,9 +50,6 @@ class GameOverSubstate extends MusicBeatSubstate
 		}
 	}
 
-	var charX:Float = 0;
-	var charY:Float = 0;
-
 	override function create()
 	{
 		instance = this;
@@ -58,23 +59,67 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		Conductor.songPosition = 0;
 
-		boyfriend = new Character(PlayState.instance.boyfriend.getScreenPosition().x, PlayState.instance.boyfriend.getScreenPosition().y, characterName, true);
-		boyfriend.x += boyfriend.positionArray[0] - PlayState.instance.boyfriend.positionArray[0];
-		boyfriend.y += boyfriend.positionArray[1] - PlayState.instance.boyfriend.positionArray[1];
-		add(boyfriend);
+		var game:PlayState = PlayState.instance;
+		suffix = game.boyfriend.idleSuffix;
 
-		FlxG.sound.play(Paths.sound(deathSoundName));
-		FlxG.camera.scroll.set();
-		FlxG.camera.target = null;
+		for (name in game.boyfriend.animOffsets.keys())
+		{
+			if (name.startsWith('firstDeath'))
+			{
+				usingLiveBoyfriend = true;
+				break;
+			}
+		}
 
-		boyfriend.playAnim('firstDeath');
+		if (usingLiveBoyfriend)
+		{
+			game.remove(game.boyfriendGroup);
+			add(game.boyfriendGroup);
+			boyfriend = game.boyfriend;
+		}
+		else
+		{
+			boyfriend = new Character(game.boyfriend.x, game.boyfriend.y, characterName, true);
+			boyfriend.x += boyfriend.positionArray[0] - game.boyfriend.positionArray[0];
+			boyfriend.y += boyfriend.positionArray[1] - game.boyfriend.positionArray[1];
+			add(boyfriend);
+		}
 
+		boyfriend.shader = null;
+		boyfriend.color = FlxColor.WHITE;
+		boyfriend.skipDance = true;
+		for (cam in FlxG.cameras.list)
+			cam.filters = [];
+
+		playDeathAnim('firstDeath');
+		FlxG.sound.play(Paths.sound(checkFile(deathSoundName, 'sounds')));
+
+		targetZoom = StageData.getStageFile(PlayState.curStage)?.defaultZoom ?? 1;
+
+		var json:Dynamic = Json.parse(Paths.getTextFromFile('characters/' + boyfriend.curCharacter + '.json'));
+		if (json != null && json.gameover != null)
+		{
+			if (json.gameover.offsets != null)
+			{
+				camOffsetX = json.gameover.offsets[0];
+				camOffsetY = json.gameover.offsets[1];
+			}
+			if (json.gameover.zoom != null)
+				targetZoom *= json.gameover.zoom;
+		}
+
+		// Tracks the character's midpoint every frame rather than being pinned once, so the camera
+		// eases onto them from wherever gameplay left it and keeps up as the death frames change size.
+		// The character's own `cameraPosition` is deliberately ignored -- that frames them for gameplay,
+		// off to one side, but here they're the only thing on screen.
 		camFollow = new FlxObject(0, 0, 1, 1);
-		camFollow.setPosition(boyfriend.getGraphicMidpoint().x + boyfriend.cameraPosition[0], boyfriend.getGraphicMidpoint().y + boyfriend.cameraPosition[1]);
-		FlxG.camera.focusOn(new FlxPoint(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
+		updateCamFollow();
 		add(camFollow);
 
+		FlxG.camera.follow(camFollow, LOCKON, 0.6);
+
 		setOnScripts('inGameOver', true);
+		setOnScripts('boyfriend', boyfriend);
 		callOnScripts('onGameOverStart', []);
 
 		#if FEATURE_MOBILE_CONTROLS
@@ -85,7 +130,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		super.create();
 	}
 
-	public var startedDeath:Bool = false;
+	var startedDeath:Bool = false;
 
 	override function update(elapsed:Float)
 	{
@@ -94,9 +139,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		callOnScripts('onUpdate', [elapsed]);
 
 		if (Funkin.controls.ACCEPT)
-		{
 			endBullshit();
-		}
 
 		if (Funkin.controls.BACK)
 		{
@@ -116,78 +159,144 @@ class GameOverSubstate extends MusicBeatSubstate
 			callOnScripts('onGameOverConfirm', [false]);
 		}
 
-		if (boyfriend.animation.curAnim != null)
+		updateCamFollow();
+		FlxG.camera.zoom = smoothLerpPrecision(FlxG.camera.zoom, targetZoom, elapsed, 0.5);
+
+		if (!startedDeath && boyfriend.getAnimationName().startsWith('firstDeath') && boyfriend.isAnimationFinished())
 		{
-			if (boyfriend.animation.curAnim.name == 'firstDeath' && boyfriend.animation.curAnim.finished && startedDeath)
-				boyfriend.playAnim('deathLoop');
+			startedDeath = true;
+			playDeathAnim('deathLoop');
+			FlxG.sound.playMusic(Paths.music(checkFile(loopSoundName, 'music')), 0.2);
 
-			if (boyfriend.animation.curAnim.name == 'firstDeath')
-			{
-				if (boyfriend.animation.curAnim.curFrame >= 12 && !moveCamera)
-				{
-					FlxG.camera.follow(camFollow, LOCKON, 0.6);
-					moveCamera = true;
-				}
+			var quote:String = deathQuote();
+			if (quote != '')
+				FlxG.sound.play(Paths.sound(quote), 1, false, null, true, () -> FlxG.sound.music.fadeIn(4, 0.2, 1));
+			else
+				FlxG.sound.music.fadeIn(4, 0.2, 1);
 
-				if (boyfriend.animation.curAnim.finished && !playingDeathSound)
-				{
-					startedDeath = true;
-					coolStartDeath();
-				}
-			}
+			callOnScripts('onGameOverMusicStart');
 		}
 
 		if (FlxG.sound.music.playing)
-		{
 			Conductor.songPosition = FlxG.sound.music.time;
-		}
+
 		callOnScripts('onUpdatePost', [elapsed]);
 	}
 
 	var isEnding:Bool = false;
 
-	function coolStartDeath(?volume:Float = 1):Void
-	{
-		FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
-	}
-
 	function endBullshit():Void
 	{
-		if (!isEnding)
+		if (isEnding)
+			return;
+
+		isEnding = true;
+		playDeathAnim('deathConfirm');
+		FlxG.sound.music.stop();
+		FlxG.sound.playMusic(Paths.music(checkFile(endSoundName, 'music')), 1, false);
+
+		final fade:Float = FlxG.sound.music.length / 7000;
+		new FlxTimer().start(fade, function(tmr:FlxTimer)
 		{
-			isEnding = true;
-			boyfriend.playAnim('deathConfirm', true);
-			FlxG.sound.music.stop();
-			FlxG.sound.play(Paths.music(endSoundName));
-			new FlxTimer().start(0.7, function(tmr:FlxTimer)
+			if (PlayState.isPixelStage)
 			{
-				if (PlayState.isPixelStage)
+				RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
+				new FlxTimer().start(2.05, function(_)
 				{
-					RetroCameraFade.fadeToBlack(FlxG.camera, 10, 2);
-					new FlxTimer().start(2, function(_)
-					{
-						remove(boyfriend);
-						boyfriend.destroy();
-						Funkin.resetState();
-					});
-				}
-				else
+					releaseBoyfriend();
+					Funkin.resetState();
+				});
+			}
+			else
+			{
+				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					FlxG.camera.fade(FlxColor.BLACK, 1.5, false, function()
-					{
-						remove(boyfriend);
-						boyfriend.destroy();
-						Funkin.resetState();
-					});
-				}
-			});
-			callOnScripts('onGameOverConfirm', [true]);
+					releaseBoyfriend();
+					Funkin.resetState();
+				});
+			}
+		});
+		callOnScripts('onGameOverConfirm', [true]);
+	}
+
+	function updateCamFollow():Void
+	{
+		var midpoint:FlxPoint = boyfriend.getGraphicMidpoint();
+		camFollow.setPosition(midpoint.x + camOffsetX, midpoint.y + camOffsetY);
+		midpoint.put();
+	}
+
+	function playDeathAnim(anim:String):Void
+	{
+		if (boyfriend.animOffsets.exists(anim + suffix))
+			boyfriend.playAnim(anim + suffix, true);
+		else
+			boyfriend.playAnim(anim, true);
+	}
+
+	function smoothLerpPrecision(base:Float, target:Float, deltaTime:Float, duration:Float, precision:Float = 1 / 100):Float
+	{
+		if (deltaTime == 0 || base == target)
+			return target;
+		return FlxMath.lerp(target, base, Math.pow(precision, deltaTime / duration));
+	}
+
+	/** Hands PlayState's boyfriend group back, or disposes of the death character we made. */
+	var released:Bool = false;
+
+	function releaseBoyfriend():Void
+	{
+		if (released)
+			return;
+		released = true;
+
+		if (usingLiveBoyfriend)
+		{
+			var group:FlxSpriteGroup = PlayState.instance.boyfriendGroup;
+			remove(group);
+			PlayState.instance.add(group);
 		}
+		else
+		{
+			remove(boyfriend);
+			boyfriend.destroy();
+		}
+	}
+
+	function deathQuote():String
+	{
+		var path:String = 'data/' + Paths.formatToSongPath(PlayState.SONG.song);
+		var variant:String = PlayState.SONG.variant;
+		if (variant != null && variant != '')
+			path += '/' + variant;
+		path += '/deathQuote.txt';
+
+		var contents:String = Paths.getTextFromFile(path);
+		if (contents == null)
+			return '';
+
+		var quotes:Array<String> = contents.split('\n');
+		return quotes[FlxG.random.int(0, quotes.length - 1)];
+	}
+
+	/** Prefers a `-pixel` variant of a sound when the mod folder actually ships one. */
+	function checkFile(file:String, folder:String):String
+	{
+		if (!PlayState.isPixelStage)
+			return file;
+
+		var pixelName:String = file + '-pixel';
+		// fileExists covers base assets as well as mods -- modFolders alone would miss assets/.
+		for (ext in Paths.SOUND_EXTS)
+			if (Paths.fileExists('$folder/$pixelName.$ext', SOUND))
+				return pixelName;
+		return file;
 	}
 
 	override function destroy()
 	{
 		instance = null;
+		releaseBoyfriend();
 		super.destroy();
 	}
 }

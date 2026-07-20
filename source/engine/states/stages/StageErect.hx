@@ -1,12 +1,23 @@
 package states.stages;
 
 import flixel.graphics.FlxGraphic;
+#if FEATURE_FUNKIN_CONTENT
+import flixel.tweens.FlxEase.EaseFunction;
+#end
 import openfl.display.BlendMode;
 import shaders.AdjustColorShader;
 
 class StageErect extends BaseStage
 {
 	var peeps:BGSprite;
+
+	#if FEATURE_FUNKIN_CONTENT
+	var spotlightBG:FlxSprite;
+	var spotlightDAD:BGSprite;
+	var spotlightGF:BGSprite;
+	var spotlightBF:BGSprite;
+	var smokeGroup:FlxSpriteGroup;
+	#end
 
 	override function create()
 	{
@@ -54,6 +65,83 @@ class StageErect extends BaseStage
 			TheOneAbove.blend = BlendMode.ADD;
 			add(TheOneAbove);
 		}
+
+		createSpotlights();
+	}
+
+	function createSpotlights()
+	{
+		#if FEATURE_FUNKIN_CONTENT
+		spotlightBG = new FlxSprite(-300, -500).makeGraphic(1, 1, 0xFF000000);
+		spotlightBG.scale.set(2000, 2000);
+		spotlightBG.updateHitbox();
+		add(spotlightBG);
+
+		spotlightGF = new BGSprite('stages/mainStage/spotlight', 200, -90);
+		spotlightGF.blend = BlendMode.ADD;
+		add(spotlightGF);
+
+		spotlightDAD = new BGSprite('stages/mainStage/spotlight', -190, -50);
+		spotlightDAD.blend = BlendMode.ADD;
+		add(spotlightDAD);
+
+		spotlightBF = new BGSprite('stages/mainStage/spotlight', 690, -50);
+		spotlightBF.blend = BlendMode.ADD;
+		add(spotlightBF);
+
+		smokeGroup = new FlxSpriteGroup();
+		add(smokeGroup);
+		for (i in 0...4)
+		{
+			var smok:BGSprite = new BGSprite('stages/mainStage/smoke');
+			smok.flipX = i > 1;
+			smok.x = -1100;
+			if (i > 1)
+				smok.x += 2200;
+			smok.y = 700;
+			smok.velocity.x = smok.flipX ? -10 : 10;
+			smok.active = true;
+			smokeGroup.add(smok);
+		}
+
+		spotlightDAD.alpha = spotlightBF.alpha = spotlightGF.alpha = smokeGroup.alpha = spotlightBG.alpha = 0.001;
+		#end
+	}
+
+	override function eventCalled(eventName:String, value1:String, value2:String, flValue1:Null<Float>, flValue2:Null<Float>, strumTime:Float)
+	{
+		#if FEATURE_FUNKIN_CONTENT
+		if (eventName != 'Dadbattle Spotlight' || value1 == null || value1.length < 1)
+			return;
+
+		var target:FlxSprite = switch (value1.toLowerCase().trim())
+		{
+			case 'dad' | 'opponent' | '1': spotlightDAD;
+			case 'girlfriend' | 'gf' | '2': spotlightGF;
+			case 'background' | 'bg' | '3': spotlightBG;
+			case 'smoke' | '4': smokeGroup;
+			default: spotlightBF;
+		}
+
+		var values:Array<String> = (value2 != null && value2.contains(',')) ? value2.split(',') : [value2, '0', 'classic'];
+		var alphaFloat:Float = Std.parseFloat(values[0]);
+		if (Math.isNaN(alphaFloat))
+			alphaFloat = 0;
+
+		var easeString:String = (values.length > 2 ? Std.string(values[2]) : 'classic').toLowerCase().trim();
+		if (easeString == 'classic' || easeString.length < 1)
+		{
+			target.alpha = alphaFloat;
+			return;
+		}
+
+		var durationFloat:Float = (values.length > 1) ? Std.parseFloat(values[1]) : 0;
+		if (Math.isNaN(durationFloat))
+			durationFloat = 0;
+
+		var ease:EaseFunction = LuaUtils.getTweenEaseByString(easeString);
+		FlxTween.tween(target, {alpha: alphaFloat}, Conductor.stepCrochet / 1000 * durationFloat, {ease: ease});
+		#end
 	}
 
 	override function createPost()

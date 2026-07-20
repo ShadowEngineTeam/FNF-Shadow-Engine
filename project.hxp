@@ -364,18 +364,19 @@ class Project extends HXProject
 		final embed:Bool = FEATURE_EMBED_ASSETS.isEnabled();
 
 		includeAssetLibrary("default", true, false);
+
+		if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		{
+			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
+			addAssetPath("assets/funkin_resources/shared", 'assets/shared', embed);
+		}
+
 		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
 		addAssetPath("assets/shared", null, embed);
 
 		if (FEATURE_MOBILE_CONTROLS.isEnabled())
 			addAssetPath("assets/mobile", 'assets/shared/mobile', embed);
-		if (FEATURE_FUNKIN_CONTENT.isEnabled())
-		{
-			addAssetPath("assets/funkin_resources/embed", 'assets/embed', embed);
-			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
-			addAssetPath("assets/funkin_resources/shared", 'assets/shared', embed);
-		}
 
 		final textureFormats:Array<String> = ["ASTC", "BC"];
 		var hasFormat:Bool = false;
@@ -428,11 +429,11 @@ class Project extends HXProject
 		}
 		if (FEATURE_DISCORD_RPC.isEnabled())
 			includeHaxelib("hxdiscord_rpc");
-		if (FEATURE_FUNKIN_CONTENT.isEnabled())
-		{
+		//if (FEATURE_FUNKIN_CONTENT.isEnabled())
+		//{
 			includeHaxelib("funkin.vis");
 			includeHaxelib("grig.audio");
-		}
+		//}
 
 		if (isDebug() && isCPP())
 			includeHaxelib("hxcpp-debug-server");

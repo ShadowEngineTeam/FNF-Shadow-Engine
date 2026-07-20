@@ -334,7 +334,6 @@ class PlayState extends MusicBeatState
 		detailsPausedText = "Paused - " + detailsText;
 		#end
 
-		GameOverSubstate.resetVariables();
 		songName = Paths.formatToSongPath(SONG.song);
 		if (SONG.stage == null || SONG.stage.length < 1)
 		{
@@ -362,6 +361,8 @@ class PlayState extends MusicBeatState
 			if (stageData.isPixelStage)
 				stageUI = "pixel";
 		}
+
+		GameOverSubstate.resetVariables();
 
 		BF_X = stageData.boyfriend[0];
 		BF_Y = stageData.boyfriend[1];
