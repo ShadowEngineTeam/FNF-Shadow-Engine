@@ -499,6 +499,8 @@ class Character extends FlxAnimate
 		var animFps:Int = anim.fps;
 		var animLoop:Bool = !!anim.loop; // bruh?
 		var animIndices:Array<Int> = anim.indices;
+		var animFlipX:Bool = anim.flipX == true;
+		var animFlipY:Bool = anim.flipY == true;
 
 		var asAnimate:Bool;
 		if (anim.isAnimate != null)
@@ -515,36 +517,24 @@ class Character extends FlxAnimate
 			if (anim.isFrameLabel == true)
 			{
 				if (animIndices != null && animIndices.length > 0)
-					this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop);
+					this.anim.addByFrameLabelIndices(animAnim, animName, animIndices, animFps, animLoop, animFlipX, animFlipY);
 				else
-					this.anim.addByFrameLabel(animAnim, animName, animFps, animLoop);
+					this.anim.addByFrameLabel(animAnim, animName, animFps, animLoop, animFlipX, animFlipY);
 			}
 			else
 			{
 				if (animIndices != null && animIndices.length > 0)
-					this.anim.addBySymbolIndices(animAnim, animName, animIndices, animFps, animLoop);
+					this.anim.addBySymbolIndices(animAnim, animName, animIndices, animFps, animLoop, animFlipX, animFlipY);
 				else
-					this.anim.addBySymbol(animAnim, animName, animFps, animLoop);
+					this.anim.addBySymbol(animAnim, animName, animFps, animLoop, animFlipX, animFlipY);
 			}
 		}
 		else
 		{
 			if (animIndices != null && animIndices.length > 0)
-				this.anim.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
+				this.anim.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop, animFlipX, animFlipY);
 			else
-				this.anim.addByPrefix(animAnim, animName, animFps, animLoop);
-		}
-
-		if (anim.flipX != null || anim.flipY != null)
-		{
-			var theAnim = animation.getByName(animName);
-			if (theAnim != null)
-			{
-				if (anim.flipX != null)
-					theAnim.flipX = anim.flipX == true;
-				if (anim.flipY != null)
-					theAnim.flipY = anim.flipY == true;
-			}
+				this.anim.addByPrefix(animAnim, animName, animFps, animLoop, animFlipX, animFlipY);
 		}
 	}
 
