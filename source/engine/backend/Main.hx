@@ -1,41 +1,32 @@
 package backend;
-
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.input.keyboard.FlxKey;
-import debug.codename.Framerate;
-import flixel.FlxGame;
-import haxe.io.Path;
-import openfl.Lib;
 import openfl.display.Sprite;
 import openfl.events.Event;
-import lime.system.System as LimeSystem;
-import states.InitState;
 import openfl.events.KeyboardEvent;
+import debug.codename.Framerate;
+import flixel.FlxGame;
+
+#if desktop
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.input.keyboard.FlxKey;
+#end
 
 class Main extends Sprite
 {
-	public static final game = {
-		width: 1280, // game width
-		height: 720, // game height
-		initialState: InitState, // initial game state
-		framerate: 60, // default framerate
-		skipSplash: true, // if the flixel splash screen should be skipped
-		startFullscreen: false // if the game should start at fullscreen mode
-	};
-
 	public static var fpsVar:Framerate;
 
 	public static function main():Void
 	{
-		Lib.current.addChild(new Main());
+		openfl.Lib.current.addChild(new Main());
+
 		#if cpp
 		cpp.NativeGc.enable(true);
 		#end
 	}
 
-	public function new()
+	public function new():Void
 	{
 		backend.CrashHandler.init();
+
 		#if mobile
 		Sys.setCwd(StorageUtil.getStorageDirectory());
 		#if android
@@ -43,29 +34,22 @@ class Main extends Sprite
 		#end
 		mobile.backend.io.Assets.init();
 		#end
+
 		super();
 
-		if (stage != null)
-		{
-			init();
-		}
-		else
-		{
-			addEventListener(Event.ADDED_TO_STAGE, init);
-		}
+		stage != null ? init() : addEventListener(Event.ADDED_TO_STAGE, init);
 	}
 
-	private function init(?E:Event):Void
+	function init(?e:Event):Void
 	{
 		if (hasEventListener(Event.ADDED_TO_STAGE))
-		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-		}
 
 		#if android
-		if (!FileSystem.exists(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt"))
+		final file:String = haxe.io.Path.addTrailingSlash(lime.system.System.applicationStorageDirectory) + "useExternal.txt";
+		if (!FileSystem.exists(file))
 		{
-			File.saveContent(haxe.io.Path.addTrailingSlash(LimeSystem.applicationStorageDirectory) + "useExternal.txt", 'false');
+			File.saveContent(file, 'false');
 			Sys.setCwd(StorageUtil.getStorageDirectory());
 		}
 		#end
@@ -73,19 +57,17 @@ class Main extends Sprite
 		setupGame();
 	}
 
-	private function setupGame():Void
+	function setupGame():Void
 	{
+		final gaym:FlxGame = new FlxGame(1280, 720, states.InitState, 60, 60, true, false);
 		untyped FlxG.cameras = new backend.rendering.ShadowCameraFrontEnd();
-
-		final funkinGame:FlxGame = new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash,
-			game.startFullscreen);
 
 		#if !html5
 		@:privateAccess
-		funkinGame._customSoundTray = objects.CustomSoundTray;
+		gaym._customSoundTray = objects.CustomSoundTray;
 		#end
 
-		addChild(funkinGame);
+		addChild(gaym);
 
 		@:privateAccess
 		FlxG.game.addChildAt(fpsVar = new Framerate(), FlxG.game.getChildIndex(FlxG.game._inputContainer) + 1);
@@ -106,13 +88,31 @@ class Main extends Sprite
 			fpsVar.visible = true;
 
 		#if desktop
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, toggleFullScreen);
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, emergencyEject);
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, hotReload);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, (e:KeyboardEvent) ->
+		{
+			if (Controls.instance?.justReleased('fullscreen'))
+				FlxG.fullscreen = !FlxG.fullscreen;
+		});
+
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, (e:KeyboardEvent) ->
+		{
+			if (e.shiftKey && e.keyCode == FlxKey.F4)
+			{
+				FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+				Paths.clearStoredMemory();
+				Funkin.switchState(states.MainMenuState);
+			}
+		});
+
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, (e:KeyboardEvent) ->
+		{
+			if (e.shiftKey && e.keyCode == FlxKey.F5)
+				FlxG.resetState();
+		});
 		#end
 
 		// shader coords fix
-		FlxG.signals.gameResized.add(function(w, h)
+		FlxG.signals.gameResized.add((w:Int, h:Int) ->
 		{
 			if (FlxG.cameras != null)
 			{
@@ -128,37 +128,12 @@ class Main extends Sprite
 		});
 	}
 
-	static function resetSpriteCache(sprite:Sprite):Void
+	static inline function resetSpriteCache(sprite:Sprite):Void
 	{
 		@:privateAccess
 		{
 			sprite.__cacheBitmap = null;
 			sprite.__cacheBitmapData = null;
-		}
-	}
-
-	function toggleFullScreen(event:KeyboardEvent):Void
-	{
-		if (Controls.instance?.justReleased('fullscreen'))
-			FlxG.fullscreen = !FlxG.fullscreen;
-	}
-
-	function emergencyEject(event:KeyboardEvent):Void
-	{
-		if (event.shiftKey && event.keyCode == FlxKey.F4)
-		{
-			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
-			Paths.clearStoredMemory();
-			Funkin.switchState(states.MainMenuState);
-		}
-	}
-
-	function hotReload(event:KeyboardEvent):Void
-	{
-		if (event.shiftKey && event.keyCode == FlxKey.F5)
-		{
-			// SHADOW TODO: maybe do some real hot reloading in the future...
-			FlxG.resetState();
 		}
 	}
 }
