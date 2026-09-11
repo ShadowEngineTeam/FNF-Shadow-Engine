@@ -342,6 +342,7 @@ class PlayState extends MusicBeatState
 	var _lastSecondsTotal:Int = -1;
 	var _lastCpuControlled:Null<Bool> = null;
 	public var transitioning:Bool = false;
+	public var autoUpdateRPC:Bool = true;
 
 	override public function create():Void
 	{
@@ -1229,9 +1230,7 @@ class PlayState extends MusicBeatState
 
 		FlxG.sound.music.pause();
 		vocals.pause();
-
-		if (opponentVocals != null)
-			opponentVocals.pause();
+		opponentVocals?.pause();
 
 		FlxG.sound.music.time = time;
 		FlxG.sound.music.pitch = playbackRate;
@@ -1593,23 +1592,22 @@ class PlayState extends MusicBeatState
 	}
 
 	@:haxe.warning("-WDeprecated")
-	override function openSubState(SubState:FlxSubState)
+	override function openSubState(SubState:FlxSubState):Void
 	{
-		stagesFunc(function(stage:BaseStage) stage.openSubState(SubState));
+		stagesFunc((stage:BaseStage) -> stage.openSubState(SubState));
+
 		if (paused)
 		{
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
 				vocals.pause();
-				@:privateAccess
-				if (opponentVocals._sound != null)
-					opponentVocals.pause();
+				opponentVocals?.pause();
 			}
-			FlxTimer.globalManager.forEach(function(tmr:FlxTimer) if (!tmr.finished)
-				tmr.active = false);
-			FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
-				twn.active = false);
+
+			FlxTimer.globalManager.forEach((tmr:FlxTimer) -> if (!tmr.finished) tmr.active = false);
+			FlxTween.globalManager.forEach((twn:FlxTween) -> if (!twn.finished) twn.active = false);
+
 			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = touchPad.visible = false;
 			#end
@@ -1618,24 +1616,26 @@ class PlayState extends MusicBeatState
 		super.openSubState(SubState);
 	}
 
-	override function closeSubState()
+	override function closeSubState():Void
 	{
-		stagesFunc(function(stage:BaseStage) stage.closeSubState());
+		stagesFunc((stage:BaseStage) -> stage.closeSubState());
+
 		if (paused && !closedFromPause)
 		{
 			if (FlxG.sound.music != null && !startingSong)
 				resyncVocals();
 
-			FlxTimer.globalManager.forEach(function(tmr:FlxTimer) if (!tmr.finished)
-				tmr.active = true);
-			FlxTween.globalManager.forEach(function(twn:FlxTween) if (!twn.finished)
-				twn.active = true);
+			FlxTimer.globalManager.forEach((tmr:FlxTimer) -> if (!tmr.finished) tmr.active = true);
+			FlxTween.globalManager.forEach((twn:FlxTween) -> if (!twn.finished) twn.active = true);
 
 			paused = closedFromPause =  false;
+
 			#if FEATURE_MOBILE_CONTROLS
 			mobileControls.instance.visible = touchPad.visible = true;
 			#end
+
 			resetRPC(startTimer != null && startTimer.finished);
+
 			#if (target.threaded)
 			runSongSyncThread();
 			#end
@@ -1647,10 +1647,12 @@ class PlayState extends MusicBeatState
 	{
 		if (health > 0 && !paused)
 			resetRPC(Conductor.songPosition > 0.0);
+
 		#if (target.threaded)
 		shutdownThread = false;
 		runSongSyncThread();
 		#end
+
 		super.onFocus();
 	}
 
@@ -1658,33 +1660,20 @@ class PlayState extends MusicBeatState
 	{
 		#if FEATURE_DISCORD_RPC
 		if (health > 0 && !paused && FlxG.autoPause && autoUpdateRPC)
-			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+			DiscordClient.changePresence(detailsPausedText, '${SONG.song} ($storyDifficultyText)', iconP2.getCharacter());
 		#end
+
 		#if (target.threaded)
 		shutdownThread = true;
 		#end
 		super.onFocusLost();
 	}
 
-	// Updating Discord Rich Presence.
-	public var autoUpdateRPC:Bool = true; // performance setting for custom RPC things
-
 	function resetRPC(?showTime:Bool = false)
 	{
 		#if FEATURE_DISCORD_RPC
-		if (!autoUpdateRPC)
-			return;
-
-		if (showTime)
-			DiscordClient.changePresence(detailsText, SONG.song
-				+ " ("
-				+ storyDifficultyText
-				+ ")", iconP2.getCharacter(), true,
-				songLength
-				- Conductor.songPosition
-				- ClientPrefs.data.noteOffset);
-		else
-			DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+		if (autoUpdateRPC)
+			DiscordClient.changePresence(detailsText, '${SONG.song} ($storyDifficultyText)', iconP2.getCharacter(), showTime, showTime ? songLength - Conductor.songPosition - ClientPrefs.data.noteOffset : null);
 		#end
 	}
 
@@ -1693,26 +1682,25 @@ class PlayState extends MusicBeatState
 		if (finishTimer != null)
 			return;
 
-		//trace('resynced vocals at ' + Math.floor(Conductor.songPosition));
-
 		FlxG.sound.music.play();
 		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 
-		var checkVocals = @:privateAccess (opponentVocals._sound != null) ? [vocals, opponentVocals] : [vocals];
-		for (voc in checkVocals)
+		if (FlxG.sound.music.time < vocals.length)
 		{
-			if (FlxG.sound.music.time < vocals.length)
+			vocals.time = FlxG.sound.music.time;
+			vocals.pitch = playbackRate;
+			vocals.play();
+		} else vocals.pause();
+
+		if (opponentVocals != null)
+		{
+			if (FlxG.sound.music.time < opponentVocals.length)
 			{
-				voc.time = FlxG.sound.music.time;
-				voc.pitch = playbackRate;
-				#if mobile
-				//FlxTween.tween(voc, {volume: 1}, 0.05, {ease: FlxEase.linear});
-				#end
-				voc.play();
-			}
-			else
-				voc.pause();
+				opponentVocals.time = FlxG.sound.music.time;
+				opponentVocals.pitch = playbackRate;
+				opponentVocals.play();
+			} else opponentVocals.pause();
 		}
 	}
 
@@ -1725,18 +1713,13 @@ class PlayState extends MusicBeatState
 	var freezeCamera:Bool = false;
 	var allowDebugKeys:Bool = true;
 
-	override public function update(elapsed:Float)
+	override public function update(elapsed:Float):Void
 	{
-		if (!inCutscene && !paused && !freezeCamera)
-			FlxG.camera.followLerp = 2.4 * cameraSpeed * playbackRate;
-		else
-			FlxG.camera.followLerp = 0;
+		FlxG.camera.followLerp = !inCutscene && !paused && !freezeCamera ? 2.4 * cameraSpeed * playbackRate : 0;
 
 		super.update(elapsed);
 
 		if (!inCutscene && !paused && !freezeCamera && camTween != null)
-			// `FlxPoint.get()` takes a point out of the pool and never puts it back, so this drained
-			// the pool and allocated a fresh point every frame. `weak()` is reclaimed by focusOn().
 			FlxG.camera.focusOn(FlxPoint.weak(camFollow.x, camFollow.y));
 
 		if (botplayTxt != null && botplayTxt.visible)
@@ -1808,18 +1791,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			// `recalculateRating()` fans out to ~9 script calls, rebuilds the score string and
-			// re-rasterises `scoreTxt`. Running it unconditionally every frame meant a full software
-			// text re-raster plus a GPU texture re-upload on any frame the score moved, and a pile of
-			// Lua global writes on every other frame. Nothing it produces can change unless one of
-			// these inputs changes, so gate on them. Comparing values (rather than using a dirty
-			// flag) also keeps working when a mod script writes `songScore`/`combo` directly.
-			if (songScore != _lastSongScore
-				|| songMisses != _lastSongMisses
-				|| songHits != _lastSongHits
-				|| combo != _lastCombo
-				|| totalPlayed != _lastTotalPlayed
-				|| totalNotesHit != _lastTotalNotesHit)
+			if (songScore != _lastSongScore || songMisses != _lastSongMisses || songHits != _lastSongHits || combo != _lastCombo || totalPlayed != _lastTotalPlayed || totalNotesHit != _lastTotalNotesHit)
 			{
 				_lastSongScore = songScore;
 				_lastSongMisses = songMisses;
@@ -1837,10 +1809,6 @@ class PlayState extends MusicBeatState
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
 		}
 
-		FlxG.watch.addQuick("secShit", curSection);
-		FlxG.watch.addQuick("beatShit", curBeat);
-		FlxG.watch.addQuick("stepShit", curStep);
-
 		if (!ClientPrefs.data.noReset && Funkin.controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
 			health = 0;
 
@@ -1849,19 +1817,19 @@ class PlayState extends MusicBeatState
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
+
 			if (songSpeed < 1)
 				time /= songSpeed;
+
 			if (unspawnNotes[0].multSpeed < 1)
 				time /= unspawnNotes[0].multSpeed;
 
 			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
-				// `shift()` instead of the old `indexOf(dunceNote)` + `splice(index, 1)`: the note is
-				// always at index 0 here, so the scan was pointless and the splice did the same work
-				// shift() does anyway.
 				final dunceNote:Note = unspawnNotes.shift();
 				notes.insert(0, dunceNote);
 				dunceNote.spawned = true;
+
 				if (dunceNote.mustPress && allowedNotes.contains(dunceNote.noteType))
 					dunceNote.texture = noteSkin;
 				else if (!dunceNote.mustPress && allowedNotes.contains(dunceNote.noteType))
@@ -1869,15 +1837,7 @@ class PlayState extends MusicBeatState
 
 				if (hasScripts)
 				{
-					// The note was just inserted at index 0, so the old indexOf() call was a
-					// guaranteed-zero linear scan.
-					final args:Array<Dynamic> = [
-						0,
-						dunceNote.noteData,
-						dunceNote.noteType,
-						dunceNote.isSustainNote,
-						dunceNote.strumTime
-					];
+					final args:Array<Dynamic> = [0, dunceNote.noteData, dunceNote.noteType, dunceNote.isSustainNote, dunceNote.strumTime];
 					callOnLuas('onSpawnNote', args);
 					callOnHScript('onSpawnNote', [dunceNote]);
 				}
@@ -1897,11 +1857,6 @@ class PlayState extends MusicBeatState
 				{
 					if (startedCountdown)
 					{
-						// Walked with an indexed reverse loop rather than `forEachAlive(closure)`.
-						// The closure was allocated every frame, and the callbacks below
-						// (goodNoteHit/opponentNoteHit/noteMiss -> invalidateNote) splice
-						// `notes.members` while it is being iterated, which forEachAlive doesn't
-						// account for - iterating backwards makes the removals safe.
 						final fakeCrochet:Float = (60 / SONG.bpm) * 1000;
 						final scrollSpeed:Float = songSpeed / playbackRate;
 						final members:Array<Note> = notes.members;
@@ -2112,6 +2067,7 @@ class PlayState extends MusicBeatState
 			vocals.pause();
 			opponentVocals?.pause();
 		}
+
 		if (!cpuControlled)
 		{
 			for (note in playerStrums)
@@ -2150,8 +2106,7 @@ class PlayState extends MusicBeatState
 		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		paused = true;
-		if (FlxG.sound.music != null)
-			FlxG.sound.music.stop();
+		FlxG.sound.music?.stop();
 		#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 		Funkin.switchState(CharacterEditorState, [SONG.player2]);
 	}
@@ -2171,24 +2126,20 @@ class PlayState extends MusicBeatState
 
 				paused = true;
 				canPause = false;
+
 				#if FEATURE_VIDEOS
-				if (videoCutscene != null)
-				{
-					videoCutscene.destroy();
-					videoCutscene = null;
-				}
+				videoCutscene = FlxDestroyUtil.destroy(videoCutscene);
 				#end
 
 				vocals.stop();
-				@:privateAccess
-				if (opponentVocals._sound != null)
-					opponentVocals.stop();
+				opponentVocals?.stop();
 				FlxG.sound.music.stop();
 
 				persistentUpdate = false;
 				persistentDraw = false;
 				FlxTimer.globalManager.clear();
 				FlxTween.globalManager.clear();
+
 				#if FEATURE_LUA
 				modchartTimers.clear();
 				modchartTweens.clear();
@@ -2196,13 +2147,11 @@ class PlayState extends MusicBeatState
 
 				switchSubState(GameOverSubstate);
 
-				// Funkin.switchState(GameOverState, [boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y]);
-
 				#if FEATURE_DISCORD_RPC
-				// Game Over doesn't get his its variable because it's only used here
 				if (autoUpdateRPC)
 					DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 				#end
+
 				isDead = true;
 				return true;
 			}
@@ -3423,9 +3372,10 @@ class PlayState extends MusicBeatState
 		if (instakillOnMiss)
 		{
 			vocals.volume = 0;
-			@:privateAccess
-			if (opponentVocals._sound != null)
+
+			if (opponentVocals != null)
 				opponentVocals.volume = 0;
+
 			doDeathCheck(true);
 		}
 
@@ -3461,8 +3411,8 @@ class PlayState extends MusicBeatState
 				gf.specialAnim = true;
 			}
 		}
-		@:privateAccess
-		if (char == dad && opponentVocals._sound != null)
+
+		if (char == dad && opponentVocals != null)
 			opponentVocals.volume = 0;
 		else
 			vocals.volume = 0;
@@ -3508,8 +3458,8 @@ class PlayState extends MusicBeatState
 				char.holdTimer = 0;
 			}
 		}
-		@:privateAccess
-		if (char == dad && opponentVocals._sound != null)
+
+		if (char == dad && opponentVocals != null)
 			opponentVocals.volume = 1;
 		else
 			vocals.volume = 1;
@@ -3620,8 +3570,8 @@ class PlayState extends MusicBeatState
 		}
 		else
 			strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
-		@:privateAccess
-		if (char == dad && opponentVocals._sound != null)
+
+		if (char == dad && opponentVocals != null)
 			opponentVocals.volume = 1;
 		else
 			vocals.volume = 1;
@@ -3739,13 +3689,11 @@ class PlayState extends MusicBeatState
 		#end
 
 		FlxG.sound.music.pitch = 1;
+		vocals = FlxDestroyUtil.destroy(vocals);
+		opponentVocals = FlxDestroyUtil.destroy(opponentVocals);
 
 		#if FEATURE_VIDEOS
-		if (videoCutscene != null)
-		{
-			videoCutscene.destroy();
-			videoCutscene = null;
-		}
+		videoCutscene = FlxDestroyUtil.destroy(videoCutscene);
 		#end
 
 		super.destroy();
@@ -3763,8 +3711,8 @@ class PlayState extends MusicBeatState
 			#else
 			final syncTime:Float = 20 * playbackRate;
 			#end
-			@:privateAccess
-			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals._sound != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
+
+			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
 				resyncVocals();
 		}
 
@@ -4059,7 +4007,7 @@ class PlayState extends MusicBeatState
 			SustainSplash.opponentTexture = skin;
 
 		@:privateAccess
-		SustainSplash.mainGroup.forEachExists(function(splash:SustainSplash)
+		SustainSplash.mainGroup.forEachExists((splash:SustainSplash) ->
 		{
 			if (splash.mustPress == player)
 				splash.reloadSustainSplash(SustainSplash.getTextureNameFromData(splash.noteData, splash.mustPress));

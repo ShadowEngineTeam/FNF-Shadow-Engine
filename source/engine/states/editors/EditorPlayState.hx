@@ -271,8 +271,8 @@ class EditorPlayState extends MusicBeatSubstate
 			#else
 			final syncTime:Float = 20 * playbackRate;
 			#end
-			@:privateAccess
-			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals._sound != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
+
+			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
 				resyncVocals();
 		}
 		super.stepHit();
