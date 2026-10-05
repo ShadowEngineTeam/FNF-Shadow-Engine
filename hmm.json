@@ -63,19 +63,19 @@
     {
       "name": "funkin.vis",
       "type": "git",
-      "ref": "02bada154b474c2554709b9d12aef0cbf0da3ec9",
+      "ref": "4a77a1ffcc84bef9df45988f6794420a4e019670",
       "url": "https://github.com/FunkinCrew/funkVis"
     },
     {
       "name": "grig.audio",
       "type": "git",
-      "ref": "6409f3c6d1b4c52176813d3ede86c0d34e8af2c1",
+      "ref": "57f5d47f2533fd0c3dcd025a86cb86c0dfa0b6d2",
       "url": "https://github.com/FunkinCrew/grig.audio"
     },
     {
       "name": "hxp",
       "type": "git",
-      "ref": "47ef5ae6569cb0961761a2fbb416694df067124c",
+      "ref": "a060a749bfae3af190c50884cd89f89e5835abd6",
       "url": "https://github.com/openfl/hxp"
     },
     {
