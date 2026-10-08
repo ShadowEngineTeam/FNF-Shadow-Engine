@@ -1295,7 +1295,10 @@ class PlayState extends MusicBeatState
 
 	function findVocals(?name:String):Sound
 	{
-		final prefix:Null<String> = (name != null && name.length > 0) ? name : null;
+		if (name != null && name.length == 0)
+			return null;
+
+		final prefix:Null<String> = name;
 
 		for (suffix in songAudioSuffixes())
 		{
@@ -1364,6 +1367,9 @@ class PlayState extends MusicBeatState
 
 		vocals = new FlxSound();
 		opponentVocals = new FlxSound();
+
+		FlxG.sound.list.add(vocals);
+		FlxG.sound.list.add(opponentVocals);
 		try
 		{
 			if (SONG.needsVoices)

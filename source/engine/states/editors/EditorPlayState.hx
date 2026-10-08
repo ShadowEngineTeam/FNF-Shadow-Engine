@@ -672,6 +672,7 @@ class EditorPlayState extends MusicBeatSubstate
 		if (ClientPrefs.data.showNoteTiming && (!ClientPrefs.data.hideHud && showRating) && noteTimingRating == null)
 		{
 			add(noteTimingRating = new FlxText(0, 0, 0, "0ms"));
+			noteTimingRating.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
 		}
 		if (noteTimingRating != null)
 		{
