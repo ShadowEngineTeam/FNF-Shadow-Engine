@@ -38,55 +38,7 @@ class ColorSwap
 class ColorSwapShader extends FlxShader
 {
 	@:glFragmentSource('
-		varying float openfl_Alphav;
-		varying vec4 openfl_ColorMultiplierv;
-		varying vec4 openfl_ColorOffsetv;
-		varying vec2 openfl_TextureCoordv;
-
-		uniform bool openfl_HasColorTransform;
-		uniform vec2 openfl_TextureSize;
-		uniform sampler2D bitmap;
-
-		out vec4 openfl_FragColor;
-
-		uniform bool hasTransform;
-		uniform bool hasColorTransform;
-
-		vec4 flixel_texture2D(sampler2D bitmap, vec2 coord)
-		{
-			vec4 color = texture2D(bitmap, coord);
-
-			if (!hasTransform)
-			{
-				return color;
-			}
-
-			if (color.a == 0.0)
-			{
-				return vec4(0.0, 0.0, 0.0, 0.0);
-			}
-
-			if (!hasColorTransform)
-			{
-				return color * openfl_Alphav;
-			}
-
-			color = vec4(color.rgb / color.a, color.a);
-
-			mat4 colorMultiplier = mat4(0);
-			colorMultiplier[0][0] = openfl_ColorMultiplierv.x;
-			colorMultiplier[1][1] = openfl_ColorMultiplierv.y;
-			colorMultiplier[2][2] = openfl_ColorMultiplierv.z;
-			colorMultiplier[3][3] = openfl_ColorMultiplierv.w;
-
-			color = clamp(openfl_ColorOffsetv + (color * colorMultiplier), 0.0, 1.0);
-
-			if (color.a > 0.0)
-			{
-				return vec4(color.rgb * color.a * openfl_Alphav, color.a * openfl_Alphav);
-			}
-			return vec4(0.0, 0.0, 0.0, 0.0);
-		}
+		#pragma header
 
 		uniform vec3 uTime;
 		uniform bool awesomeOutline;
@@ -121,7 +73,7 @@ class ColorSwapShader extends FlxShader
 
 		void main()
 		{
-			vec4 color = flixel_texture2D(bitmap, openfl_TextureCoordv);
+			vec4 color = flixel_sampleBitmap(bitmap, openfl_TextureCoordv);
 
 			vec4 swagColor = vec4(rgb2hsv(vec3(color[0], color[1], color[2])), color[3]);
 
@@ -150,69 +102,29 @@ class ColorSwapShader extends FlxShader
 					float w = size.x / openfl_TextureSize.x;
 					float h = size.y / openfl_TextureSize.y;
 					
-					if (flixel_texture2D(bitmap, vec2(openfl_TextureCoordv.x + w, openfl_TextureCoordv.y)).a != 0.
-					|| flixel_texture2D(bitmap, vec2(openfl_TextureCoordv.x - w, openfl_TextureCoordv.y)).a != 0.
-					|| flixel_texture2D(bitmap, vec2(openfl_TextureCoordv.x, openfl_TextureCoordv.y + h)).a != 0.
-					|| flixel_texture2D(bitmap, vec2(openfl_TextureCoordv.x, openfl_TextureCoordv.y - h)).a != 0.)
+					if (flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv.x + w, openfl_TextureCoordv.y)).a != 0.
+					|| flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv.x - w, openfl_TextureCoordv.y)).a != 0.
+					|| flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv.x, openfl_TextureCoordv.y + h)).a != 0.
+					|| flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv.x, openfl_TextureCoordv.y - h)).a != 0.)
 						color = vec4(1.0, 1.0, 1.0, 1.0);
 				}
 			}
-			gl_FragColor = color;
+			gl_FragColor = openfl_applyBlend(color);
 
 			/* 
 			if (color.a > 0.5)
 				gl_FragColor = color;
 			else
 			{
-				float a = flixel_texture2D(bitmap, vec2(openfl_TextureCoordv + offset, openfl_TextureCoordv.y)).a +
-						  flixel_texture2D(bitmap, vec2(openfl_TextureCoordv, openfl_TextureCoordv.y - offset)).a +
-						  flixel_texture2D(bitmap, vec2(openfl_TextureCoordv - offset, openfl_TextureCoordv.y)).a +
-						  flixel_texture2D(bitmap, vec2(openfl_TextureCoordv, openfl_TextureCoordv.y + offset)).a;
+				float a = flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv + offset, openfl_TextureCoordv.y)).a +
+						  flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv, openfl_TextureCoordv.y - offset)).a +
+						  flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv - offset, openfl_TextureCoordv.y)).a +
+						  flixel_sampleBitmap(bitmap, vec2(openfl_TextureCoordv, openfl_TextureCoordv.y + offset)).a;
 				if (color.a < 1.0 && a > 0.0)
 					gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);
 				else
 					gl_FragColor = color;
 			} */
-		}')
-	@:glVertexSource('
-		attribute float openfl_Alpha;
-		attribute vec4 openfl_ColorMultiplier;
-		attribute vec4 openfl_ColorOffset;
-		attribute vec4 openfl_Position;
-		attribute vec2 openfl_TextureCoord;
-
-		varying float openfl_Alphav;
-		varying vec4 openfl_ColorMultiplierv;
-		varying vec4 openfl_ColorOffsetv;
-		varying vec2 openfl_TextureCoordv;
-
-		uniform mat4 openfl_Matrix;
-		uniform bool openfl_HasColorTransform;
-		uniform vec2 openfl_TextureSize;
-
-		attribute float alpha;
-		attribute vec4 colorMultiplier;
-		attribute vec4 colorOffset;
-		uniform bool hasColorTransform;
-		
-		void main(void)
-		{
-			openfl_Alphav = openfl_Alpha;
-			openfl_TextureCoordv = openfl_TextureCoord;
-
-			if (openfl_HasColorTransform) {
-				openfl_ColorMultiplierv = openfl_ColorMultiplier;
-				openfl_ColorOffsetv = openfl_ColorOffset / 255.0;
-			}
-
-			gl_Position = openfl_Matrix * openfl_Position;
-
-			openfl_Alphav = openfl_Alpha * alpha;
-			if (hasColorTransform)
-			{
-				openfl_ColorOffsetv = colorOffset / 255.0;
-				openfl_ColorMultiplierv = colorMultiplier;
-			}
 		}')
 	public function new()
 	{

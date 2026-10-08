@@ -22,6 +22,10 @@ class PsychCamera extends ShadowCamera
 		// using a camera shader.
 		updateFlashSpritePosition();
 		updateShake(elapsed);
+
+		// `FlxCamera.update()` ends with this and we do not call it, so `viewportRect` would
+		// otherwise stay zeroed on every camera in the engine.
+		__updateViewportRect();
 	}
 
 	public function updateFollowDelta(?elapsed:Float = 0):Void
