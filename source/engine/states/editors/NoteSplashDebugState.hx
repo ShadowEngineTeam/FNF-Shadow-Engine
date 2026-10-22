@@ -301,9 +301,6 @@ class NoteSplashDebugState extends MusicBeatState
 		if (!notTyping)
 			return;
 
-		if (FlxG.keys.justPressed.P)
-			setPixelMode(!pixelMode);
-
 		if (FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end)
 			changeSelection(-1);
 		else if (FlxG.keys.justPressed.D #if FEATURE_MOBILE_CONTROLS || touchPad.buttonDown.justPressed #end)
@@ -498,8 +495,6 @@ class NoteSplashDebugState extends MusicBeatState
 			return;
 
 		pixelMode = value;
-		if (pixelCheckbox.checked != value)
-			pixelCheckbox.checked = value;
 
 		reloadStrums();
 		try
@@ -692,7 +687,6 @@ class NoteSplashDebugState extends MusicBeatState
 				+ "W/S - Change animation\n"
 				+ "Q/E - Change frame\n"
 				+ "Ctrl + C/V - Copy & Paste offsets\n"
-				+ "P - Toggle pixel mode (red cross = strum center)\n"
 				+ "ESCAPE - Return to Editor Menu";
 		}
 
