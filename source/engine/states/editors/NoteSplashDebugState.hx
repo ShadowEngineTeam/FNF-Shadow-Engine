@@ -16,6 +16,15 @@ class NoteSplashDebugState extends MusicBeatState
 	var selection:FlxSprite;
 	var notes:FlxTypedGroup<StrumNote>;
 	var splashes:FlxTypedGroup<FlxSprite>;
+	var crosshairs:FlxTypedGroup<FlxSprite>;
+
+	var pixelMode:Bool = false;
+	var pixelScale:Float = 4; // pixel.hx forces 4x on every splash, NoteSplash alone uses PlayState.daPixelZoom (6x)
+	var pixelCheckbox:ShadowCheckbox;
+	var stepperPixelScale:ShadowStepper;
+
+	var prevStrumPixel:Null<Bool>;
+	var prevNotePixel:Null<Bool>;
 
 	var imageInputText:ShadowTextInput;
 	var nameInputText:ShadowTextInput;
@@ -57,27 +66,34 @@ class NoteSplashDebugState extends MusicBeatState
 		if (ClientPrefs.data.disableRGBNotes)
 			defaultTexture = 'noteSplashes';
 
+		prevStrumPixel = StrumNote.usePixelTextures;
+		prevNotePixel = Note.usePixelTextures;
+
 		notes = new FlxTypedGroup<StrumNote>();
 		add(notes);
 
 		splashes = new FlxTypedGroup<FlxSprite>();
 		add(splashes);
 
+		crosshairs = new FlxTypedGroup<FlxSprite>();
+		add(crosshairs);
+
 		for (i in 0...maxNotes)
 		{
 			var x:Int = i * 220 + 240;
 			var y:Int = 290;
-			var note:StrumNote = new StrumNote(x, y, i, 0, null);
-			note.alpha = 0.75;
-			note.playAnim('static');
-			notes.add(note);
 
 			var splash:FlxSprite = new FlxSprite(x, y);
 			splash.setPosition(splash.x - Note.swagWidth * 0.95, splash.y - Note.swagWidth);
-			splash.shader = ClientPrefs.data.disableRGBNotes ? note.colorSwap.shader : note.rgbShader.parent.shader;
-			splash.antialiasing = ClientPrefs.data.antialiasing;
 			splashes.add(splash);
+
+			var crosshair:FlxSprite = new FlxSprite().makeGraphic(41, 41, FlxColor.TRANSPARENT, true);
+			crosshair.pixels.fillRect(new openfl.geom.Rectangle(0, 20, 41, 1), FlxColor.RED);
+			crosshair.pixels.fillRect(new openfl.geom.Rectangle(20, 0, 1, 41), FlxColor.RED);
+			crosshair.alpha = 0.8;
+			crosshairs.add(crosshair);
 		}
+		reloadStrums();
 
 		var tipText:FlxText = new FlxText(0, FlxG.height - 30, FlxG.width, 'Press ${Funkin.controls.mobileC ? "F" : "F1"} for Help', 16);
 		tipText.setFormat(null, ShadowStyle.FONT_SIZE_MD, FlxColor.WHITE, CENTER);
@@ -85,7 +101,7 @@ class NoteSplashDebugState extends MusicBeatState
 		add(tipText);
 
 		var settingsPanelW:Int = 400;
-		var settingsPanelH:Int = 200;
+		var settingsPanelH:Int = 240;
 		UI_settingsPanel = new ShadowPanel((FlxG.width - settingsPanelW) / 2, FlxG.height - settingsPanelH - ShadowStyle.SPACING_LG, settingsPanelW, settingsPanelH);
 		UI_settingsPanel.scrollFactor.set();
 		add(UI_settingsPanel);
@@ -175,6 +191,23 @@ class NoteSplashDebugState extends MusicBeatState
 			}
 		};
 		UI_settingsPanel.add(nameInputText);
+
+		pixelCheckbox = new ShadowCheckbox(innerX, innerY + 182, 'Pixel', pixelMode, function(checked:Bool)
+		{
+			setPixelMode(checked);
+		});
+		UI_settingsPanel.add(pixelCheckbox);
+
+		var pixelScaleLabel:ShadowLabel = new ShadowLabel(innerX + 100, innerY + 182, 'Pixel Scale:', ShadowStyle.FONT_SIZE_MD);
+		UI_settingsPanel.add(pixelScaleLabel);
+
+		stepperPixelScale = new ShadowStepper(innerX + 200, innerY + 180, 1, pixelScale, 1, 8, 0, function(value:Float)
+		{
+			pixelScale = value;
+			if (pixelMode)
+				splashes.forEachAlive(function(spr:FlxSprite) spr.scale.set(pixelScale, pixelScale));
+		});
+		UI_settingsPanel.add(stepperPixelScale);
 
 		var infoPanelW:Int = 500;
 		var infoPanelH:Int = 90;
@@ -267,6 +300,9 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (!notTyping)
 			return;
+
+		if (FlxG.keys.justPressed.P)
+			setPixelMode(!pixelMode);
 
 		if (FlxG.keys.justPressed.A #if FEATURE_MOBILE_CONTROLS || touchPad.buttonUp.justPressed #end)
 			changeSelection(-1);
@@ -405,14 +441,18 @@ class NoteSplashDebugState extends MusicBeatState
 
 	function loadFrames()
 	{
+		var texture:String = getTexturePath();
 		splashes.forEachAlive(function(spr:FlxSprite)
 		{
-			spr.frames = Paths.getSparrowAtlas(textureName);
+			spr.frames = Paths.getSparrowAtlas(texture);
+			// Same as NoteSplash.setupNoteSplash: no updateHitbox, so the scale pivots around the frame center
+			spr.antialiasing = !pixelMode && ClientPrefs.data.antialiasing;
+			spr.scale.set(pixelMode ? pixelScale : 1, pixelMode ? pixelScale : 1);
 		});
 
 		// Initialize config
 		NoteSplash.configs.clear();
-		config = NoteSplash.precacheConfig(textureName);
+		config = NoteSplash.precacheConfig(texture);
 		if (config == null)
 			config = NoteSplash.precacheConfig(NoteSplash.defaultNoteSplash);
 		nameInputText.text = config.anim;
@@ -436,13 +476,70 @@ class NoteSplashDebugState extends MusicBeatState
 		for (offGroup in config.offsets)
 			strToSave += '\n' + offGroup[0] + ' ' + offGroup[1];
 
-		var pathSplit:Array<String> = (Paths.getPath('images/$textureName.png', IMAGE, true).split('.png')[0]).split(':');
+		var pathSplit:Array<String> = (Paths.getPath('images/${getTexturePath()}.png', IMAGE, true).split('.png')[0]).split(':');
 		var path:String = pathSplit[pathSplit.length - 1].trim() + '.txt';
 		var assetsDir:String = '';
 		savedText.text = 'Saved to: $path';
 		File.saveContent(path, strToSave);
 
 		// trace(strToSave);
+	}
+
+	function getTexturePath():String
+	{
+		if (pixelMode && !textureName.startsWith('pixelUI/'))
+			return 'pixelUI/' + textureName;
+		return textureName;
+	}
+
+	function setPixelMode(value:Bool)
+	{
+		if (pixelMode == value)
+			return;
+
+		pixelMode = value;
+		if (pixelCheckbox.checked != value)
+			pixelCheckbox.checked = value;
+
+		reloadStrums();
+		try
+		{
+			loadFrames();
+		}
+		catch (e:Dynamic)
+		{
+			trace('ERROR! $e');
+			textureName = defaultTexture;
+			imageInputText.text = textureName;
+			loadFrames();
+		}
+	}
+
+	function reloadStrums()
+	{
+		while (notes.members.length > 0)
+		{
+			var note:StrumNote = notes.members[0];
+			notes.remove(note, true);
+			note.destroy();
+		}
+
+		// Strums and the global RGB shaders pick pixel textures/colors from these flags, so they get rebuilt
+		StrumNote.usePixelTextures = Note.usePixelTextures = pixelMode;
+		Note.globalRgbShaders = [];
+
+		for (i in 0...maxNotes)
+		{
+			var note:StrumNote = new StrumNote(i * 220 + 240, 290, i, 0, null);
+			note.alpha = 0.75;
+			note.playAnim('static');
+			notes.add(note);
+
+			splashes.members[i].shader = ClientPrefs.data.disableRGBNotes ? note.colorSwap.shader : note.rgbShader.parent.shader;
+
+			var crosshair:FlxSprite = crosshairs.members[i];
+			crosshair.setPosition(note.x + (note.width - crosshair.width) / 2, note.y + (note.height - crosshair.height) / 2);
+		}
 	}
 
 	var maxAnims:Int = 0;
@@ -595,6 +692,7 @@ class NoteSplashDebugState extends MusicBeatState
 				+ "W/S - Change animation\n"
 				+ "Q/E - Change frame\n"
 				+ "Ctrl + C/V - Copy & Paste offsets\n"
+				+ "P - Toggle pixel mode (red cross = strum center)\n"
 				+ "ESCAPE - Return to Editor Menu";
 		}
 
@@ -612,5 +710,8 @@ class NoteSplashDebugState extends MusicBeatState
 	override function destroy()
 	{
 		super.destroy();
+		StrumNote.usePixelTextures = prevStrumPixel;
+		Note.usePixelTextures = prevNotePixel;
+		Note.globalRgbShaders = [];
 	}
 }
