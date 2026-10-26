@@ -31,10 +31,29 @@
             },
             {
               "appearance": "tinted",
-              "value": "Shadow Icon Translucent.png"
+              "value": "Shadow Translucent.png"
             }
           ],
           "name": "Shadow",
+          "position": {
+            "scale": 1,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "appearance": "tinted",
+              "value": "automatic"
+            }
+          ],
+          "glass": true,
+          "hidden": false,
+          "image-name": "Shadow Silhouette.png",
+          "name": "Shadow Silhouette",
           "position": {
             "scale": 1,
             "translation-in-points": [
