@@ -245,6 +245,7 @@ class PlayState extends MusicBeatState
 	private var requiresSyncing:Bool = false;
 	private var lastCorrectSongPos:Float = -1.0;
 	private var syncMutex:Mutex;
+	private var syncThreadRunning:Bool = false;
 	#end
 
 	public var noteSkin:String;
@@ -1379,7 +1380,8 @@ class PlayState extends MusicBeatState
 				vocals.pitch = playbackRate;
 
 				final oppVocals:Sound = findVocals(dad.vocalsFile) ?? findVocals('Opponent');
-				if (oppVocals != null) {
+				// Paths caches sounds, so the same file would be the same Sound playing twice
+				if (oppVocals != null && oppVocals != playerVocals) {
 					opponentVocals.loadEmbedded(oppVocals);
 					opponentVocals.pitch = playbackRate;
 				}
@@ -1737,18 +1739,16 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.sound.music.time < vocals.length)
 		{
-			vocals.time = FlxG.sound.music.time;
 			vocals.pitch = playbackRate;
-			vocals.play();
+			vocals.play(true, FlxG.sound.music.time);
 		} else vocals.pause();
 
 		if (opponentVocals != null)
 		{
 			if (FlxG.sound.music.time < opponentVocals.length)
 			{
-				opponentVocals.time = FlxG.sound.music.time;
 				opponentVocals.pitch = playbackRate;
-				opponentVocals.play();
+				opponentVocals.play(true, FlxG.sound.music.time);
 			} else opponentVocals.pause();
 		}
 	}
@@ -4116,42 +4116,61 @@ class PlayState extends MusicBeatState
 		if (syncMutex == null)
 			syncMutex = new Mutex();
 
-		Thread.create(function()
+		// a thread that hasn't noticed the shutdown yet just keeps going, so only one ever runs
+		syncMutex.acquire();
+		final alreadyRunning:Bool = syncThreadRunning;
+		syncThreadRunning = true;
+		syncMutex.release();
+
+		if (!alreadyRunning)
 		{
-			try
+			Thread.create(function()
 			{
-				while (!endingSong && !paused && !shutdownThread)
+				try
 				{
-					syncMutex.acquire();
-					var shouldContinue:Bool = !requiresSyncing;
-					syncMutex.release();
-
-					if (!shouldContinue)
+					while (true)
 					{
-						Sys.sleep(0.01);
-						continue;
+						syncMutex.acquire();
+						if (endingSong || paused || shutdownThread)
+						{
+							syncThreadRunning = false;
+							syncMutex.release();
+							break;
+						}
+						var shouldContinue:Bool = !requiresSyncing;
+						syncMutex.release();
+
+						if (!shouldContinue)
+						{
+							Sys.sleep(0.01);
+							continue;
+						}
+
+						syncMutex.acquire();
+						gameFroze = true;
+						syncMutex.release();
+
+						Sys.sleep(0.25);
+
+						syncMutex.acquire();
+						if (gameFroze && !shutdownThread)
+						{
+							lastCorrectSongPos = Conductor.songPosition;
+							requiresSyncing = true;
+						}
+						syncMutex.release();
 					}
+				}
+				catch (e:Dynamic)
+				{
+					trace('Song sync thread error: $e');
 
 					syncMutex.acquire();
-					gameFroze = true;
-					syncMutex.release();
-
-					Sys.sleep(0.25);
-
-					syncMutex.acquire();
-					if (gameFroze && !shutdownThread)
-					{
-						lastCorrectSongPos = Conductor.songPosition;
-						requiresSyncing = true;
-					}
+					syncThreadRunning = false;
 					syncMutex.release();
 				}
-			}
-			catch (e:Dynamic)
-			{
-				trace('Song sync thread error: $e');
-			}
-		});
+			});
+		}
 
 		if (!FlxG.signals.preUpdate.has(checkForResync))
 			FlxG.signals.preUpdate.add(checkForResync);
