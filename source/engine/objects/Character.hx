@@ -325,7 +325,7 @@ class Character extends FlxAnimate
 			holdTimer = 0;
 
 		if (!isPlayer
-			&& holdTimer >= Conductor.stepCrochet * (0.0011 #if FLX_PITCH / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1) #end) * singDuration)
+			&& holdTimer >= Conductor.stepCrochet * (0.0011 / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1)) * singDuration)
 		{
 			dance();
 			holdTimer = 0;
