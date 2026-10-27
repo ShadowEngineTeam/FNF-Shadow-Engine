@@ -27,8 +27,8 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "7c91acaafbb4ccfb7abea4f757adb5253b10e3de",
-      "url": "https://github.com/ShadowEngineTeam/hxcpp"
+      "ref": "23c1e95c54a59c92c585c7148dc99fa4777a476f",
+      "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
       "name": "SScript",
