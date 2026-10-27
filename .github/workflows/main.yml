@@ -140,5 +140,5 @@ jobs:
       - name: Upload Universal macOS bundle
         uses: actions/upload-artifact@main
         with:
-          name: macOSBuild-Universal-BC
+          name: macOSBuild-Universal-PNG
           path: ShadowEngine.app
