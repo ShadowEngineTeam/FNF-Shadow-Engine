@@ -88,7 +88,7 @@ jobs:
       name: macOS x86_64
       os: macos-15
       buildArgs: "mac -64 -D HXCPP_M64"
-      assetType: BC
+      assetType: PNG
       artifactName: macOSBuild-x86_64
       artifactPath: export/release/macos/bin/*
 
@@ -99,7 +99,7 @@ jobs:
       name: macOS ARM64
       os: macos-15
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
-      assetType: BC
+      assetType: PNG
       artifactName: macOSBuild-arm64
       artifactPath: export/release/macos/bin/*
 
@@ -113,13 +113,13 @@ jobs:
       - name: Download x86_64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-x86_64-BC
+          name: macOSBuild-x86_64-PNG
           path: intel
 
       - name: Download ARM64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-arm64-BC
+          name: macOSBuild-arm64-PNG
           path: arm
 
       - name: Remove ARM64 and x86_64 artifacts
