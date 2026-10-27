@@ -1311,7 +1311,7 @@ class ChartingState extends MusicBeatState
 	var instVolume:ShadowStepper;
 	var voicesVolume:ShadowStepper;
 	var voicesOppVolume:ShadowStepper;
-	#if lime_openal
+	#if lime_miniaudio
 	var waveformUseInstrumental:ShadowCheckbox;
 	var waveformUseVoices:ShadowCheckbox;
 	var waveformUseOppVoices:ShadowCheckbox;
@@ -1363,7 +1363,7 @@ class ChartingState extends MusicBeatState
 		var row8:Float = nextCheckboxRow();
 
 		// Initialize save data
-		#if lime_openal
+		#if lime_miniaudio
 		if (FlxG.save.data.chart_waveformInst == null)
 			FlxG.save.data.chart_waveformInst = false;
 		if (FlxG.save.data.chart_waveformVoices == null)
@@ -1406,7 +1406,7 @@ class ChartingState extends MusicBeatState
 		metronomeOffsetStepper = new ShadowStepper(pad + 80, row1 + labelOffset, 25, 0, 0, 1000, 1, null, 70);
 		tab_group.add(metronomeOffsetStepper);
 
-		#if lime_openal
+		#if lime_miniaudio
 		waveformUseInstrumental = new ShadowCheckbox(columnX(1), row2, "Wave Inst", FlxG.save.data.chart_waveformInst, function(checked:Bool)
 		{
 			waveformUseVoices.checked = false;
@@ -2537,7 +2537,7 @@ class ChartingState extends MusicBeatState
 		gridBG.scale.set(GRID_SIZE, GRID_SIZE);
 		gridBG.updateHitbox();
 
-		#if lime_openal
+		#if lime_miniaudio
 		if (FlxG.save.data.chart_waveformInst || FlxG.save.data.chart_waveformVoices || FlxG.save.data.chart_waveformOppVoices)
 		{
 			updateWaveform();
@@ -2613,7 +2613,7 @@ class ChartingState extends MusicBeatState
 
 	function updateWaveform()
 	{
-		#if lime_openal
+		#if lime_miniaudio
 		if (waveformPrinted)
 		{
 			var width:Int = Std.int(GRID_SIZE * 8);
@@ -2685,7 +2685,7 @@ class ChartingState extends MusicBeatState
 	function waveformData(buffer:AudioBuffer, bytes:Bytes, time:Float, endTime:Float, multiply:Float = 1, ?array:Array<Array<Array<Float>>>,
 			?steps:Float):Array<Array<Array<Float>>>
 	{
-		#if lime_openal
+		#if lime_miniaudio
 		if (buffer == null || buffer.data == null)
 			return [[[0], [0]], [[0], [0]]];
 
@@ -2718,32 +2718,28 @@ class ChartingState extends MusicBeatState
 		if (array == null)
 			array = [[[0], [0]], [[0], [0]]];
 
-		while (index < (bytes.length - 1))
+		var totalFrames:Int = Std.int(bytes.length / (channels * 4));
+
+		while (index < totalFrames)
 		{
 			if (index >= 0)
 			{
-				var byte:Int = bytes.getUInt16(index * channels * 2);
-
-				if (byte > 65535 / 2)
-					byte -= 65535;
-
-				var sample:Float = (byte / 65535);
+				var sample:Float = bytes.getFloat(index * channels * 4) * 0.5;
 
 				if (sample > 0)
+				{
 					if (sample > lmax)
 						lmax = sample;
-					else if (sample < 0)
-						if (sample < lmin)
-							lmin = sample;
+				}
+				else if (sample < 0)
+				{
+					if (sample < lmin)
+						lmin = sample;
+				}
 
 				if (channels >= 2)
 				{
-					byte = bytes.getUInt16((index * channels * 2) + 2);
-
-					if (byte > 65535 / 2)
-						byte -= 65535;
-
-					sample = (byte / 65535);
+					sample = bytes.getFloat((index * channels * 4) + 4) * 0.5;
 
 					if (sample > 0)
 					{
