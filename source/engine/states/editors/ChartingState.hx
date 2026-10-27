@@ -2652,7 +2652,6 @@ class ChartingState extends MusicBeatState
 
 		if (sound != null && sound._sound != null && sound._sound.__buffer != null && sound._sound.__buffer.data != null)
 		{
-			// lime decodes AudioBuffer data as F32 now, so `data` is an ArrayBufferView instead of a UInt8Array
 			var bytes:Bytes = sound._sound.__buffer.data.buffer;
 
 			wavData = waveformData(sound._sound.__buffer, bytes, st, et, 1, wavData, Std.int(gridBG.height));
