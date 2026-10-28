@@ -253,6 +253,7 @@ class Project extends HXProject
 		setHaxedef("HXCPP_STACK_LINE");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
+		setHaxedef("HXCPP_PCRE_JIT");
 
 		setHaxedef("HXCPP_GC_BIG_BLOCKS"); // still totally unsure btw!
 
@@ -267,7 +268,13 @@ class Project extends HXProject
 		setHaxedef("USING_SHADOW_ENGINE");
 
 		if (FEATURE_DCE.isDisabled())
-			setHaxedef("HXCPP_DEBUG_LINK");
+		{
+			// symbols for the build, stripped from the shipped Android library
+			if (isAndroid() && !isDebug())
+				setHaxedef("HXCPP_DEBUG_LINK_AND_STRIP");
+			else
+				setHaxedef("HXCPP_DEBUG_LINK");
+		}
 
 		if (FEATURE_TRACY.isEnabled())
 		{
