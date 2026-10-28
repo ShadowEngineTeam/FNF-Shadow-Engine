@@ -269,8 +269,8 @@ class Project extends HXProject
 
 		if (FEATURE_DCE.isDisabled())
 		{
-			// symbols for the build, stripped from the shipped Android library
-			if (isAndroid() && !isDebug())
+			// symbols for the build, stripped from the shipped binary
+			if (isFinal())
 				setHaxedef("HXCPP_DEBUG_LINK_AND_STRIP");
 			else
 				setHaxedef("HXCPP_DEBUG_LINK");
