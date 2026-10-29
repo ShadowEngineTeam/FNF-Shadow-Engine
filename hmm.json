@@ -9,7 +9,7 @@
     {
       "name": "openfl",
       "type": "git",
-      "ref": "de11e10b684b90852dd5e5ae75ca369f6b3f6470",
+      "ref": "a6a70dd7a05c943ea1ac87df03ca955db4c2ea1c",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
@@ -45,7 +45,7 @@
     {
       "name": "hxluau",
       "type": "git",
-      "ref": "8b53b273bd38e3a178a3d28bf260e22f8b72732c",
+      "ref": "519bd9d3f8e17b1510ed456c55e32a1838a3183e",
       "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "hxvlc",
       "type": "git",
-      "ref": "274e02e676900b39e967bc86762002539bead85e",
+      "ref": "d8df8ebd3e7ad2c9356b95a8b0940e4fba349e9b",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
