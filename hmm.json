@@ -3,13 +3,13 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "2532e399f44442b5417f6ce74ea484e46d9d4925",
+      "ref": "c68e692de9bb6fe8f1c11aba0803478a7fae4362",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "a6a70dd7a05c943ea1ac87df03ca955db4c2ea1c",
+      "ref": "c885bde3f725dc44951680bc522742b184d556e8",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "a63fd150342afb8aa3ba81a085ce74806f20c6df",
+      "ref": "723caf07a89af6489d2d0ac78ac7fc7d2db049f5",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
@@ -87,7 +87,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "211fcb5b3114038fd1420266368e4ae010359029",
+      "ref": "d6ab53c71cadbfb4a3bff6d96eba1fc3263e8966",
       "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {
