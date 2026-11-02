@@ -79,6 +79,7 @@ jobs:
           haxelib run hmm install --quiet
 
       - name: Setup Android NDK & SDK
+        if: ${{ inputs.name == 'Android' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -126,6 +127,9 @@ jobs:
           BASE=https://github.com/HomuHomu833
           NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.${EXT}"
           SDK_URL="$BASE/android-sdk-custom/releases/download/${SDK_VERSION}/android-sdk-${SDK_VERSION}-${HOST}.${EXT}"
+
+          echo $SDK_URL
+          echo $NDK_URL
 
           ROOT="$HOME/android"
           mkdir -p "$ROOT/ndk" "$ROOT/sdk"
