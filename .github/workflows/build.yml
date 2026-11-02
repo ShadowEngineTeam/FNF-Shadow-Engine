@@ -113,7 +113,7 @@ jobs:
               android-aarch64) echo "aarch64-linux-android" ;;
               android-armv7)   echo "armv7a-linux-androideabi" ;;
               macos-x86_64)    echo "x86_64-apple-darwin" ;;
-              macos-aarch64)   echo "arm64e-apple-darwin" ;;
+              macos-aarch64)   echo "arm64-apple-darwin" ;;
               windows-x86_64)  echo "x86_64-w64-mingw32" ;;
               windows-i686)    echo "i686-w64-mingw32" ;;
               windows-aarch64) echo "aarch64-w64-mingw32" ;;
@@ -126,10 +126,7 @@ jobs:
 
           BASE=https://github.com/HomuHomu833
           NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.${EXT}"
-          SDK_URL="$BASE/android-sdk-custom/releases/download/${SDK_VERSION}/android-sdk-${SDK_VERSION}-${HOST}.${EXT}"
-
-          echo $SDK_URL
-          echo $NDK_URL
+          SDK_URL="$BASE/android-sdk-custom/releases/download/${SDK_VERSION}/android-sdk-${HOST}.${EXT}"
 
           ROOT="$HOME/android"
           mkdir -p "$ROOT/ndk" "$ROOT/sdk"
