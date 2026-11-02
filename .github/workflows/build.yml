@@ -31,7 +31,7 @@ env:
   HAXE_VERSION: 4.3.7
   NDK_TAG: "r30"
   NDK_VERSION: ""
-  SDK_VERSION: "36.0.0"
+  SDK_VERSION: "37.0.0"
   PROJECT_NAME: ShadowEngine
 
 jobs:
