@@ -29,6 +29,9 @@ on:
 
 env:
   HAXE_VERSION: 4.3.7
+  NDK_TAG: "r30"
+  NDK_VERSION: ""
+  SDK_VERSION: "36.0.0"
   PROJECT_NAME: ShadowEngine
 
 jobs:
@@ -75,12 +78,104 @@ jobs:
           haxelib git hmm https://github.com/ShadowEngineTeam/hmm --skip-dependencies --quiet
           haxelib run hmm install --quiet
 
+      - name: Setup Android NDK & SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          detect_host() {
+            local os arch libc="${NDK_LIBC:-gnu}"
+
+            case "$(uname -m | tr '[:upper:]' '[:lower:]')" in
+              x86_64|amd64)              arch=x86_64 ;;
+              i386|i486|i586|i686|x86)   arch=i686 ;;
+              aarch64|arm64)             arch=aarch64 ;;
+              armv7*|armv8l|armhf)       arch=armv7 ;;
+              *) echo "Unsupported arch: $(uname -m)" >&2; return 1 ;;
+            esac
+
+            case "$(uname -s)" in
+              Linux)
+                if [ "$(uname -o 2>/dev/null)" = "Android" ]; then os=android; else os=linux; fi ;;
+              Darwin) os=macos ;;
+              MINGW*|MSYS*|CYGWIN*) os=windows ;;
+              *) echo "Unsupported OS: $(uname -s)" >&2; return 1 ;;
+            esac
+
+            case "$os-$arch" in
+              linux-x86_64)    echo "x86_64-linux-$libc" ;;
+              linux-i686)      echo "x86-linux-$libc" ;;
+              linux-aarch64)   echo "aarch64-linux-$libc" ;;
+              linux-armv7)     echo "arm-linux-${libc}eabihf" ;;
+              android-x86_64)  echo "x86_64-linux-android" ;;
+              android-i686)    echo "i686-linux-android" ;;
+              android-aarch64) echo "aarch64-linux-android" ;;
+              android-armv7)   echo "armv7a-linux-androideabi" ;;
+              macos-x86_64)    echo "x86_64-apple-darwin" ;;
+              macos-aarch64)   echo "arm64e-apple-darwin" ;;
+              windows-x86_64)  echo "x86_64-w64-mingw32" ;;
+              windows-i686)    echo "i686-w64-mingw32" ;;
+              windows-aarch64) echo "aarch64-w64-mingw32" ;;
+              *) echo "No NDK variant for $os-$arch" >&2; return 1 ;;
+            esac
+          }
+
+          HOST="${ANDROID_HOST:-$(detect_host)}"
+          case "$HOST" in *w64-mingw32) EXT=7z ;; *) EXT=tar.xz ;; esac
+
+          BASE=https://github.com/HomuHomu833
+          NDK_URL="$BASE/android-ndk-custom/releases/download/${NDK_TAG}/android-ndk-${NDK_TAG}${NDK_VERSION}-${HOST}.${EXT}"
+          SDK_URL="$BASE/android-sdk-custom/releases/download/${SDK_VERSION}/android-sdk-${SDK_VERSION}-${HOST}.${EXT}"
+
+          ROOT="$HOME/android"
+          mkdir -p "$ROOT/ndk" "$ROOT/sdk"
+
+          download_and_extract() {
+            local name="$1"
+            local url="$2"
+            local destination="$ROOT/$name"
+            local archive="$RUNNER_TEMP/$name.$EXT"
+            local extract="$RUNNER_TEMP/$name-extract"
+
+            curl -fsSL --retry 3 -o "$archive" "$url"
+
+            if [ "$EXT" = "7z" ]; then
+              mkdir -p "$extract"
+              7z x -y "-o$extract" "$archive" > /dev/null
+
+              local -a entries=("$extract"/*)
+              if [ "${#entries[@]}" -ne 1 ] || [ ! -d "${entries[0]}" ]; then
+                echo "Unexpected $name archive structure" >&2
+                return 1
+              fi
+
+              cp -a "${entries[0]}/." "$destination/"
+            else
+              tar -xJf "$archive" -C "$destination" --strip-components=1
+            fi
+
+            rm -rf "$archive" "$extract"
+          }
+
+          download_and_extract ndk "$NDK_URL"
+          download_and_extract sdk "$SDK_URL"
+
+          # windows runners need native-style paths
+          if command -v cygpath >/dev/null 2>&1; then
+            ROOT="$(cygpath -m "$ROOT")"
+          fi
+
+          {
+            echo "ANDROID_HOME=$ROOT/sdk"
+            echo "ANDROID_NDK_HOME=$ROOT/ndk"
+          } >> "$GITHUB_ENV"
+
       - name: Configure Android
         if: ${{ inputs.name == 'Android' }}
         run: |
           haxelib run lime config ANDROID_SDK $ANDROID_HOME
-          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME
-          haxelib run lime config JAVA_HOME $JAVA_HOME_21_arm64
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
+          haxelib run lime config JAVA_HOME $JAVA_HOME_25_arm64
           haxelib run lime config ANDROID_SETUP true
 
       - name: Extract Android keystore
