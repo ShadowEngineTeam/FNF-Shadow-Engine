@@ -59,13 +59,13 @@ jobs:
             artifactName: androidBuild
             artifactPath: "export/release/android/bin/app/build/outputs/apk/release/*.apk"
           - name: iOS
-            os: macos-26
+            os: xcode-27
             buildArgs: "ios -nosign"
             assetType: ASTC
             artifactName: iOSBuild
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
           - name: iOS (Simulator)
-            os: macos-26
+            os: xcode-27
             buildArgs: "ios -simulator -nosign"
             assetType: ASTC
             artifactName: iOSSimulatorBuild
@@ -86,7 +86,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS x86_64
-      os: macos-15
+      os: xcode-27
       buildArgs: "mac -64 -D HXCPP_M64"
       assetType: PNG
       artifactName: macOSBuild-x86_64
@@ -97,7 +97,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       name: macOS ARM64
-      os: macos-15
+      os: xcode-27
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
       assetType: PNG
       artifactName: macOSBuild-arm64
@@ -105,7 +105,7 @@ jobs:
 
   macOS-universal:
     name: macOS Universal
-    runs-on: macos-26
+    runs-on: xcode-27
     needs: 
       - Build-macOS-x86_64
       - Build-macOS-ARM64
