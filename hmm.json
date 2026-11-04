@@ -9,13 +9,13 @@
     {
       "name": "openfl",
       "type": "git",
-      "ref": "c885bde3f725dc44951680bc522742b184d556e8",
+      "ref": "3900ebd3477a58d6d4a30ffc2af8afa36471da6b",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
-      "ref": "9779cc55e34f8d2a76900929ab8a56757ca51212",
+      "ref": "c7be131b1f2143eab86d2c71407751c7a76cf79b",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
