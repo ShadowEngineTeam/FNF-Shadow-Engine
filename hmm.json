@@ -63,8 +63,8 @@
     {
       "name": "funkin.vis",
       "type": "git",
-      "ref": "6fb23a73dbc71c8af818317351e5cf86847b4f9a",
-      "url": "https://github.com/ShadowEngineTeam/funkVis"
+      "ref": "f4bef9819cf21c883d1633c46559728086fabf8e",
+      "url": "https://github.com/FunkinCrew/funkVis"
     },
     {
       "name": "grig.audio",
