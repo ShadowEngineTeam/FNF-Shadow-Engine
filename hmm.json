@@ -67,12 +67,6 @@
       "url": "https://github.com/FunkinCrew/funkVis"
     },
     {
-      "name": "grig.audio",
-      "type": "git",
-      "ref": "6409f3c6d1b4c52176813d3ede86c0d34e8af2c1",
-      "url": "https://github.com/FunkinCrew/grig.audio"
-    },
-    {
       "name": "hxp",
       "type": "git",
       "ref": "a060a749bfae3af190c50884cd89f89e5835abd6",

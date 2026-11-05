@@ -443,7 +443,6 @@ class Project extends HXProject
 		//if (FEATURE_FUNKIN_CONTENT.isEnabled())
 		//{
 			includeHaxelib("funkin.vis");
-			includeHaxelib("grig.audio");
 		//}
 
 		if (isDebug() && isCPP())
