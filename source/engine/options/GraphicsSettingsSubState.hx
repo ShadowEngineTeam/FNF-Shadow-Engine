@@ -19,7 +19,8 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		rpcTitle = 'Graphics Settings Menu'; // for Discord Rich Presence
 
 		boyfriend = new Character(840, 170, 'bf', true);
-		boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
+		// don't use setGraphicSize(width * 0.75): for texture atlases (FlxAnimate) `width` and `frameWidth` come from different timeline bounds
+		boyfriend.scale.set(0.75, 0.75);
 		boyfriend.updateHitbox();
 		boyfriend.dance();
 		boyfriend.animation.onFinish.add(function(name:String) boyfriend.dance());
