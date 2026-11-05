@@ -49,7 +49,7 @@ class VideoSprite extends FlxSpriteGroup
 		if (!shouldLoop)
 			videoSprite.bitmap.onEndReached.add(finishVideo);
 
-		videoSprite.bitmap.onFormatSetup.add(() ->
+		videoSprite.bitmap.onVideoFormatSetup.add(() ->
 		{
 			/*
 				#if FEATURE_VIDEOS

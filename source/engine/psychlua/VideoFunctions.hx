@@ -28,7 +28,7 @@ class VideoFunctions
 
 			var videoSprite:FlxVideoSprite = new FlxVideoSprite();
 			videoSprite.antialiasing = ClientPrefs.data.antialiasing;
-			videoSprite.bitmap.onFormatSetup.add(function()
+			videoSprite.bitmap.onVideoFormatSetup.add(function()
 			{
 				videoSprite.updateHitbox();
 				videoSprite.x = x;
@@ -170,7 +170,7 @@ class VideoFunctions
 		if (videoSprite.bitmap != null)
 		{
 			videoSprite.bitmap.onEndReached.removeAll();
-			videoSprite.bitmap.onFormatSetup.removeAll();
+			videoSprite.bitmap.onVideoFormatSetup.removeAll();
 		}
 
 		if (state.members != null && state.members.contains(videoSprite)) state.remove(videoSprite);
