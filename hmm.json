@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "230bc213830b8a40feb3f2ddce2e278cf045ff1e",
+      "ref": "81d4f7ae19d8d9b074032f00f837e052d247093c",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -63,7 +63,7 @@
     {
       "name": "funkin.vis",
       "type": "git",
-      "ref": "f4bef9819cf21c883d1633c46559728086fabf8e",
+      "ref": "b6717304eb154f7b1201ca56b789c01b6a43439f",
       "url": "https://github.com/FunkinCrew/funkVis"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "d6ab53c71cadbfb4a3bff6d96eba1fc3263e8966",
+      "ref": "49c4d29658a1723b4f22757fde2de45fbb012b3d",
       "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {
