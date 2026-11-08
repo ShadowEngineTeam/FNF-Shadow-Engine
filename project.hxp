@@ -253,9 +253,11 @@ class Project extends HXProject
 		setHaxedef("HXCPP_STACK_LINE");
 		setHaxedef("HXCPP_STACK_TRACE");
 		setHaxedef("HXCPP_CATCH_SEGV");
-		setHaxedef("HXCPP_PCRE_JIT");
 
-		setHaxedef("HXCPP_GC_BIG_BLOCKS"); // still totally unsure btw!
+		setHaxedef("HXCPP_GC_BIG_BLOCKS");
+		setHaxedef("HXCPP_GC_NURSERY");
+
+		setHaxedef("HXCPP_PCRE_JIT");
 
 		if (isFinal())
 		{
