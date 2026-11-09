@@ -118,7 +118,7 @@ class CreditsState extends MusicBeatState
 		["Funkin' Crew Mobile Team"],
 		[
 			"MoonDroid",
-			"moondroid",
+			"zack",
 			"Main Programmer of Friday Night Funkin' Mobile",
 			"https://x.com/ZackDroidCoder",
 			"FFFFFF"
