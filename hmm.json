@@ -3,25 +3,25 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "60fbdfd318728367f13ef908215199da35a7339d",
+      "ref": "50a53a7013ebfbabc2e0a9588a0a5ff036209836",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
       "name": "openfl",
       "type": "git",
-      "ref": "3900ebd3477a58d6d4a30ffc2af8afa36471da6b",
+      "ref": "2d307da405457c32cabdb58495c9d4d009ff251f",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
       "name": "flixel",
       "type": "git",
-      "ref": "5ae6cd242763e1b481545f015ee92d290578b2e8",
+      "ref": "17253413876aca56848261e271da61af1b6c6382",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
-      "ref": "b8baa05032365809113e9b3e534ad6a815d4a240",
+      "ref": "a0f7f17990cb072dd72d30db4bd07c8681b85871",
       "url": "https://github.com/ShadowEngineTeam/flixel-addons"
     },
     {
@@ -75,13 +75,13 @@
     {
       "name": "hxvlc",
       "type": "git",
-      "ref": "73838bfcb6b1a2a1e9f2b414a5d8a4df46df93ae",
+      "ref": "de4e6a43d6217bcfdea471a46903549212c2a1e7",
       "url": "https://github.com/ShadowEngineTeam/hxvlc"
     },
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "a57f3a7c99a31e29a792d8cd1d0f2f9e5db06eb7",
+      "ref": "cf7339999bf06d84fd1b5127902f49d8723dd381",
       "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {

@@ -6,7 +6,7 @@ import openfl.display3D.textures.TextureBase;
 import openfl.filters.BitmapFilter;
 import animate.internal.FilterRenderer;
 import flixel.math.FlxMatrix;
-import openfl.display.OpenGLRenderer;
+import openfl.display.Context3DRenderer;
 import flixel.FlxCamera;
 import openfl.Lib;
 import openfl.geom.Matrix;
@@ -18,20 +18,20 @@ import openfl.geom.ColorTransform;
 @:access(openfl.display.BitmapData)
 @:access(openfl.display3D.textures.TextureBase)
 @:access(openfl.display3D.Context3D)
-@:access(openfl.display.OpenGLRenderer)
+@:access(openfl.display.Context3DRenderer)
 @:access(flixel.FlxCamera)
 @:access(openfl.display.Sprite)
 @:access(openfl.geom.ColorTransform)
 class BitmapDataUtil
 {
-	static var renderer(get, never):OpenGLRenderer;
-	static var _renderer:Null<OpenGLRenderer>;
+	static var renderer(get, never):Context3DRenderer;
+	static var _renderer:Null<Context3DRenderer>;
 
-	static inline function get_renderer():OpenGLRenderer
+	static inline function get_renderer():Context3DRenderer
 	{
 		if (_renderer == null)
 		{
-			_renderer = new OpenGLRenderer(FlxG.stage.context3D);
+			_renderer = new Context3DRenderer(FlxG.stage.context3D);
 			_renderer.__worldTransform = new Matrix();
 			_renderer.__worldColorTransform = new ColorTransform();
 		}
@@ -129,6 +129,23 @@ class BitmapDataUtil
 
 		texture.__width = width;
 		texture.__height = height;
+
+		if (context.isBGFX)
+		{
+			// A bgfx texture has a fixed size: drop it (and the frame buffer on top of it) and
+			// let `__uploadTexture2D` make a new one.
+			texture.__destroyBGFXFramebuffer();
+
+			if (texture.__textureID != null)
+			{
+				context.bgfx.destroyTexture(texture.__textureID);
+				texture.__textureID = null;
+			}
+
+			@:nullSafety(Off)
+			texture.__uploadTexture2D(0, width, height, texture.__format, texture.__format, null);
+			return;
+		}
 
 		context.__bindGLTexture2D(texture.__textureID);
 		context.gl.texImage2D(context.gl.TEXTURE_2D, 0, texture.__internalFormat, width, height, 0, texture.__format, context.gl.UNSIGNED_BYTE, null);

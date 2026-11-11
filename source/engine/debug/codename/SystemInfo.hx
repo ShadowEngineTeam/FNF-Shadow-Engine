@@ -149,13 +149,41 @@ class SystemInfo extends FramerateCategory
 		@:privateAccess
 		if (FlxG.renderTile) // Blit doesn't enable the gpu. Idk if we should fix this
 		{
-			if (flixel.FlxG.stage.context3D != null && flixel.FlxG.stage.context3D.gl != null)
-			{
-				gpuName = Std.string(flixel.FlxG.stage.context3D.gl.getParameter(flixel.FlxG.stage.context3D.gl.RENDERER)).split("/")[0].trim();
+			var context3D:Null<openfl.display3D.Context3D> = flixel.FlxG.stage.context3D;
 
-				if (openfl.display3D.Context3D.__glMemoryTotalAvailable != -1)
+			if (context3D != null && context3D.isBGFX)
+			{
+				// bgfx only reports the PCI vendor of the device it runs on, not its name.
+				var caps:lime.graphics.bgfx.BGFXCaps = context3D.bgfx.getCaps();
+				var vendorName:String = switch (caps.vendorId)
 				{
-					var vRAMBytes:Int = cast flixel.FlxG.stage.context3D.gl.getParameter(openfl.display3D.Context3D.__glMemoryTotalAvailable);
+					case 0x1002: "AMD";
+					case 0x106b: "Apple";
+					case 0x8086: "Intel";
+					case 0x10de: "NVIDIA";
+					case 0x1414: "Microsoft";
+					case 0x13b5: "ARM";
+					case 0x5143: "Qualcomm";
+					case 0x1010: "Imagination Technologies";
+					case 0x14e4: "Broadcom";
+					default: "Unknown";
+				}
+
+				gpuName = '$vendorName GPU (${context3D.bgfx.getRendererName(caps.rendererType)})';
+
+				var vRAMMax:Float = context3D.bgfx.getStats().gpuMemoryMax;
+				if (vRAMMax > 0)
+					vRAM = getSizeString(vRAMMax / (1024 * 1024)); // bytes to MB
+				else
+					Log.error('Unable to grab GPU VRAM');
+			}
+			else if (context3D != null && context3D.gl != null)
+			{
+				gpuName = Std.string(context3D.gl.getParameter(context3D.gl.RENDERER)).split("/")[0].trim();
+
+				if (openfl.display3D.backends.opengl.OpenGLContext3D.__memoryTotalAvailable != -1)
+				{
+					var vRAMBytes:Int = cast context3D.gl.getParameter(openfl.display3D.backends.opengl.OpenGLContext3D.__memoryTotalAvailable);
 					if (vRAMBytes == 1000 || vRAMBytes == 1 || vRAMBytes <= 0)
 						Log.error('Unable to grab GPU VRAM');
 					else
