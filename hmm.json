@@ -45,7 +45,7 @@
     {
       "name": "hxluau",
       "type": "git",
-      "ref": "8823df31e61afdd2b2e4561f1a9cc826bc84abf6",
+      "ref": "3274a280acbd69a316a0f437670e8651c986b27f",
       "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "49c4d29658a1723b4f22757fde2de45fbb012b3d",
+      "ref": "a57f3a7c99a31e29a792d8cd1d0f2f9e5db06eb7",
       "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {
