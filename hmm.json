@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "8dd0009e8e19af55383f6a0caf1d233d15317415",
+      "ref": "b9499aeb73c0b0feb4baf86c3d2aba081629d37b",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -27,13 +27,13 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "7c8daff6d20fb41b1a632596a1ca712bf3e67596",
+      "ref": "090d107f3ddc7292c5bdf85ed6fb2ccfcf674d12",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
-      "ref": "6bf686f8174d32e82ad9ae554eb2f325b0450990",
+      "ref": "04f9779155502b362173f1fb05bd0f88ad9b05e0",
       "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
