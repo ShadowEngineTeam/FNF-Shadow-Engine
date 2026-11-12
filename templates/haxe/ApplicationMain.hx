@@ -49,12 +49,70 @@ class ApplicationMain
 
 		lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
+		#if sys
+		loadEnvTable();
+		#end
+
 		#if android
 		lime.system.System.setHint('ANDROID_DRAW_SCALE', (sys.FileSystem.exists(lime.system.System.applicationStorageDirectory + 'scaleSize.txt') ? sys.io.File.getContent(lime.system.System.applicationStorageDirectory + 'scaleSize.txt') : "1"));
 		#end
 
 		create(null);
 	}
+
+	#if sys
+	/**
+	 * Reads the ENV table, `env.txt`, before anything else starts: one `NAME=value` per line,
+	 * with `#` starting a comment. For example:
+	 *
+	 * ```
+	 * # renderers to try, in order
+	 * LIME_BGFX_PLATFORM=vulkan,d3d11,opengl
+	 * ```
+	 *
+	 * The file sits next to the game on desktop, in the storage directory on Android and in
+	 * Documents on iOS. A variable already set in the real environment wins over the table.
+	 */
+	static function loadEnvTable():Void
+	{
+		#if android
+		final path:String = lime.system.System.applicationStorageDirectory + 'env.txt';
+		#elseif ios
+		final path:String = lime.system.System.documentsDirectory + 'env.txt';
+		#else
+		final path:String = lime.system.System.applicationDirectory + 'env.txt';
+		#end
+
+		try
+		{
+			if (!sys.FileSystem.exists(path))
+				return;
+
+			for (rawLine in sys.io.File.getContent(path).split('\n'))
+			{
+				final line:String = StringTools.trim(rawLine);
+				final separator:Int = line.indexOf('=');
+
+				if (line.length == 0 || line.charAt(0) == '#' || separator <= 0)
+					continue;
+
+				final name:String = StringTools.trim(line.substr(0, separator));
+				final value:String = StringTools.trim(line.substr(separator + 1));
+
+				if (Sys.getEnv(name) != null)
+					continue;
+
+				// Lime and SDL read their settings as hints; anything else gets the variable itself.
+				Sys.putEnv(name, value);
+				lime.system.System.setHint(name, value);
+			}
+		}
+		catch (e:haxe.Exception)
+		{
+			Sys.println('Could not read the ENV table at ' + path + ': ' + e.message);
+		}
+	}
+	#end
 
 	public static function create(config):Void
 	{
