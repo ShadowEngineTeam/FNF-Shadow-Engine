@@ -258,6 +258,8 @@ class Project extends HXProject
 		setHaxedef("HXCPP_GC_NURSERY");
 
 		setHaxedef("HXCPP_PCRE_JIT");
+		if (isLinux())
+			setHaxedef("HXCPP_PTHREAD_FAST_TLS");
 
 		if (isFinal())
 		{
@@ -271,7 +273,6 @@ class Project extends HXProject
 
 		if (FEATURE_DCE.isDisabled())
 		{
-			// symbols for the build, stripped from the shipped binary
 			if (isFinal())
 				setHaxedef("HXCPP_DEBUG_LINK_AND_STRIP");
 			else
