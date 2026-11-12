@@ -6,6 +6,11 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 #end
 
+#if (lime_cffi && !macro)
+import haxe.Resource;
+import lime._internal.backend.native.NativeCFFI;
+#end
+
 #if ((linux || mac) && !macro)
 #if (linux && cpp)
 import hxgamemode.GamemodeClient;
@@ -23,6 +28,9 @@ import backend.Native;
 @:access(lime.system.System)
 @:access(openfl.display.Stage)
 @:access(openfl.events.UncaughtErrorEvents)
+#if (lime_cffi && !macro)
+@:access(lime._internal.backend.native.NativeCFFI)
+#end
 #if (static_link || ios)
 @:cppFileCode("\nextern \"C\" int lime_register_prims ();\n::foreach ndlls::::if (registerStatics)::extern \"C\" int ::nameSafe::_register_prims ();::end::::end::")
 #end
@@ -46,6 +54,10 @@ class ApplicationMain
 		untyped __cpp__("lime_register_prims ()");
 		::foreach ndlls::::if (registerStatics)::untyped __cpp__("::nameSafe::_register_prims ()");::end::::end::
 		#end
+
+		#if (lime_cffi && !macro)
+	    NativeCFFI.lime_haxe_resource_init(Resource.listNames, Resource.getBytes);
+	    #end
 
 		lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
