@@ -49,7 +49,7 @@ class ApplicationMain
 
 		lime.system.System.__registerEntryPoint("::APP_FILE::", create);
 
-		#if sys
+		#if mobile
 		loadEnvTable();
 		#end
 
@@ -60,27 +60,25 @@ class ApplicationMain
 		create(null);
 	}
 
-	#if sys
+	#if mobile
 	/**
 	 * Reads the ENV table, `env.txt`, before anything else starts: one `NAME=value` per line,
 	 * with `#` starting a comment. For example:
 	 *
 	 * ```
 	 * # renderers to try, in order
-	 * LIME_BGFX_PLATFORM=vulkan,d3d11,opengl
+	 * LIME_BGFX_PLATFORM=vulkan,opengles
 	 * ```
 	 *
-	 * The file sits next to the game on desktop, in the storage directory on Android and in
-	 * Documents on iOS. A variable already set in the real environment wins over the table.
+	 * Mobile only, where there is no shell to set a variable from: the file sits in the storage
+	 * directory on Android and in Documents on iOS. Desktop uses real environment variables.
 	 */
 	static function loadEnvTable():Void
 	{
 		#if android
 		final path:String = lime.system.System.applicationStorageDirectory + 'env.txt';
-		#elseif ios
-		final path:String = lime.system.System.documentsDirectory + 'env.txt';
 		#else
-		final path:String = lime.system.System.applicationDirectory + 'env.txt';
+		final path:String = lime.system.System.documentsDirectory + 'env.txt';
 		#end
 
 		try
