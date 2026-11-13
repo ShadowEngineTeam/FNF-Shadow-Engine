@@ -88,7 +88,7 @@ jobs:
       name: macOS x86_64
       os: xcode-27
       buildArgs: "mac -64 -D HXCPP_M64"
-      assetType: PNG
+      assetType: BC
       artifactName: macOSBuild-x86_64
       artifactPath: export/release/macos/bin/*
 
@@ -99,27 +99,27 @@ jobs:
       name: macOS ARM64
       os: xcode-27
       buildArgs: "mac -arm64 -D HXCPP_ARM64"
-      assetType: PNG
+      assetType: BC
       artifactName: macOSBuild-arm64
       artifactPath: export/release/macos/bin/*
 
   macOS-universal:
     name: macOS Universal
     runs-on: xcode-27
-    needs: 
+    needs:
       - Build-macOS-x86_64
       - Build-macOS-ARM64
     steps:
       - name: Download x86_64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-x86_64-PNG
+          name: macOSBuild-x86_64-BC
           path: intel
 
       - name: Download ARM64 build
         uses: actions/download-artifact@main
         with:
-          name: macOSBuild-arm64-PNG
+          name: macOSBuild-arm64-BC
           path: arm
 
       - name: Remove ARM64 and x86_64 artifacts
@@ -140,5 +140,5 @@ jobs:
       - name: Upload Universal macOS bundle
         uses: actions/upload-artifact@main
         with:
-          name: macOSBuild-Universal-PNG
+          name: macOSBuild-Universal-BC
           path: ShadowEngine.app
