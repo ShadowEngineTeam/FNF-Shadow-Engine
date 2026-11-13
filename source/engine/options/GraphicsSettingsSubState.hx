@@ -60,7 +60,7 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.onChange = onChangeFramerate;
 		#end
 
-		#if !mobile
+		#if !ios
 		var option:Option = new Option('Unlocked Framerate', 'If checked, the game runs as fast as it can\nand the Framerate option is ignored.',
 			'unlockedFramerate', 'bool');
 		addOption(option);

@@ -232,7 +232,7 @@ class ClientPrefs
 	public static function applyFramerate()
 	{
 		// 0 means no cap
-		final framerate:Int = #if !mobile data.unlockedFramerate ? 0 : #end data.framerate;
+		final framerate:Int = #if !ios data.unlockedFramerate ? 0 : #end data.framerate;
 
 		if (framerate > FlxG.drawFramerate)
 		{
