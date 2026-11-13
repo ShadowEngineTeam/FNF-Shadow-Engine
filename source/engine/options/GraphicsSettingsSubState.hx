@@ -60,6 +60,13 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.onChange = onChangeFramerate;
 		#end
 
+		#if !mobile
+		var option:Option = new Option('Unlocked Framerate', 'If checked, the game runs as fast as it can\nand the Framerate option is ignored.',
+			'unlockedFramerate', 'bool');
+		addOption(option);
+		option.onChange = onChangeFramerate;
+		#end
+
 		super();
 		insert(1, boyfriend);
 	}
@@ -78,16 +85,7 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 
 	function onChangeFramerate()
 	{
-		if (ClientPrefs.data.framerate > FlxG.drawFramerate)
-		{
-			FlxG.updateFramerate = ClientPrefs.data.framerate;
-			FlxG.drawFramerate = ClientPrefs.data.framerate;
-		}
-		else
-		{
-			FlxG.drawFramerate = ClientPrefs.data.framerate;
-			FlxG.updateFramerate = ClientPrefs.data.framerate;
-		}
+		ClientPrefs.applyFramerate();
 	}
 
 	override function changeSelection(change:Int = 0)

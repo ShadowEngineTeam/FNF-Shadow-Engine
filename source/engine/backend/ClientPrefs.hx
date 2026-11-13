@@ -37,6 +37,7 @@ import states.TitleState;
 	public var lowQuality:Bool = false;
 	public var shaders:Bool = true;
 	public var framerate:Int = 60;
+	public var unlockedFramerate:Bool = false;
 	public var camZooms:Bool = true;
 	public var hideHud:Bool = false;
 	public var uiTheme:String = 'dark';
@@ -228,6 +229,23 @@ class ClientPrefs
 		FlxG.log.add("Settings saved!");
 	}
 
+	public static function applyFramerate()
+	{
+		// 0 means no cap
+		final framerate:Int = #if !mobile data.unlockedFramerate ? 0 : #end data.framerate;
+
+		if (framerate > FlxG.drawFramerate)
+		{
+			FlxG.updateFramerate = framerate;
+			FlxG.drawFramerate = framerate;
+		}
+		else
+		{
+			FlxG.drawFramerate = framerate;
+			FlxG.updateFramerate = framerate;
+		}
+	}
+
 	public static function loadPrefs()
 	{
 		for (key in Reflect.fields(data))
@@ -242,16 +260,7 @@ class ClientPrefs
 			data.framerate = Std.int(FlxMath.bound(refreshRate, 60, 240));
 		}
 
-		if (data.framerate > FlxG.drawFramerate)
-		{
-			FlxG.updateFramerate = data.framerate;
-			FlxG.drawFramerate = data.framerate;
-		}
-		else
-		{
-			FlxG.drawFramerate = data.framerate;
-			FlxG.updateFramerate = data.framerate;
-		}
+		applyFramerate();
 
 		if (FlxG.save.data.gameplaySettings != null)
 		{
