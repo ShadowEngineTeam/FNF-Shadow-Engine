@@ -37,10 +37,28 @@ class Framerate extends Sprite
 	 * 0: INVISIBLE
 	 * 1: BOARD      (text wrapped in a panel)
 	 * 2: BOARD + SYSTEM INFO
+	 * 3: BGFX STATS (only with BGFX)
 	 */
-	public static var debugMode:Int = 1;
+	public static var debugMode(default, set):Int = 1;
 
 	public static var offset:FlxPoint = new FlxPoint(INSET, INSET);
+
+	static function set_debugMode(value:Int):Int
+	{
+		final context3D:Null<openfl.display3D.Context3D> = FlxG.stage.context3D;
+
+		if (context3D != null && context3D.isBGFX)
+			lime.graphics.bgfx.BGFX.setDebug(value == 3 ? lime.graphics.bgfx.BGFX.DEBUG_STATS : 0);
+
+		return debugMode = value;
+	}
+
+	static function nextDebugMode():Void
+	{
+		final context3D:Null<openfl.display3D.Context3D> = FlxG.stage.context3D;
+
+		debugMode = (debugMode + 1) % (context3D != null && context3D.isBGFX ? 4 : 3);
+	}
 
 	// Hold to drag either object with the mouse.
 	public static var draggable:Bool = true;
@@ -156,7 +174,7 @@ class Framerate extends Sprite
 		{
 			if (Controls.instance.justReleased('fpsCounter'))
 			{
-				debugMode = (debugMode + 1) % 3;
+				nextDebugMode();
 				@:privateAccess
 				{
 					memoryCounter.refreshText(memoryCounter.memory, memoryCounter.memoryPeak);
@@ -208,7 +226,7 @@ class Framerate extends Sprite
 		if (!dragging && FlxG.mouse.justPressed && shift)
 		{
 			// System Info panels are independent objects; check them first (they draw separately).
-			if (debugMode > 1)
+			if (debugMode == 2)
 			{
 				for (c in categories)
 				{
@@ -222,7 +240,7 @@ class Framerate extends Sprite
 					}
 				}
 			}
-			if (!dragging && debugMode > 0 && board.visible && hitTest(m, board.x - PAD_X, board.y - PAD_Y, boardW, boardH))
+			if (!dragging && (debugMode == 1 || debugMode == 2) && board.visible && hitTest(m, board.x - PAD_X, board.y - PAD_Y, boardW, boardH))
 			{
 				dragging = true;
 				dragBoard = true;
@@ -273,7 +291,7 @@ class Framerate extends Sprite
 			++presses;
 			if (presses >= 3)
 			{
-				debugMode = (debugMode + 1) % 3;
+				nextDebugMode();
 				presses = 0;
 				return;
 			}
@@ -289,7 +307,7 @@ class Framerate extends Sprite
 				&& pos.y <= FlxG.game.y + offset.y + 60)
 			{
 				if (FlxG.mouse.justPressed)
-					sillyTimer.start(0.4, (tmr:FlxTimer) -> debugMode = (debugMode + 1) % 3);
+					sillyTimer.start(0.4, (tmr:FlxTimer) -> nextDebugMode());
 
 				if (FlxG.mouse.justReleased)
 					sillyTimer.cancel();
@@ -313,7 +331,7 @@ class Framerate extends Sprite
 		boardH = contentH + PAD_Y * 2;
 
 		// --- Board appear / disappear ---
-		var boardVisible = debugMode > 0;
+		var boardVisible = debugMode == 1 || debugMode == 2;
 		boardVisT = CoolUtil.fpsLerp(boardVisT, boardVisible ? 1 : 0, 0.5);
 
 		if (boardVisible && !boardLastVisible) // just appeared: slide in from nearest edge
@@ -344,7 +362,7 @@ class Framerate extends Sprite
 		borderSprite.scaleX = 2;
 		borderSprite.scaleY = boardH;
 
-		var selectable = debugMode >= 2;
+		var selectable = debugMode == 2;
 		memoryCounter.memLabel.selectable = memoryCounter.memoryText.selectable = memoryCounter.memoryPeakText.selectable = fpsCounter.fpsNum.selectable = fpsCounter.fpsLabel.selectable = selectable;
 
 		var stackY = offset.y + boardH + 8;
@@ -356,7 +374,7 @@ class Framerate extends Sprite
 				c.dragged = true; // position once, then independent
 			}
 			c.title.selectable = c.text.selectable = selectable;
-			c.updateAnim(debugMode > 1);
+			c.updateAnim(debugMode == 2);
 			stackY = c.offset.y + c.height + 8;
 		}
 	}
