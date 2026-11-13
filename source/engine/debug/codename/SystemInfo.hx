@@ -30,7 +30,6 @@ class SystemInfo extends FramerateCategory
 {
 	public static var osInfo:String = "Unknown";
 	public static var gpuName:String = "Unknown";
-	public static var vRAM:String = "Unknown";
 	public static var cpuName:String = "Unknown";
 	public static var totalMem:String = "Unknown";
 	public static var totalSwapMem:String = "Unknown";
@@ -155,27 +154,10 @@ class SystemInfo extends FramerateCategory
 			{
 				var caps:lime.graphics.bgfx.BGFXCaps = context3D.bgfx.getCaps();
 				gpuName = '${getDeviceName(caps.vendorId, caps.deviceId)} (${context3D.bgfx.getRendererName(caps.rendererType)})';
-
-				var vRAMMax:Float = context3D.bgfx.getStats().gpuMemoryMax;
-				if (vRAMMax > 0)
-					vRAM = getSizeString(vRAMMax / (1024 * 1024)); // bytes to MB
-				else
-					Log.error('Unable to grab GPU VRAM');
 			}
 			else if (context3D != null && context3D.gl != null)
 			{
 				gpuName = Std.string(context3D.gl.getParameter(context3D.gl.RENDERER)).split("/")[0].trim();
-
-				if (openfl.display3D.backends.opengl.OpenGLContext3D.__memoryTotalAvailable != -1)
-				{
-					var vRAMBytes:Int = cast context3D.gl.getParameter(openfl.display3D.backends.opengl.OpenGLContext3D.__memoryTotalAvailable);
-					if (vRAMBytes == 1000 || vRAMBytes == 1 || vRAMBytes <= 0)
-						Log.error('Unable to grab GPU VRAM');
-					else
-					{
-						vRAM = getSizeString(vRAMBytes / 1024);
-					}
-				}
 			}
 			else
 				Log.error('Unable to grab GPU Info');
@@ -284,19 +266,8 @@ class SystemInfo extends FramerateCategory
 		if (cpuName != "Unknown")
 			lines.push(row("CPU:", '$cpuName ${getCPUArch()}'));
 
-		var gpuNameKnown = gpuName != "Unknown" && gpuName != cpuName;
-		var vramKnown = vRAM != "Unknown";
-		if (gpuNameKnown || vramKnown)
-		{
-			var gpuVal = "";
-			if (gpuNameKnown)
-				gpuVal += gpuName;
-			if (gpuNameKnown && vramKnown)
-				gpuVal += " | ";
-			if (vramKnown)
-				gpuVal += 'VRAM: $vRAM'; // 1000 bytes of vram (apus)
-			lines.push(row("GPU:", gpuVal));
-		}
+		if (gpuName != "Unknown" && gpuName != cpuName)
+			lines.push(row("GPU:", gpuName));
 		if (totalMem != "Unknown" && memType != "Unknown")
 			lines.push(row("Total MEM:", '$totalMem $memType ${totalSwapMem != "Unknown" ? '+ $totalSwapMem SWAP' : ""}'));
 
