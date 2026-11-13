@@ -7,6 +7,5 @@
 - Add multikey support(?)
 - Rewrite the Input System(?)
 - HSV Note Skin Textures
-- Rewrite Source with Null Safety and Haxe 4.3 features(?) 
-- Find Artist for our Credits icons
+- Rewrite Source with Null Safety and Haxe 4.3 features(?)
 - Add Metallic Funkin (Legacy) and 2hot only can (FEATURE_JOKES)
