@@ -19,43 +19,10 @@ using StringTools;
 
 #if cpp
 #if windows
-@:buildXml('
-<target id="haxe">
-	<lib name="dxgi.lib" unless="mingw" />
-	<lib name="-ldxgi" if="mingw" />
-</target>
-')
-@:cppFileCode('
-#include <windows.h>
-#include <dxgi.h>
-')
+@:cppFileCode('#include <windows.h>')
 #elseif (mac || ios)
-#if mac
-@:buildXml('
-<target id="haxe">
-	<vflag name="-framework" value="Metal" />
-</target>
-')
-#end
-@:cppFileCode('
-#include <mach-o/arch.h>
-#include <objc/runtime.h>
-#include <objc/message.h>
-
-extern "C" id MTLCreateSystemDefaultDevice(void);
-')
+@:cppFileCode('#include <mach-o/arch.h>')
 #else
-@:buildXml('
-<files id="haxe">
-	<compilerflag value="-I${haxelib:lime}/project/lib/bgfx/3rdparty/khronos" />
-</files>
-')
-@:cppFileCode('
-#include <dlfcn.h>
-#include <vector>
-#define VK_NO_PROTOTYPES
-#include <vulkan-local/vulkan_core.h>
-')
 @:headerInclude('sys/utsname.h')
 #end
 #end
@@ -186,7 +153,9 @@ class SystemInfo extends FramerateCategory
 			if (context3D != null && context3D.isBGFX)
 			{
 				var caps:lime.graphics.bgfx.BGFXCaps = context3D.bgfx.getCaps();
-				gpuName = '${getDeviceName(caps.vendorId, caps.deviceId)} (${context3D.bgfx.getRendererName(caps.rendererType)})';
+				var deviceName:String = context3D.bgfx.getDeviceName().split("/")[0].trim();
+				var rendererName:String = context3D.bgfx.getRendererName(caps.rendererType);
+				gpuName = deviceName != "" ? '$deviceName ($rendererName)' : rendererName;
 			}
 			else if (context3D != null && context3D.gl != null)
 			{
@@ -213,128 +182,6 @@ class SystemInfo extends FramerateCategory
 
 		totalSwapMem = getSizeString(MemoryUtil.getTotalSwapMem());
 		formatSysInfo();
-	}
-
-	// bgfx only reports the PCI ids of the device it runs on, not its name.
-	static function getDeviceName(vendorId:Int, deviceId:Int):String
-	{
-		final vendorName:String = switch (vendorId)
-		{
-			case 0x1002: "AMD";
-			case 0x106b: "Apple";
-			case 0x8086: "Intel";
-			case 0x10de: "NVIDIA";
-			case 0x1414: "Microsoft";
-			case 0x13b5: "ARM";
-			case 0x5143: "Qualcomm";
-			case 0x1010: "Imagination Technologies";
-			case 0x14e4: "Broadcom";
-			default: "Unknown";
-		}
-
-		final name:Null<String> = getNativeDeviceName(vendorId, deviceId);
-		if (name != null && name != "")
-			return name;
-
-		return '$vendorName GPU';
-	}
-
-	// A device id of 0 means bgfx only knows the vendor.
-	#if windows
-	@:functionCode('
-		IDXGIFactory1* factory = NULL;
-		if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
-			return null();
-
-		::String name = null();
-		IDXGIAdapter1* adapter = NULL;
-		for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
-		{
-			DXGI_ADAPTER_DESC1 desc;
-			bool matches = SUCCEEDED(adapter->GetDesc1(&desc)) && desc.VendorId == (UINT)vendorId && (deviceId == 0 || desc.DeviceId == (UINT)deviceId);
-			adapter->Release();
-
-			if (matches)
-			{
-				name = ::String::create(desc.Description);
-				break;
-			}
-		}
-
-		factory->Release();
-		return name;
-	')
-	#elseif (mac || ios)
-	@:functionCode('
-		id device = MTLCreateSystemDefaultDevice();
-		if (device == NULL)
-			return null();
-
-		::String name = null();
-		id deviceName = ((id (*)(id, SEL))objc_msgSend)(device, sel_registerName("name"));
-		if (deviceName != NULL)
-		{
-			const char* utf8 = ((const char* (*)(id, SEL))objc_msgSend)(deviceName, sel_registerName("UTF8String"));
-			if (utf8 != NULL)
-				name = ::String::create(utf8);
-		}
-
-		((void (*)(id, SEL))objc_msgSend)(device, sel_registerName("release"));
-		return name;
-	')
-	#elseif cpp
-	@:functionCode('
-		#ifdef __ANDROID__
-		void* vulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
-		#else
-		void* vulkan = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
-		#endif
-		if (vulkan == NULL)
-			return null();
-
-		PFN_vkCreateInstance createInstance = (PFN_vkCreateInstance)dlsym(vulkan, "vkCreateInstance");
-		PFN_vkDestroyInstance destroyInstance = (PFN_vkDestroyInstance)dlsym(vulkan, "vkDestroyInstance");
-		PFN_vkEnumeratePhysicalDevices enumeratePhysicalDevices = (PFN_vkEnumeratePhysicalDevices)dlsym(vulkan, "vkEnumeratePhysicalDevices");
-		PFN_vkGetPhysicalDeviceProperties getPhysicalDeviceProperties = (PFN_vkGetPhysicalDeviceProperties)dlsym(vulkan, "vkGetPhysicalDeviceProperties");
-
-		::String name = null();
-		VkInstanceCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		VkInstance instance = VK_NULL_HANDLE;
-
-		if (createInstance != NULL && destroyInstance != NULL && enumeratePhysicalDevices != NULL && getPhysicalDeviceProperties != NULL
-			&& createInstance(&createInfo, NULL, &instance) == VK_SUCCESS)
-		{
-			uint32_t count = 0;
-			enumeratePhysicalDevices(instance, &count, NULL);
-			std::vector<VkPhysicalDevice> devices(count);
-			if (count > 0)
-				enumeratePhysicalDevices(instance, &count, devices.data());
-
-			for (uint32_t i = 0; i < count; i++)
-			{
-				VkPhysicalDeviceProperties properties;
-				getPhysicalDeviceProperties(devices[i], &properties);
-
-				// bgfx keeps the low 16 bits of both ids.
-				if ((uint16_t)properties.vendorID == (uint16_t)vendorId && (deviceId == 0 || (uint16_t)properties.deviceID == (uint16_t)deviceId))
-				{
-					name = ::String::create(properties.deviceName);
-					break;
-				}
-			}
-
-			destroyInstance(instance, NULL);
-		}
-
-		dlclose(vulkan);
-		return name;
-	')
-	#end
-	@:noCompletion
-	private static function getNativeDeviceName(vendorId:Int, deviceId:Int):Null<String>
-	{
-		return null;
 	}
 
 	static inline function row(key:String, value:String):String
