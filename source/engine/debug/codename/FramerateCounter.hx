@@ -99,11 +99,10 @@ class FramerateCounter extends Sprite
 		catch (e:haxe.Exception) {}
 	}
 
-	@:privateAccess
 	private function recordFileName():String
 	{
 		final context3D:Null<openfl.display3D.Context3D> = FlxG.stage.context3D;
-		final gpu:String = context3D != null && context3D.gl != null ? Std.string(context3D.gl.getParameter(context3D.gl.RENDERER)) : "";
+		final gpu:String = @:privateAccess (context3D != null && context3D.gl != null ? Std.string(context3D.gl.getParameter(context3D.gl.RENDERER)) : "");
 		return '${recordName(gpu)}-fps.txt';
 	}
 
