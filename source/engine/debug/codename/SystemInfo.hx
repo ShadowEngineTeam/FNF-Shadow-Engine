@@ -19,10 +19,43 @@ using StringTools;
 
 #if cpp
 #if windows
-@:cppFileCode('#include <windows.h>')
+@:buildXml('
+<target id="haxe">
+	<lib name="dxgi.lib" unless="mingw" />
+	<lib name="-ldxgi" if="mingw" />
+</target>
+')
+@:cppFileCode('
+#include <windows.h>
+#include <dxgi.h>
+')
 #elseif (mac || ios)
-@:cppFileCode('#include <mach-o/arch.h>')
+#if mac
+@:buildXml('
+<target id="haxe">
+	<vflag name="-framework" value="Metal" />
+</target>
+')
+#end
+@:cppFileCode('
+#include <mach-o/arch.h>
+#include <objc/runtime.h>
+#include <objc/message.h>
+
+extern "C" id MTLCreateSystemDefaultDevice(void);
+')
 #else
+@:buildXml('
+<files id="haxe">
+	<compilerflag value="-I${haxelib:lime}/project/lib/bgfx/3rdparty/khronos" />
+</files>
+')
+@:cppFileCode('
+#include <dlfcn.h>
+#include <vector>
+#define VK_NO_PROTOTYPES
+#include <vulkan-local/vulkan_core.h>
+')
 @:headerInclude('sys/utsname.h')
 #end
 #end
@@ -199,56 +232,109 @@ class SystemInfo extends FramerateCategory
 			default: "Unknown";
 		}
 
-		try
-		{
-			#if windows
-			final displayClassPath:String = "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\";
-			final pciId:String = 'ven_${StringTools.hex(vendorId, 4)}&dev_${StringTools.hex(deviceId, 4)}'.toLowerCase();
-			for (i in 0...16)
-			{
-				final adapterPath:String = displayClassPath + CoolUtil.addZeros(Std.string(i), 4);
-				final matchingId:Null<String> = RegistryUtil.get(HKEY_LOCAL_MACHINE, adapterPath, "MatchingDeviceId");
-				if (matchingId == null || !matchingId.toLowerCase().contains(pciId))
-					continue;
-
-				final name:Null<String> = RegistryUtil.get(HKEY_LOCAL_MACHINE, adapterPath, "DriverDesc");
-				if (name != null && name != "")
-					return name;
-			}
-			#elseif linux
-			final process:Process = new Process("lspci", ["-mm", "-d", '${StringTools.hex(vendorId, 4)}:${StringTools.hex(deviceId, 4)}']);
-			if (process.exitCode() == 0)
-			{
-				// 01:00.0 "VGA compatible controller" "NVIDIA Corporation" "GA106 [GeForce RTX 3060]" ...
-				final fields:Array<String> = process.stdout.readAll().toString().split("\n")[0].split('"');
-				if (fields.length > 5)
-				{
-					var name:String = fields[5];
-					if (name.endsWith("]") && name.contains("["))
-						name = name.substring(name.lastIndexOf("[") + 1, name.length - 1);
-					if (name != "")
-						return vendorName != "Unknown" ? '$vendorName $name' : name;
-				}
-			}
-			#elseif mac
-			final process:Process = new Process("system_profiler", ["SPDisplaysDataType"]);
-			if (process.exitCode() == 0)
-			{
-				for (line in process.stdout.readAll().toString().split("\n"))
-				{
-					final trimmedLine:String = line.trim();
-					if (trimmedLine.startsWith("Chipset Model:"))
-						return trimmedLine.substr(trimmedLine.indexOf(":") + 1).trim();
-				}
-			}
-			#end
-		}
-		catch (e)
-		{
-			Log.error('Unable to grab GPU Name: $e');
-		}
+		final name:Null<String> = getNativeDeviceName(vendorId, deviceId);
+		if (name != null && name != "")
+			return name;
 
 		return '$vendorName GPU';
+	}
+
+	// A device id of 0 means bgfx only knows the vendor.
+	#if windows
+	@:functionCode('
+		IDXGIFactory1* factory = NULL;
+		if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
+			return null();
+
+		::String name = null();
+		IDXGIAdapter1* adapter = NULL;
+		for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++)
+		{
+			DXGI_ADAPTER_DESC1 desc;
+			bool matches = SUCCEEDED(adapter->GetDesc1(&desc)) && desc.VendorId == (UINT)vendorId && (deviceId == 0 || desc.DeviceId == (UINT)deviceId);
+			adapter->Release();
+
+			if (matches)
+			{
+				name = ::String::create(desc.Description);
+				break;
+			}
+		}
+
+		factory->Release();
+		return name;
+	')
+	#elseif (mac || ios)
+	@:functionCode('
+		id device = MTLCreateSystemDefaultDevice();
+		if (device == NULL)
+			return null();
+
+		::String name = null();
+		id deviceName = ((id (*)(id, SEL))objc_msgSend)(device, sel_registerName("name"));
+		if (deviceName != NULL)
+		{
+			const char* utf8 = ((const char* (*)(id, SEL))objc_msgSend)(deviceName, sel_registerName("UTF8String"));
+			if (utf8 != NULL)
+				name = ::String::create(utf8);
+		}
+
+		((void (*)(id, SEL))objc_msgSend)(device, sel_registerName("release"));
+		return name;
+	')
+	#elseif cpp
+	@:functionCode('
+		#ifdef __ANDROID__
+		void* vulkan = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+		#else
+		void* vulkan = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
+		#endif
+		if (vulkan == NULL)
+			return null();
+
+		PFN_vkCreateInstance createInstance = (PFN_vkCreateInstance)dlsym(vulkan, "vkCreateInstance");
+		PFN_vkDestroyInstance destroyInstance = (PFN_vkDestroyInstance)dlsym(vulkan, "vkDestroyInstance");
+		PFN_vkEnumeratePhysicalDevices enumeratePhysicalDevices = (PFN_vkEnumeratePhysicalDevices)dlsym(vulkan, "vkEnumeratePhysicalDevices");
+		PFN_vkGetPhysicalDeviceProperties getPhysicalDeviceProperties = (PFN_vkGetPhysicalDeviceProperties)dlsym(vulkan, "vkGetPhysicalDeviceProperties");
+
+		::String name = null();
+		VkInstanceCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		VkInstance instance = VK_NULL_HANDLE;
+
+		if (createInstance != NULL && destroyInstance != NULL && enumeratePhysicalDevices != NULL && getPhysicalDeviceProperties != NULL
+			&& createInstance(&createInfo, NULL, &instance) == VK_SUCCESS)
+		{
+			uint32_t count = 0;
+			enumeratePhysicalDevices(instance, &count, NULL);
+			std::vector<VkPhysicalDevice> devices(count);
+			if (count > 0)
+				enumeratePhysicalDevices(instance, &count, devices.data());
+
+			for (uint32_t i = 0; i < count; i++)
+			{
+				VkPhysicalDeviceProperties properties;
+				getPhysicalDeviceProperties(devices[i], &properties);
+
+				// bgfx keeps the low 16 bits of both ids.
+				if ((uint16_t)properties.vendorID == (uint16_t)vendorId && (deviceId == 0 || (uint16_t)properties.deviceID == (uint16_t)deviceId))
+				{
+					name = ::String::create(properties.deviceName);
+					break;
+				}
+			}
+
+			destroyInstance(instance, NULL);
+		}
+
+		dlclose(vulkan);
+		return name;
+	')
+	#end
+	@:noCompletion
+	private static function getNativeDeviceName(vendorId:Int, deviceId:Int):Null<String>
+	{
+		return null;
 	}
 
 	static inline function row(key:String, value:String):String
