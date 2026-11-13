@@ -153,23 +153,8 @@ class SystemInfo extends FramerateCategory
 
 			if (context3D != null && context3D.isBGFX)
 			{
-				// bgfx only reports the PCI vendor of the device it runs on, not its name.
 				var caps:lime.graphics.bgfx.BGFXCaps = context3D.bgfx.getCaps();
-				var vendorName:String = switch (caps.vendorId)
-				{
-					case 0x1002: "AMD";
-					case 0x106b: "Apple";
-					case 0x8086: "Intel";
-					case 0x10de: "NVIDIA";
-					case 0x1414: "Microsoft";
-					case 0x13b5: "ARM";
-					case 0x5143: "Qualcomm";
-					case 0x1010: "Imagination Technologies";
-					case 0x14e4: "Broadcom";
-					default: "Unknown";
-				}
-
-				gpuName = '$vendorName GPU (${context3D.bgfx.getRendererName(caps.rendererType)})';
+				gpuName = '${getDeviceName(caps.vendorId, caps.deviceId)} (${context3D.bgfx.getRendererName(caps.rendererType)})';
 
 				var vRAMMax:Float = context3D.bgfx.getStats().gpuMemoryMax;
 				if (vRAMMax > 0)
@@ -213,6 +198,75 @@ class SystemInfo extends FramerateCategory
 
 		totalSwapMem = getSizeString(MemoryUtil.getTotalSwapMem());
 		formatSysInfo();
+	}
+
+	// bgfx only reports the PCI ids of the device it runs on, not its name.
+	static function getDeviceName(vendorId:Int, deviceId:Int):String
+	{
+		final vendorName:String = switch (vendorId)
+		{
+			case 0x1002: "AMD";
+			case 0x106b: "Apple";
+			case 0x8086: "Intel";
+			case 0x10de: "NVIDIA";
+			case 0x1414: "Microsoft";
+			case 0x13b5: "ARM";
+			case 0x5143: "Qualcomm";
+			case 0x1010: "Imagination Technologies";
+			case 0x14e4: "Broadcom";
+			default: "Unknown";
+		}
+
+		try
+		{
+			#if windows
+			final displayClassPath:String = "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\";
+			final pciId:String = 'ven_${StringTools.hex(vendorId, 4)}&dev_${StringTools.hex(deviceId, 4)}'.toLowerCase();
+			for (i in 0...16)
+			{
+				final adapterPath:String = displayClassPath + CoolUtil.addZeros(Std.string(i), 4);
+				final matchingId:Null<String> = RegistryUtil.get(HKEY_LOCAL_MACHINE, adapterPath, "MatchingDeviceId");
+				if (matchingId == null || !matchingId.toLowerCase().contains(pciId))
+					continue;
+
+				final name:Null<String> = RegistryUtil.get(HKEY_LOCAL_MACHINE, adapterPath, "DriverDesc");
+				if (name != null && name != "")
+					return name;
+			}
+			#elseif linux
+			final process:Process = new Process("lspci", ["-mm", "-d", '${StringTools.hex(vendorId, 4)}:${StringTools.hex(deviceId, 4)}']);
+			if (process.exitCode() == 0)
+			{
+				// 01:00.0 "VGA compatible controller" "NVIDIA Corporation" "GA106 [GeForce RTX 3060]" ...
+				final fields:Array<String> = process.stdout.readAll().toString().split("\n")[0].split('"');
+				if (fields.length > 5)
+				{
+					var name:String = fields[5];
+					if (name.endsWith("]") && name.contains("["))
+						name = name.substring(name.lastIndexOf("[") + 1, name.length - 1);
+					if (name != "")
+						return vendorName != "Unknown" ? '$vendorName $name' : name;
+				}
+			}
+			#elseif mac
+			final process:Process = new Process("system_profiler", ["SPDisplaysDataType"]);
+			if (process.exitCode() == 0)
+			{
+				for (line in process.stdout.readAll().toString().split("\n"))
+				{
+					final trimmedLine:String = line.trim();
+					if (trimmedLine.startsWith("Chipset Model:"))
+						return trimmedLine.substr(trimmedLine.indexOf(":") + 1).trim();
+				}
+			}
+			#end
+		}
+		catch (e)
+		{
+			Log.error('Unable to grab GPU Name: $e');
+		}
+
+		return '$vendorName GPU';
 	}
 
 	static inline function row(key:String, value:String):String
