@@ -33,7 +33,7 @@ class MenuItem extends FlxSprite
 		if (isFlashing)
 		{
 			_flashingElapsed += elapsed;
-			color = (Math.floor(_flashingElapsed * FlxG.updateFramerate * flashes_ps) % 2 == 0) ? _flashColor : FlxColor.WHITE;
+			color = (Math.floor(_flashingElapsed * ClientPrefs.data.framerate * flashes_ps) % 2 == 0) ? _flashColor : FlxColor.WHITE;
 		}
 	}
 }
