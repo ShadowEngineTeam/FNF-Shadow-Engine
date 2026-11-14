@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "b0afca86a339850740f99576555932b419b25708",
+      "ref": "ef1624dedbab0ca3595060bd439af30247a07123",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -27,13 +27,13 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "e40dfd0188d92f4983a02db5c57002650b6e6973",
+      "ref": "9a461db78cdfc2bab56936d89398222a5dfac712",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
       "name": "SScript",
       "type": "git",
-      "ref": "b869209b7eb9d3bba1a32caa9d9fff2cc459153a",
+      "ref": "974960397aaca9a6bb1b31258a48171cfc28ecc0",
       "url": "https://github.com/ShadowEngineTeam/ShadowScript"
     },
     {
