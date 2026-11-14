@@ -17,10 +17,6 @@ class FramerateCounter extends Sprite
 	private final updateInterval:Float = 1 / 15;
 	private var lastUpdateTime:Float = 0;
 
-	#if sys
-	private var record:Null<sys.io.FileOutput> = null;
-	#end
-
 	public function new()
 	{
 		super();
@@ -78,40 +74,8 @@ class FramerateCounter extends Sprite
 		fpsNum.text = Std.string(Math.round(lastFPS));
 		lastUpdateTime = frameCount = 0;
 
-		#if sys
-		recordFPS(Math.round(lastFPS));
-		#end
-
 		updateLabelPosition();
 	}
-
-	#if sys
-	private function recordFPS(fps:Int):Void
-	{
-		try
-		{
-			if (record == null)
-				record = sys.io.File.write(Sys.getCwd() + recordFileName(), false);
-
-			record.writeString('$fps\n');
-			record.flush();
-		}
-		catch (e:haxe.Exception) {}
-	}
-
-	private function recordFileName():String
-	{
-		final context3D:Null<openfl.display3D.Context3D> = FlxG.stage.context3D;
-		final gpu:String = @:privateAccess (context3D != null && context3D.gl != null ? Std.string(context3D.gl.getParameter(context3D.gl.RENDERER)) : "");
-		return '${recordName(gpu)}-fps.txt';
-	}
-
-	private static function recordName(gpu:String):String
-	{
-		final name:String = ~/[\\\/:*?"<>|]/g.replace(gpu.split("/")[0].trim(), "_");
-		return name != "" ? name : "Unknown";
-	}
-	#end
 
 	private inline function updateLabelPosition():Void
 	{
