@@ -529,8 +529,8 @@ class SScript
 
 		#if sys
 		setClass(Sys);
-		setClass(sys.FileSystem);
-		setClass(sys.io.File);
+		setClass(backend.io.FileSystem);
+		setClass(backend.io.File);
 		setClass(sys.io.Process);
 		setClass(sys.io.FileInput);
 		setClass(sys.io.FileOutput);

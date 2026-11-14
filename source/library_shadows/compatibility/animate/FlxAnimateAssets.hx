@@ -43,45 +43,34 @@ class FlxAnimateAssets
 
 	public static dynamic function list(path:String, ?type:AssetType, ?library:String, includeSubDirectories:Bool = false):Array<String>
 	{
-		var result:Array<String> = null;
+		if ((library == null || library.length == 0) && FileSystem.isDirectory(path))
+		{
+			var result:Array<String> = [];
+			var checkSubDirectory:String->Void = null;
 
-		// Check openfl/flixel assets first
-		result = #if (flixel >= "5.9.0") flixel.FlxG.assets.list(type); #else openfl.utils.Assets.list(type); #end
+			checkSubDirectory = (file) ->
+			{
+				if (includeSubDirectories && FileSystem.isDirectory('$path/$file'))
+				{
+					for (subFile in FileSystem.readDirectory('$path/$file'))
+						checkSubDirectory('$file/$subFile');
+				}
+				else
+				{
+					result.push(file);
+				}
+			};
+
+			for (file in FileSystem.readDirectory(path))
+				checkSubDirectory(file);
+
+			return result;
+		}
+
+		var result:Array<String> = #if (flixel >= "5.9.0") flixel.FlxG.assets.list(type); #else openfl.utils.Assets.list(type); #end
 
 		if (result == null)
-			result = [];
-
-		// Fallback to filesystem for non-library assets
-		#if sys
-		if (library == null || library.length == 0)
-		{
-			if (sys.FileSystem.exists(path))
-			{
-				var files:Array<String> = sys.FileSystem.readDirectory(path);
-				var result:Array<String> = [];
-				var checkSubDirectory:String->Void = null;
-
-				checkSubDirectory = (file) ->
-				{
-					if (sys.FileSystem.isDirectory('$path/$file') && includeSubDirectories)
-					{
-						var files = sys.FileSystem.readDirectory('$path/$file').map((subFile) -> '$file/$subFile');
-						for (file in files)
-							checkSubDirectory(file);
-					}
-					else
-					{
-						result.push(file);
-					}
-				};
-
-				for (file in files)
-					checkSubDirectory(file);
-
-				return result;
-			}
-		}
-		#end
+			return [];
 
 		return result.filter((str) -> str.startsWith(path.substring(path.indexOf(':') + 1, path.length)))
 			.map((str) -> str.split('${path.split(":").pop()}/').pop());
