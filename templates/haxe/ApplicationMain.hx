@@ -79,7 +79,7 @@ class ApplicationMain
 	 *
 	 * ```
 	 * # renderers to try, in order
-	 * LIME_BGFX_PLATFORM=vulkan,opengles
+	 * SDL_LIME_BGFX_RENDERER=vulkan,opengles
 	 * ```
 	 *
 	 * Mobile only, where there is no shell to set a variable from: the file sits in the storage
