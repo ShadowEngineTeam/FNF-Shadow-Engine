@@ -172,7 +172,7 @@ class ShadowList extends FlxSpriteGroup
 		return _selectedIndex;
 	}
 
-	public function refresh()
+	override public function refresh():Void
 	{
 		refreshDisplay();
 	}
