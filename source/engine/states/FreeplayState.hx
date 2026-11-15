@@ -8,6 +8,7 @@ import objects.HealthIcon;
 import objects.MusicPlayer;
 import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
+import substates.FreeplayOptionsSubState;
 import flixel.math.FlxMath;
 
 class FreeplayState extends MusicBeatState
@@ -345,41 +346,21 @@ class FreeplayState extends MusicBeatState
 		}
 		else if (Funkin.controls.ACCEPT && !player.playingMusic)
 		{
-			persistentUpdate = false;
-
 			final songPath:String = Paths.formatToSongPath(songs[curSelected].songName);
-			final json:String = Highscore.formatSong(songPath, curDifficulty);
+			final mixes:Array<String> = songMixes(songPath);
+			final instrumentals:Map<String, Array<String>> = mixInstrumentals(songPath, mixes);
 
-			try
+			if (mixes.length > 1 || instrumentals.get(FreeplayOptionsSubState.DEFAULT_MIX).length > 1)
 			{
-				PlayState.SONG = Song.loadFromJson(json, songPath);
-				PlayState.isStoryMode = false;
-				PlayState.storyDifficulty = curDifficulty;
-				trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
-				colorTween?.cancel();
+				persistentUpdate = false;
+				#if FEATURE_MOBILE_CONTROLS
+				removeTouchPad();
+				#end
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				switchSubState(FreeplayOptionsSubState, [mixes, instrumentals, startSong]);
 			}
-			catch (e:Dynamic)
-			{
-				trace('ERROR! $e');
-				missingText.text = 'ERROR WHILE LOADING CHART:\n${e.toString()}';
-				missingText.screenCenter(Y);
-				missingText.visible = missingTextBG.visible = true;
-
-				FlxG.sound.play(Paths.sound('cancelMenu'));
-				updateTexts(elapsed);
-				super.update(elapsed);
-				return;
-			}
-
-			HapticUtil.vibrate(0, 0.05, 1, 1, MENU);
-			LoadingState.prepareToSong();
-			LoadingState.loadAndSwitchState(PlayState);
-			// FlxG.sound.music.volume = 0;
-			destroyFreeplayVocals();
-
-			#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
-			DiscordClient.loadModRPC();
-			#end
+			else
+				startSong(FreeplayOptionsSubState.DEFAULT_MIX, FreeplayOptionsSubState.DEFAULT_MIX);
 		}
 		else if ((Funkin.controls.RESET #if FEATURE_MOBILE_CONTROLS || touchPad.buttonY.justPressed #end) && !player.playingMusic)
 		{
@@ -394,6 +375,100 @@ class FreeplayState extends MusicBeatState
 		}
 		updateTexts(elapsed);
 		super.update(elapsed);
+	}
+
+	function startSong(mix:String, instrumental:String):Void
+	{
+		persistentUpdate = false;
+
+		final songPath:String = Paths.formatToSongPath(songs[curSelected].songName);
+		final json:String = Highscore.formatSong(songPath, curDifficulty);
+		final isDefault:Bool = mix == FreeplayOptionsSubState.DEFAULT_MIX;
+
+		try
+		{
+			PlayState.SONG = Song.loadFromJson(json, isDefault ? songPath : '$songPath/$mix');
+			PlayState.isStoryMode = false;
+			PlayState.storyDifficulty = curDifficulty;
+			PlayState.altInstrumental = instrumental == FreeplayOptionsSubState.DEFAULT_MIX ? null : instrumental;
+			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
+			colorTween?.cancel();
+		}
+		catch (e:Dynamic)
+		{
+			trace('ERROR! $e');
+			missingText.text = 'ERROR WHILE LOADING CHART:\n${e.toString()}';
+			missingText.screenCenter(Y);
+			missingText.visible = missingTextBG.visible = true;
+
+			FlxG.sound.play(Paths.sound('cancelMenu'));
+			persistentUpdate = true;
+			return;
+		}
+
+		HapticUtil.vibrate(0, 0.05, 1, 1, MENU);
+		LoadingState.prepareToSong();
+		LoadingState.loadAndSwitchState(PlayState);
+		destroyFreeplayVocals();
+
+		#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
+		DiscordClient.loadModRPC();
+		#end
+	}
+
+	/**
+	 * The mixes of a song with a chart for the current difficulty, from its `data/song/mix/` folders.
+	 */
+	function songMixes(songPath:String):Array<String>
+	{
+		final chart:String = Highscore.formatSong(songPath, curDifficulty) + '.json';
+		final mixes:Array<String> = [FreeplayOptionsSubState.DEFAULT_MIX];
+		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songPath/'))
+		{
+			for (file in FileSystem.readDirectory(folder))
+			{
+				if (!mixes.contains(file) && FileSystem.isDirectory(folder + file) && FileSystem.exists('$folder$file/$chart'))
+					mixes.push(file);
+			}
+		}
+		return mixes;
+	}
+
+	/**
+	 * The default mix can also play the instrumental of each other mix once that mix is beaten, outside of Erect.
+	 */
+	function mixInstrumentals(songPath:String, mixes:Array<String>):Map<String, Array<String>>
+	{
+		final list:Array<String> = [FreeplayOptionsSubState.DEFAULT_MIX];
+		if (Difficulty.getSongPrefix(curDifficulty) == '')
+		{
+			for (mix in mixes)
+			{
+				if (mix != FreeplayOptionsSubState.DEFAULT_MIX && hasInstrumental(songPath, mix) && beatenMix(songPath, mix))
+					list.push(mix);
+			}
+		}
+		return [FreeplayOptionsSubState.DEFAULT_MIX => list];
+	}
+
+	static function hasInstrumental(songPath:String, mix:String):Bool
+	{
+		for (ext in Paths.SOUND_EXTS)
+		{
+			if (Paths.fileExists('songs/$songPath/Inst-$mix.$ext', SOUND))
+				return true;
+		}
+		return false;
+	}
+
+	static function beatenMix(songPath:String, mix:String):Bool
+	{
+		for (i in 0...Difficulty.list.length)
+		{
+			if (Highscore.getScore(Highscore.mixSong(songPath, mix), i) > 0)
+				return true;
+		}
+		return false;
 	}
 
 	public static function destroyFreeplayVocals():Void

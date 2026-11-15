@@ -31,6 +31,8 @@ import states.TitleState;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;
 	public var flashing:Bool = true;
+	public var subtitles:Bool = true;
+	public var naughtyness:Bool = true;
 	public var autoPause:Bool = true;
 	public var antialiasing:Bool = true;
 	public var noteSkin:String = 'Default';

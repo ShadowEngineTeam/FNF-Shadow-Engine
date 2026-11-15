@@ -276,9 +276,10 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (PlayState.SONG.variant?.length > 0)
 			path += '/${PlayState.SONG.variant}';
 
-		path += '/deathQuote.txt';
+		path += '/deathQuote';
 
-		final contents:String = Paths.getTextFromFile(path);
+		var contents:Null<String> = !ClientPrefs.data.naughtyness ? Paths.getTextFromFile('$path-censored.txt') : null;
+		contents ??= Paths.getTextFromFile('$path.txt');
 		if (contents == null)
 			return '';
 

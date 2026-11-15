@@ -82,6 +82,12 @@ class VisualsUISubState extends BaseOptionsMenu
 		var option:Option = new Option('Flashing Lights', "Uncheck this if you're sensitive to flashing lights!", 'flashing', 'bool');
 		addOption(option);
 
+		var option:Option = new Option('Subtitles', 'When enabled, subtitles appear during some songs and cutscenes.', 'subtitles', 'bool');
+		addOption(option);
+
+		var option:Option = new Option('Naughtyness', 'When enabled, raunchy content (such as swearing, etc.) is displayed.', 'naughtyness', 'bool');
+		addOption(option);
+
 		var option:Option = new Option('Camera Zooms', "If unchecked, the camera won't zoom in on a beat hit.", 'camZooms', 'bool');
 		addOption(option);
 

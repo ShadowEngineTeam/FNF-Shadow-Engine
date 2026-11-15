@@ -305,7 +305,12 @@ class PauseSubState extends MusicBeatSubstate
 					{
 						var name:String = PlayState.SONG.song;
 						var poop = Highscore.formatSong(name, curSelected);
-						PlayState.SONG = Song.loadFromJson(poop, name);
+						// Stay on the same mix if it has this difficulty.
+						final mix:Null<String> = PlayState.SONG.variant;
+						var folder:String = name;
+						if (mix?.length > 0 && Paths.fileExists('data/${Paths.formatToSongPath(name)}/$mix/$poop.json', TEXT))
+							folder = '$name/$mix';
+						PlayState.SONG = Song.loadFromJson(poop, folder);
 						PlayState.storyDifficulty = curSelected;
 						Funkin.resetState();
 						FlxG.sound.music.volume = 0;

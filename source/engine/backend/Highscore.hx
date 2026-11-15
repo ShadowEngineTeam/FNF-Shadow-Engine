@@ -82,6 +82,14 @@ class Highscore
 		FlxG.save.flush();
 	}
 
+	/**
+	 * The name scores are saved under for a mix of a song.
+	 */
+	public static function mixSong(song:String, ?mix:String):String
+	{
+		return (mix != null && mix.length > 0) ? '$song-$mix' : song;
+	}
+
 	public static function formatSong(song:String, diff:Int):String
 	{
 		return Paths.formatToSongPath(song) + Difficulty.getFilePath(diff);

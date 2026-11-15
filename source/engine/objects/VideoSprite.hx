@@ -65,7 +65,21 @@ class VideoSprite extends FlxSpriteGroup
 		});
 
 		// start video and adjust resolution to screen size
-		videoSprite.load(videoName, shouldLoop ? ['input-repeat=65545'] : null);
+		final options:Array<String> = loadOptions();
+		if (shouldLoop)
+			options.push('input-repeat=65545');
+		videoSprite.load(videoName, options);
+	}
+
+	/**
+	 * Options for loading a video, picking the subtitle track from the Subtitles option.
+	 */
+	public static function loadOptions():Array<String>
+	{
+		return [
+			ClientPrefs.data.subtitles ? ':sub-language=English' : ':sub-language=none',
+			':audio-language=English'
+		];
 	}
 
 	override function destroy():Void

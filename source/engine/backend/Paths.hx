@@ -21,6 +21,11 @@ class Paths
 	#end
 	#if FEATURE_VIDEOS
 	public static final VIDEO_EXT:String = "mp4";
+
+	/**
+	 * The video formats to look for, in order. MKV goes first since it can carry subtitles.
+	 */
+	public static final VIDEO_EXTS:Array<String> = ["mkv", VIDEO_EXT];
 	#end
 	public static final SOUND_EXTS:Array<String> = ['ogg', 'mp3', 'opus', 'flac', 'wav'];
 
@@ -246,10 +251,19 @@ class Paths
 	public static function video(key:String):String
 	{
 		#if FEATURE_MODS
-		var file:String = modsVideo(key);
-		if (FileSystem.exists(file))
-			return file;
+		for (ext in VIDEO_EXTS)
+		{
+			final file:String = modsVideo(key, ext);
+			if (FileSystem.exists(file))
+				return file;
+		}
 		#end
+		for (ext in VIDEO_EXTS)
+		{
+			final file:String = getSharedPath('videos/$key.$ext');
+			if (FileSystem.exists(file))
+				return file;
+		}
 		return 'assets/videos/$key.$VIDEO_EXT';
 	}
 	#end
@@ -689,9 +703,9 @@ class Paths
 	}
 
 	#if FEATURE_VIDEOS
-	inline public static function modsVideo(key:String):String
+	inline public static function modsVideo(key:String, ?ext:String):String
 	{
-		return modFolders('videos/' + key + '.' + VIDEO_EXT);
+		return modFolders('videos/' + key + '.' + (ext ?? VIDEO_EXT));
 	}
 	#end
 

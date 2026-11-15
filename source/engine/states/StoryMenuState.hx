@@ -238,6 +238,7 @@ class StoryMenuState extends MusicBeatState
 				callOnScripts('onSelectWeek');
 
 				PlayState.storyDifficulty = curDifficulty;
+				PlayState.altInstrumental = null;
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + Difficulty.getFilePath(curDifficulty), PlayState.storyPlaylist[0].toLowerCase());
 				PlayState.campaignScore = PlayState.campaignMisses = 0;
 			}

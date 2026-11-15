@@ -108,6 +108,11 @@ class PlayState extends MusicBeatState
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
 
+	/**
+	 * Another mix's instrumental to play instead of the song's own, picked in Freeplay.
+	 */
+	public static var altInstrumental:Null<String> = null;
+
 	public var spawnTime:Float = 2000;
 
 	public var scrollVelocity:ScrollVelocityTimeline = null;
@@ -689,7 +694,11 @@ class PlayState extends MusicBeatState
 
 		// SONG SPECIFIC SCRIPTS
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/'))
+		final songFolders:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/');
+		if (SONG.variant?.length > 0)
+			for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/${SONG.variant}/'))
+				songFolders.push(folder);
+		for (folder in songFolders)
 		{
 			for (file in FileSystem.readDirectory(folder))
 			{
@@ -890,7 +899,13 @@ class PlayState extends MusicBeatState
 		inCutscene = !forMidSong;
 		canPause = forMidSong;
 
-		final fileName:String = Paths.video(name);
+		var fileName:String = Paths.video(name);
+		if (!ClientPrefs.data.naughtyness)
+		{
+			final censoredName:String = Paths.video('$name-censored');
+			if (FileSystem.exists(censoredName))
+				fileName = censoredName;
+		}
 
 		if (FileSystem.exists(fileName))
 		{
@@ -1297,6 +1312,13 @@ class PlayState extends MusicBeatState
 
 	function findInst():Sound
 	{
+		if (altInstrumental != null)
+		{
+			final snd:Sound = Paths.inst(SONG.song, altInstrumental);
+			if (snd != null)
+				return snd;
+		}
+
 		for (suffix in songAudioSuffixes())
 		{
 			final snd:Sound = Paths.inst(SONG.song, suffix);
@@ -1406,9 +1428,16 @@ class PlayState extends MusicBeatState
 		isErect = Difficulty.list[storyDifficulty] == ERECT || Difficulty.list[storyDifficulty] == NIGHTMARE;
 
 		final file:String = 'events${isErect ? '-erect' : ''}';
-		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$songName/$file')) || #end FileSystem.exists(Paths.json('$songName/$file')))
+		var eventsFolder:String = songName;
+		if (SONG.variant?.length > 0)
 		{
-			final eventsData:Array<Dynamic> = Song.loadFromJson(file, songName).events;
+			final mixFolder:String = '$songName/${SONG.variant}';
+			if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$mixFolder/$file')) || #end FileSystem.exists(Paths.json('$mixFolder/$file')))
+				eventsFolder = mixFolder;
+		}
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$eventsFolder/$file')) || #end FileSystem.exists(Paths.json('$eventsFolder/$file')))
+		{
+			final eventsData:Array<Dynamic> = Song.loadFromJson(file, eventsFolder).events;
 			for (event in eventsData)
 			{
 				for (i in 0...event[1].length)
@@ -2823,7 +2852,7 @@ class PlayState extends MusicBeatState
 			var percent:Float = ratingPercent;
 			if (Math.isNaN(percent))
 				percent = 0;
-			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
+			Highscore.saveScore(Highscore.mixSong(SONG.song, SONG.variant), songScore, storyDifficulty, percent);
 
 			playbackRate = 1;
 

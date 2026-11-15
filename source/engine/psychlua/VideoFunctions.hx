@@ -2,6 +2,7 @@ package psychlua;
 
 #if FEATURE_VIDEOS
 import hxvlc.flixel.FlxVideoSprite;
+import objects.VideoSprite;
 #end
 
 class VideoFunctions
@@ -39,7 +40,7 @@ class VideoFunctions
 				funk.call('onVideoFinished', [tag]);
 				removeLuaVideo(tag, state);
 			});
-			videoSprite.load(Paths.video(path), null);
+			videoSprite.load(Paths.video(path), VideoSprite.loadOptions());
 			videoSprite.play();
 			state.variables.set(tag, videoSprite);
 

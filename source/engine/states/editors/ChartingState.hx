@@ -2070,6 +2070,7 @@ class ChartingState extends MusicBeatState
 				autosaveSong();
 				FlxG.mouse.visible = false;
 				PlayState.SONG = _song;
+				PlayState.altInstrumental = null;
 				FlxG.sound.music.stop();
 				if (vocals != null)
 					vocals.stop();
