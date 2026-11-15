@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 - Unreleased
+
+(TODO)
+
 ## 0.10.0 - Unreleased
 
 - New framerate design (moveable, behind cursor)
