@@ -249,7 +249,7 @@ class StoryMenuState extends MusicBeatState
 			}
 
 			FlxG.sound.play(Paths.sound('confirmMenu'));
-			HapticUtil.vibrate(0, 0.05, 1);
+			HapticUtil.vibrate(0, 0.05, 1, 1, MENU);
 
 			grpWeekText.members[curWeek].isFlashing = true;
 			for (char in grpWeekCharacters.members)

@@ -43,7 +43,15 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		#if FEATURE_HAPTICS
 		var option:Option = new Option('Vibration', "If unchecked, your device won't vibrate at game over or on in-game events, like explosions or a passing train.", 'vibration', 'bool');
 		addOption(option);
-		option.onChange = () -> backend.HapticUtil.vibrate(0, 0.05, 1);
+		option.onChange = () -> HapticUtil.vibrate(0, 0.05, 1);
+
+		var option:Option = new Option('Menu Vibration', "If unchecked, your device won't vibrate in menus or when pressing touch buttons.", 'menuVibration', 'bool');
+		addOption(option);
+		option.onChange = () -> HapticUtil.vibrate(0, 0.05, 1, 1, MENU);
+
+		var option:Option = new Option('Note Vibration', "If unchecked, your device won't vibrate when you hit notes.", 'noteVibration', 'bool');
+		addOption(option);
+		option.onChange = () -> HapticUtil.vibrate(0, 0.01, 0.625, 1, NOTES);
 		#end
 
 		var option:Option = new Option('Hitsound Volume', 'Funny notes does \"Tick!\" when you hit them.', 'hitsoundVolume', 'percent');

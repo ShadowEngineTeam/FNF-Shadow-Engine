@@ -27,12 +27,13 @@ class HapticUtil
 	 * @param duration The time taken for a complete cycle in seconds.
 	 * @param amplitude The intensity of the vibration (0.0 to 1.0).
 	 * @param sharpness Controls the feel of vibration.
+	 * @param type Which option turns this vibration on or off.
 	 */
 	public static function vibrate(period:Float = DEFAULT_VIBRATION_PERIOD, duration:Float = DEFAULT_VIBRATION_DURATION,
-			amplitude:Float = DEFAULT_VIBRATION_AMPLITUDE, sharpness:Float = DEFAULT_VIBRATION_SHARPNESS):Void
+			amplitude:Float = DEFAULT_VIBRATION_AMPLITUDE, sharpness:Float = DEFAULT_VIBRATION_SHARPNESS, type:VibrationType = GAMEPLAY):Void
 	{
 		#if FEATURE_HAPTICS
-		if (!hapticsAvailable)
+		if (!isEnabled(type))
 			return;
 
 		final amplitudeValue:Float = Math.max(0, Math.min(MAX_VIBRATION_AMPLITUDE, amplitude));
@@ -76,14 +77,25 @@ class HapticUtil
 			vibrate(vibrationPreset.period, vibrationPreset.duration, vibrationPreset.amplitude, vibrationPreset.sharpness);
 	}
 
-	static function get_hapticsAvailable():Bool
+	/**
+	 * Whether vibrations of this type are turned on.
+	 */
+	public static function isEnabled(type:VibrationType):Bool
 	{
 		#if FEATURE_HAPTICS
-		return ClientPrefs.data.vibration;
+		return switch (type)
+		{
+			case MENU: ClientPrefs.data.menuVibration;
+			case NOTES: ClientPrefs.data.noteVibration;
+			default: ClientPrefs.data.vibration;
+		}
 		#else
 		return false;
 		#end
 	}
+
+	static function get_hapticsAvailable():Bool
+		return isEnabled(GAMEPLAY);
 }
 
 /**
@@ -95,4 +107,25 @@ typedef VibrationPreset =
 	var duration:Float;
 	var amplitude:Float;
 	var sharpness:Float;
+}
+
+/**
+ * Which option a vibration belongs to.
+ */
+enum abstract VibrationType(Int) from Int to Int
+{
+	/**
+	 * Game over and in-game events, like explosions or a passing train.
+	 */
+	var GAMEPLAY = 0;
+
+	/**
+	 * Menus, the pause menu and touch buttons.
+	 */
+	var MENU = 1;
+
+	/**
+	 * Hitting notes.
+	 */
+	var NOTES = 2;
 }

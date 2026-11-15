@@ -1898,7 +1898,10 @@ class PlayState extends MusicBeatState
 			if (!inCutscene)
 			{
 				if (!cpuControlled)
+				{
 					keysCheck();
+					tryNoteVibration();
+				}
 				else
 					playerDance();
 
@@ -3009,6 +3012,9 @@ class PlayState extends MusicBeatState
 
 	public var strumsBlocked:Array<Bool> = [];
 
+	// Note vibrations, like Funkin's NoteVibrationsHandler: 1 = hit, 2 = holding a sustain.
+	var noteVibrationStatus:Array<Int> = [];
+
 	private function onKeyPress(event:KeyboardEvent):Void
 	{
 		var eventKey:FlxKey = event.keyCode;
@@ -3105,6 +3111,9 @@ class PlayState extends MusicBeatState
 
 	private function keyReleased(key:Int)
 	{
+		if (key >= 0 && key < noteVibrationStatus.length)
+			noteVibrationStatus[key] = 0;
+
 		if (cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrums.length)
 			return;
 
@@ -3120,6 +3129,21 @@ class PlayState extends MusicBeatState
 		}
 
 		callOnScripts('onKeyRelease', [key]);
+	}
+
+	/**
+	 * Vibrates while hit notes are held, stronger the more lanes are hit at once.
+	 * @param holds Checks lanes holding a sustain instead, once per step.
+	 */
+	function tryNoteVibration(holds:Bool = false):Void
+	{
+		var amplitude:Float = 0;
+		for (status in noteVibrationStatus)
+			if (status == (holds ? 2 : 1))
+				amplitude += holds ? 0.1 : 0.25;
+
+		if (amplitude > 0)
+			HapticUtil.vibrate(0, 0.01, Math.min(amplitude, 1) * 2.5, 1, NOTES);
 	}
 
 	public static function getKeyFromEvent(arr:Array<String>, key:FlxKey):Int
@@ -3661,6 +3685,23 @@ class PlayState extends MusicBeatState
 		if (note.isSustainNote && !cpuControlled)
 			songScore += Rating.SUSTAIN_SCORE;
 
+		if (!cpuControlled && leData < playerStrums.length)
+		{
+			while (noteVibrationStatus.length < playerStrums.length)
+				noteVibrationStatus.push(0);
+
+			if (!note.isSustainNote)
+				noteVibrationStatus[leData] = 1;
+			else if (note.parent != null && note.parent.tail[note.parent.tail.length - 1] == note)
+			{
+				// Hold note's final vibration.
+				noteVibrationStatus[leData] = 0;
+				HapticUtil.vibrate(0, 0.01, 0.25 * 2.5, 1, NOTES);
+			}
+			else
+				noteVibrationStatus[leData] = 2;
+		}
+
 		final args:Array<Dynamic> = [noteIndex, leData, leType, isSus];
 		callOnLuas('goodNoteHit', args);
 		callOnHScript('goodNoteHit', [note]);
@@ -3758,6 +3799,9 @@ class PlayState extends MusicBeatState
 
 	override function stepHit()
 	{
+		if (!cpuControlled)
+			tryNoteVibration(true);
+
 		if (SONG.needsVoices && FlxG.sound.music.time >= -ClientPrefs.data.noteOffset)
 		{
 			final timeSub:Float = Conductor.songPosition - Conductor.offset;

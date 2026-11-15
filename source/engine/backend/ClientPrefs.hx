@@ -22,6 +22,8 @@ import states.TitleState;
 	public var hitboxType:String = "Gradient";
 	#if FEATURE_HAPTICS
 	public var vibration:Bool = true;
+	public var menuVibration:Bool = true;
+	public var noteVibration:Bool = true;
 	#end
 	// end of Mobile and Mobile Controls Releated
 

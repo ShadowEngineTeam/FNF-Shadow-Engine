@@ -263,7 +263,7 @@ class TitleState extends MusicBeatState
 
 				FlxG.camera.flash(ClientPrefs.data.flashing ? FlxColor.WHITE : 0x4CFFFFFF, 1);
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
-				HapticUtil.vibrate(0.1, 0.5, 0.5);
+				HapticUtil.vibrate(0.1, 0.5, 0.5, 1, MENU);
 
 				transitioning = true;
 				// FlxG.sound.music.stop();
@@ -311,7 +311,7 @@ class TitleState extends MusicBeatState
 	{
 		if (textGroup != null && credGroup != null)
 		{
-			HapticUtil.vibrate();
+			HapticUtil.vibrate(0.1, 0.1, 0.5, 1, MENU);
 
 			var coolText:Alphabet = new Alphabet(0, 0, text, true);
 			coolText.screenCenter(X);
