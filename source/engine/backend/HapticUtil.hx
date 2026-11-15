@@ -1,5 +1,7 @@
 package backend;
 
+import flixel.tweens.FlxTween;
+
 #if FEATURE_HAPTICS
 import extension.haptics.Haptic;
 #end
@@ -10,10 +12,16 @@ import extension.haptics.Haptic;
 class HapticUtil
 {
 	public static inline final DEFAULT_VIBRATION_PERIOD:Float = 0.1;
+	public static inline final MIN_VIBRATION_AMPLITUDE:Float = 0.25;
 	public static inline final DEFAULT_VIBRATION_DURATION:Float = 0.1;
 	public static inline final DEFAULT_VIBRATION_AMPLITUDE:Float = 0.5;
 	public static inline final MAX_VIBRATION_AMPLITUDE:Float = 1;
 	public static inline final DEFAULT_VIBRATION_SHARPNESS:Float = 1;
+
+	/**
+	 * Tween that is used in increasingVibrate function for tweening vibration amplitude.
+	 */
+	public static var amplitudeTween:FlxTween;
 
 	/**
 	 * Indicates if haptics are available.
@@ -75,6 +83,24 @@ class HapticUtil
 			vibrate();
 		else
 			vibrate(vibrationPreset.period, vibrationPreset.duration, vibrationPreset.amplitude, vibrationPreset.sharpness);
+	}
+
+	/**
+	 * Triggers a queue of small vibrations with increasing amplitude.
+	 * When the amplitudeTween is finished, triggers a single strong vibration.
+	 * @param startAmplitude Start amplitude value.
+	 * @param targetAmplitude Target amplitude value.
+	 * @param tweenDuration Duration of the tween.
+	 */
+	public static function increasingVibrate(startAmplitude:Float, targetAmplitude:Float, tweenDuration:Float = 1):Void
+	{
+		if (!hapticsAvailable)
+			return;
+
+		amplitudeTween?.cancel();
+		amplitudeTween = FlxTween.num(startAmplitude, targetAmplitude, tweenDuration, {
+			onComplete: (_) -> vibrate(DEFAULT_VIBRATION_PERIOD, DEFAULT_VIBRATION_DURATION, targetAmplitude * 2)
+		}, (currentAmplitude:Float) -> vibrate(0, DEFAULT_VIBRATION_DURATION / 10, currentAmplitude));
 	}
 
 	/**
