@@ -41,15 +41,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		#if FEATURE_HAPTICS
-		var option:Option = new Option('Game Over Vibration', "If checked, your device will vibrate at game over.", 'gameOverVibration', 'bool');
-		addOption(option);
-		option.onChange = () ->
-		{
-			if (ClientPrefs.data.gameOverVibration)
-				extension.haptics.Haptic.vibrateOneShot(0.5, 1, 1);
-		};
-
-		var option:Option = new Option('Haptics', "If unchecked, your device won't vibrate on in-game events, like explosions or a passing train.", 'haptics', 'bool');
+		var option:Option = new Option('Vibration', "If unchecked, your device won't vibrate at game over or on in-game events, like explosions or a passing train.", 'vibration', 'bool');
 		addOption(option);
 		option.onChange = () -> backend.HapticUtil.vibrate(0, 0.05, 1);
 		#end

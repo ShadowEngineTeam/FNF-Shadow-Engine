@@ -79,7 +79,7 @@ class HapticUtil
 	static function get_hapticsAvailable():Bool
 	{
 		#if FEATURE_HAPTICS
-		return ClientPrefs.data.haptics;
+		return ClientPrefs.data.vibration;
 		#else
 		return false;
 		#end
