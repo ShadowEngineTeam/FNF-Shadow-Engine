@@ -709,7 +709,7 @@ class Note extends FlxSkewedSprite
 		}
 	}
 
-	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1)
+	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1, ?songPosition:Float)
 	{
 		var strumX:Float = myStrum.x;
 		var strumY:Float = myStrum.y;
@@ -717,7 +717,7 @@ class Note extends FlxSkewedSprite
 		var strumAlpha:Float = myStrum.alpha;
 		var strumDirection:Float = myStrum.direction;
 
-		distance = (0.45 * (Conductor.songPosition - strumTime) * songSpeed * multSpeed);
+		distance = (0.45 * ((songPosition ?? Conductor.songPosition) - strumTime) * songSpeed * multSpeed);
 		if (!myStrum.downScroll)
 			distance *= -1;
 

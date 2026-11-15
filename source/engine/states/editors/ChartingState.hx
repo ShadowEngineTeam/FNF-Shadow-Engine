@@ -103,6 +103,10 @@ class ChartingState extends MusicBeatState
 		[
 			'Dadbattle Spotlight',
 			"Exclusive to Week 1's \"stage\" (and its Erect variant).\n\nValue 1: Spotlight to target\n(Dad, BF, GF, BG, Smoke)\nNote: it won't disable the other spotlights\nunless you set their Value 2 alpha too.\n\nValue 2: separated with ',' Alpha, Duration (in steps), Ease\nLeave the ease blank (or \"classic\") to change instantly."
+		],
+		[
+			'Scroll Velocity',
+			"Changes how fast the notes move toward the strums,\nwithout changing the spacing.\n\nValue 1: Velocity (1 is normal, 0 stops the notes)\nOptionally a start velocity after a ','\n\nValue 2: Duration (in steps) and ease, separated with ','\nUse \"instant\" as the ease to change instantly."
 		]
 	];
 

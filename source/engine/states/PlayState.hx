@@ -110,6 +110,18 @@ class PlayState extends MusicBeatState
 
 	public var spawnTime:Float = 2000;
 
+	public var scrollVelocity:ScrollVelocityTimeline = null;
+
+	/**
+	 * The song time the notes are drawn around, which Scroll Velocity events move away from the real one.
+	 */
+	public var visualSongPosition(default, null):Float = 0;
+
+	var velocityLagStretchStart:Float = -1;
+	var velocityLagPixels:Float = 0;
+	var velocityLagPrevious:Float = 0;
+	var velocityLagSongTime:Float = 0;
+
 	public var vocals:FlxSound;
 	public var opponentVocals:FlxSound;
 
@@ -1519,7 +1531,36 @@ class PlayState extends MusicBeatState
 				makeEvent(event, i);
 
 		unspawnNotes.sort(sortByTime);
+
+		scrollVelocity = new ScrollVelocityTimeline(eventNotes);
+		if (!scrollVelocity.hasEvents)
+			scrollVelocity = null;
+
 		generatedMusic = true;
+	}
+
+	function updateVisualSongPosition():Void
+	{
+		final songTime:Float = Conductor.songPosition;
+		if (scrollVelocity == null)
+		{
+			visualSongPosition = songTime;
+			return;
+		}
+
+		final stretchStart:Float = scrollVelocity.stretchStartAt(songTime);
+		final lag:Float = songTime - scrollVelocity.visualTime(songTime);
+		if (stretchStart != velocityLagStretchStart || songTime < velocityLagSongTime)
+		{
+			velocityLagStretchStart = stretchStart;
+			velocityLagPixels = lag * songSpeed;
+		}
+		else
+			velocityLagPixels = ScrollVelocityTimeline.stepLag(velocityLagPixels, velocityLagPrevious, lag, songSpeed);
+
+		velocityLagPrevious = lag;
+		velocityLagSongTime = songTime;
+		visualSongPosition = (stretchStart < 0) ? songTime - lag : ScrollVelocityTimeline.lagToVisual(songTime, velocityLagPixels, lag, songSpeed);
 	}
 
 	// called only once per different event (Used for precaching)
@@ -1863,6 +1904,8 @@ class PlayState extends MusicBeatState
 
 		doDeathCheck();
 
+		updateVisualSongPosition();
+
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
@@ -1873,7 +1916,7 @@ class PlayState extends MusicBeatState
 			if (unspawnNotes[0].multSpeed < 1)
 				time /= unspawnNotes[0].multSpeed;
 
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Math.max(Conductor.songPosition, visualSongPosition) < time)
 			{
 				final dunceNote:Note = unspawnNotes.shift();
 				notes.insert(0, dunceNote);
@@ -1928,7 +1971,7 @@ class PlayState extends MusicBeatState
 
 							final strumGroup:FlxTypedGroup<StrumNote> = daNote.mustPress ? playerStrums : opponentStrums;
 							final strum:StrumNote = strumGroup.members[daNote.noteData];
-							daNote.followStrumNote(strum, fakeCrochet, scrollSpeed);
+							daNote.followStrumNote(strum, fakeCrochet, scrollSpeed, visualSongPosition);
 
 							if (daNote.mustPress)
 							{
