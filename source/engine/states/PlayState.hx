@@ -3411,7 +3411,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		if (note.mustPress)
+		if (note == null || note.mustPress)
 		{
 			missnoteSound = FlxG.sound.play(getMissSound(), FlxG.random.float(0.1, 0.2));
 			if (missnoteSound != null)
@@ -3435,7 +3435,7 @@ class PlayState extends MusicBeatState
 
 		health -= subtract * healthLoss;
 		if (!practiceMode)
-			songScore -= (note.isSustainNote) ? Rating.SUSTAIN_MISS_SCORE : Rating.MISS_SCORE;
+			songScore -= (note != null && note.isSustainNote) ? Rating.SUSTAIN_MISS_SCORE : Rating.MISS_SCORE;
 		if (!endingSong)
 			songMisses++;
 		totalPlayed++;
