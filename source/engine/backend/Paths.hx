@@ -20,12 +20,7 @@ class Paths
 	public static final GPU_IMAGE_EXTS:Array<String> = [#if desktop 'dds', 'astc' #else 'astc', 'dds' #end];
 	#end
 	#if FEATURE_VIDEOS
-	public static final VIDEO_EXT:String = "mp4";
-
-	/**
-	 * The video formats to look for, in order. MKV goes first since it can carry subtitles.
-	 */
-	public static final VIDEO_EXTS:Array<String> = ["mkv", VIDEO_EXT];
+	public static final VIDEO_EXTS:Array<String> = ["mkv", "mp4"];
 	#end
 	public static final SOUND_EXTS:Array<String> = ['ogg', 'mp3', 'opus', 'flac', 'wav'];
 
@@ -264,7 +259,7 @@ class Paths
 			if (FileSystem.exists(file))
 				return file;
 		}
-		return 'assets/videos/$key.$VIDEO_EXT';
+		return 'assets/videos/$key.${VIDEO_EXTS[0]}';
 	}
 	#end
 
@@ -705,7 +700,7 @@ class Paths
 	#if FEATURE_VIDEOS
 	inline public static function modsVideo(key:String, ?ext:String):String
 	{
-		return modFolders('videos/' + key + '.' + (ext ?? VIDEO_EXT));
+		return modFolders('videos/' + key + '.' + (ext ?? VIDEO_EXTS[0]));
 	}
 	#end
 
