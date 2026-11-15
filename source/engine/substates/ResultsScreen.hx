@@ -148,6 +148,7 @@ class ResultsScreen extends MusicBeatSubstate
 		add(settingsText);
 
 		FlxTween.tween(background, {alpha: 0.5}, 0.5);
+		HapticUtil.vibrate(0.1, 0.5, 1);
 		FlxTween.tween(text, {y: 20}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(comboText, {y: 145}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(contText, {y: FlxG.height - 45}, 0.5, {ease: FlxEase.expoInOut});

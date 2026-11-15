@@ -132,6 +132,7 @@ class MainMenuState extends MusicBeatState
 			if (Funkin.controls.ACCEPT)
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));
+				HapticUtil.vibrate(0, 0.05, 1);
 				selectedSomethin = true;
 
 				if (ClientPrefs.data.flashing)

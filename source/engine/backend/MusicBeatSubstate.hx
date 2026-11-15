@@ -68,6 +68,7 @@ class MusicBeatSubstate extends FlxSubState implements IMusicState
 	public function addTouchPad(DPad:String, Action:String)
 	{
 		touchPad = new TouchPad(DPad, Action);
+		touchPad.onButtonDown.add((_) -> HapticUtil.vibrate(0, 0.01, 0.5));
 		add(touchPad);
 	}
 

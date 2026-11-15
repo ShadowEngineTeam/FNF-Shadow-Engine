@@ -5,7 +5,6 @@ import flixel.FlxObject;
 import states.StoryMenuState;
 import states.FreeplayState;
 import effects.RetroCameraFade;
-import backend.HapticUtil;
 import backend.StageData;
 import haxe.Json;
 

@@ -371,6 +371,7 @@ class FreeplayState extends MusicBeatState
 				return;
 			}
 
+			HapticUtil.vibrate(0, 0.05, 1);
 			LoadingState.prepareToSong();
 			LoadingState.loadAndSwitchState(PlayState);
 			// FlxG.sound.music.volume = 0;

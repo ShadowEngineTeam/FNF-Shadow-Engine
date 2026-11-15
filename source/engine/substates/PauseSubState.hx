@@ -173,6 +173,9 @@ class PauseSubState extends MusicBeatSubstate
 		regenMenu();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 
+		HapticUtil.vibrate(0, 0.05, 0.5);
+		new FlxTimer().start(0.2, (_) -> HapticUtil.vibrate(0, 0.01, 0.5));
+
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad(PlayState.chartingMode ? "LEFT_FULL" : "UP_DOWN", "A");
 		addTouchPadCamera(false);
@@ -293,6 +296,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		if (Funkin.controls.ACCEPT && cantUnpause <= 0)
 		{
+			HapticUtil.vibrate(0, 0.05, 1);
 			if (menuItems == difficultyChoices)
 			{
 				try
