@@ -15,6 +15,9 @@ class FreeplayOptionsSubState extends MusicBeatSubstate
 	var curInstrumental:Int = 0;
 	var curRow:Int = 0;
 
+	// The press that opened this would also confirm it on the same frame.
+	var canInput:Bool = false;
+
 	var bg:FlxSprite;
 	var box:FlxSprite;
 	var title:FlxText;
@@ -109,6 +112,13 @@ class FreeplayOptionsSubState extends MusicBeatSubstate
 	override function update(elapsed:Float):Void
 	{
 		bg.alpha = Math.min(bg.alpha + elapsed * 1.5, 0.6);
+
+		if (!canInput)
+		{
+			canInput = true;
+			super.update(elapsed);
+			return;
+		}
 
 		final rowList:Array<Int> = rows();
 		if (Funkin.controls.UI_UP_P || Funkin.controls.UI_DOWN_P)

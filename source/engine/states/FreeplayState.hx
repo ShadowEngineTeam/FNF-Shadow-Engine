@@ -436,6 +436,7 @@ class FreeplayState extends MusicBeatState
 
 	/**
 	 * The default mix can also play the instrumental of each other mix once that mix is beaten, outside of Erect.
+	 * Boyfriend's mixes keep theirs, as Funkin's Weekend 1 songs do.
 	 */
 	function mixInstrumentals(songPath:String, mixes:Array<String>):Map<String, Array<String>>
 	{
@@ -444,7 +445,7 @@ class FreeplayState extends MusicBeatState
 		{
 			for (mix in mixes)
 			{
-				if (mix != FreeplayOptionsSubState.DEFAULT_MIX && hasInstrumental(songPath, mix) && beatenMix(songPath, mix))
+				if (mix != FreeplayOptionsSubState.DEFAULT_MIX && mix != 'bf' && hasInstrumental(songPath, mix) && beatenMix(songPath, mix))
 					list.push(mix);
 			}
 		}

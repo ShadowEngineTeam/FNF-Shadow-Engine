@@ -9,3 +9,4 @@
 - HSV Note Skin Textures
 - Rewrite Source with Null Safety and Haxe 4.3 features(?)
 - Add Metallic Funkin (Legacy) and 2hot only can (FEATURE_JOKES)
+- Only offer the difficulties a week's songs have in Story Mode, and each song's own in Freeplay, like Funkin. Every base game week lists Erect, but Monster, MILF, Winter Horrorland, Guns, Stress, Lit Up, 2hot and Blazin have no Erect chart, so Story Mode crashes when it reaches one (Week 2 on Erect after South)

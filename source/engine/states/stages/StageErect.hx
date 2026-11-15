@@ -52,18 +52,10 @@ class StageErect extends BaseStage
 			add(redLight);
 
 			var orangeLight:BGSprite = new BGSprite('stages/week1/erect/orangeLight', 189, -500);
+			orangeLight.scale.y = 1700 / orangeLight.frameHeight;
+			orangeLight.updateHitbox();
 			orangeLight.blend = BlendMode.ADD;
 			add(orangeLight);
-		}
-
-		var beamLol:BGSprite = new BGSprite('stages/week1/erect/lights', -847, -245, 1.2, 1.2);
-		add(beamLol);
-
-		if (!ClientPrefs.data.lowQuality)
-		{
-			var TheOneAbove:BGSprite = new BGSprite('stages/week1/erect/lightAbove', 804, -117);
-			TheOneAbove.blend = BlendMode.ADD;
-			add(TheOneAbove);
 		}
 
 		createSpotlights();
@@ -147,6 +139,18 @@ class StageErect extends BaseStage
 	override function createPost()
 	{
 		super.createPost();
+
+		// The lights hang in front of the characters.
+		var beamLol:BGSprite = new BGSprite('stages/week1/erect/lights', -847, -245, 1.2, 1.2);
+		add(beamLol);
+
+		if (!ClientPrefs.data.lowQuality)
+		{
+			var TheOneAbove:BGSprite = new BGSprite('stages/week1/erect/lightAbove', 804, -117);
+			TheOneAbove.blend = BlendMode.ADD;
+			add(TheOneAbove);
+		}
+
 		if (ClientPrefs.data.shaders)
 		{
 			gf.shader = makeCoolShader(-9, 0, -30, -4);
