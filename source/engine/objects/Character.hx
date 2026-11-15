@@ -408,6 +408,61 @@ class Character extends FlxAnimate
 		}
 	}
 
+	/**
+	 * Plays `combo<count>` when the character has it, as V-Slice's girlfriends cheer at a combo.
+	 * Scripted states (a raised knife, blowing hair) are left alone: only a dancing or idle
+	 * character, or one already reacting to the combo, switches.
+	 * @return Whether an animation started.
+	 */
+	public function playComboAnimation(count:Int):Bool
+	{
+		return playComboReaction('combo' + count);
+	}
+
+	/**
+	 * Plays the highest `drop<N>` with N up to `count`, as V-Slice's girlfriends react to a dropped combo.
+	 * @return Whether an animation started; false also when the combo was too small for any of them.
+	 */
+	public function playComboDropAnimation(count:Int):Bool
+	{
+		var best:Int = -1;
+		for (name in animOffsets.keys())
+		{
+			if (!name.startsWith('drop'))
+				continue;
+
+			final threshold:Null<Int> = Std.parseInt(name.substr(4));
+			if (threshold != null && '$threshold' == name.substr(4) && threshold <= count && threshold > best)
+				best = threshold;
+		}
+
+		return best >= 0 && playComboReaction('drop' + best);
+	}
+
+	/** Whether the character has any `drop<N>` animation, which replaces the old `sad` reaction. */
+	public function hasComboDropAnimations():Bool
+	{
+		for (name in animOffsets.keys())
+			if (name.startsWith('drop') && Std.parseInt(name.substr(4)) != null)
+				return true;
+
+		return false;
+	}
+
+	function playComboReaction(animName:String):Bool
+	{
+		if (!animOffsets.exists(animName))
+			return false;
+
+		final current:String = getAnimationName();
+		if (!(current == '' || current.startsWith('dance') || current.startsWith('idle') || current.startsWith('combo') || current.startsWith('drop')))
+			return false;
+
+		playAnim(animName, true);
+		specialAnim = true;
+		return true;
+	}
+
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
 		specialAnim = false;

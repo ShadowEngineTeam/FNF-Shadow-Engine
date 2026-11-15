@@ -3454,12 +3454,15 @@ class PlayState extends MusicBeatState
 			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, direction)))] + 'miss' + suffix;
 			char.playAnim(animToPlay, true);
 
-			if (char != gf && lastCombo > 5 && gf != null && gf.animOffsets.exists('sad'))
+			if (char != gf && lastCombo > 5 && gf != null && !gf.hasComboDropAnimations() && gf.animOffsets.exists('sad'))
 			{
 				gf.playAnim('sad');
 				gf.specialAnim = true;
 			}
 		}
+
+		if (char != gf && gf != null && (note == null || note.mustPress))
+			gf.playComboDropAnimation(lastCombo);
 
 		if (char == dad && opponentVocals != null)
 			opponentVocals.volume = 0;
@@ -3638,6 +3641,9 @@ class PlayState extends MusicBeatState
 			//if (combo > 9999)
 			//	combo = 9999;
 			popUpScore(note);
+
+			if (gf != null && !note.gfNote && (note.rating == 'sick' || note.rating == 'good'))
+				gf.playComboAnimation(combo);
 
 			// This used to push *every* live ana on every tap hit, so `anaArray` grew by up to four
 			// entries per note and filled up with duplicates - unbounded growth over a song, and a
