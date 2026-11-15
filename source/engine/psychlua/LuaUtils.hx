@@ -669,8 +669,6 @@ class LuaUtils
 				return "table";
 			case type if (type == Lua.TFUNCTION):
 				return "function";
-			case type if (type == Lua.TINTEGER):
-				return "integer";
 			case type if (type == Lua.TVECTOR):
 				return "vector";
 			case type if (type == Lua.TBUFFER):
