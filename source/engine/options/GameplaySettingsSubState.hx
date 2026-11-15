@@ -48,6 +48,10 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			if (ClientPrefs.data.gameOverVibration)
 				extension.haptics.Haptic.vibrateOneShot(0.5, 1, 1);
 		};
+
+		var option:Option = new Option('Haptics', "If unchecked, your device won't vibrate on in-game events, like explosions or a passing train.", 'haptics', 'bool');
+		addOption(option);
+		option.onChange = () -> backend.HapticUtil.vibrate(0, 0.05, 1);
 		#end
 
 		var option:Option = new Option('Hitsound Volume', 'Funny notes does \"Tick!\" when you hit them.', 'hitsoundVolume', 'percent');

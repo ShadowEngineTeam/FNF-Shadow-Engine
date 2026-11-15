@@ -16,6 +16,7 @@ class GameOverSubstate extends MusicBeatSubstate
 	public static var loopSoundName:String = 'gameOver';
 	public static var endSoundName:String = 'gameOverEnd';
 	public var boyfriend:Character;
+	public var isFakeout:Bool = false;
 	var camFollow:FlxObject;
 	var suffix:String = '';
 	var targetZoom:Float = 1;
@@ -89,8 +90,16 @@ class GameOverSubstate extends MusicBeatSubstate
 		for (cam in FlxG.cameras.list)
 			cam.filters = [];
 
-		playDeathAnim('firstDeath');
-		FlxG.sound.play(Paths.sound(checkFile(deathSoundName, 'sounds')));
+		isFakeout = boyfriend.animOffsets.exists('fakeoutDeath') && FlxG.random.bool((1 / 4096) * 100);
+		if (isFakeout)
+		{
+			boyfriend.playAnim('fakeoutDeath', true);
+		}
+		else
+		{
+			playDeathAnim('firstDeath');
+			playDeathSound();
+		}
 
 		targetZoom = StageData.getStageFile(PlayState.curStage)?.defaultZoom ?? 1;
 
@@ -112,28 +121,46 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		FlxG.camera.follow(camFollow, LOCKON, 0.6);
 
-		setOnScripts('inGameOver', true);
-		setOnScripts('boyfriend', boyfriend);
-		callOnScripts('onGameOverStart', []);
-
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("NONE", "A_B");
 		addTouchPadCamera(false);
 		#end
 
 		super.create();
+
+		if (!usingLiveBoyfriend)
+		{
+			#if FEATURE_LUA
+			startLuasNamed('characters/${boyfriend.curCharacter}');
+			#end
+			#if FEATURE_HSCRIPT
+			startHScriptsNamed('characters/${boyfriend.curCharacter}');
+			#end
+		}
+
+		game.setOnScripts('inGameOver', true);
+		setOnScripts('inGameOver', true);
+		setOnScripts('boyfriend', boyfriend);
+		callOnGameOverScripts('onGameOverStart');
 	}
 
 	override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
 
-		callOnScripts('onUpdate', [elapsed]);
-
-		if (Funkin.controls.ACCEPT)
+		if (isFakeout)
+		{
+			if (boyfriend.isAnimationFinished())
+			{
+				isFakeout = false;
+				playDeathAnim('firstDeath');
+				playDeathSound();
+			}
+		}
+		else if (Funkin.controls.ACCEPT)
 			endBullshit();
 
-		if (Funkin.controls.BACK)
+		if (!isFakeout && Funkin.controls.BACK)
 		{
 			#if FEATURE_DISCORD_RPC DiscordClient.resetClientID(); #end
 			FlxG.sound.music?.stop();
@@ -144,7 +171,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			Funkin.switchState(PlayState.isStoryMode ? StoryMenuState : FreeplayState);
 
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			callOnScripts('onGameOverConfirm', [false]);
+			callOnGameOverScripts('onGameOverConfirm', [false]);
 		}
 
 		updateCamFollow();
@@ -162,13 +189,11 @@ class GameOverSubstate extends MusicBeatSubstate
 			else
 				FlxG.sound.music.fadeIn(4, 0.2, 1);
 
-			callOnScripts('onGameOverMusicStart');
+			callOnGameOverScripts('onGameOverMusicStart');
 		}
 
 		if (FlxG.sound.music.playing)
 			Conductor.songPosition = FlxG.sound.music.time;
-
-		callOnScripts('onUpdatePost', [elapsed]);
 	}
 
 	function endBullshit():Void
@@ -201,7 +226,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				});
 			}
 		});
-		callOnScripts('onGameOverConfirm', [true]);
+		callOnGameOverScripts('onGameOverConfirm', [true]);
 	}
 
 	function updateCamFollow():Void
@@ -210,6 +235,15 @@ class GameOverSubstate extends MusicBeatSubstate
 		final stageOffset:Array<Float> = PlayState.instance?.boyfriendCameraOffset ?? [0, 0];
 		camFollow.setPosition(midpoint.x - 100 - (boyfriend.cameraPosition[0] - stageOffset[0] - camOffsetX), midpoint.y - 100 + (boyfriend.cameraPosition[1] + stageOffset[1] + camOffsetY));
 		midpoint.put();
+	}
+
+	public function playDeathSound():Void
+		FlxG.sound.play(Paths.sound(checkFile(deathSoundName, 'sounds')));
+
+	function callOnGameOverScripts(funcToCall:String, ?args:Array<Dynamic>):Void
+	{
+		PlayState.instance?.callOnScripts(funcToCall, args);
+		callOnScripts(funcToCall, args);
 	}
 
 	inline function playDeathAnim(anim:String):Void
