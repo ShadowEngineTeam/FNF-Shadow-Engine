@@ -120,9 +120,7 @@ class EditorPlayState extends MusicBeatSubstate
 		add(strumLineNotes);
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 		NoteSplash.mainGroup = grpNoteSplashes;
-		add(grpNoteSplashes);
 		grpHoldSplashes = new FlxTypedGroup<SustainSplash>();
-		add(grpHoldSplashes);
 
 		var splash:NoteSplash = new NoteSplash(100, 100);
 		grpNoteSplashes.add(splash);
@@ -164,6 +162,9 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.mouse.visible = false;
 
 		generateSong(PlayState.SONG.song);
+
+		add(grpNoteSplashes);
+		add(grpHoldSplashes);
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
@@ -241,8 +242,21 @@ class EditorPlayState extends MusicBeatSubstate
 		if (notes.length > 0)
 		{
 			var fakeCrochet:Float = (60 / PlayState.SONG.bpm) * 1000;
-			notes.forEachAlive(function(daNote:Note)
+			final members:Array<Note> = notes.members;
+			var i:Int = members.length - 1;
+			while (i >= 0)
 			{
+				if (i >= members.length)
+				{
+					i = members.length - 1;
+					continue;
+				}
+
+				final daNote:Note = members[i];
+				i--;
+				if (daNote == null || !daNote.exists || !daNote.alive)
+					continue;
+
 				var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
 				if (!daNote.mustPress)
 					strumGroup = opponentStrums;
@@ -265,7 +279,7 @@ class EditorPlayState extends MusicBeatSubstate
 					daNote.active = daNote.visible = false;
 					invalidateNote(daNote);
 				}
-			});
+			}
 		}
 
 		if (!ClientPrefs.data.hideHud)
