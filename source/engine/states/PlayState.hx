@@ -159,6 +159,8 @@ class PlayState extends MusicBeatState
 	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
 	public var camZoomingFrequency:Float = 4;
+	public var camZoomingOffset:Float = 0;
+	public var camZoomingOnSection:Bool = true;
 	public var camZoomingDecay:Float = 1;
 
 	public var gfSpeed:Int = 1;
@@ -2613,10 +2615,14 @@ class PlayState extends MusicBeatState
 				FlxG.sound.play(Paths.sound(value1), flValue2);
 
 			case 'Set Camera Bopping':
-				var val1:Float = Std.parseFloat(value1);
+				var rate:Array<String> = value1.split(',');
+				var val1:Float = Std.parseFloat(rate[0]);
+				var offset:Float = Std.parseFloat(rate[1]);
 				var val2:Float = Std.parseFloat(value2);
 				camZoomingMult = !Math.isNaN(val2) ? val2 : 1;
 				camZoomingFrequency = !Math.isNaN(val1) ? val1 : 4;
+				camZoomingOffset = !Math.isNaN(offset) ? offset : 0;
+				camZoomingOnSection = false;
 
 			case 'Focus Camera': // P-slice focus camera event notes val1: char val2: x,y,dur,ease
 				isCameraOnForcedPos = false;
@@ -3925,7 +3931,7 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && (curBeat % camZoomingFrequency) == 0)
+		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && ((curBeat + camZoomingOffset) % camZoomingFrequency) == 0)
 		{
 			FlxG.camera.zoom += 0.015 * camZoomingMult;
 			camHUD.zoom += 0.03 * camZoomingMult;
@@ -3980,8 +3986,8 @@ class PlayState extends MusicBeatState
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
 				moveCameraSection();
 
-			final vsliceCondition:Bool = (curBeat % camZoomingFrequency) == 0;
-			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && !vsliceCondition)
+			final vsliceCondition:Bool = ((curBeat + camZoomingOffset) % camZoomingFrequency) == 0;
+			if (camZoomingOnSection && camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && !vsliceCondition)
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;

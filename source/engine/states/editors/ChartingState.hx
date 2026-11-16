@@ -90,7 +90,7 @@ class ChartingState extends MusicBeatState
 		],
 		[
 			'Set Camera Bopping',
-			"Sets how camera should bop.\nValue 1: Frequency (in beats)\nValue 2: Intensity scale (1 for default)"
+			"Sets how camera should bop.\nValue 1: Frequency (in beats)\nOptionally an offset (in beats) after a ','\nValue 2: Intensity scale (1 for default)"
 		],
 		[
 			'Zoom Camera',
