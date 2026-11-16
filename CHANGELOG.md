@@ -3,27 +3,47 @@
 ## 0.11.0 - Unreleased
 
 - Switched rendering to bgfx (Vulkan/Metal first, then OpenGL, picked with `SDL_LIME_BGFX_RENDERER`)
+- Shader blends now come from OpenFL and flixel, ColorSwap and PsychCamera follow them
 - Added `env.txt` on Android and iOS to set environment variables before the game starts
 - Added a fourth FPS counter mode with bgfx's stats
-- System info shows the GPU name
+- System info shows the GPU name and no longer shows VRAM
+- Added an Unlocked Framerate option (desktop and Android)
 - Updated hxluau to Luau 0.747
+- Added new Tracy profiler calls
 - Base Game synced with Funkin (stages, cutscenes, deaths, dialogue, Erect tempo changes, re-charts and more)
 - Base Game textures re-encoded as BC7 and ASTC
 - Added Scroll Velocity events
 - Added `.srt` subtitles for song lyrics and cutscenes, and `game.subtitles` for scripts
 - Added Subtitles and Naughtyness options
 - Added Vibration, Menu Vibration and Note Vibration options and `HapticUtil`
+- Reworked the game over: it uses the playing character when it has death animations, and characters can set its camera offset and zoom with `gameover`
 - Added fakeout deaths and the `onGameOverStart`, `onGameOverMusicStart` and `onGameOverConfirm` script calls
 - GF and Nene react to combos and drops
+- Reworked the rating and combo pop-ups
 - Added a Freeplay mix picker, and every mix's instrumental is available
-- Videos can be MKV
+- Instrumentals and vocals are looked up by mix and Erect suffix, falling back to the plain ones
 - Charts can carry Funkin's instrumental and vocal offsets
 - Set Camera Bopping takes an optional offset
 - Weeks can set the story mode track list text with `tracklist`
 - Story menu week titles stack by their heights
 - Health icons can be made of other icons (`images/icons/<name>.json`)
+- Pixel splashes in the Note Splash Editor, and pixel note splashes centered on their strums
+- Videos can be MKV
+- Sounds can be opus, flac and wav too
+- Chart editor waveforms read F32 audio
+- Scripts' `FileSystem` and `File` are the engine's `backend.io` ones
+- Image paths and directory listings are cached, so assets resolve faster
+- Fixed doubled vocals and stacked song sync threads
+- Fixed vocals playing after leaving PlayState
+- Fixed a crash on ghost-tap misses
+- Fixed Nene's speaker visualizer
+- Fixed the oversized BF in Graphics options
+- Fixed image paths on case-sensitive file systems
 - Fixed chart editor test play pop-ups, hold splashes and offsets
 - Fixed the pause menu resuming by itself during lag
+- EReg uses PCRE2's JIT
+- Final builds are stripped and link-time optimized
+- New iOS app icon
 
 ## 0.10.0 - Unreleased
 
