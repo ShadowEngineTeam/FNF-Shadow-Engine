@@ -445,7 +445,7 @@ class FreeplayState extends MusicBeatState
 		{
 			for (mix in mixes)
 			{
-				if (mix != FreeplayOptionsSubState.DEFAULT_MIX && mix != 'bf' && hasInstrumental(songPath, mix) && beatenMix(songPath, mix))
+				if (mix != FreeplayOptionsSubState.DEFAULT_MIX && mix != 'bf' && hasInstrumental(songPath, mix))
 					list.push(mix);
 			}
 		}
@@ -457,16 +457,6 @@ class FreeplayState extends MusicBeatState
 		for (ext in Paths.SOUND_EXTS)
 		{
 			if (Paths.fileExists('songs/$songPath/Inst-$mix.$ext', SOUND))
-				return true;
-		}
-		return false;
-	}
-
-	static function beatenMix(songPath:String, mix:String):Bool
-	{
-		for (i in 0...Difficulty.list.length)
-		{
-			if (Highscore.getScore(Highscore.mixSong(songPath, mix), i) > 0)
 				return true;
 		}
 		return false;
