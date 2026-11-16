@@ -2,6 +2,7 @@ package backend;
 
 import openfl.utils.Assets;
 import backend.Section;
+import haxe.DynamicAccess;
 
 typedef SwagSong =
 {
@@ -34,6 +35,20 @@ typedef SwagSong =
 	@:optional var splashSkin:String;
 
 	@:optional var format:String;
+
+	@:optional var offsets:SongOffsets;
+}
+
+/**
+ * Audio offsets in milliseconds, as in Funkin's song metadata.
+ * A negative instrumental offset starts the instrumental before the chart.
+ */
+typedef SongOffsets =
+{
+	@:optional var instrumental:Float;
+	@:optional var altInstrumentals:DynamicAccess<Float>;
+	@:optional var vocals:DynamicAccess<Float>;
+	@:optional var altVocals:DynamicAccess<DynamicAccess<Float>>;
 }
 
 class Song
@@ -109,6 +124,31 @@ class Song
 				}
 			}
 		}
+	}
+
+	public static function getInstrumentalOffset(song:SwagSong, ?instrumental:String):Float
+	{
+		final offsets:Null<SongOffsets> = song.offsets;
+		if (offsets == null)
+			return 0;
+
+		if (instrumental != null && offsets.altInstrumentals != null && offsets.altInstrumentals.exists(instrumental))
+			return offsets.altInstrumentals.get(instrumental);
+
+		return offsets.instrumental ?? 0;
+	}
+
+	public static function getVocalOffset(song:SwagSong, charId:String, ?instrumental:String):Float
+	{
+		final offsets:Null<SongOffsets> = song.offsets;
+		if (offsets == null)
+			return 0;
+
+		final vocals:Null<DynamicAccess<Float>> = instrumental == null ? offsets.vocals : (offsets.altVocals != null ? offsets.altVocals.get(instrumental) : null);
+		if (vocals == null || !vocals.exists(charId))
+			return 0;
+
+		return vocals.get(charId);
 	}
 
 	public function new(song, notes, bpm)

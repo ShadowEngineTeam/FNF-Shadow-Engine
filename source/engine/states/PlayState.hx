@@ -114,6 +114,9 @@ class PlayState extends MusicBeatState
 	 */
 	public static var altInstrumental:Null<String> = null;
 
+	public var vocalsOffset:Float = 0;
+	public var opponentVocalsOffset:Float = 0;
+
 	public var spawnTime:Float = 2000;
 
 	public var scrollVelocity:ScrollVelocityTimeline = null;
@@ -1266,34 +1269,46 @@ class PlayState extends MusicBeatState
 
 	public function setSongTime(time:Float):Void
 	{
-		if (time < 0)
-			time = 0;
+		final musicTime:Float = Math.max(0, time - Conductor.offset);
 
 		FlxG.sound.music.pause();
 		vocals.pause();
 		opponentVocals?.pause();
 
-		FlxG.sound.music.time = time;
+		FlxG.sound.music.time = musicTime;
 		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.play();
 
-		if (Conductor.songPosition <= vocals.length)
+		playVocals(vocals, musicTime - vocalsOffset);
+		playVocals(opponentVocals, musicTime - opponentVocalsOffset);
+
+		Conductor.songPosition = musicTime + Conductor.offset;
+	}
+
+	/**
+	 * Plays `sound` from `time`, or keeps it paused while `time` is outside it.
+	 */
+	function playVocals(sound:FlxSound, time:Float):Void
+	{
+		if (sound == null)
+			return;
+
+		if (time >= 0 && time < sound.length)
 		{
-			vocals.time = time;
-
-			if (opponentVocals != null)
-				opponentVocals.time = time;
-
-			vocals.pitch = playbackRate;
-
-			if (opponentVocals != null)
-				opponentVocals.pitch = playbackRate;
+			sound.pitch = playbackRate;
+			sound.play(true, time);
 		}
+		else
+		{
+			sound.pause();
+			if (time < 0)
+				sound.time = 0;
+		}
+	}
 
-		vocals.play();
-		opponentVocals?.play();
-
-		Conductor.songPosition = time;
+	function vocalsDesynced(sound:FlxSound, time:Float, syncTime:Float):Bool
+	{
+		return sound != null && time >= 0 && time < sound.length && Math.abs(sound.time - time) > syncTime;
 	}
 
 	public function startNextDialogue():Void
@@ -1373,10 +1388,7 @@ class PlayState extends MusicBeatState
 			subtitles.assignSubtitles(subtitlesFile, FlxG.sound.music);
 		}
 
-		vocals.play();
-		opponentVocals?.play();
-
-		setSongTime(Math.max(0, startOnTime - 500));
+		setSongTime(startOnTime > 0 ? startOnTime - 500 : Conductor.offset);
 		startOnTime = 0;
 
 		if (paused)
@@ -1388,7 +1400,7 @@ class PlayState extends MusicBeatState
 		}
 
 		// Song duration in a float, useful for the time left feature
-		songLength = FlxG.sound.music.length;
+		songLength = FlxG.sound.music.length + Conductor.offset;
 		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
@@ -1419,6 +1431,9 @@ class PlayState extends MusicBeatState
 		}
 
 		Conductor.bpm = SONG.bpm;
+		Conductor.offset = Song.getInstrumentalOffset(SONG, altInstrumental);
+		vocalsOffset = Song.getVocalOffset(SONG, SONG.player1, altInstrumental);
+		opponentVocalsOffset = Song.getVocalOffset(SONG, SONG.player2, altInstrumental);
 
 		vocals = new FlxSound();
 		opponentVocals = new FlxSound();
@@ -1827,20 +1842,8 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 
-		if (FlxG.sound.music.time < vocals.length)
-		{
-			vocals.pitch = playbackRate;
-			vocals.play(true, FlxG.sound.music.time);
-		} else vocals.pause();
-
-		if (opponentVocals != null)
-		{
-			if (FlxG.sound.music.time < opponentVocals.length)
-			{
-				opponentVocals.pitch = playbackRate;
-				opponentVocals.play(true, FlxG.sound.music.time);
-			} else opponentVocals.pause();
-		}
+		playVocals(vocals, FlxG.sound.music.time - vocalsOffset);
+		playVocals(opponentVocals, FlxG.sound.music.time - opponentVocalsOffset);
 	}
 
 	public var paused:Bool = false;
@@ -1892,18 +1895,19 @@ class PlayState extends MusicBeatState
 		if (startedCountdown && !paused)
 		{
 			Conductor.songPosition += elapsed * 1000 * playbackRate;
-			if (Conductor.songPosition >= 0)
+			if (!startingSong)
 			{
-				var timeDiff:Float = Math.abs(FlxG.sound.music.time - Conductor.songPosition - Conductor.offset);
-				Conductor.songPosition = FlxMath.lerp(Conductor.songPosition, FlxG.sound.music.time, FlxMath.bound(elapsed * 2.5, 0, 1));
-				if (timeDiff > 1000 * playbackRate)
+				final musicPosition:Float = FlxG.sound.music.time + Conductor.offset;
+				final timeDiff:Float = musicPosition - Conductor.songPosition;
+				Conductor.songPosition = FlxMath.lerp(Conductor.songPosition, musicPosition, FlxMath.bound(elapsed * 2.5, 0, 1));
+				if (Math.abs(timeDiff) > 1000 * playbackRate)
 					Conductor.songPosition = Conductor.songPosition + 1000 * FlxMath.signOf(timeDiff);
 			}
 		}
 
 		if (startingSong)
 		{
-			if (startedCountdown && Conductor.songPosition >= 0)
+			if (startedCountdown && Conductor.songPosition >= Conductor.offset)
 				startSong();
 			else if (!startedCountdown)
 				Conductor.songPosition = -Conductor.crochet * 5;
@@ -3881,6 +3885,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		FlxG.sound.music.pitch = 1;
+		Conductor.offset = 0;
 		vocals = FlxDestroyUtil.destroy(vocals);
 		opponentVocals = FlxDestroyUtil.destroy(opponentVocals);
 
@@ -3907,7 +3912,9 @@ class PlayState extends MusicBeatState
 			final syncTime:Float = 20 * playbackRate;
 			#end
 
-			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
+			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime
+				|| vocalsDesynced(vocals, timeSub - vocalsOffset, syncTime)
+				|| vocalsDesynced(opponentVocals, timeSub - opponentVocalsOffset, syncTime))
 				resyncVocals();
 		}
 
