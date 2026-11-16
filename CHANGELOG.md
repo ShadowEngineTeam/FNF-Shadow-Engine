@@ -2,7 +2,28 @@
 
 ## 0.11.0 - Unreleased
 
-(TODO)
+- Switched rendering to bgfx (Vulkan/Metal first, then OpenGL, picked with `SDL_LIME_BGFX_RENDERER`)
+- Added `env.txt` on Android and iOS to set environment variables before the game starts
+- Added a fourth FPS counter mode with bgfx's stats
+- System info shows the GPU name
+- Updated hxluau to Luau 0.747
+- Base Game synced with Funkin (stages, cutscenes, deaths, dialogue, Erect tempo changes, re-charts and more)
+- Base Game textures re-encoded as BC7 and ASTC
+- Added Scroll Velocity events
+- Added `.srt` subtitles for song lyrics and cutscenes, and `game.subtitles` for scripts
+- Added Subtitles and Naughtyness options
+- Added Vibration, Menu Vibration and Note Vibration options and `HapticUtil`
+- Added fakeout deaths and the `onGameOverStart`, `onGameOverMusicStart` and `onGameOverConfirm` script calls
+- GF and Nene react to combos and drops
+- Added a Freeplay mix picker, and every mix's instrumental is available
+- Videos can be MKV
+- Charts can carry Funkin's instrumental and vocal offsets
+- Set Camera Bopping takes an optional offset
+- Weeks can set the story mode track list text with `tracklist`
+- Story menu week titles stack by their heights
+- Health icons can be made of other icons (`images/icons/<name>.json`)
+- Fixed chart editor test play pop-ups, hold splashes and offsets
+- Fixed the pause menu resuming by itself during lag
 
 ## 0.10.0 - Unreleased
 
