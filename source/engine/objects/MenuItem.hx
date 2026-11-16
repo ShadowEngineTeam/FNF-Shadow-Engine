@@ -4,6 +4,11 @@ class MenuItem extends FlxSprite
 {
 	public var targetY:Float = 0;
 
+	/**
+	 * The y to move to, used instead of `targetY` when set.
+	 */
+	public var targetPosition:Null<Float> = null;
+
 	public function new(x:Float, y:Float, weekName:String = '')
 	{
 		super(x, y);
@@ -29,7 +34,7 @@ class MenuItem extends FlxSprite
 	{
 		super.update(elapsed);
 
-		y = FlxMath.lerp((targetY * 120) + 480, y, Math.exp(-elapsed * 10.2));
+		y = FlxMath.lerp(targetPosition ?? (targetY * 120) + 480, y, Math.exp(-elapsed * 10.2));
 		if (isFlashing)
 		{
 			_flashingElapsed += elapsed;

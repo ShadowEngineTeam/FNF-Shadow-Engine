@@ -345,6 +345,7 @@ class StoryMenuState extends MusicBeatState
 			item.alpha = item.targetY == Std.int(0) && unlocked ? 1 : 0.6;
 			bullShit++;
 		}
+		repositionTitles();
 
 		final assetName:String = leWeek.weekBackground;
 		if (assetName == null || assetName.length < 1)
@@ -367,6 +368,25 @@ class StoryMenuState extends MusicBeatState
 	{
 		final leWeek:WeekData = WeekData.weeksLoaded.get(name);
 		return !leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!weekCompleted.exists(leWeek.weekBefore) || !weekCompleted.get(leWeek.weekBefore));
+	}
+
+	/**
+	 * Stacks the week titles by their heights around the selected one, as in Funkin, so taller titles don't overlap.
+	 */
+	function repositionTitles():Void
+	{
+		final titles:Array<MenuItem> = grpWeekText.members;
+		titles[curWeek].targetPosition = 480;
+
+		var i:Int = curWeek - 1;
+		while (i >= 0)
+		{
+			titles[i].targetPosition = titles[i + 1].targetPosition - Math.max(titles[i].height + 20, 125);
+			i--;
+		}
+
+		for (j in (curWeek + 1)...titles.length)
+			titles[j].targetPosition = titles[j - 1].targetPosition + titles[j - 1].height + 20;
 	}
 
 	function updateText():Void
