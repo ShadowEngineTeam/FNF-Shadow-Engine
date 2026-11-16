@@ -376,7 +376,7 @@ class StoryMenuState extends MusicBeatState
 		for (i in 0...grpWeekCharacters.length)
 			grpWeekCharacters.members[i].changeCharacter(week.weekCharacters[i]);
 
-		txtTracklist.text = week.songs.map((s:Dynamic) -> s[0]).join('\n').toUpperCase();
+		txtTracklist.text = week.tracklist?.length > 0 ? week.tracklist.join('\n') : week.songs.map((s:Dynamic) -> s[0]).join('\n').toUpperCase();
 		txtTracklist.screenCenter(X);
 		txtTracklist.x -= FlxG.width * 0.35;
 

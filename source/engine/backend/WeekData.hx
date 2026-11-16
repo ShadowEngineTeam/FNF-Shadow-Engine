@@ -15,6 +15,7 @@ typedef WeekFile =
 	var hideStoryMode:Bool;
 	var hideFreeplay:Bool;
 	var difficulties:Array<String>;
+	@:optional var tracklist:Array<String>;
 }
 
 class WeekData
@@ -37,6 +38,11 @@ class WeekData
 	public var hideStoryMode:Bool;
 	public var hideFreeplay:Bool;
 	public var difficulties:Array<String>;
+
+	/**
+	 * Story mode track list text, shown as written. Lists the song names when empty.
+	 */
+	public var tracklist:Array<String> = null;
 
 	public var fileName:String;
 
@@ -79,6 +85,7 @@ class WeekData
 		hideStoryMode = weekFile.hideStoryMode;
 		hideFreeplay = weekFile.hideFreeplay;
 		difficulties = weekFile.difficulties;
+		tracklist = weekFile.tracklist;
 		#else
 		for (field in Reflect.fields(weekFile))
 			if (Reflect.fields(this).contains(field)) // Reflect.hasField() won't fucking work :/
