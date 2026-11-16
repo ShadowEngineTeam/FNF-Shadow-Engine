@@ -1,5 +1,6 @@
 import os
 import subprocess
+import shlex
 import argparse
 import shutil
 import sys
@@ -32,7 +33,7 @@ def premultiply_alpha(input_path, output_path):
 def run_command(command):
     try:
         if os.name != "nt":
-            command = ["bash", "-c", " ".join(command)]
+            command = ["bash", "-c", " ".join(shlex.quote(c) for c in command)]
         subprocess.run(command, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e}")
