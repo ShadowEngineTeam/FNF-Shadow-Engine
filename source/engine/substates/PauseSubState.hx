@@ -239,13 +239,15 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function update(elapsed:Float)
 	{
+		// the first update runs in the same frame the pause key was pressed
+		final canUnpause:Bool = cantUnpause <= 0;
 		cantUnpause -= elapsed;
 		if (pauseMusic.volume < 0.5)
 			pauseMusic.volume += 0.01 * elapsed;
 
 		super.update(elapsed);
 
-		if (Funkin.controls.BACK && cantUnpause <= 0)
+		if (Funkin.controls.BACK && canUnpause)
 		{
 			close();
 			return;
@@ -294,7 +296,7 @@ class PauseSubState extends MusicBeatSubstate
 				}
 		}
 
-		if (Funkin.controls.ACCEPT && cantUnpause <= 0)
+		if (Funkin.controls.ACCEPT && canUnpause)
 		{
 			HapticUtil.vibrate(0, 0.05, 1, 1, MENU);
 			if (menuItems == difficultyChoices)
