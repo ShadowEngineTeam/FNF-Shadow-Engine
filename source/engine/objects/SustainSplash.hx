@@ -128,6 +128,7 @@ class SustainSplash extends FlxSprite
 	public function new()
 	{
 		super();
+		scrollFactor.set();
 
 		// Registered once: setting `frames` clears the animations but not this signal, so adding
 		// it in reloadSustainSplash() stacked one more listener on every texture change.

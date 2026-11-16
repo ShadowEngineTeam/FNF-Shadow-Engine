@@ -1279,8 +1279,8 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.play();
 
-		playVocals(vocals, musicTime - vocalsOffset);
-		playVocals(opponentVocals, musicTime - opponentVocalsOffset);
+		playVocals(vocals, musicTime - vocalsOffset, playbackRate);
+		playVocals(opponentVocals, musicTime - opponentVocalsOffset, playbackRate);
 
 		Conductor.songPosition = musicTime + Conductor.offset;
 	}
@@ -1288,14 +1288,14 @@ class PlayState extends MusicBeatState
 	/**
 	 * Plays `sound` from `time`, or keeps it paused while `time` is outside it.
 	 */
-	function playVocals(sound:FlxSound, time:Float):Void
+	public static function playVocals(sound:FlxSound, time:Float, pitch:Float):Void
 	{
 		if (sound == null)
 			return;
 
 		if (time >= 0 && time < sound.length)
 		{
-			sound.pitch = playbackRate;
+			sound.pitch = pitch;
 			sound.play(true, time);
 		}
 		else
@@ -1306,7 +1306,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function vocalsDesynced(sound:FlxSound, time:Float, syncTime:Float):Bool
+	public static function vocalsDesynced(sound:FlxSound, time:Float, syncTime:Float):Bool
 	{
 		return sound != null && time >= 0 && time < sound.length && Math.abs(sound.time - time) > syncTime;
 	}
@@ -1842,8 +1842,8 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackRate;
 		Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 
-		playVocals(vocals, FlxG.sound.music.time - vocalsOffset);
-		playVocals(opponentVocals, FlxG.sound.music.time - opponentVocalsOffset);
+		playVocals(vocals, FlxG.sound.music.time - vocalsOffset, playbackRate);
+		playVocals(opponentVocals, FlxG.sound.music.time - opponentVocalsOffset, playbackRate);
 	}
 
 	public var paused:Bool = false;

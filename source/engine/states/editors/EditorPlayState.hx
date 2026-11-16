@@ -3,6 +3,7 @@ package states.editors;
 import backend.Song;
 import backend.Section;
 import backend.Rating;
+import backend.EaseUtil;
 import objects.Note;
 import objects.NoteSplash;
 import objects.StrumNote;
@@ -12,6 +13,7 @@ import flixel.animation.FlxAnimationController;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
 import objects.Character;
+import states.PlayState.Combo;
 import openfl.utils.Assets as OpenFlAssets;
 
 class EditorPlayState extends MusicBeatSubstate
@@ -38,9 +40,7 @@ class EditorPlayState extends MusicBeatSubstate
 	var grpHoldSplashes:FlxTypedGroup<SustainSplash>;
 
 	var combo:Int = 0;
-	var lastRating:FlxSprite;
-	var lastCombo:FlxSprite;
-	var lastScore:Array<FlxSprite> = [];
+	var comboGroup:FlxTypedGroup<Combo>;
 	var keysArray:Array<String> = ['note_left', 'note_down', 'note_up', 'note_right'];
 
 	var songHits:Int = 0;
@@ -64,6 +64,9 @@ class EditorPlayState extends MusicBeatSubstate
 	var startPos:Float = 0;
 	var timerToStart:Float = 0;
 
+	var vocalsOffset:Float = 0;
+	var opponentVocalsOffset:Float = 0;
+
 	var scoreTxt:FlxText;
 	var dataTxt:FlxText;
 	var guitarHeroSustains:Bool = false;
@@ -75,6 +78,10 @@ class EditorPlayState extends MusicBeatSubstate
 		/* setting up some important data */
 		this.playbackRate = playbackRate;
 		this.startPos = Conductor.songPosition;
+
+		Conductor.offset = Song.getInstrumentalOffset(PlayState.SONG);
+		vocalsOffset = Song.getVocalOffset(PlayState.SONG, PlayState.SONG.player1);
+		opponentVocalsOffset = Song.getVocalOffset(PlayState.SONG, PlayState.SONG.player2);
 
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * playbackRate;
 		Conductor.songPosition -= startOffset;
@@ -97,6 +104,16 @@ class EditorPlayState extends MusicBeatSubstate
 		bg.color = 0xFF101010;
 		bg.alpha = 0.9;
 		add(bg);
+
+		add(comboGroup = new FlxTypedGroup<Combo>());
+
+		if (ClientPrefs.data.showNoteTiming)
+		{
+			add(noteTimingRating = new FlxText(0, 0, 0, "0ms"));
+			noteTimingRating.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
+			noteTimingRating.scrollFactor.set();
+			noteTimingRating.exists = false;
+		}
 
 		/**** NOTES ****/
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
@@ -251,8 +268,24 @@ class EditorPlayState extends MusicBeatSubstate
 			});
 		}
 
+		if (!ClientPrefs.data.hideHud)
+		{
+			for (s in comboGroup.members)
+			{
+				s.lifeTime -= elapsed * playbackRate;
+
+				if (s.lifeTime <= 0)
+				{
+					s.alpha -= elapsed * 6 * playbackRate;
+
+					if (s.alpha <= 0)
+						s.kill();
+				}
+			}
+		}
+
 		var time:Float = CoolUtil.floorDecimal((Conductor.songPosition - ClientPrefs.data.noteOffset) / 1000, 1);
-		dataTxt.text = 'Time: $time / ${songLength / 1000}
+		dataTxt.text = 'Time: $time / ${CoolUtil.floorDecimal(songLength / 1000, 1)}
 						\nSection: $curSection
 						\nBeat: $curBeat
 						\nStep: $curStep';
@@ -272,7 +305,9 @@ class EditorPlayState extends MusicBeatSubstate
 			final syncTime:Float = 20 * playbackRate;
 			#end
 
-			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime || Math.abs(vocals.time - timeSub) > syncTime || (opponentVocals != null && opponentVocals.playing && Math.abs(opponentVocals.time - timeSub) > syncTime))
+			if (Math.abs(FlxG.sound.music.time - timeSub) > syncTime
+				|| PlayState.vocalsDesynced(vocals, timeSub - vocalsOffset, syncTime)
+				|| PlayState.vocalsDesynced(opponentVocals, timeSub - opponentVocalsOffset, syncTime))
 				resyncVocals();
 		}
 		super.stepHit();
@@ -318,6 +353,7 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.mouse.visible = true;
 
 		SustainSplash.close();
+		Conductor.offset = 0;
 
 		super.destroy();
 	}
@@ -327,18 +363,18 @@ class EditorPlayState extends MusicBeatSubstate
 		startingSong = false;
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
-		FlxG.sound.music.time = startPos;
+		final musicTime:Float = Math.max(0, startPos - Conductor.offset);
+		FlxG.sound.music.time = musicTime;
 		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.onComplete = finishSong;
+		Conductor.songPosition = musicTime + Conductor.offset;
 		vocals.volume = 1;
-		vocals.time = startPos;
-		vocals.play();
 		opponentVocals.volume = 1;
-		opponentVocals.time = startPos;
-		opponentVocals.play();
+		PlayState.playVocals(vocals, musicTime - vocalsOffset, playbackRate);
+		PlayState.playVocals(opponentVocals, musicTime - opponentVocalsOffset, playbackRate);
 
 		// Song duration in a float, useful for the time left feature
-		songLength = FlxG.sound.music.length;
+		songLength = FlxG.sound.music.length + Conductor.offset;
 	}
 
 	// Borrowed from PlayState
@@ -582,13 +618,6 @@ class EditorPlayState extends MusicBeatSubstate
 		var noteDiff:Float = Math.abs(noteDiffNoAbs);
 
 		vocals.volume = 1;
-		var placement:String = Std.string(combo);
-
-		var coolText:FlxText = new FlxText(0, 0, 0, placement, 32);
-		coolText.screenCenter();
-		coolText.x = FlxG.width * 0.35;
-
-		var rating:FlxSprite = new FlxSprite();
 
 		var judgment:String = Rating.judgeNote(noteDiff);
 		var score:Int = Rating.scoreNote(noteDiff);
@@ -624,200 +653,102 @@ class EditorPlayState extends MusicBeatSubstate
 			recalculateRating(false);
 		}
 
-		var pixelShitPart1:String = "";
-		var pixelShitPart2:String = '';
+		if (!ClientPrefs.data.popUpRating)
+			return;
 
-		rating.loadGraphic(Paths.image(pixelShitPart1 + daRating.image + pixelShitPart2));
-		rating.antialiasing = ClientPrefs.data.antialiasing;
-		rating.pixelPerfectRender = !ClientPrefs.data.antialiasing;
-		rating.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
-		rating.screenCenter();
-		rating.x = coolText.x - 40;
-		rating.y -= 60;
-		rating.acceleration.y = 550 * playbackRate * playbackRate;
-		rating.velocity.y -= FlxG.random.int(140, 175) * playbackRate;
-		rating.velocity.x -= FlxG.random.int(0, 10) * playbackRate;
-		rating.visible = (!ClientPrefs.data.hideHud && showRating);
-		rating.x += ClientPrefs.data.comboOffset[0];
-		rating.y -= ClientPrefs.data.comboOffset[1];
+		// The same pop-ups as PlayState's, held still while the chart editor's camera scrolls.
+		final stageUI:String = PlayState.stageUI;
+		final isPixelStage:Bool = PlayState.isPixelStage;
+		final uiPrefix:String = stageUI != "normal" ? '${stageUI}UI/' : '';
+		final uiSuffix:String = isPixelStage ? '-pixel' : '';
+		final antialias:Bool = ClientPrefs.data.antialiasing && (stageUI == "normal" || !isPixelStage);
+		final lifetime:Float = Conductor.crochet * 0.001 / playbackRate;
+		final placement:Float = FlxG.width * 0.35;
+		var yoRating:Float = 0;
 
-		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
-		comboSpr.antialiasing = ClientPrefs.data.antialiasing;
-		comboSpr.pixelPerfectRender = !ClientPrefs.data.antialiasing;
-		comboSpr.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
-		comboSpr.screenCenter();
-		comboSpr.x = coolText.x;
-		comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
-		comboSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
-		comboSpr.visible = (!ClientPrefs.data.hideHud && showCombo);
-		comboSpr.x += ClientPrefs.data.comboOffset[0];
-		comboSpr.y -= ClientPrefs.data.comboOffset[1];
-		comboSpr.y += 60;
-		comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
-
-		insert(members.indexOf(strumLineNotes), rating);
-
-		if (!ClientPrefs.data.comboStacking)
+		inline function setUp(spr:Combo):Void
 		{
-			if (lastRating != null)
-				lastRating.kill();
-			lastRating = rating;
+			spr.screenCenter();
+			spr.alpha = 1;
+			spr.velocity.set();
+			spr.antialiasing = antialias;
+			spr.pixelPerfectRender = spr.pixelPerfectPosition = !antialias;
+			spr.scrollFactor.set();
+			spr.lifeTime = lifetime;
+			spr.ID = Std.int(Conductor.songPosition);
 		}
 
-		rating.setGraphicSize(Std.int(rating.width * 0.7));
-		rating.updateHitbox();
-		comboSpr.setGraphicSize(Std.int(comboSpr.width * 0.7));
-		comboSpr.updateHitbox();
-
-		if (ClientPrefs.data.showNoteTiming && (!ClientPrefs.data.hideHud && showRating) && noteTimingRating == null)
+		if (showRating)
 		{
-			add(noteTimingRating = new FlxText(0, 0, 0, "0ms"));
-			noteTimingRating.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, OUTLINE, FlxColor.BLACK);
+			final rating:Combo = comboGroup.recycle(Combo);
+			rating.loadGraphic(Paths.image(uiPrefix + daRating.image + uiSuffix));
+			setUp(rating);
+			rating.x = placement - 40 + ClientPrefs.data.comboOffset[0];
+			rating.y -= 60 + ClientPrefs.data.comboOffset[1];
+			rating.acceleration.set(0, 550 * playbackRate * playbackRate);
+			rating.velocity.x -= FlxG.random.int(-10, 10) * playbackRate;
+			rating.velocity.y -= FlxG.random.int(130, 160) * playbackRate;
+			rating.setGraphicSize(Std.int(rating.width * (isPixelStage ? PlayState.daPixelZoom * 0.85 : 0.7)));
+			rating.updateHitbox();
+			yoRating = rating.y + rating.height;
 		}
-		if (noteTimingRating != null)
+
+		if (showCombo)
 		{
-			switch (daRating.name)
+			final comboSpr:Combo = comboGroup.recycle(Combo);
+			comboSpr.loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
+			setUp(comboSpr);
+			comboSpr.x = placement + 40 + ClientPrefs.data.comboOffset[0];
+			comboSpr.y += 50 + ClientPrefs.data.comboOffset[1];
+			comboSpr.acceleration.set(0, FlxG.random.int(200, 300) * playbackRate * playbackRate);
+			comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
+			comboSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
+			comboSpr.setGraphicSize(Std.int(comboSpr.width * (isPixelStage ? PlayState.daPixelZoom * 0.75 : 0.6)));
+			comboSpr.updateHitbox();
+		}
+
+		if (ClientPrefs.data.showNoteTiming && showRating)
+		{
+			noteTimingRating.color = switch (daRating.name)
 			{
-				case 'shit' | 'bad':
-					noteTimingRating.color = FlxColor.RED;
-				case 'good':
-					noteTimingRating.color = FlxColor.LIME;
-				case 'sick':
-					noteTimingRating.color = FlxColor.CYAN;
+				case 'sick': FlxColor.CYAN;
+				case 'good': FlxColor.LIME;
+				default: FlxColor.RED;
 			}
-			noteTimingRating.borderStyle = OUTLINE;
-			noteTimingRating.borderSize = 1;
-			noteTimingRating.borderColor = FlxColor.BLACK;
+
 			noteTimingRating.text = FlxMath.roundDecimal(noteDiffNoAbs / playbackRate, 3) + "ms";
-			noteTimingRating.size = 20;
 			noteTimingRating.alpha = 1;
-			noteTimingRating.active = true;
-
-			if (noteTimingRatingTween != null)
-			{
-				noteTimingRatingTween.cancel();
-			}
-
-			noteTimingRating.screenCenter();
-			noteTimingRating.x = coolText.x + ClientPrefs.data.comboOffset[0] + 100;
-			noteTimingRating.y += -ClientPrefs.data.comboOffset[1] - 80 + (comboSpr?.height ?? 0);
-			if (PlayState.isPixelStage)
-				noteTimingRating.y += 60;
-			noteTimingRating.acceleration.y = 600;
-			noteTimingRating.velocity.y -= 150;
-			noteTimingRating.velocity.x += comboSpr?.velocity?.x ?? (FlxG.random.int(1, 10) * playbackRate);
+			noteTimingRating.exists = true;
+			noteTimingRating.setPosition(placement + ClientPrefs.data.comboOffset[0] + 100, yoRating + (isPixelStage ? 60 : 0));
+			noteTimingRatingTween?.cancel();
 
 			noteTimingRatingTween = FlxTween.tween(noteTimingRating, {alpha: 0}, 0.2 / playbackRate, {
 				startDelay: Conductor.crochet * 0.001 / playbackRate,
-				onComplete: (t) -> noteTimingRating.active = false
+				onComplete: (_) -> noteTimingRating.exists = false,
+				ease: isPixelStage ? EaseUtil.stepped(2) : null
 			});
 		}
 
-		var seperatedScore:Array<Int> = [];
+		if (showComboNum)
+		{
+			final sepScore:String = '$combo';
 
-		var comboStr:String = Std.string(combo);
-
-		for (i in 0...comboStr.length)
-		{
-			var num = Std.parseInt(comboStr.charAt(i));
-			if (num != null)
-				seperatedScore.push(num);
-		}
-
-		var daLoop:Int = 0;
-		var xThing:Float = 0;
-		if (showCombo)
-		{
-			insert(members.indexOf(strumLineNotes), comboSpr);
-		}
-		if (!ClientPrefs.data.comboStacking)
-		{
-			if (lastCombo != null)
-				lastCombo.kill();
-			lastCombo = comboSpr;
-		}
-		if (lastScore != null)
-		{
-			while (lastScore.length > 0)
+			for (i in 0...sepScore.length)
 			{
-				lastScore[0].destroy();
-				lastScore.remove(lastScore[0]);
+				final numScore:Combo = comboGroup.recycle(Combo);
+				numScore.loadGraphic(Paths.image(uiPrefix + 'num' + Std.parseInt(sepScore.charAt(i)) + uiSuffix));
+				setUp(numScore);
+				numScore.x = (placement - 30 + ClientPrefs.data.comboOffset[2]) - (sepScore.length * 43 / 2) + i * 43;
+				numScore.y += 80 - ClientPrefs.data.comboOffset[3];
+				numScore.setGraphicSize(Std.int(numScore.width * (isPixelStage ? PlayState.daPixelZoom : 0.5)));
+				numScore.updateHitbox();
+				numScore.velocity.x -= FlxG.random.float(-10, 10) * playbackRate;
+				numScore.velocity.y -= FlxG.random.int(135, 155) * playbackRate;
+				numScore.acceleration.set(0, FlxG.random.int(200, 300) * playbackRate * playbackRate);
 			}
 		}
-		for (i in seperatedScore)
-		{
-			var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'num' + Std.int(i) + pixelShitPart2));
-			numScore.screenCenter();
 
-			var totalNums:Int = seperatedScore.length;
-			var numWidth:Int = 43;
-			var totalWidth:Int = totalNums * numWidth;
-			var centerX:Float = coolText.x - 30 + ClientPrefs.data.comboOffset[2];
-			var startX:Float = centerX - (totalWidth / 2);
-
-			numScore.x = startX + (numWidth * daLoop);
-			numScore.y += 80 - ClientPrefs.data.comboOffset[3];
-
-			if (!ClientPrefs.data.comboStacking)
-				lastScore.push(numScore);
-
-			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
-			numScore.updateHitbox();
-
-			numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
-			numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
-			numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
-			numScore.antialiasing = ClientPrefs.data.antialiasing;
-			numScore.pixelPerfectRender = !ClientPrefs.data.antialiasing;
-			numScore.pixelPerfectPosition = !ClientPrefs.data.antialiasing;
-			numScore.visible = !ClientPrefs.data.hideHud;
-
-			// if (combo >= 10 || combo == 0)
-			if (showComboNum)
-				insert(members.indexOf(strumLineNotes), numScore);
-
-			FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
-				onComplete: function(tween:FlxTween)
-				{
-					numScore.container = null;
-					numScore.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
-			});
-
-			daLoop++;
-			if (numScore.x > xThing)
-				xThing = numScore.x;
-		}
-		comboSpr.x = xThing + 50;
-		/*
-			trace(combo);
-			trace(seperatedScore);
-		 */
-
-		coolText.text = Std.string(seperatedScore);
-		// add(coolText);
-
-		FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
-			startDelay: Conductor.crochet * 0.001 / playbackRate,
-			onComplete: function(tween:FlxTween)
-			{
-				rating.container = null;
-				rating.destroy();
-			},
-		});
-
-		FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
-			onComplete: function(tween:FlxTween)
-			{
-				coolText.destroy();
-				comboSpr.container = null;
-				comboSpr.destroy();
-
-				rating.destroy();
-			},
-			startDelay: Conductor.crochet * 0.002 / playbackRate
-		});
+		comboGroup.sort((o:Int, a:Combo, b:Combo) -> return FlxSort.byValues(FlxSort.ASCENDING, a.ID, b.ID));
 	}
 
 	private function onKeyPress(event:KeyboardEvent):Void
@@ -847,7 +778,7 @@ class EditorPlayState extends MusicBeatSubstate
 		// more accurate hit time for the ratings?
 		var lastTime:Float = Conductor.songPosition;
 		if (Conductor.songPosition >= 0)
-			Conductor.songPosition = FlxG.sound.music.time;
+			Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
 
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note) return n != null && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit
@@ -1158,20 +1089,9 @@ class EditorPlayState extends MusicBeatSubstate
 
 		FlxG.sound.music.play();
 		FlxG.sound.music.pitch = playbackRate;
-		Conductor.songPosition = FlxG.sound.music.time;
-		if (Conductor.songPosition <= vocals.length)
-		{
-			vocals.time = Conductor.songPosition;
-			vocals.pitch = playbackRate;
-		}
-
-		if (Conductor.songPosition <= opponentVocals.length)
-		{
-			opponentVocals.time = Conductor.songPosition;
-			opponentVocals.pitch = playbackRate;
-		}
-		vocals.play();
-		opponentVocals.play();
+		Conductor.songPosition = FlxG.sound.music.time + Conductor.offset;
+		PlayState.playVocals(vocals, FlxG.sound.music.time - vocalsOffset, playbackRate);
+		PlayState.playVocals(opponentVocals, FlxG.sound.music.time - opponentVocalsOffset, playbackRate);
 	}
 
 	function recalculateRating(badHit:Bool = false)
