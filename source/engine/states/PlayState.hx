@@ -25,6 +25,7 @@ import substates.PauseSubState;
 import substates.GameOverSubstate;
 import flixel.addons.display.FlxRuntimeShader;
 import objects.Note.EventNote;
+import objects.Subtitles.SubtitlesAlignment;
 import objects.*;
 import states.stages.objects.*;
 import substates.ResultsScreen;
@@ -328,6 +329,8 @@ class PlayState extends MusicBeatState
 
 	public var psychDialogue:DialogueBoxPsych;
 
+	public var subtitles:Subtitles;
+
 	var startTimer:FlxTimer;
 	var finishTimer:FlxTimer = null;
 
@@ -561,6 +564,13 @@ class PlayState extends MusicBeatState
 
 		add(uiGroup = new FlxSpriteGroup());
 		add(noteGroup = new FlxTypedGroup<FlxBasic>());
+
+		if (ClientPrefs.data.subtitles)
+		{
+			subtitles = new Subtitles(0, 139, ClientPrefs.data.downScroll ? SubtitlesAlignment.SUBTITLES_TOP : SubtitlesAlignment.SUBTITLES_BOTTOM);
+			subtitles.cameras = [camOther];
+			add(subtitles);
+		}
 
 		Conductor.songPosition = -5000 / Conductor.songPosition;
 
@@ -1352,6 +1362,14 @@ class PlayState extends MusicBeatState
 		FlxG.sound.playMusic(findInst(), 1, false);
 		FlxG.sound.music.pitch = playbackRate;
 		FlxG.sound.music.onComplete = () -> finishSong();
+
+		if (subtitles != null)
+		{
+			var subtitlesFile:String = '${Paths.formatToSongPath(SONG.song)}/subtitles/song-lyrics';
+			if (SONG.variant?.length > 0)
+				subtitlesFile += '-${SONG.variant}';
+			subtitles.assignSubtitles(subtitlesFile, FlxG.sound.music);
+		}
 
 		vocals.play();
 		opponentVocals?.play();
