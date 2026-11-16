@@ -31,14 +31,14 @@ class CreditsState extends MusicBeatState
 			"homura",
 			"Main Programmer and Co-Owner of Shadow Engine",
 			"https://www.youtube.com/@HomuHomu833",
-			"FFFFFF"
+			"6D686A"
 		],
 		[
 			"Karim Akra",
 			"karim",
 			"Lead Programmer and Co-Owner of Shadow Engine",
 			"https://www.youtube.com/@Karim-Akra",
-			"FFFFFF"
+			"E4E4E4"
 		],
 		[""],
 		["Engine Contributors"],
@@ -47,35 +47,35 @@ class CreditsState extends MusicBeatState
 			"chaos",
 			"Assistant Programmer of Shadow Engine",
 			"https://www.youtube.com/@mr_chaosss",
-			"FFFFFF"
+			"484848"
 		],
 		[
 			"Modeus",
 			"modeus",
 			"Helper of Shadow Engine",
 			"https://github.com/moxie-coder",
-			"FFFFFF"
+			"979D99"
 		],
 		[
 			"Zanxt",
 			"santi",
 			"Helper and Tester of Shadow Engine",
 			"https://www.youtube.com/@SantiYea",
-			"FFFFFF"
+			"262626"
 		],
 		[
 			"sirthegamercoder",
 			"mtgm",
 			"Little Artist and Coding of Shadow Engine",
 			"https://bsky.app/profile/stgmd.bsky.social",
-			"FFFFFF"
+			"FF0000"
 		],
 		[
 			"Sky",
 			"skelly",
 			"Porting Base Game to Shadow Engine",
 			"https://youtube.com/@skilitonskelly",
-			"FFFFFF"
+			"31B0D1"
 		],
 		[""],
 		["Funkin' Crew"],
@@ -121,7 +121,7 @@ class CreditsState extends MusicBeatState
 			"zack",
 			"Main Programmer of Friday Night Funkin' Mobile",
 			"https://x.com/ZackDroidCoder",
-			"FFFFFF"
+			"63C74D"
 		],
 		[
 			"MAJigsaw77",
@@ -135,21 +135,21 @@ class CreditsState extends MusicBeatState
 			"karim",
 			"Assistant Programmer of Friday Night Funkin' Mobile",
 			"https://www.youtube.com/@Karim-Akra",
-			"FFFFFF"
+			"E4E4E4"
 		],
 		[
 			"Luckydog7",
 			"lucky",
 			"Assistant Programmer of Friday Night Funkin' Mobile",
 			"https://github.com/luckydog7",
-			"FFFFFF"
+			"597C24"
 		],
 		[
 			"sector_5",
 			"sector",
 			"Assistant Programmer of Friday Night Funkin' Mobile",
 			"https://github.com/sector-a",
-			"FFFFFF"
+			"3D3D3F"
 		],
 		[""]
 	];
