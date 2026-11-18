@@ -21,6 +21,7 @@ typedef SwagSong =
 
 	@:optional var disableNoteCustomColor:Bool;
 
+	@:optional var songName:String; // the name to show, like Funkin's metadata
 	@:optional var artist:String;
 	@:optional var charter:String;
 	@:optional var variant:String;

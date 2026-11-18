@@ -240,7 +240,6 @@ class PlayState extends MusicBeatState
 	public var boyfriendCameraOffset:Array<Float> = null;
 	public var opponentCameraOffset:Array<Float> = null;
 	public var girlfriendCameraOffset:Array<Float> = null;
-	public var stageData:StageFile = null;
 
 	#if FEATURE_DISCORD_RPC
 	// Discord RPC variables
@@ -441,7 +440,7 @@ class PlayState extends MusicBeatState
 		if (curStage == "mainStageErect")
 			curStage = "stageErect";
 
-		stageData = StageData.getStageFile(curStage) ?? StageData.dummy();
+		final stageData:StageFile = StageData.getStageFile(curStage) ?? StageData.dummy();
 
 		defaultCamZoom = stageData.defaultZoom;
 
@@ -529,7 +528,6 @@ class PlayState extends MusicBeatState
 
 		gfGroup.add(gf = new Character(0, 0, !stageData.hide_girlfriend && !ClientPrefs.data.lowQuality ? SONG.gfVersion : 'gf-empty'));
 		startCharacterPos(gf);
-		setGfScroll(gf);
 		startCharacterScripts(gf.curCharacter);
 
 		dadGroup.add(dad = new Character(0, 0, SONG.player2, characterPlayingAsDad));
@@ -876,21 +874,11 @@ class PlayState extends MusicBeatState
 					final newGf:Character = new Character(0, 0, newCharacter);
 					gfMap.set(newCharacter, newGf);
 					gfGroup.add(newGf);
-					setGfScroll(newGf);
 					startCharacterPos(newGf);
 					newGf.alpha = 0.00001;
 					startCharacterScripts(newGf.curCharacter);
 				}
 		}
-	}
-
-	function setGfScroll(char:Character):Void
-	{
-		final scroll:Array<Float> = stageData != null ? stageData.girlfriend_scroll : null;
-		if (scroll != null && scroll.length > 1)
-			char.scrollFactor.set(scroll[0], scroll[1]);
-		else
-			char.scrollFactor.set(0.95, 0.95);
 	}
 
 	function startCharacterScripts(name:String):Void
@@ -909,7 +897,6 @@ class PlayState extends MusicBeatState
 		if (gfCheck && char.curCharacter.startsWith('gf')) // IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
 		{
 			char.setPosition(GF_X, GF_Y);
-			setGfScroll(char);
 			char.danceEveryNumBeats = 2;
 		}
 		char.x += char.positionArray[0];
@@ -2199,17 +2186,10 @@ class PlayState extends MusicBeatState
 
 	#if FEATURE_DISCORD_RPC
 	/**
-	 * The song for Discord, with its mix if it isn't the default one, like `Darnell (BF Mix) (Hard)`.
+	 * The song for Discord, with its display name like Funkin, e.g. `Darnell (BF Mix) (Hard)`.
 	 */
-	function discordSongText():String
-	{
-		final mix:Null<String> = SONG.variant;
-		if (mix == null || mix.length == 0)
-			return '${SONG.song} ($storyDifficultyText)';
-
-		final mixName:String = mix.length <= 2 ? mix.toUpperCase() : mix.charAt(0).toUpperCase() + mix.substr(1);
-		return '${SONG.song} ($mixName Mix) ($storyDifficultyText)';
-	}
+	inline function discordSongText():String
+		return '${SONG.songName?.length > 0 ? SONG.songName : SONG.song} ($storyDifficultyText)';
 	#end
 
 	public function openChartEditor()
