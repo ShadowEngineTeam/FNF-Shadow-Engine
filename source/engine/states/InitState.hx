@@ -67,6 +67,7 @@ class InitState extends FlxState
 
 		#if mobile
 		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver;
+		mobile.backend.RenderScale.init();
 		#end
 
 		FlxSprite.defaultAntialiasing = ClientPrefs.data.antialiasing;

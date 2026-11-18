@@ -110,11 +110,11 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.onChange = onChangeVSync;
 		addOption(option);
 
-		#if android
+		#if mobile
 		var option:Option = new Option('Downscale Game',
-			'If checked, Renders the game at a lower resolution (near 0.67x) for better performance.\n(Must restart the game to have an effect)',
+			'If checked, Renders the game at a lower resolution (near 0.67x) for better performance.' #if android + '\n(Must restart the game to have an effect)' #end,
 			'downscaleGame', 'bool');
-		option.onChange = onChangeScaleSize;
+		option.onChange = mobile.backend.RenderScale.save;
 		addOption(option);
 		#end
 		#end
@@ -209,10 +209,5 @@ class VisualsUISubState extends BaseOptionsMenu
 	#if native
 	function onChangeVSync()
 		FlxG.stage.application.window.setVSyncMode(ClientPrefs.data.vsync ? WindowVSyncMode.ON : WindowVSyncMode.OFF);
-
-	#if android
-	function onChangeScaleSize()
-		File.saveContent(lime.system.System.applicationStorageDirectory + 'scaleSize.txt', (ClientPrefs.data.downscaleGame ? '${(720 / 1.5) / 720}' : '1'));
-	#end
 	#end
 }
