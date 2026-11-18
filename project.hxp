@@ -459,7 +459,7 @@ class Project extends HXProject
 		if (isAndroid())
 			adaptiveIcon = new AdaptiveIcon('icons/android/', true);
 		else if (isIOS())
-			adaptiveIcon = new AdaptiveIcon('icons/ios', true);
+			adaptiveIcon = new AdaptiveIcon('icons/ios/AppIcon.icon', true);
 		else
 		{
 			for (size in [16, 32, 64])
