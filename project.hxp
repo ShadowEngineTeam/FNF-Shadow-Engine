@@ -76,8 +76,7 @@ class Project extends HXProject
 		configureIcons();
 		if (!isDisplay())
 			checkLibraries();
-		trace("Configured project successfully!");
-		trace("Starting build...");
+		addMacroFlag("macros.BuildMessages.init()");
 		trace("");
 	}
 
