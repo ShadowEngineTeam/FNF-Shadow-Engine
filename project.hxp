@@ -77,7 +77,6 @@ class Project extends HXProject
 		if (!isDisplay())
 			checkLibraries();
 		addMacroFlag("macros.BuildMessages.init()");
-		trace("");
 	}
 
 	function getHaxeVersion():String
