@@ -1,10 +1,12 @@
 package objects;
 
 import backend.SRTUtil;
+import backend.SRTUtil.KaraokeSyllable;
 import flixel.sound.FlxSound;
 
 /**
  * Shows the lines of an `.srt` file in time with a sound, as in Funkin.
+ * Lines with karaoke tags color each syllable as it is sung.
  */
 class Subtitles extends FlxSpriteGroup
 {
@@ -12,6 +14,8 @@ class Subtitles extends FlxSpriteGroup
 	var background:FlxSprite;
 	var subtitlesData:Array<SubtitleEntry>;
 	var assignedSound:FlxSound;
+
+	static inline final KARAOKE_COLOR:String = 'FFD54A';
 
 	public var offsets(default, set):Array<Float> = [0, 0];
 	public var alignment(default, set):SubtitlesAlignment = SUBTITLES_BOTTOM;
@@ -40,10 +44,11 @@ class Subtitles extends FlxSpriteGroup
 		if (assignedSound == null || subtitlesData == null)
 			return;
 
+		final time:Float = assignedSound.time;
 		final currentLines:Array<String> = [];
 		for (data in subtitlesData)
-			if (assignedSound.time >= data.start && assignedSound.time <= data.end)
-				currentLines.unshift(data.text);
+			if (time >= data.start && time <= data.end)
+				currentLines.unshift(data.syllables != null ? karaokeText(data.syllables, time) : data.text);
 
 		setText(currentLines, currentLines.length == 0);
 	}
@@ -67,6 +72,22 @@ class Subtitles extends FlxSpriteGroup
 
 		subtitlesData = data;
 		assignedSound = sound;
+	}
+
+	// The syllables that were sung get colored, like karaoke
+	function karaokeText(syllables:Array<KaraokeSyllable>, time:Float):String
+	{
+		var sung:String = '';
+		var unsung:String = '';
+		for (syllable in syllables)
+		{
+			final text:String = syllable.text.htmlEscape();
+			if (time >= syllable.start)
+				sung += text;
+			else
+				unsung += text;
+		}
+		return sung.length > 0 ? '<font color="#$KARAOKE_COLOR">$sung</font>$unsung' : unsung;
 	}
 
 	function setText(lines:Array<String>, hide:Bool = false):Void

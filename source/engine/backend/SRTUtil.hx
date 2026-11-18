@@ -8,6 +8,8 @@ class SubtitleEntry
 	public var start:Float; // ms
 	public var end:Float; // ms
 	public var text:String;
+	// set when the line has karaoke tags like `{\k25}Spa{\k18}ghet`
+	public var syllables:Null<Array<KaraokeSyllable>>;
 
 	public function new(id:Int = 0, start:Float = 0, end:Float = 0, text:String = '')
 	{
@@ -15,6 +17,20 @@ class SubtitleEntry
 		this.start = start;
 		this.end = end;
 		this.text = text;
+	}
+}
+
+class KaraokeSyllable
+{
+	public var text:String;
+	public var start:Float; // ms
+	public var end:Float; // ms
+
+	public function new(text:String, start:Float, end:Float)
+	{
+		this.text = text;
+		this.start = start;
+		this.end = end;
 	}
 }
 
@@ -56,11 +72,12 @@ class SRTParser
 			if (times == null)
 				continue;
 
-			var text:String = lines.slice(idx + 1).join('\n');
+			final entry:SubtitleEntry = new SubtitleEntry(number, times.start, times.end, lines.slice(idx + 1).join('\n'));
+			parseKaraoke(entry);
 			if (convertBracesToAngles)
-				text = text.replace('{', '<').replace('}', '>');
+				entry.text = entry.text.replace('{', '<').replace('}', '>');
 
-			out.push(new SubtitleEntry(number, times.start, times.end, text));
+			out.push(entry);
 		}
 
 		out.sort((a:SubtitleEntry, b:SubtitleEntry) -> a.id - b.id);
@@ -73,6 +90,37 @@ class SRTParser
 	public static function parseFromFile(key:String):Array<SubtitleEntry>
 	{
 		return parseFromString(Paths.getTextFromFile('data/$key.srt'));
+	}
+
+	/**
+	 * Reads ASS karaoke tags (`{\k}`, `{\kf}`, `{\ko}`, in centiseconds) into syllables, like Aegisub writes them.
+	 */
+	static function parseKaraoke(entry:SubtitleEntry):Void
+	{
+		final tag:EReg = ~/\{\\[kK][fo]?(\d+)\}/;
+		if (!tag.match(entry.text))
+			return;
+
+		final syllables:Array<KaraokeSyllable> = [];
+		var rest:String = entry.text;
+		var time:Float = entry.start;
+		var duration:Float = 0;
+		while (true)
+		{
+			final found:Bool = tag.match(rest);
+			final piece:String = found ? tag.matchedLeft() : rest;
+			if (piece.length > 0)
+				syllables.push(new KaraokeSyllable(piece, time, time + duration));
+			time += duration;
+			if (!found)
+				break;
+
+			duration = Std.parseInt(tag.matched(1)) * 10;
+			rest = tag.matchedRight();
+		}
+
+		entry.syllables = syllables;
+		entry.text = [for (syllable in syllables) syllable.text].join('');
 	}
 
 	public static function parseTimeLine(line:String):Null<{start:Float, end:Float}>
