@@ -22,6 +22,7 @@ typedef StageFile =
 	var camera_speed:Null<Float>;
 
 	@:optional var characterFeetPos:Bool; // vslice character positioning
+	@:optional var girlfriend_scroll:Array<Float>; // [0.95, 0.95] if not set, V-Slice stages use [1, 1]
 	@:optional var preload:Dynamic;
 	@:optional var objects:Array<Dynamic>;
 }

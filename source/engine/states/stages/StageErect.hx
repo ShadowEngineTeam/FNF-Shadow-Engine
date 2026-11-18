@@ -58,7 +58,6 @@ class StageErect extends BaseStage
 			add(orangeLight);
 		}
 
-		createSpotlights();
 	}
 
 	function createSpotlights()
@@ -157,6 +156,9 @@ class StageErect extends BaseStage
 			dad.shader = makeCoolShader(-32, 0, -33, -23);
 			boyfriend.shader = makeCoolShader(12, 0, -23, 7);
 		}
+
+		// The spotlights and smoke go over the characters
+		createSpotlights();
 	}
 
 	function makeSolidColor(sprite:FlxSprite, width:Int, height:Int, color:FlxColor = FlxColor.WHITE):FlxSprite

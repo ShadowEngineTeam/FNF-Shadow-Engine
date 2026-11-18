@@ -347,7 +347,7 @@ class FreeplayState extends MusicBeatState
 		else if (Funkin.controls.ACCEPT && !player.playingMusic)
 		{
 			final songPath:String = Paths.formatToSongPath(songs[curSelected].songName);
-			final mixes:Array<String> = songMixes(songPath);
+			final mixes:Array<String> = Song.listMixes(songPath, curDifficulty);
 			final instrumentals:Map<String, Array<String>> = mixInstrumentals(songPath, mixes);
 
 			if (mixes.length > 1 || instrumentals.get(FreeplayOptionsSubState.DEFAULT_MIX).length > 1)
@@ -414,24 +414,6 @@ class FreeplayState extends MusicBeatState
 		#if (FEATURE_MODS && FEATURE_DISCORD_RPC)
 		DiscordClient.loadModRPC();
 		#end
-	}
-
-	/**
-	 * The mixes of a song with a chart for the current difficulty, from its `data/song/mix/` folders.
-	 */
-	function songMixes(songPath:String):Array<String>
-	{
-		final chart:String = Highscore.formatSong(songPath, curDifficulty) + '.json';
-		final mixes:Array<String> = [FreeplayOptionsSubState.DEFAULT_MIX];
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songPath/'))
-		{
-			for (file in FileSystem.readDirectory(folder))
-			{
-				if (!mixes.contains(file) && FileSystem.isDirectory(folder + file) && FileSystem.exists('$folder$file/$chart'))
-					mixes.push(file);
-			}
-		}
-		return mixes;
 	}
 
 	/**

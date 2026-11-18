@@ -1,6 +1,7 @@
 package states.editors;
 
 import backend.Song;
+import openfl.media.Sound;
 import backend.Section;
 import backend.Rating;
 import backend.EaseUtil;
@@ -418,11 +419,13 @@ class EditorPlayState extends MusicBeatSubstate
 		{
 			if (songData.needsVoices)
 			{
-				var playerVocals = Paths.voices(songData.song, (boyfriendVocals == null || boyfriendVocals.length < 1) ? 'Player' : boyfriendVocals + Difficulty.getSongPrefix());
-				vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(songData.song, Difficulty.getSongPrefix(null, false)));
+				final playerVocals:Sound = Song.findVocals(songData.song, songData.variant, boyfriendVocals) ?? Song.findVocals(songData.song, songData.variant, 'Player')
+					?? Song.findVocals(songData.song, songData.variant);
+				vocals.loadEmbedded(playerVocals);
 
-				var oppVocals = Paths.voices(songData.song, (dadVocals == null || dadVocals.length < 1) ? 'Opponent' : dadVocals + Difficulty.getSongPrefix());
-				if (oppVocals != null)
+				// Paths caches sounds, so the same file would be the same Sound playing twice
+				final oppVocals:Sound = Song.findVocals(songData.song, songData.variant, dadVocals) ?? Song.findVocals(songData.song, songData.variant, 'Opponent');
+				if (oppVocals != null && oppVocals != playerVocals)
 					opponentVocals.loadEmbedded(oppVocals);
 			}
 		}
@@ -437,7 +440,7 @@ class EditorPlayState extends MusicBeatSubstate
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
 
-		inst = new FlxSound().loadEmbedded(Paths.inst(songData.song, Difficulty.getSongPrefix(null, false)));
+		inst = new FlxSound().loadEmbedded(Song.findInst(songData.song, songData.variant));
 		FlxG.sound.list.add(inst);
 		FlxG.sound.music.volume = 0;
 

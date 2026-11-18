@@ -26,6 +26,7 @@ import objects.HealthIcon;
 import objects.AttachedSprite;
 import objects.Character;
 import substates.Prompt;
+import substates.FreeplayOptionsSubState;
 
 @:access(flixel.sound.FlxSound._sound)
 @:access(openfl.media.Sound.__buffer)
@@ -604,6 +605,25 @@ class ChartingState extends MusicBeatState
 		}, dropdownWidth);
 		gfVersionDropDown.selectedIndex = characters.indexOf(_song.gfVersion);
 
+		final mixes:Array<String> = Song.listMixes(Paths.formatToSongPath(_song.song), PlayState.storyDifficulty);
+		final curMix:Int = Std.int(Math.max(0, mixes.indexOf(_song.variant?.length > 0 ? _song.variant : FreeplayOptionsSubState.DEFAULT_MIX)));
+		tab_group.add(new ShadowLabel(pad + dropdownWidth + pad, row3, "Mix:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
+		var mixDropDown:ShadowDropdown = null;
+		mixDropDown = new ShadowDropdown(pad + dropdownWidth + pad, row3 + labelOffset, mixes, function(index:Int)
+		{
+			if (index == curMix)
+				return;
+
+			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
+			{
+				loadJson(_song.song.toLowerCase(), mixes[index]);
+			}, function()
+			{
+				mixDropDown.selectedIndex = curMix;
+			}, ignoreWarnings]);
+		}, dropdownWidth);
+		mixDropDown.selectedIndex = curMix;
+
 		var row4:Int = row3 + rowStep;
 		tab_group.add(new ShadowLabel(pad, row4, "Opponent:", ShadowStyle.FONT_SIZE_SM, ShadowStyle.TEXT_SECONDARY));
 		var player2DropDown:ShadowDropdown = new ShadowDropdown(pad, row4 + labelOffset, characters, function(index:Int)
@@ -619,7 +639,7 @@ class ChartingState extends MusicBeatState
 		{
 			switchSubState(Prompt, ['This action will clear current progress.\n\nProceed?', 0, function()
 			{
-				loadJson(_song.song.toLowerCase());
+				loadJson(_song.song.toLowerCase(), _song.variant);
 			}, null, ignoreWarnings]);
 		}, buttonWidth);
 		tab_group.add(reloadSongJson);
@@ -633,7 +653,7 @@ class ChartingState extends MusicBeatState
 
 		var loadEventJson:ShadowButton = new ShadowButton(pad + buttonWidth + buttonGap + 75, row5, "Load Events", function()
 		{
-			var songName:String = Paths.formatToSongPath(_song.song);
+			var songName:String = Song.chartFolder(_song);
 			var baseFile:String = Paths.json(songName + '/events' + (isDiffErect ? '-erect' : ""));
 			var exists:Bool = false;
 			#if FEATURE_MODS
@@ -684,6 +704,7 @@ class ChartingState extends MusicBeatState
 		tab_group.add(clear_notes);
 
 		// dropdowns
+		tab_group.add(mixDropDown);
 		tab_group.add(stageDropDown);
 		tab_group.add(player2DropDown);
 		tab_group.add(gfVersionDropDown);
@@ -1648,6 +1669,8 @@ class ChartingState extends MusicBeatState
 		UI_help.add(closeText);
 	}
 
+	var playerVocals:Null<Sound> = null;
+
 	function loadSong():Void
 	{
 		if (FlxG.sound.music != null)
@@ -1668,9 +1691,8 @@ class ChartingState extends MusicBeatState
 		opponentVocals = new FlxSound();
 		try
 		{
-			var playerVocals = Paths.voices(currentSongName,
-				(characterData.vocalsP1 == null || characterData.vocalsP1.length < 1) ? 'Player' : characterData.vocalsP1 + Difficulty.getSongPrefix());
-			vocals.loadEmbedded(playerVocals != null ? playerVocals : Paths.voices(currentSongName, Difficulty.getSongPrefix(null, false)));
+			playerVocals = findVocals(characterData.vocalsP1) ?? findVocals('Player') ?? findVocals();
+			vocals.loadEmbedded(playerVocals);
 		}
 		vocals.autoDestroy = false;
 		FlxG.sound.list.add(vocals);
@@ -1678,9 +1700,9 @@ class ChartingState extends MusicBeatState
 		opponentVocals = new FlxSound();
 		try
 		{
-			var oppVocals = Paths.voices(currentSongName,
-				(characterData.vocalsP2 == null || characterData.vocalsP2.length < 1) ? 'Opponent' : characterData.vocalsP2 + Difficulty.getSongPrefix());
-			if (oppVocals != null)
+			// Paths caches sounds, so the same file would be the same Sound playing twice
+			final oppVocals:Sound = findVocals(characterData.vocalsP2) ?? findVocals('Opponent');
+			if (oppVocals != null && oppVocals != playerVocals)
 				opponentVocals.loadEmbedded(oppVocals);
 		}
 		opponentVocals.autoDestroy = false;
@@ -1753,9 +1775,12 @@ class ChartingState extends MusicBeatState
 		super.closeSubState();
 	}
 
+	inline function findVocals(?name:String):Sound
+		return Song.findVocals(currentSongName, _song.variant, name);
+
 	function generateSong()
 	{
-		FlxG.sound.playMusic(Paths.inst(currentSongName, Difficulty.getSongPrefix(null, false)), 0.6 /*, false*/);
+		FlxG.sound.playMusic(Song.findInst(currentSongName, _song.variant), 0.6 /*, false*/);
 		FlxG.sound.music.autoDestroy = false;
 		if (instVolume != null)
 			FlxG.sound.music.volume = instVolume.value;
@@ -3506,14 +3531,19 @@ class ChartingState extends MusicBeatState
 	var missingText:FlxText;
 	var missingTextTimer:FlxTimer;
 
-	function loadJson(song:String):Void
+	function loadJson(song:String, ?mix:String):Void
 	{
+		if (mix == FreeplayOptionsSubState.DEFAULT_MIX)
+			mix = null;
+
 		// shitty null fix, i fucking hate it when this happens
 		// make it look sexier if possible
 		try
 		{
 			final fuckinDiff:String = Difficulty.getByIndex() != NORMAL ? '-${PlayState.storyDifficulty}' : '';
-			PlayState.SONG = Song.loadFromJson(song.toLowerCase() + fuckinDiff, song.toLowerCase());
+			PlayState.SONG = Song.loadFromJson(song.toLowerCase() + fuckinDiff, song.toLowerCase() + (mix != null ? '/$mix' : ''));
+			if (mix != null && !(PlayState.SONG.variant?.length > 0))
+				PlayState.SONG.variant = mix;
 			Funkin.resetState();
 		}
 		catch (e)

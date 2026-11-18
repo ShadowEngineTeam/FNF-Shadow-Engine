@@ -847,8 +847,18 @@ class ModsMenuState extends MusicBeatState
 
 	function checkToggleButtons()
 	{
+		final focused:Bool = (buttonEnableAll.enabled && buttonEnableAll.onFocus) || (buttonDisableAll.enabled && buttonDisableAll.onFocus);
+		final keepFocus:Bool = focused && (buttonEnableAll.ignoreCheck || buttonDisableAll.ignoreCheck);
+
 		buttonEnableAll.visible = buttonEnableAll.enabled = buttonEnableAll.active = modsList.disabled.length > 0;
 		buttonDisableAll.visible = buttonDisableAll.enabled = buttonDisableAll.active = !buttonEnableAll.visible;
+
+		// both buttons share a spot, the one shown now keeps the keyboard focus
+		if (keepFocus)
+		{
+			final shown:MenuButton = buttonEnableAll.enabled ? buttonEnableAll : buttonDisableAll;
+			shown.ignoreCheck = shown.onFocus = true;
+		}
 	}
 
 	function reload()
@@ -1047,6 +1057,8 @@ class MenuButton extends FlxSpriteGroup
 	public var ignoreCheck:Bool = false;
 
 	private var _needACheck:Bool = false;
+	// set when the button gets enabled, so the click that enabled it can't also press it
+	private var _skipClick:Bool = false;
 
 	override function update(elapsed:Float)
 	{
@@ -1066,7 +1078,7 @@ class MenuButton extends FlxSpriteGroup
 			if (onFocus && TouchUtil.justReleased)
 				onFocus = false;
 
-			if (onFocus && onClick != null && TouchUtil.justPressed)
+			if (onFocus && onClick != null && TouchUtil.justPressed && !_skipClick)
 				onClick();
 
 			if (_needACheck)
@@ -1080,7 +1092,7 @@ class MenuButton extends FlxSpriteGroup
 			if (!ignoreCheck && !Controls.instance.controllerMode && FlxG.mouse.justMoved && FlxG.mouse.visible)
 				onFocus = FlxG.mouse.overlaps(this);
 
-			if (onFocus && onClick != null && FlxG.mouse.justPressed)
+			if (onFocus && onClick != null && FlxG.mouse.justPressed && !_skipClick)
 				onClick();
 
 			if (_needACheck)
@@ -1090,6 +1102,8 @@ class MenuButton extends FlxSpriteGroup
 					setButtonVisibility(FlxG.mouse.overlaps(this));
 			}
 		}
+
+		_skipClick = false;
 	}
 
 	function set_onFocus(newValue:Bool)
@@ -1108,6 +1122,7 @@ class MenuButton extends FlxSpriteGroup
 		alpha = enabled ? 1 : 0.4;
 
 		_needACheck = enabled;
+		_skipClick = enabled;
 		return newValue;
 	}
 

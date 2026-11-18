@@ -3,6 +3,7 @@ package backend;
 import openfl.utils.Assets;
 import backend.Section;
 import haxe.DynamicAccess;
+import openfl.media.Sound;
 
 typedef SwagSong =
 {
@@ -149,6 +150,88 @@ class Song
 			return 0;
 
 		return vocals.get(charId);
+	}
+
+	/**
+	 * The audio suffixes to try for a song, most specific first: its mix, then Erect, then none.
+	 */
+	public static function audioSuffixes(?variant:String):Array<Null<String>>
+	{
+		if (variant != null && variant.length == 0)
+			variant = null;
+		final erect:Null<String> = Difficulty.getSongPrefix(null, false);
+		final list:Array<Null<String>> = [];
+
+		if (variant != null && erect != null)
+			list.push('$variant-$erect');
+		if (variant != null)
+			list.push(variant);
+		if (erect != null)
+			list.push(erect);
+		list.push(null);
+
+		return list;
+	}
+
+	public static function findInst(song:String, ?variant:String, ?altInstrumental:String):Null<Sound>
+	{
+		if (altInstrumental != null)
+		{
+			final snd:Null<Sound> = Paths.inst(song, altInstrumental);
+			if (snd != null)
+				return snd;
+		}
+
+		for (suffix in audioSuffixes(variant))
+		{
+			final snd:Null<Sound> = Paths.inst(song, suffix);
+			if (snd != null)
+				return snd;
+		}
+		return null;
+	}
+
+	public static function findVocals(song:String, ?variant:String, ?name:String):Null<Sound>
+	{
+		if (name != null && name.length == 0)
+			return null;
+
+		for (suffix in audioSuffixes(variant))
+		{
+			final postfix:Null<String> = (name != null && suffix != null) ? '$name-$suffix' : (name ?? suffix);
+			final snd:Null<Sound> = Paths.voices(song, postfix);
+			if (snd != null)
+				return snd;
+		}
+		return null;
+	}
+
+	/**
+	 * The mixes of a song with a chart for a difficulty, from its `data/song/mix/` folders.
+	 * The default mix comes first.
+	 */
+	public static function listMixes(songPath:String, difficulty:Int):Array<String>
+	{
+		final chart:String = Highscore.formatSong(songPath, difficulty) + '.json';
+		final mixes:Array<String> = [substates.FreeplayOptionsSubState.DEFAULT_MIX];
+		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songPath/'))
+		{
+			for (file in FileSystem.readDirectory(folder))
+			{
+				if (!mixes.contains(file) && FileSystem.isDirectory(folder + file) && FileSystem.exists('$folder$file/$chart'))
+					mixes.push(file);
+			}
+		}
+		return mixes;
+	}
+
+	/**
+	 * The `data/` folder of a song's chart, with its mix folder if it has one.
+	 */
+	public static function chartFolder(song:SwagSong):String
+	{
+		final folder:String = Paths.formatToSongPath(song.song);
+		return (song.variant?.length > 0) ? '$folder/${song.variant}' : folder;
 	}
 
 	public function new(song, notes, bpm)

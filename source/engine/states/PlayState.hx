@@ -240,6 +240,7 @@ class PlayState extends MusicBeatState
 	public var boyfriendCameraOffset:Array<Float> = null;
 	public var opponentCameraOffset:Array<Float> = null;
 	public var girlfriendCameraOffset:Array<Float> = null;
+	public var stageData:StageFile = null;
 
 	#if FEATURE_DISCORD_RPC
 	// Discord RPC variables
@@ -440,7 +441,7 @@ class PlayState extends MusicBeatState
 		if (curStage == "mainStageErect")
 			curStage = "stageErect";
 
-		final stageData:StageFile = StageData.getStageFile(curStage) ?? StageData.dummy();
+		stageData = StageData.getStageFile(curStage) ?? StageData.dummy();
 
 		defaultCamZoom = stageData.defaultZoom;
 
@@ -528,7 +529,7 @@ class PlayState extends MusicBeatState
 
 		gfGroup.add(gf = new Character(0, 0, !stageData.hide_girlfriend && !ClientPrefs.data.lowQuality ? SONG.gfVersion : 'gf-empty'));
 		startCharacterPos(gf);
-		gf.scrollFactor.set(0.95, 0.95);
+		setGfScroll(gf);
 		startCharacterScripts(gf.curCharacter);
 
 		dadGroup.add(dad = new Character(0, 0, SONG.player2, characterPlayingAsDad));
@@ -875,12 +876,21 @@ class PlayState extends MusicBeatState
 					final newGf:Character = new Character(0, 0, newCharacter);
 					gfMap.set(newCharacter, newGf);
 					gfGroup.add(newGf);
-					newGf.scrollFactor.set(0.95, 0.95);
+					setGfScroll(newGf);
 					startCharacterPos(newGf);
 					newGf.alpha = 0.00001;
 					startCharacterScripts(newGf.curCharacter);
 				}
 		}
+	}
+
+	function setGfScroll(char:Character):Void
+	{
+		final scroll:Array<Float> = stageData != null ? stageData.girlfriend_scroll : null;
+		if (scroll != null && scroll.length > 1)
+			char.scrollFactor.set(scroll[0], scroll[1]);
+		else
+			char.scrollFactor.set(0.95, 0.95);
 	}
 
 	function startCharacterScripts(name:String):Void
@@ -899,7 +909,7 @@ class PlayState extends MusicBeatState
 		if (gfCheck && char.curCharacter.startsWith('gf')) // IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
 		{
 			char.setPosition(GF_X, GF_Y);
-			char.scrollFactor.set(0.95, 0.95);
+			setGfScroll(char);
 			char.danceEveryNumBeats = 2;
 		}
 		char.x += char.positionArray[0];
@@ -1320,57 +1330,11 @@ class PlayState extends MusicBeatState
 	public function skipDialogue():Void
 		callOnScripts('onSkipDialogue', [dialogueCount]);
 
-	function songAudioSuffixes():Array<Null<String>>
-	{
-		final variant:Null<String> = (SONG.variant?.length > 0) ? SONG.variant : null;
-		final erect:Null<String> = Difficulty.getSongPrefix(null, false);
-		final list:Array<Null<String>> = [];
+	inline function findInst():Sound
+		return Song.findInst(SONG.song, SONG.variant, altInstrumental);
 
-		if (variant != null && erect != null)
-			list.push('$variant-$erect');
-		if (variant != null)
-			list.push(variant);
-		if (erect != null)
-			list.push(erect);
-		list.push(null);
-
-		return list;
-	}
-
-	function findInst():Sound
-	{
-		if (altInstrumental != null)
-		{
-			final snd:Sound = Paths.inst(SONG.song, altInstrumental);
-			if (snd != null)
-				return snd;
-		}
-
-		for (suffix in songAudioSuffixes())
-		{
-			final snd:Sound = Paths.inst(SONG.song, suffix);
-			if (snd != null)
-				return snd;
-		}
-		return null;
-	}
-
-	function findVocals(?name:String):Sound
-	{
-		if (name != null && name.length == 0)
-			return null;
-
-		final prefix:Null<String> = name;
-
-		for (suffix in songAudioSuffixes())
-		{
-			final postfix:Null<String> = (prefix != null && suffix != null) ? '$prefix-$suffix' : (prefix ?? suffix);
-			final snd:Sound = Paths.voices(SONG.song, postfix);
-			if (snd != null)
-				return snd;
-		}
-		return null;
-	}
+	inline function findVocals(?name:String):Sound
+		return Song.findVocals(SONG.song, SONG.variant, name);
 
 	function startSong():Void
 	{
@@ -1407,7 +1371,7 @@ class PlayState extends MusicBeatState
 		#if FEATURE_DISCORD_RPC
 		// Updating Discord Rich Presence (with Time Left)
 		if (autoUpdateRPC)
-			DiscordClient.changePresence(detailsText, '${SONG.song} ($storyDifficultyText)', iconP2.getCharacter(), true, songLength);
+			DiscordClient.changePresence(detailsText, discordSongText(), iconP2.getCharacter(), true, songLength);
 		#end
 
 		setOnScripts('songLength', songLength);
@@ -1816,7 +1780,7 @@ class PlayState extends MusicBeatState
 	{
 		#if FEATURE_DISCORD_RPC
 		if (health > 0 && !paused && FlxG.autoPause && autoUpdateRPC)
-			DiscordClient.changePresence(detailsPausedText, '${SONG.song} ($storyDifficultyText)', iconP2.getCharacter());
+			DiscordClient.changePresence(detailsPausedText, discordSongText(), iconP2.getCharacter());
 		#end
 
 		#if (target.threaded)
@@ -1829,7 +1793,7 @@ class PlayState extends MusicBeatState
 	{
 		#if FEATURE_DISCORD_RPC
 		if (autoUpdateRPC)
-			DiscordClient.changePresence(detailsText, '${SONG.song} ($storyDifficultyText)', iconP2.getCharacter(), showTime, showTime ? songLength - Conductor.songPosition - ClientPrefs.data.noteOffset : null);
+			DiscordClient.changePresence(detailsText, discordSongText(), iconP2.getCharacter(), showTime, showTime ? songLength - Conductor.songPosition - ClientPrefs.data.noteOffset : null);
 		#end
 	}
 
@@ -2229,9 +2193,24 @@ class PlayState extends MusicBeatState
 
 		#if FEATURE_DISCORD_RPC
 		if (autoUpdateRPC)
-			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+			DiscordClient.changePresence(detailsPausedText, discordSongText(), iconP2.getCharacter());
 		#end
 	}
+
+	#if FEATURE_DISCORD_RPC
+	/**
+	 * The song for Discord, with its mix if it isn't the default one, like `Darnell (BF Mix) (Hard)`.
+	 */
+	function discordSongText():String
+	{
+		final mix:Null<String> = SONG.variant;
+		if (mix == null || mix.length == 0)
+			return '${SONG.song} ($storyDifficultyText)';
+
+		final mixName:String = mix.length <= 2 ? mix.toUpperCase() : mix.charAt(0).toUpperCase() + mix.substr(1);
+		return '${SONG.song} ($mixName Mix) ($storyDifficultyText)';
+	}
+	#end
 
 	public function openChartEditor()
 	{
@@ -2297,7 +2276,7 @@ class PlayState extends MusicBeatState
 
 				#if FEATURE_DISCORD_RPC
 				if (autoUpdateRPC)
-					DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+					DiscordClient.changePresence("Game Over - " + detailsText, discordSongText(), iconP2.getCharacter());
 				#end
 
 				isDead = true;

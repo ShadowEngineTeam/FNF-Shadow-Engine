@@ -41,6 +41,11 @@ class Stage extends BaseStage
 			add(stageCurtains);
 		}
 
+	}
+
+	override function createPost()
+	{
+		// The spotlights and smoke go over the characters
 		createSpotlights();
 	}
 
