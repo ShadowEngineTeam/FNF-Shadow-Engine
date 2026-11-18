@@ -28,6 +28,66 @@ static jmethodID midGetContext;
 static jclass mActivityClass;
 static AAssetManager *asset_manager = NULL;
 static jobject javaAssetManagerRef = 0;
+static JavaVM *java_vm = NULL;
+static jmethodID midList = NULL;
+
+// AAssetDir only lists files, so folders are listed with the Java AssetManager.list()
+static bool ListAssets(const char *path, std::vector<std::string> &names)
+{
+	if (!java_vm || !javaAssetManagerRef || !midList)
+		return false;
+
+	JNIEnv *env = NULL;
+	bool attached = false;
+	if (java_vm->GetEnv((void **)&env, JNI_VERSION_1_6) == JNI_EDETACHED)
+	{
+		if (java_vm->AttachCurrentThread(&env, NULL) != JNI_OK)
+			return false;
+		attached = true;
+	}
+
+	bool success = false;
+	if ((*env).PushLocalFrame(16) >= 0)
+	{
+		jobjectArray list = (jobjectArray)(*env).CallObjectMethod(javaAssetManagerRef, midList, (*env).NewStringUTF(path));
+		if ((*env).ExceptionCheck())
+		{
+			(*env).ExceptionClear();
+			list = NULL;
+		}
+
+		if (list)
+		{
+			const jsize count = (*env).GetArrayLength(list);
+			for (jsize i = 0; i < count; i++)
+			{
+				jstring name = (jstring)(*env).GetObjectArrayElement(list, i);
+				const char *chars = (*env).GetStringUTFChars(name, NULL);
+				names.push_back(chars);
+				(*env).ReleaseStringUTFChars(name, chars);
+				(*env).DeleteLocalRef(name);
+			}
+			success = true;
+		}
+
+		(*env).PopLocalFrame(NULL);
+	}
+
+	if (attached)
+		java_vm->DetachCurrentThread();
+
+	return success;
+}
+
+static bool IsAssetFile(const char *path)
+{
+	AAsset *file = AAssetManager_open(asset_manager, path, AASSET_MODE_UNKNOWN);
+	if (file == NULL)
+		return false;
+
+	AAsset_close(file);
+	return true;
+}
 
 struct LocalReferenceHolder
 {
@@ -100,6 +160,9 @@ void Assets_obj::native_init(::Dynamic jni_env)
 	javaAssetManagerRef = (*env).NewGlobalRef(javaAssetManager);
 	asset_manager = AAssetManager_fromJava(env, javaAssetManagerRef);
 
+	(*env).GetJavaVM(&java_vm);
+	midList = (*env).GetMethodID((*env).GetObjectClass(javaAssetManager), "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+
 	if (asset_manager == NULL)
 	{
 		(*env).DeleteGlobalRef(javaAssetManagerRef);
@@ -126,28 +189,10 @@ bool Assets_obj::native_exists(::String path)
 		return false;
 
 	hx::EnterGCFreeZone();
-
-	AAsset* file = AAssetManager_open(asset_manager, path.__s, AASSET_MODE_UNKNOWN);
-	if (file != NULL)
-	{
-		AAsset_close(file);
-		hx::ExitGCFreeZone();
-		return true;
-	}
-
-	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
-	if (dir && AAssetDir_getNextFileName(dir) != NULL)
-	{
-		AAssetDir_close(dir);
-		hx::ExitGCFreeZone();
-		return true;
-	}
-
-	if (dir)
-		AAssetDir_close(dir);
-
+	const bool isFile = IsAssetFile(path.__s);
 	hx::ExitGCFreeZone();
-	return false;
+
+	return isFile || native_isDirectory(path);
 }
 
 ::String Assets_obj::native_getContent(::String file)
@@ -290,20 +335,25 @@ bool Assets_obj::native_isDirectory(::String path)
 		return false;
 
 	hx::EnterGCFreeZone();
-	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
-
-	if (dir && AAssetDir_getNextFileName(dir) != NULL)
+	if (IsAssetFile(path.__s))
 	{
-		AAssetDir_close(dir);
 		hx::ExitGCFreeZone();
-		return true;
+		return false;
 	}
 
-	if (dir)
-		AAssetDir_close(dir);
+	std::vector<std::string> names;
+	bool isDir = ListAssets(path.__s, names) && !names.empty();
+
+	if (!isDir)
+	{
+		AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
+		isDir = dir && AAssetDir_getNextFileName(dir) != NULL;
+		if (dir)
+			AAssetDir_close(dir);
+	}
 
 	hx::ExitGCFreeZone();
-	return false;
+	return isDir;
 }
 
 Array<::String> Assets_obj::native_readDirectory(::String path)
@@ -314,14 +364,17 @@ Array<::String> Assets_obj::native_readDirectory(::String path)
 	std::vector<std::string> names;
 
 	hx::EnterGCFreeZone();
-	AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
-
-	if (dir)
+	if (!ListAssets(path.__s, names))
 	{
-		const char* filename;
-		while ((filename = AAssetDir_getNextFileName(dir)) != NULL)
-			names.push_back(filename);
-		AAssetDir_close(dir);
+		AAssetDir* dir = AAssetManager_openDir(asset_manager, path.__s);
+
+		if (dir)
+		{
+			const char* filename;
+			while ((filename = AAssetDir_getNextFileName(dir)) != NULL)
+				names.push_back(filename);
+			AAssetDir_close(dir);
+		}
 	}
 	hx::ExitGCFreeZone();
 
@@ -415,22 +468,30 @@ class Assets
 
 	public static function exists(path:String):Bool
 	{
-		return __exists(path);
+		return __exists(trimSlash(path));
 	}
 
 	public static function isDirectory(path:String):Bool
 	{
-		return __isDirectory(path);
+		return __isDirectory(trimSlash(path));
 	}
 
 	public static function readDirectory(path:String):Array<String>
 	{
-		return __readDirectory(path);
+		return __readDirectory(trimSlash(path));
+	}
+
+	// The asset manager doesn't find folders written with a slash at the end
+	static function trimSlash(path:String):String
+	{
+		while (path.length > 1 && StringTools.endsWith(path, '/'))
+			path = path.substr(0, path.length - 1);
+		return path;
 	}
 
 	public static function stat(path:String):FileStat
 	{
-		return __stat(path);
+		return __stat(trimSlash(path));
 	}
 
 	@:noCompletion
