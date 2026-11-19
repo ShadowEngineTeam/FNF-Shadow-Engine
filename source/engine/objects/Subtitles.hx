@@ -48,7 +48,7 @@ class Subtitles extends FlxSpriteGroup
 		final currentLines:Array<String> = [];
 		for (data in subtitlesData)
 			if (time >= data.start && time <= data.end)
-				currentLines.unshift(data.syllables != null ? karaokeText(data.syllables, time) : data.text);
+				currentLines.unshift(data.syllables != null ? karaokeText(data, time) : data.text);
 
 		setText(currentLines, currentLines.length == 0);
 	}
@@ -75,11 +75,11 @@ class Subtitles extends FlxSpriteGroup
 	}
 
 	// The syllables that were sung get colored, like karaoke
-	function karaokeText(syllables:Array<KaraokeSyllable>, time:Float):String
+	function karaokeText(entry:SubtitleEntry, time:Float):String
 	{
 		var sung:String = '';
 		var unsung:String = '';
-		for (syllable in syllables)
+		for (syllable in entry.syllables)
 		{
 			final text:String = syllable.text.htmlEscape();
 			if (time >= syllable.start)
@@ -87,7 +87,7 @@ class Subtitles extends FlxSpriteGroup
 			else
 				unsung += text;
 		}
-		return sung.length > 0 ? '<font color="#$KARAOKE_COLOR">$sung</font>$unsung' : unsung;
+		return sung.length > 0 ? '<font color="#${entry.color ?? KARAOKE_COLOR}">$sung</font>$unsung' : unsung;
 	}
 
 	function setText(lines:Array<String>, hide:Bool = false):Void

@@ -10,6 +10,8 @@ class SubtitleEntry
 	public var text:String;
 	// set when the line has karaoke tags like `{\k25}Spa{\k18}ghet`
 	public var syllables:Null<Array<KaraokeSyllable>>;
+	// set when a karaoke line is wrapped in `<font color="#RRGGBB">`, the color it is sung in
+	public var color:Null<String>;
 
 	public function new(id:Int = 0, start:Float = 0, end:Float = 0, text:String = '')
 	{
@@ -100,6 +102,13 @@ class SRTParser
 		final tag:EReg = ~/\{\\[kK][fo]?(\d+)\}/;
 		if (!tag.match(entry.text))
 			return;
+
+		final font:EReg = ~/^<font color="#([0-9a-fA-F]{6})">([\s\S]*)<\/font>$/;
+		if (font.match(entry.text))
+		{
+			entry.color = font.matched(1);
+			entry.text = font.matched(2);
+		}
 
 		final syllables:Array<KaraokeSyllable> = [];
 		var rest:String = entry.text;
