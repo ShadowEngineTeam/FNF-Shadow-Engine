@@ -2764,6 +2764,9 @@ class PlayState extends MusicBeatState
 		updateTime = false;
 		FlxG.sound.music.volume = 0;
 
+		// The results music plays on FlxG.sound.music too
+		subtitles?.assignSubtitles(null, null);
+
 		vocals.volume = 0;
 		vocals.pause();
 
