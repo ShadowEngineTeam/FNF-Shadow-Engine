@@ -20,7 +20,7 @@ class Subtitles extends FlxSpriteGroup
 	public var offsets(default, set):Array<Float> = [0, 0];
 	public var alignment(default, set):SubtitlesAlignment = SUBTITLES_BOTTOM;
 
-	public function new(x:Float = 0, y:Float = 0, alignment:SubtitlesAlignment = SUBTITLES_BOTTOM)
+	public function new(x:Float = 0, y:Float = 0, alignment:SubtitlesAlignment = SUBTITLES_BOTTOM, ?font:String)
 	{
 		super(0, 0);
 
@@ -28,7 +28,7 @@ class Subtitles extends FlxSpriteGroup
 		background.alpha = 0.5;
 		add(background);
 
-		subtitleText = new SubtitlesText(0, 0, 30, Paths.font('vcr.ttf'));
+		subtitleText = new SubtitlesText(0, 0, 30, font ?? Paths.font('vcr.ttf'));
 		add(subtitleText);
 
 		this.offsets = [x, y];
