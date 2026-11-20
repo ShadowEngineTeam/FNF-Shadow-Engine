@@ -76,6 +76,10 @@ class NotesSubStateOld extends MusicBeatSubstate
 		camY = 0;
 		targetCamY = 0;
 
+		var skin:String = Note.defaultNoteSkin + Note.getNoteSkinPostfix();
+		if (!Paths.fileExists('images/$skin.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT)))
+			skin = Note.defaultNoteSkin;
+
 		for (i in 0...4)
 		{
 			var yPos:Float = (165 * i) + 35;
@@ -87,7 +91,7 @@ class NotesSubStateOld extends MusicBeatSubstate
 			}
 
 			var note:FlxSprite = new FlxSprite(posX, yPos);
-			note.frames = Paths.getSparrowAtlas('NOTE_assets');
+			note.frames = Paths.getSparrowAtlas(skin);
 
 			var animName:String = Note.colArray[i % Note.colArray.length] + '0';
 			note.animation.addByPrefix('idle', animName);
