@@ -293,6 +293,7 @@ class Note extends FlxSkewedSprite
 	{
 		noteSplashData.texture = PlayState.SONG != null ? PlayState.SONG.splashSkin : 'noteSplashes';
 		if (ClientPrefs.data.disableRGBNotes)
+		{
 			if (noteData > -1 && noteData < ClientPrefs.data.arrowHSV.length)
 			{
 				noteSplashHue = ClientPrefs.data.arrowHSV[noteData][0] / 360;
@@ -300,6 +301,7 @@ class Note extends FlxSkewedSprite
 				noteSplashBrightness = ClientPrefs.data.arrowHSV[noteData][2] / 100;
 				setColorSwap(noteSplashHue, noteSplashSaturation, noteSplashBrightness);
 			}
+		}
 		else
 			defaultRGB();
 
