@@ -98,6 +98,9 @@ class PlayState extends MusicBeatState
 	public static var stageUI:String = "normal";
 	public static var isPixelStage(get, never):Bool;
 
+	// Ratings, combo and numbers fade in steps on pixel stages, like V-Slice
+	public static final pixelComboEase:Float->Float = EaseUtil.stepped(2);
+
 	@:noCompletion
 	static function get_isPixelStage():Bool
 		return stageUI == "pixel" || stageUI.endsWith("-pixel");
@@ -1994,7 +1997,10 @@ class PlayState extends MusicBeatState
 
 				if (s.lifeTime <= 0)
 				{
-					s.alpha -= elapsed * 6 * playbackRate;
+					if (isPixelStage)
+						s.alpha = 1 - pixelComboEase(-s.lifeTime * 6);
+					else
+						s.alpha -= elapsed * 6 * playbackRate;
 
 					if (s.alpha <= 0)
 						s.kill();
