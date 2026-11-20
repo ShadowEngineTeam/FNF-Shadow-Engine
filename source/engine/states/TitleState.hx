@@ -179,6 +179,9 @@ class TitleState extends MusicBeatState
 		else
 			showIntro = false;
 
+		if (AttractState.availableVideos().length > 0)
+			attractTimer = new FlxTimer().start(AttractState.DELAY, (_) -> moveToAttract());
+
 		Paths.clearUnusedMemory();
 		// credGroup.add(credTextShit);
 	}
@@ -197,6 +200,7 @@ class TitleState extends MusicBeatState
 	}
 
 	var transitioning:Bool = false;
+	var attractTimer:FlxTimer;
 
 	private static var playJingle:Bool = false;
 
@@ -266,6 +270,7 @@ class TitleState extends MusicBeatState
 				HapticUtil.vibrate(0.1, 0.5, 0.5, 1, MENU);
 
 				transitioning = true;
+				attractTimer?.cancel();
 				// FlxG.sound.music.stop();
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
@@ -290,6 +295,16 @@ class TitleState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+	}
+
+	function moveToAttract():Void
+	{
+		if (transitioning)
+			return;
+
+		transitioning = true;
+		FlxG.sound.music?.fadeOut(2, 0);
+		FlxG.camera.fade(FlxColor.BLACK, 2, false, () -> Funkin.switchState(AttractState));
 	}
 
 	function createCoolText(textArray:Array<String>, ?offset:Float = 0)
