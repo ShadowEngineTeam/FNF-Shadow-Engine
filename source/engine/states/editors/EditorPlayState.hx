@@ -291,7 +291,10 @@ class EditorPlayState extends MusicBeatSubstate
 
 				if (s.lifeTime <= 0)
 				{
-					s.alpha -= elapsed * 6 * playbackRate;
+					if (PlayState.isPixelStage)
+						s.alpha = 1 - PlayState.pixelComboEase(-s.lifeTime * 6);
+					else
+						s.alpha -= elapsed * 6 * playbackRate;
 
 					if (s.alpha <= 0)
 						s.kill();
