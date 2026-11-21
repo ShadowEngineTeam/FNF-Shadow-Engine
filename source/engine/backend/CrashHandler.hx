@@ -15,6 +15,10 @@ class CrashHandler
 {
 	public static function init():Void
 	{
+		#if FEATURE_NATIVE_CRASH_HANDLER
+		backend.crash.NativeCrash.install('logs', lime.app.Application.current?.meta.get('title') ?? 'Shadow Engine');
+		#end
+
 		openfl.Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 		#if cpp
 		untyped __global__.__hxcpp_set_critical_error_handler(onError);
