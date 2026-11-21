@@ -41,6 +41,7 @@ class Project extends HXProject
 	static final FEATURE_EMBED_ASSETS:CompileFlag = CompileFlag.get("EMBED_ASSETS");
 	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 	static final FEATURE_HAPTICS:CompileFlag = CompileFlag.get("FEATURE_HAPTICS");
+	static final FEATURE_NATIVE_CRASH_HANDLER:CompileFlag = CompileFlag.get("FEATURE_NATIVE_CRASH_HANDLER");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -201,6 +202,7 @@ class Project extends HXProject
 		window.background = 0x000000;
 		window.hardware = true;
 		window.vsync = false;
+		window.depthBuffer = false;
 		window.orientation = Orientation.LANDSCAPE;
 
 		if (isWeb())
@@ -233,6 +235,7 @@ class Project extends HXProject
 		FEATURE_FUNKIN_CONTENT.integrate(true);
 		FEATURE_EMBED_ASSETS.integrate(false);
 		FEATURE_HAPTICS.integrate(isMobile());
+		FEATURE_NATIVE_CRASH_HANDLER.integrate((isDesktop() || isMobile()) && isCPP());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
@@ -251,7 +254,9 @@ class Project extends HXProject
 		setHaxedef("HXCPP_CHECK_POINTER");
 		setHaxedef("HXCPP_STACK_LINE");
 		setHaxedef("HXCPP_STACK_TRACE");
-		setHaxedef("HXCPP_CATCH_SEGV");
+		// The native crash handler reports segfaults itself, with the native stack
+		if (FEATURE_NATIVE_CRASH_HANDLER.isDisabled())
+			setHaxedef("HXCPP_CATCH_SEGV");
 
 		setHaxedef("HXCPP_GC_BIG_BLOCKS");
 		setHaxedef("HXCPP_GC_NURSERY");
@@ -269,6 +274,12 @@ class Project extends HXProject
 		}
 
 		setHaxedef("USING_SHADOW_ENGINE");
+
+		if (isWindows() && isCPP() && !targetFlags.exists("mingw") && FEATURE_NATIVE_CRASH_HANDLER.isEnabled())
+		{
+			// The native crash handler symbolizes stack traces with the PDB
+			setenv("HXCPP_PDB_FILE", FileSystem.absolutePath(Path.join([app.path, "windows", "obj", '${EXECUTABLE}.pdb'])));
+		}
 
 		if (FEATURE_DCE.isDisabled())
 		{
