@@ -701,10 +701,25 @@ class Paths
 		#if FEATURE_MODS
 		var modFolder:String = modFolders('images/' + key);
 		if (FileSystem.exists(modFolder) && FileSystem.isDirectory(modFolder))
-			return FlxAnimateFrames.fromAnimate(modFolder, settings);
+			animateFolder = modFolder;
 		#end
 
-		return FlxAnimateFrames.fromAnimate(animateFolder, settings);
+		final frames:FlxAnimateFrames = FlxAnimateFrames.fromAnimate(animateFolder, settings);
+		trackSpritemaps(frames);
+		return frames;
+	}
+
+	// flixel-animate gets its spritemaps from FlxG.bitmap, so ones preloaded into the cache have to be marked as used here,
+	// or clearUnusedMemory() destroys them under the atlas.
+	static function trackSpritemaps(frames:Null<FlxAnimateFrames>):Void
+	{
+		if (frames == null || !(frames.parent is FlxAnimateSpritemapCollection))
+			return;
+
+		@:privateAccess
+		for (spritemap in cast(frames.parent, FlxAnimateSpritemapCollection).spritemaps)
+			if (spritemap.key != null && currentTrackedAssets.exists(spritemap.key))
+				trackLocalAsset(spritemap.key);
 	}
 
 	public static function isTextureAtlas(key:String, ?library:String = null):Bool
