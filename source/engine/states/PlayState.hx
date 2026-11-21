@@ -3852,7 +3852,8 @@ class PlayState extends MusicBeatState
 		FlxG.signals.preUpdate.remove(checkForResync);
 		#end
 
-		FlxG.sound.music.pitch = 1;
+		if (FlxG.sound.music != null)
+			FlxG.sound.music.pitch = 1;
 		Conductor.offset = 0;
 		vocals = FlxDestroyUtil.destroy(vocals);
 		opponentVocals = FlxDestroyUtil.destroy(opponentVocals);
