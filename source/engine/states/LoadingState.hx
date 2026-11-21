@@ -1,12 +1,10 @@
 package states;
 
 import objects.Bar;
-#if (target.threaded)
-import sys.thread.Thread;
-import sys.thread.Mutex;
-#end
 import lime.utils.Assets;
 import openfl.display.BitmapData;
+import openfl.media.Sound;
+import backend.TaskHandler;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.addons.transition.FlxTransitionableState;
@@ -20,11 +18,6 @@ class LoadingState extends MusicBeatState
 	public static var loaded:Int = 0;
 	public static var loadMax:Int = 0;
 
-	static var requestedBitmaps:Map<String, BitmapData> = [];
-	#if (target.threaded)
-	static var mutex:Mutex = new Mutex();
-	static var loadedMutex:Mutex = new Mutex();
-	#end
 
 	function new(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic:Bool)
 	{
@@ -140,14 +133,7 @@ class LoadingState extends MusicBeatState
 
 	static function checkLoaded():Bool
 	{
-		for (key => bitmap in requestedBitmaps)
-		{
-			if (bitmap != null && Paths.cacheBitmap(key, bitmap) != null)
-				trace('finished preloading image $key');
-			else
-				trace('failed to cache image $key');
-		}
-		requestedBitmaps.clear();
+		TaskHandler.processMainThreadQueue();
 		return (loaded == loadMax);
 	}
 
@@ -190,7 +176,7 @@ class LoadingState extends MusicBeatState
 					break;
 				}
 				else
-					#if sys Sys.sleep(0.01); #else haxe.Timer.delay(() -> {}, 10); #end
+					#if sys Sys.sleep(0.001); #else haxe.Timer.delay(() -> {}, 1); #end
 			}
 		}
 		return {state: target, args: args};
@@ -331,240 +317,117 @@ class LoadingState extends MusicBeatState
 
 	public static function startThreads()
 	{
-		loadMax = imagesToPrepare.length + soundsToPrepare.length + musicToPrepare.length + songsToPrepare.length;
+		final images:Array<String> = unique(imagesToPrepare);
+		final sounds:Array<{path:Null<String>, key:String}> = [];
+		for (sound in unique(soundsToPrepare))
+			sounds.push({path: 'sounds', key: sound});
+		for (music in unique(musicToPrepare))
+			sounds.push({path: 'music', key: music});
+		for (song in unique(songsToPrepare))
+			sounds.push({path: null, key: 'songs/$song'});
+
+		loadMax = images.length + sounds.length;
 		loaded = 0;
 
-		#if (!target.threaded)
-		for (sound in soundsToPrepare)
-		{
-			try
-			{
-				var ret:Dynamic = Paths.sound(sound);
-				if (ret != null)
-					trace('finished preloading sound $sound');
-				else
-					trace('ERROR! fail on preloading sound $sound');
-			}
-			catch (e:Dynamic)
-			{
-				trace('ERROR! fail on preloading sound $sound');
-			}
-			loaded++;
-		}
-
-		for (music in musicToPrepare)
-		{
-			try
-			{
-				var ret:Dynamic = Paths.music(music);
-				if (ret != null)
-					trace('finished preloading music $music');
-				else
-					trace('ERROR! fail on preloading music $music');
-			}
-			catch (e:Dynamic)
-			{
-				trace('ERROR! fail on preloading music $music');
-			}
-			loaded++;
-		}
-
-		for (song in songsToPrepare)
-		{
-			try
-			{
-				var ret:Dynamic = Paths.returnSound(null, 'songs/$song');
-				if (ret != null)
-					trace('finished preloading song $song');
-				else
-					trace('ERROR! fail on preloading song $song');
-			}
-			catch (e:Dynamic)
-			{
-				trace('ERROR! fail on preloading song $song');
-			}
-			loaded++;
-		}
-
-		for (image in imagesToPrepare)
-		{
-			try
-			{
-				var bitmap:BitmapData = null;
-				var file:String = null;
-
-				#if FEATURE_MODS
-				file = Paths.modsImages(image);
-				if (Paths.currentTrackedAssets.exists(file))
-				{
-					loaded++;
-					continue;
-				}
-				else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
-					bitmap = BitmapData.fromBytes(File.getBytes(file));
-				else
-				#end
-				{
-					file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-					if (Paths.currentTrackedAssets.exists(file))
-					{
-						loaded++;
-						continue;
-					}
-					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
-						bitmap = BitmapData.fromBytes(File.getBytes(file));
-					else
-					{
-						trace('no such image $image exists');
-						loaded++;
-						continue;
-					}
-				}
-
-				if (bitmap != null)
-					requestedBitmaps.set(file, bitmap);
-				else
-					trace('oh no the image is null NOOOO ($image)');
-			}
-			catch (e:Dynamic)
-			{
-				trace('ERROR! fail on preloading image $image');
-			}
-			loaded++;
-		}
-		#else
-		for (sound in soundsToPrepare)
-			initThread(() -> Paths.sound(sound), 'sound $sound');
-		for (music in musicToPrepare)
-			initThread(() -> Paths.music(music), 'music $music');
-		for (song in songsToPrepare)
-			initThread(() -> Paths.returnSound(null, 'songs/$song'), 'song $song');
-
-		for (image in imagesToPrepare)
-		{
-			#if (target.threaded)
-			Thread.create(() -> {
-			#end
-				#if (target.threaded)
-				mutex.acquire();
-				#end
-				try
-				{
-					var bitmap:BitmapData = null;
-					var file:String = null;
-
-					#if FEATURE_MODS
-					file = Paths.modsImages(image);
-					if (Paths.currentTrackedAssets.exists(file))
-					{
-						#if (target.threaded)
-						mutex.release();
-						loadedMutex.acquire();
-						#end
-						loaded++;
-						#if (target.threaded)
-						loadedMutex.release();
-						#end
-						return;
-					}
-					else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
-						bitmap = BitmapData.fromBytes(File.getBytes(file));
-					else
-					#end
-					{
-						file = Paths.getPath('images/$image.${Paths.IMAGE_EXT}', Paths.getImageAssetType(Paths.IMAGE_EXT));
-						if (Paths.currentTrackedAssets.exists(file))
-						{
-							#if (target.threaded)
-							mutex.release();
-							loadedMutex.acquire();
-							#end
-							loaded++;
-							#if (target.threaded)
-							loadedMutex.release();
-							#end
-							return;
-						}
-						else if (FileSystem.exists(file) #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
-							bitmap = BitmapData.fromBytes(File.getBytes(file));
-						else
-						{
-							trace('no such image $image exists');
-							#if (target.threaded)
-							mutex.release();
-							loadedMutex.acquire();
-							#end
-							loaded++;
-							#if (target.threaded)
-							loadedMutex.release();
-							#end
-							return;
-						}
-					}
-					#if (target.threaded)
-					mutex.release();
-					#end
-
-					if (bitmap != null)
-						requestedBitmaps.set(file, bitmap);
-					else
-						trace('oh no the image is null NOOOO ($image)');
-				}
-				catch (e:Dynamic)
-				{
-					#if (target.threaded)
-					mutex.release();
-					#end
-					trace('ERROR! fail on preloading image $image');
-				}
-				#if (target.threaded)
-				loadedMutex.acquire();
-				#end
-				loaded++;
-				#if (target.threaded)
-				loadedMutex.release();
-				#end
-			#if (target.threaded)
-			});
-			#end
-		}
-		#end
+		for (sound in sounds)
+			preloadSound(sound.path, sound.key);
+		for (image in images)
+			preloadImage(image);
 	}
 
-	static function initThread(func:Void->Dynamic, traceData:String)
+	static function unique(list:Array<String>):Array<String>
 	{
-		#if (target.threaded)
-		Thread.create(() -> {
-		#end
-			#if (target.threaded)
-			mutex.acquire();
-			#end
+		final result:Array<String> = [];
+		for (item in list)
+			if (!result.contains(item))
+				result.push(item);
+		return result;
+	}
+
+	// The pool only finds and decodes files; the caches are filled on the main thread.
+	static function preloadSound(path:Null<String>, key:String):Void
+	{
+		TaskHandler.run(() ->
+		{
+			var found:Null<{key:String, file:String, mod:Bool}> = null;
+			var sound:Null<Sound> = null;
+			var error:Null<Dynamic> = null;
+
 			try
 			{
-				var ret:Dynamic = func();
-				if (ret != null)
-					trace('finished preloading $traceData');
-				else
-					trace('ERROR! fail on preloading $traceData');
+				found = Paths.findSoundFile(path, key);
+				if (found != null)
+					sound = found.mod ? Sound.fromFile(found.file) : Sound.fromBytes(File.getBytes(found.file));
 			}
 			catch (e:Dynamic)
-			{
-				trace('ERROR! fail on preloading $traceData');
-			}
-			#if (target.threaded)
-			mutex.release();
-			#end
+				error = e;
 
-			#if (target.threaded)
-			loadedMutex.acquire();
-			#end
-			loaded++;
-			#if (target.threaded)
-			loadedMutex.release();
-			#end
-		#if (target.threaded)
+			TaskHandler.toMainThread(() ->
+			{
+				if (sound != null)
+				{
+					Paths.cacheSound(found.key, sound);
+					trace('finished preloading ${path ?? 'song'} $key');
+				}
+				else
+					trace('ERROR! fail on preloading ${path ?? 'song'} $key${error != null ? ': $error' : ''}');
+
+				loaded++;
+			});
 		});
-		#end
+	}
+
+	static function preloadImage(image:String):Void
+	{
+		TaskHandler.run(() ->
+		{
+			var file:Null<String> = null;
+			var bitmap:Null<BitmapData> = null;
+			var bytes:Null<haxe.io.Bytes> = null;
+			var error:Null<Dynamic> = null;
+
+			try
+			{
+				file = Paths.findImageFile(image);
+				if (file != null)
+				{
+					bytes = File.getBytes(file);
+					// Compressed GPU textures are uploaded when they are created, which has to happen on the main thread.
+					if (bytes != null #if USING_GPU_TEXTURES && !Paths.isGpuImageExt(file) #end)
+					{
+						bitmap = BitmapData.fromBytes(bytes);
+						bytes = null;
+					}
+				}
+			}
+			catch (e:Dynamic)
+				error = e;
+
+			TaskHandler.toMainThread(() ->
+			{
+				try
+				{
+					if (file == null)
+						trace(error != null ? 'ERROR! fail on preloading image $image: $error' : 'no such image $image exists');
+					else if (Paths.currentTrackedAssets.exists(file))
+						bitmap?.dispose();
+					else
+					{
+						if (bitmap == null && bytes != null)
+							bitmap = BitmapData.fromBytes(bytes);
+
+						if (bitmap != null && Paths.cacheBitmap(file, bitmap) != null)
+							trace('finished preloading image $file');
+						else
+							trace('failed to cache image $file');
+					}
+				}
+				catch (e:Dynamic)
+					trace('ERROR! fail on preloading image $image: $e');
+
+				loaded++;
+			});
+		});
 	}
 
 	inline private static function preloadCharacter(char:String, ?prefixVocals:String)

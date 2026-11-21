@@ -42,6 +42,7 @@ class Project extends HXProject
 	static final USE_OPENFL_FILESYSTEM:CompileFlag = CompileFlag.get("USE_OPENFL_FILESYSTEM");
 	static final FEATURE_HAPTICS:CompileFlag = CompileFlag.get("FEATURE_HAPTICS");
 	static final FEATURE_NATIVE_CRASH_HANDLER:CompileFlag = CompileFlag.get("FEATURE_NATIVE_CRASH_HANDLER");
+	static final FEATURE_MULTITHREADING:CompileFlag = CompileFlag.get("FEATURE_MULTITHREADING");
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
@@ -235,6 +236,7 @@ class Project extends HXProject
 		FEATURE_EMBED_ASSETS.integrate(false);
 		FEATURE_HAPTICS.integrate(isMobile());
 		FEATURE_NATIVE_CRASH_HANDLER.integrate((isDesktop() || isMobile()) && isCPP());
+		FEATURE_MULTITHREADING.integrate(isCPP());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);

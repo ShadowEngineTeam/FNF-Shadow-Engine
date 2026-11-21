@@ -438,6 +438,31 @@ class Paths
 		return newGraphic;
 	}
 
+	/**
+	 * Finds the file `image()` would load for `key`, without touching the caches, so it can run off the main thread.
+	 * @return The file, or null if there is none.
+	 */
+	public static function findImageFile(key:String, ?library:String = null):Null<String>
+	{
+		#if FEATURE_MODS
+		final modFile:String = modsImages(key);
+		if (FileSystem.exists(modFile))
+			return modFile;
+		#end
+
+		#if USING_GPU_TEXTURES
+		for (ext in GPU_IMAGE_EXTS)
+		{
+			final file:String = getPath('images/$key.$ext', getImageAssetType(ext), library);
+			if (FileSystem.exists(file))
+				return file;
+		}
+		#end
+
+		final file:String = getPath('images/$key.$IMAGE_EXT', getImageAssetType(IMAGE_EXT), library);
+		return FileSystem.exists(file) ? file : null;
+	}
+
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
 		#if FEATURE_MODS
@@ -526,6 +551,54 @@ class Paths
 		}
 
 		return null;
+	}
+
+	/**
+	 * Finds the file `returnSound()` would load, without touching the caches, so it can run off the main thread.
+	 * @return The key `currentTrackedSounds` stores it under, the file to load and whether it is a mod's file
+	 * (loaded straight from disk, like `returnSound()` does), or null if there is none.
+	 */
+	public static function findSoundFile(path:Null<String>, key:String, ?library:String):Null<{key:String, file:String, mod:Bool}>
+	{
+		#if FEATURE_MODS
+		var modLibPath:String = '';
+		if (library != null)
+			modLibPath = '$library/';
+		if (path != null)
+			modLibPath += '$path';
+
+		final modFile:String = modsSounds(modLibPath, key);
+		if (FileSystem.exists(modFile))
+			return {key: modFile, file: modFile, mod: true};
+		#end
+
+		for (ext in SOUND_EXTS)
+		{
+			var gottenPath:String = '$key.$ext';
+			if (path != null)
+				gottenPath = '$path/$gottenPath';
+			gottenPath = getPath(gottenPath, SOUND, library);
+			gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
+
+			var retKey:String = (path != null) ? '$path/$key' : key;
+			retKey = getPath('$retKey.$ext', SOUND, library);
+			if (FileSystem.exists(retKey))
+				return {key: gottenPath, file: retKey, mod: false};
+		}
+
+		return null;
+	}
+
+	/**
+	 * Stores `sound` under `key` like `returnSound()` does, unless something is there already.
+	 * @return The sound stored under `key`.
+	 */
+	public static function cacheSound(key:String, sound:Sound):Sound
+	{
+		if (!currentTrackedSounds.exists(key))
+			currentTrackedSounds.set(key, sound);
+		trackLocalAsset(key);
+		return currentTrackedSounds.get(key);
 	}
 
 	// FlxAtlasFrames.fromSparrow() & co. return the frames already parsed for a graphic and ignore the

@@ -26,6 +26,7 @@ class Main extends Sprite
 	public function new():Void
 	{
 		backend.CrashHandler.init();
+		backend.TaskHandler.initialize();
 
 		#if mobile
 		Sys.setCwd(StorageUtil.getStorageDirectory());
