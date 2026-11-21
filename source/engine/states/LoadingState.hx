@@ -164,6 +164,8 @@ class LoadingState extends MusicBeatState
 
 		if (doPrecache)
 		{
+			// The main thread only waits here, so give the pool its core.
+			TaskHandler.setBlocking(true);
 			startThreads();
 			while (true)
 			{
@@ -173,6 +175,7 @@ class LoadingState extends MusicBeatState
 					soundsToPrepare = [];
 					musicToPrepare = [];
 					songsToPrepare = [];
+					TaskHandler.setBlocking(false);
 					break;
 				}
 				else
@@ -430,6 +433,30 @@ class LoadingState extends MusicBeatState
 		});
 	}
 
+	// Texture atlases are folders, so preload their spritemaps.
+	static function prepareCharacterImage(image:String):Void
+	{
+		if (!Paths.isTextureAtlas(image))
+		{
+			imagesToPrepare.push(image);
+			return;
+		}
+
+		var folder:String = Paths.getPath('images/$image');
+		#if FEATURE_MODS
+		final modFolder:String = Paths.modFolders('images/$image');
+		if (FileSystem.exists(modFolder) && FileSystem.isDirectory(modFolder))
+			folder = modFolder;
+		#end
+
+		if (!FileSystem.isDirectory(folder))
+			return;
+
+		for (file in FileSystem.readDirectory(folder))
+			if (file.startsWith('spritemap') && file.endsWith('.json'))
+				imagesToPrepare.push('$image/${file.substr(0, file.length - '.json'.length)}');
+	}
+
 	inline private static function preloadCharacter(char:String, ?prefixVocals:String)
 	{
 		try
@@ -437,7 +464,16 @@ class LoadingState extends MusicBeatState
 			var path:String = Paths.getPath('characters/$char.json', TEXT, null, true);
 			var character:Dynamic = Json.parse(File.getContent(path), path);
 
-			imagesToPrepare.push(character.image);
+			var images:Array<String> = [];
+			if (character.image is String)
+				images.push(character.image);
+			else if (character.image != null)
+				images = character.image;
+			else if (character.assetPath is String) // V-Slice
+				images.push((character.assetPath : String).replace('shared:', ''));
+
+			for (image in images)
+				prepareCharacterImage(image);
 			if (prefixVocals != null && character.vocals_file != null)
 			{
 				songsToPrepare.push(prefixVocals + "-" + character.vocals_file + Difficulty.getSongPrefix());

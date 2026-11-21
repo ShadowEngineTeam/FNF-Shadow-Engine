@@ -26,6 +26,11 @@ class TaskHandler
 	 */
 	public static var maxThreads(default, null):Int = 1;
 
+	/**
+	 * The most threads the pool runs at once while the main thread is blocked on it.
+	 */
+	public static var blockingThreads(default, null):Int = 1;
+
 	#if (target.threaded)
 	static final mainThreadQueue:Deque<Void->Void> = new Deque();
 	#else
@@ -46,11 +51,13 @@ class TaskHandler
 		maxThreads = Std.int(Math.max(1, cores / 2));
 		#end
 
+		blockingThreads = Std.int(Math.max(maxThreads, cores - 1));
+
 		// Don't keep idle threads around.
 		FutureWork.minThreads = 0;
 		FutureWork.maxThreads = maxThreads;
 
-		trace('Thread pool: up to $maxThreads threads ($cores cores)');
+		trace('Thread pool: up to $maxThreads threads, $blockingThreads while blocking ($cores cores)');
 		#end
 	}
 
@@ -64,6 +71,17 @@ class TaskHandler
 			work();
 			return true;
 		}, #if FEATURE_MULTITHREADING true #else false #end);
+	}
+
+	/**
+	 * Lets the pool use `blockingThreads` while the main thread does nothing but wait for it.
+	 * Turn it on before queueing the work, and off once it's done.
+	 */
+	public static function setBlocking(blocking:Bool):Void
+	{
+		#if FEATURE_MULTITHREADING
+		FutureWork.maxThreads = blocking ? blockingThreads : maxThreads;
+		#end
 	}
 
 	/**
