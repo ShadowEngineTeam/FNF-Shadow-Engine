@@ -3949,7 +3949,7 @@ class PlayState extends MusicBeatState
 	{
 		var char:Character = (!characterPlayingAsDad) ? boyfriend : dad;
 		var anim:String = char.getAnimationName();
-		if (char.holdTimer > Conductor.stepCrochet * (0.0011 / FlxG.sound.music.pitch) * char.singDuration && anim.startsWith('sing')
+		if (char.holdTimer > Conductor.stepCrochet * (0.0011 / playbackRate) * char.singDuration && anim.startsWith('sing')
 			&& !anim.endsWith('miss'))
 			char.dance();
 	}
