@@ -12,6 +12,7 @@ import openfl.utils.Assets;
 import openfl.system.System;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
+import backend.TaskHandler;
 
 class Paths
 {
@@ -504,8 +505,12 @@ class Paths
 
 	inline public static function inst(song:String, postfix:String = null):Sound
 	{
-		var songKey:String = 'songs/${formatToSongPath(song)}/Inst${postfix != null ? '-$postfix' : ''}';
-		return returnSound(null, songKey);
+		return returnSound(null, instKey(song, postfix));
+	}
+
+	inline public static function instKey(song:String, postfix:String = null):String
+	{
+		return 'songs/${formatToSongPath(song)}/Inst${postfix != null ? '-$postfix' : ''}';
 	}
 
 	public static function returnSound(path:Null<String>, key:String, ?library:String):Sound
@@ -599,6 +604,40 @@ class Paths
 			currentTrackedSounds.set(key, sound);
 		trackLocalAsset(key);
 		return currentTrackedSounds.get(key);
+	}
+
+	/**
+	 * Gets a sound like `returnSound()` does, but decodes it on the thread pool.
+	 * @param callback Runs on the main thread with the sound, or null if there is none. Right away if it is cached.
+	 */
+	public static function loadSoundAsync(path:Null<String>, key:String, callback:Null<Sound>->Void, ?library:String):Void
+	{
+		// Found here, as it depends on the current mod directory.
+		final found:Null<{key:String, file:String, mod:Bool}> = findSoundFile(path, key, library);
+		if (found == null)
+		{
+			callback(null);
+			return;
+		}
+
+		if (currentTrackedSounds.exists(found.key))
+		{
+			callback(cacheSound(found.key, currentTrackedSounds.get(found.key)));
+			return;
+		}
+
+		TaskHandler.run(() ->
+		{
+			var sound:Null<Sound> = null;
+			try
+			{
+				sound = found.mod ? Sound.fromFile(found.file) : Sound.fromBytes(File.getBytes(found.file));
+			}
+			catch (e:Dynamic)
+				trace('ERROR! fail on loading sound ${found.file}: $e');
+
+			TaskHandler.toMainThread(() -> callback(sound != null ? cacheSound(found.key, sound) : null));
+		});
 	}
 
 	// FlxAtlasFrames.fromSparrow() & co. return the frames already parsed for a graphic and ignore the

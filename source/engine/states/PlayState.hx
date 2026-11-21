@@ -751,10 +751,7 @@ class PlayState extends MusicBeatState
 
 		Paths.image('alphabet');
 
-		if (PauseSubState.songName != null)
-			Paths.music(PauseSubState.songName);
-		else if (Paths.formatToSongPath(ClientPrefs.data.pauseMusic) != 'none')
-			Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic));
+		PauseSubState.preloadMusic();
 
 		resetRPC();
 

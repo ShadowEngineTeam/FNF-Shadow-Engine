@@ -66,18 +66,9 @@ class PauseSubState extends MusicBeatSubstate
 		pauseMusic = new FlxSound();
 		try
 		{
-			var pauseSong:String = getPauseSong();
+			final pauseSong:Null<String> = getPauseSong();
 			if (pauseSong != null)
-			{
-				if (pauseSong == 'breakfast')
-				{
-					if (PlayState.isPixelStage)
-						pauseSong += "-pixel";
-					else if (PlayState.instance.boyfriend.curCharacter.startsWith('pico'))
-						pauseSong += '-pico';
-				}
 				pauseMusic.loadEmbedded(Paths.music(pauseSong), true, true);
-			}
 		}
 		catch (e:Dynamic)
 		{
@@ -224,14 +215,32 @@ class PauseSubState extends MusicBeatSubstate
 		}));
 	}
 
-	function getPauseSong()
+	static function getPauseSong():Null<String>
 	{
 		var formattedSongName:String = (songName != null ? Paths.formatToSongPath(songName) : '');
 		var formattedPauseMusic:String = Paths.formatToSongPath(ClientPrefs.data.pauseMusic);
 		if (formattedSongName == 'none' || (formattedSongName != 'none' && formattedPauseMusic == 'none'))
 			return null;
 
-		return (formattedSongName != '') ? formattedSongName : formattedPauseMusic;
+		var pauseSong:String = (formattedSongName != '') ? formattedSongName : formattedPauseMusic;
+		if (pauseSong == 'breakfast')
+		{
+			if (PlayState.isPixelStage)
+				pauseSong += "-pixel";
+			else if (PlayState.instance?.boyfriend?.curCharacter.startsWith('pico'))
+				pauseSong += '-pico';
+		}
+		return pauseSong;
+	}
+
+	/**
+	 * Loads the pause music in the background, so the first pause doesn't wait for it.
+	 */
+	public static function preloadMusic():Void
+	{
+		final pauseSong:Null<String> = getPauseSong();
+		if (pauseSong != null)
+			Paths.loadSoundAsync('music', pauseSong, _ -> {});
 	}
 
 	var holdTime:Float = 0;

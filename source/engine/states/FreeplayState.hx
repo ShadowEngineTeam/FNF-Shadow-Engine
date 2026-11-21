@@ -10,6 +10,7 @@ import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 import substates.FreeplayOptionsSubState;
 import flixel.math.FlxMath;
+import openfl.media.Sound;
 
 class FreeplayState extends MusicBeatState
 {
@@ -48,6 +49,10 @@ class FreeplayState extends MusicBeatState
 	var intendedScore:Int = 0;
 	var intendedColor:Int;
 	var instPlaying:Int = -1;
+
+	// The song whose preview is loading, and which request that is, so a newer one or leaving the menu drops it.
+	var previewLoading:Int = -1;
+	var previewRequest:Int = 0;
 	var lerpRating:Float = 0;
 	var intendedRating:Float = 0;
 	var lerpSelected:Float = 0;
@@ -291,7 +296,7 @@ class FreeplayState extends MusicBeatState
 		}
 		else if (FlxG.keys.justPressed.SPACE #if FEATURE_MOBILE_CONTROLS || touchPad.buttonX.justPressed #end || FlxG.gamepads.anyJustPressed(START))
 		{
-			if (instPlaying != curSelected && !player.playingMusic)
+			if (instPlaying != curSelected && previewLoading != curSelected && !player.playingMusic)
 			{
 				destroyFreeplayVocals();
 				FlxG.sound.music.volume = 0;
@@ -315,27 +320,41 @@ class FreeplayState extends MusicBeatState
 						vocals = null;
 					}*/
 
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, Difficulty.getSongPrefix(curDifficulty, false)), 0.8);
-					/*if (vocals != null) // Sync vocals to Inst
+					final selected:Int = curSelected;
+					final request:Int = ++previewRequest;
+					previewLoading = selected;
+					Paths.loadSoundAsync(null, Paths.instKey(PlayState.SONG.song, Difficulty.getSongPrefix(curDifficulty, false)), (inst:Null<Sound>) ->
 					{
-						vocals.play();
-						vocals.volume = 0.8;
-					}*/
-					instPlaying = curSelected;
+						if (request != previewRequest)
+							return;
 
-					player.playingMusic = true;
-					player.curTime = 0;
-					player.switchPlayMusic();
+						previewLoading = -1;
+						// Moved on, or leaving / in a submenu (which all turn persistentUpdate off).
+						if (curSelected != selected || player.playingMusic || !persistentUpdate)
+							return;
+
+						if (inst == null)
+						{
+							showPreviewError('Inst not found');
+							return;
+						}
+
+						FlxG.sound.playMusic(inst, 0.8);
+						/*if (vocals != null) // Sync vocals to Inst
+						{
+							vocals.play();
+							vocals.volume = 0.8;
+						}*/
+						instPlaying = selected;
+
+						player.playingMusic = true;
+						player.curTime = 0;
+						player.switchPlayMusic();
+					});
 				}
 				catch (e:Dynamic)
 				{
-					trace('ERROR! $e');
-
-					missingText.text = 'ERROR WHILE LOADING CHART:\n${e.toString()}';
-					missingText.screenCenter(Y);
-					missingText.visible = missingTextBG.visible = true;
-
-					FlxG.sound.play(Paths.sound('cancelMenu'));
+					showPreviewError(e.toString());
 					updateTexts(elapsed);
 					super.update(elapsed);
 					return;
@@ -442,6 +461,17 @@ class FreeplayState extends MusicBeatState
 				return true;
 		}
 		return false;
+	}
+
+	function showPreviewError(error:String):Void
+	{
+		trace('ERROR! $error');
+
+		missingText.text = 'ERROR WHILE LOADING CHART:\n$error';
+		missingText.screenCenter(Y);
+		missingText.visible = missingTextBG.visible = true;
+
+		FlxG.sound.play(Paths.sound('cancelMenu'));
 	}
 
 	public static function destroyFreeplayVocals():Void
@@ -556,6 +586,7 @@ class FreeplayState extends MusicBeatState
 
 	override function destroy():Void
 	{
+		previewRequest = -1;
 		super.destroy();
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;

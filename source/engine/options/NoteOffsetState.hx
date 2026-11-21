@@ -5,14 +5,14 @@ import objects.Character;
 import objects.Bar;
 import flixel.addons.display.shapes.FlxShapeCircle;
 import states.stages.Stage as BackgroundStage;
+import openfl.media.Sound;
 #if (target.threaded)
-import sys.thread.Thread;
-import sys.thread.Mutex;
 #end
 
 class NoteOffsetState extends MusicBeatState
 {
 	var stageDirectory:String = 'week1';
+	var leaving:Bool = false;
 	var boyfriend:Character;
 	var gf:Character;
 
@@ -38,7 +38,6 @@ class NoteOffsetState extends MusicBeatState
 	var controllerPointer:FlxSprite;
 	var _lastControllerMode:Bool = false;
 
-	#if (target.threaded) var mutex:Mutex = new Mutex(); #end
 
 	override public function create()
 	{
@@ -178,16 +177,11 @@ class NoteOffsetState extends MusicBeatState
 		_lastControllerMode = true;
 
 		Conductor.bpm = 128.0;
-		#if (target.threaded)
-		Thread.create(function()
+		Paths.loadSoundAsync('music', 'offsetSong', (song:Null<Sound>) ->
 		{
-			mutex.acquire();
-			FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
-			mutex.release();
+			if (song != null && !leaving)
+				FlxG.sound.playMusic(song, 1, true);
 		});
-		#else
-		FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
-		#end
 
 		#if FEATURE_MOBILE_CONTROLS
 		addTouchPad("LEFT_FULL", "A_B_C");
@@ -440,6 +434,7 @@ class NoteOffsetState extends MusicBeatState
 				beatTween.cancel();
 
 			persistentUpdate = false;
+			leaving = true;
 			Funkin.switchState(options.OptionsState);
 			if (OptionsState.onPlayState)
 			{
@@ -453,7 +448,8 @@ class NoteOffsetState extends MusicBeatState
 			FlxG.mouse.visible = false;
 		}
 
-		Conductor.songPosition = FlxG.sound.music.time;
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
 		super.update(elapsed);
 	}
 

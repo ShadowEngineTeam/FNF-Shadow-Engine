@@ -7,8 +7,6 @@ import mobile.substates.MobileControlSelectSubState;
 import backend.ui.ShadowStyle;
 import options.*;
 #if (target.threaded)
-import sys.thread.Thread;
-import sys.thread.Mutex;
 #end
 
 class OptionsState extends MusicBeatState
@@ -31,7 +29,6 @@ class OptionsState extends MusicBeatState
 	public static var onPlayState:Bool = false;
 
 	var tipText:FlxText;
-	#if (target.threaded) var mutex:Mutex = new Mutex(); #end
 
 	function openSelectedSubstate(label:String)
 	{
@@ -126,18 +123,9 @@ class OptionsState extends MusicBeatState
 		addTouchPad("UP_DOWN", #if android "A_B_X_Y" #else "A_B_C" #end);
 		#end
 
-		#if (target.threaded)
-		Thread.create(() ->
-		{
-			mutex.acquire();
-
-			for (i in VisualsUISubState.pauseMusics)
-				if (i.toLowerCase() != "none")
-					Paths.music(Paths.formatToSongPath(i));
-
-			mutex.release();
-		});
-		#end
+		for (i in VisualsUISubState.pauseMusics)
+			if (i.toLowerCase() != "none")
+				Paths.loadSoundAsync('music', Paths.formatToSongPath(i), _ -> {});
 
 		super.create();
 	}
