@@ -72,11 +72,12 @@ class CoolUtil
 	public static function dominantColor(sprite:flixel.FlxSprite):Int
 	{
 		var countByColor:Map<Int, Int> = [];
+		final pixels:openfl.display.BitmapData = sprite.pixels;
 		for (col in 0...sprite.frameWidth)
 		{
 			for (row in 0...sprite.frameHeight)
 			{
-				var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
+				var colorOfThisPixel:Int = pixels.getPixel32(col, row);
 				if (colorOfThisPixel != 0)
 				{
 					if (countByColor.exists(colorOfThisPixel))
@@ -86,6 +87,12 @@ class CoolUtil
 				}
 			}
 		}
+
+		#if USING_GPU_TEXTURES
+		// Frees the copy a compressed texture was decoded to.
+		if (!pixels.readable)
+			pixels.disposeImage();
+		#end
 
 		var maxCount = 0;
 		var maxKey:Int = 0; // after the loop this will store the max color

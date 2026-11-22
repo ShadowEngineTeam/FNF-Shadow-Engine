@@ -36,7 +36,12 @@ class FlxAnimateAssets
 	public static dynamic function getBitmapData(path:String):BitmapData
 	{
 		if (FileSystem.exists(path))
-			return BitmapData.fromBytes(File.getBytes(path));
+		{
+			final bitmap:Null<BitmapData> = BitmapData.fromBytes(File.getBytes(path));
+			if (bitmap != null && !bitmap.readable)
+				bitmap.compressedSource = () -> File.getBytes(path);
+			return bitmap;
+		}
 
 		return null;
 	}

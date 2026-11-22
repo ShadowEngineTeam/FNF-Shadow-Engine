@@ -422,6 +422,11 @@ class Paths
 				return null;
 		}
 
+		#if USING_GPU_TEXTURES
+		if (!bitmap.readable && bitmap.compressedSource == null && isGpuImageExt(file) && FileSystem.exists(file))
+			bitmap.compressedSource = () -> File.getBytes(file);
+		#end
+
 		trackLocalAsset(file);
 		/*if (bitmap.readable)
 		{
