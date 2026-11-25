@@ -123,6 +123,8 @@ class LoadingState extends MusicBeatState
 		soundsToPrepare = [];
 		musicToPrepare = [];
 		songsToPrepare = [];
+		jsonsToPrepare = [];
+		chartsToPrepare = [];
 
 		FlxG.camera.visible = false;
 		// FlxTransitionableState.skipNextTransIn = true;
@@ -175,6 +177,8 @@ class LoadingState extends MusicBeatState
 					soundsToPrepare = [];
 					musicToPrepare = [];
 					songsToPrepare = [];
+					jsonsToPrepare = [];
+					chartsToPrepare = [];
 					TaskHandler.setBlocking(false);
 					break;
 				}
@@ -189,6 +193,9 @@ class LoadingState extends MusicBeatState
 	static var soundsToPrepare:Array<String> = [];
 	static var musicToPrepare:Array<String> = [];
 	static var songsToPrepare:Array<String> = [];
+	// Parsed on the pool and handed to Paths.takeParsed(): texture atlas jsons, and song jsons (events).
+	static var jsonsToPrepare:Array<String> = [];
+	static var chartsToPrepare:Array<String> = [];
 
 	public static function prepare(images:Array<String> = null, sounds:Array<String> = null, music:Array<String> = null)
 	{
@@ -234,6 +241,8 @@ class LoadingState extends MusicBeatState
 			song.stage = StageData.vanillaSongStage(folder);
 
 		var stageData:StageFile = StageData.getStageFile(song.stage);
+		// PlayState reads it again, so give it this one.
+		Paths.storeParsed(StageData.getStagePath(song.stage), stageData);
 		if (stageData != null && stageData.preload != null)
 			prepare((!ClientPrefs.data.lowQuality || stageData.preload.images_low) ? stageData.preload.images : stageData.preload.images_low,
 				stageData.preload.sounds, stageData.preload.music);
@@ -257,6 +266,11 @@ class LoadingState extends MusicBeatState
 
 		if (!dontPreloadDefaultVoices && needsVoices)
 			songsToPrepare.push(prefixVocals);
+
+		final erect:Bool = Difficulty.list[PlayState.storyDifficulty] == ERECT || Difficulty.list[PlayState.storyDifficulty] == NIGHTMARE;
+		final events:Null<{file:String, folder:String}> = Song.findEvents(song, erect);
+		if (events != null)
+			chartsToPrepare.push(Song.jsonPath(events.file, events.folder));
 	}
 
 	public static function clearInvalids()
@@ -329,13 +343,20 @@ class LoadingState extends MusicBeatState
 		for (song in unique(songsToPrepare))
 			sounds.push({path: null, key: 'songs/$song'});
 
-		loadMax = images.length + sounds.length;
+		final jsons:Array<String> = unique(jsonsToPrepare);
+		final charts:Array<String> = unique(chartsToPrepare);
+
+		loadMax = images.length + sounds.length + jsons.length + charts.length;
 		loaded = 0;
 
 		for (sound in sounds)
 			preloadSound(sound.path, sound.key);
 		for (image in images)
-			preloadImage(image);
+			preloadImage(image, jsons);
+		for (json in jsons)
+			preloadJson(json, false);
+		for (chart in charts)
+			preloadJson(chart, true);
 	}
 
 	static function unique(list:Array<String>):Array<String>
@@ -380,13 +401,16 @@ class LoadingState extends MusicBeatState
 		});
 	}
 
-	static function preloadImage(image:String):Void
+	// `jsons` is only read here; spritemap jsons are parsed there instead of as sprite sheets.
+	static function preloadImage(image:String, jsons:Array<String>):Void
 	{
 		TaskHandler.run(() ->
 		{
 			var file:Null<String> = null;
 			var bitmap:Null<BitmapData> = null;
 			var bytes:Null<haxe.io.Bytes> = null;
+			var atlasFile:Null<String> = null;
+			var atlas:Null<Dynamic> = null;
 			var error:Null<Dynamic> = null;
 
 			try
@@ -402,12 +426,19 @@ class LoadingState extends MusicBeatState
 						bytes = null;
 					}
 				}
+
+				atlasFile = Paths.findAtlasFile(image);
+				if (atlasFile != null && !jsons.contains(atlasFile))
+					atlas = Paths.parseAtlasFile(atlasFile);
 			}
 			catch (e:Dynamic)
 				error = e;
 
 			TaskHandler.toMainThread(() ->
 			{
+				if (atlas != null)
+					Paths.storeParsed(atlasFile, atlas);
+
 				try
 				{
 					if (file == null)
@@ -433,7 +464,36 @@ class LoadingState extends MusicBeatState
 		});
 	}
 
-	// Texture atlases are folders, so preload their spritemaps.
+	static function preloadJson(file:String, chart:Bool):Void
+	{
+		TaskHandler.run(() ->
+		{
+			var data:Null<Dynamic> = null;
+			var error:Null<Dynamic> = null;
+
+			try
+			{
+				data = chart ? Song.parseJsonFile(file) : Json.parse(File.getContent(file).replace(String.fromCharCode(0xFEFF), ''), file);
+			}
+			catch (e:Dynamic)
+				error = e;
+
+			TaskHandler.toMainThread(() ->
+			{
+				if (data != null)
+				{
+					Paths.storeParsed(file, data);
+					trace('finished preloading $file');
+				}
+				else
+					trace('ERROR! fail on preloading $file${error != null ? ': $error' : ''}');
+
+				loaded++;
+			});
+		});
+	}
+
+	// Texture atlases are folders, so preload their spritemaps and jsons.
 	static function prepareCharacterImage(image:String):Void
 	{
 		if (!Paths.isTextureAtlas(image))
@@ -452,9 +512,17 @@ class LoadingState extends MusicBeatState
 		if (!FileSystem.isDirectory(folder))
 			return;
 
+		// The same paths FlxAnimateFrames reads.
+		for (file in ['Animation.json', 'metadata.json'])
+			if (FileSystem.exists('$folder/$file'))
+				jsonsToPrepare.push('$folder/$file');
+
 		for (file in FileSystem.readDirectory(folder))
 			if (file.startsWith('spritemap') && file.endsWith('.json'))
+			{
 				imagesToPrepare.push('$image/${file.substr(0, file.length - '.json'.length)}');
+				jsonsToPrepare.push('$folder/$file');
+			}
 	}
 
 	inline private static function preloadCharacter(char:String, ?prefixVocals:String)
@@ -463,6 +531,8 @@ class LoadingState extends MusicBeatState
 		{
 			var path:String = Paths.getPath('characters/$char.json', TEXT, null, true);
 			var character:Dynamic = Json.parse(File.getContent(path), path);
+			// Character reads it again, so give it this one.
+			Paths.storeParsed(path, character);
 
 			var images:Array<String> = [];
 			if (character.image is String)

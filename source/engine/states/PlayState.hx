@@ -1413,17 +1413,10 @@ class PlayState extends MusicBeatState
 
 		isErect = Difficulty.list[storyDifficulty] == ERECT || Difficulty.list[storyDifficulty] == NIGHTMARE;
 
-		final file:String = 'events${isErect ? '-erect' : ''}';
-		var eventsFolder:String = songName;
-		if (SONG.variant?.length > 0)
+		final eventsFile:Null<{file:String, folder:String}> = Song.findEvents(SONG, isErect);
+		if (eventsFile != null)
 		{
-			final mixFolder:String = '$songName/${SONG.variant}';
-			if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$mixFolder/$file')) || #end FileSystem.exists(Paths.json('$mixFolder/$file')))
-				eventsFolder = mixFolder;
-		}
-		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$eventsFolder/$file')) || #end FileSystem.exists(Paths.json('$eventsFolder/$file')))
-		{
-			final eventsData:Array<Dynamic> = Song.loadFromJson(file, eventsFolder).events;
+			final eventsData:Array<Dynamic> = Song.loadFromJson(eventsFile.file, eventsFile.folder).events;
 			for (event in eventsData)
 			{
 				for (i in 0...event[1].length)

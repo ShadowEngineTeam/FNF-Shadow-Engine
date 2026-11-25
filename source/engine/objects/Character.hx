@@ -123,7 +123,7 @@ class Character extends FlxAnimate
 
 				try
 				{
-					loadCharacterFile(Json.parse(File.getContent(path), path));
+					loadCharacterFile(Paths.takeParsed(path) ?? Json.parse(File.getContent(path), path));
 				}
 				catch (e:Dynamic)
 				{

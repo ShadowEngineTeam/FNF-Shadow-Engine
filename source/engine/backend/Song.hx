@@ -244,37 +244,65 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
 	{
-		var formattedFolder:String = Paths.formatToSongPath(folder);
-		var formattedSong:String = Paths.formatToSongPath(jsonInput);
-		var path:String = "";
-		var rawJson:String = null;
-		#if FEATURE_MODS
-		var modPath:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
-		if (FileSystem.exists(modPath))
-		{
-			path = modPath;
-			rawJson = File.getContent(modPath).trim();
-		}
-		#end
-
-		if (rawJson == null)
-		{
-			path = Paths.json(formattedFolder + '/' + formattedSong);
-			rawJson = File.getContent(path).trim();
-		}
-
-		// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
-		if (rawJson != null)
-			while (!rawJson.endsWith("}"))
-				rawJson = rawJson.substr(0, rawJson.length - 1);
-
-		var songJson:Dynamic = parseJSONshit(rawJson, path);
+		final path:String = jsonPath(jsonInput, folder);
+		var songJson:Dynamic = Paths.takeParsed(path) ?? parseJsonFile(path);
 
 		if (!jsonInput.startsWith("events"))
 			StageData.loadDirectory(songJson);
 
 		onLoadJson(songJson);
 		return songJson;
+	}
+
+	/**
+	 * The file `loadFromJson()` reads for `jsonInput` in `folder`.
+	 */
+	public static function jsonPath(jsonInput:String, ?folder:String):String
+	{
+		var formattedFolder:String = Paths.formatToSongPath(folder);
+		var formattedSong:String = Paths.formatToSongPath(jsonInput);
+		#if FEATURE_MODS
+		var modPath:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
+		if (FileSystem.exists(modPath))
+			return modPath;
+		#end
+
+		return Paths.json(formattedFolder + '/' + formattedSong);
+	}
+
+	/**
+	 * Reads and parses a song json, without what `loadFromJson()` does with it after. Safe off the main thread.
+	 */
+	public static function parseJsonFile(path:String):SwagSong
+	{
+		var rawJson:String = File.getContent(path).trim();
+
+		// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
+		if (rawJson != null)
+			while (!rawJson.endsWith("}"))
+				rawJson = rawJson.substr(0, rawJson.length - 1);
+
+		return parseJSONshit(rawJson, path);
+	}
+
+	/**
+	 * The events json PlayState loads for `song`, as the file and folder `loadFromJson()` takes, or null if there is none.
+	 */
+	public static function findEvents(song:SwagSong, erect:Bool):Null<{file:String, folder:String}>
+	{
+		final songName:String = Paths.formatToSongPath(song.song);
+		final file:String = 'events${erect ? '-erect' : ''}';
+		var folder:String = songName;
+		if (song.variant?.length > 0)
+		{
+			final mixFolder:String = '$songName/${song.variant}';
+			if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$mixFolder/$file')) || #end FileSystem.exists(Paths.json('$mixFolder/$file')))
+				folder = mixFolder;
+		}
+
+		if (#if FEATURE_MODS FileSystem.exists(Paths.modsJson('$folder/$file')) || #end FileSystem.exists(Paths.json('$folder/$file')))
+			return {file: file, folder: folder};
+		return null;
 	}
 
 	public static function parseJSONshit(rawJson:String, ?file:String):SwagSong

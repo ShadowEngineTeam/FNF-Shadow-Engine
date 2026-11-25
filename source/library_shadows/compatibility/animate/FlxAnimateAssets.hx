@@ -25,6 +25,14 @@ class FlxAnimateAssets
 		return null;
 	}
 
+	/**
+	 * The JSON preloading already parsed for `path`, or null.
+	 */
+	public static dynamic function getParsedJson(path:String):Null<Dynamic>
+	{
+		return backend.Paths.takeParsed(path);
+	}
+
 	public static dynamic function getBytes(path:String):Bytes
 	{
 		if (FileSystem.exists(path))

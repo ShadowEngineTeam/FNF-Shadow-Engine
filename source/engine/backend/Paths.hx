@@ -3,6 +3,7 @@ package backend;
 import flixel.system.FlxAssets;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.graphics.atlas.TexturePackerAtlas;
 import flixel.graphics.FlxGraphic;
 import flixel.math.FlxRect;
 import openfl.display.BitmapData;
@@ -67,6 +68,10 @@ class Paths
 	// tracked, and are dropped with the other path caches on clearStoredMemory().
 	static final imagePathMemo:Map<String, String> = [];
 
+	// Files the thread pool parsed while preloading, by path, until something takes them or
+	// clearUnusedMemory() drops them.
+	static final parsedFiles:Map<String, Dynamic> = [];
+
 	inline static function imageMemoKey(key:String, library:String):String
 		return #if FEATURE_MODS '${Mods.currentModDirectory}|' + #end '$library|$key';
 
@@ -105,6 +110,8 @@ class Paths
 				currentTrackedAssets.remove(key);
 			}
 		}
+
+		parsedFiles.clear();
 
 		// run the garbage collector after
 		System.gc();
@@ -469,6 +476,77 @@ class Paths
 		return FileSystem.exists(file) ? file : null;
 	}
 
+	/**
+	 * Stores what the thread pool parsed from `file`, for `takeParsed()`. Main thread only.
+	 */
+	public static function storeParsed(file:String, data:Dynamic):Void
+	{
+		if (data != null)
+			parsedFiles.set(file, data);
+	}
+
+	/**
+	 * Takes what preloading parsed from `file`, or null if it didn't. Each file is handed out once.
+	 */
+	public static function takeParsed(file:String):Null<Dynamic>
+	{
+		final data:Null<Dynamic> = parsedFiles.get(file);
+		if (data != null)
+			parsedFiles.remove(file);
+		return data;
+	}
+
+	/**
+	 * Finds the Sparrow xml or TexturePacker json `getAtlas()` would read for `key`, without touching
+	 * the caches, so it can run off the main thread.
+	 */
+	public static function findAtlasFile(key:String, ?library:String = null):Null<String>
+	{
+		#if FEATURE_MODS
+		final modXml:String = modsXml(key);
+		if (FileSystem.exists(modXml))
+			return modXml;
+		#end
+
+		final xmlPath:String = getPath('images/$key.xml', TEXT, library);
+		if (FileSystem.exists(xmlPath))
+			return xmlPath;
+
+		#if FEATURE_MODS
+		final modJson:String = modsImagesJson(key);
+		if (FileSystem.exists(modJson))
+			return modJson;
+		#end
+
+		final jsonPath:String = getPath('images/$key.json', TEXT, library);
+		return FileSystem.exists(jsonPath) ? jsonPath : null;
+	}
+
+	/**
+	 * Reads and parses an atlas file `findAtlasFile()` found. Safe off the main thread.
+	 */
+	public static function parseAtlasFile(file:String):Dynamic
+	{
+		final content:String = File.getContent(file);
+		return file.endsWith('.xml') ? Xml.parse(content) : Json.parse(content, file);
+	}
+
+	static function atlasXml(file:String):FlxXmlAsset
+	{
+		final xml:Null<Xml> = takeParsed(file);
+		if (xml != null)
+			return xml;
+		return File.getContent(file);
+	}
+
+	static function atlasJson(file:String):FlxTexturePackerJsonAsset
+	{
+		final json:Null<TexturePackerAtlas> = takeParsed(file);
+		if (json != null)
+			return json;
+		return File.getContent(file);
+	}
+
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
 		#if FEATURE_MODS
@@ -662,21 +740,21 @@ class Paths
 		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
-			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
+			return FlxAtlasFrames.fromSparrow(imageLoaded, atlasXml(modXml));
 		#end
 
 		if (FileSystem.exists(xmlPath))
-			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath));
+			return FlxAtlasFrames.fromSparrow(imageLoaded, atlasXml(xmlPath));
 
 		var jsonPath:String = getPath('images/$key.json', TEXT, library, true);
 		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
-			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, atlasJson(modJson));
 		#end
 
 		if (FileSystem.exists(jsonPath))
-			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath));
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, atlasJson(jsonPath));
 
 		return getPackerAtlas(key, library);
 	}
@@ -691,11 +769,11 @@ class Paths
 		#if FEATURE_MODS
 		var modXml:String = modsXml(key);
 		if (FileSystem.exists(modXml))
-			return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(modXml));
+			return FlxAtlasFrames.fromSparrow(imageLoaded, atlasXml(modXml));
 		#end
 
 		var xmlPath:String = getPath('images/$key.xml', library);
-		return FlxAtlasFrames.fromSparrow(imageLoaded, File.getContent(xmlPath));
+		return FlxAtlasFrames.fromSparrow(imageLoaded, atlasXml(xmlPath));
 	}
 
 	public static function getPackerAtlas(key:String, ?library:String = null):FlxAtlasFrames
@@ -725,11 +803,11 @@ class Paths
 		#if FEATURE_MODS
 		var modJson:String = modsImagesJson(key);
 		if (FileSystem.exists(modJson))
-			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(modJson));
+			return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, atlasJson(modJson));
 		#end
 
 		var jsonPath:String = getPath('images/$key.json', library);
-		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, File.getContent(jsonPath));
+		return FlxAtlasFrames.fromTexturePackerJson(imageLoaded, atlasJson(jsonPath));
 	}
 
 	public static function getTextureAtlas(key:String, ?library:String = null, ?settings:FlxAnimateSettings):FlxAnimateFrames

@@ -92,21 +92,30 @@ class StageData
 
 	public static function getStageFile(stage:String):StageFile
 	{
-		var path:String = Paths.getSharedPath('stages/' + stage + '.json');
+		final path:String = getStagePath(stage);
+		final parsed:Null<StageFile> = Paths.takeParsed(path);
+		if (parsed != null)
+			return parsed;
+
 		var rawJson:String = null;
-		#if FEATURE_MODS
-		var modPath:String = Paths.modFolders('stages/' + stage + '.json');
-		if (FileSystem.exists(modPath))
-		{
-			path = modPath;
-			rawJson = File.getContent(modPath);
-		}
-		else
-		#end
 		if (FileSystem.exists(path))
 			rawJson = File.getContent(path);
 
 		return cast Json.parse(rawJson, path);
+	}
+
+	/**
+	 * The file `getStageFile()` reads for `stage`.
+	 */
+	public static function getStagePath(stage:String):String
+	{
+		#if FEATURE_MODS
+		final modPath:String = Paths.modFolders('stages/' + stage + '.json');
+		if (FileSystem.exists(modPath))
+			return modPath;
+		#end
+
+		return Paths.getSharedPath('stages/' + stage + '.json');
 	}
 
 	public static function vanillaSongStage(songName):String
