@@ -315,7 +315,11 @@ class FlxAnimateFrames extends FlxAtlasFrames
 	// The JSON the engine already parsed for `path` while preloading, or else its text.
 	static function getJsonFromPath(path:String):Null<Dynamic>
 	{
-		return FlxAnimateAssets.getParsedJson(path) ?? getTextFromPath(path);
+		// Not `??`, which types the result as the text's String.
+		final parsed:Null<Dynamic> = FlxAnimateAssets.getParsedJson(path);
+		if (parsed != null)
+			return parsed;
+		return getTextFromPath(path);
 	}
 
 	static function listWithFilter(path:String, filter:String->Bool, includeSubDirectories:Bool = false)
