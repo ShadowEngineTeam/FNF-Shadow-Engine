@@ -21,6 +21,8 @@
 - Added iOS simulator building (main only)
 - Enabled hxdiscord_rpc IO thread
 - Updated some haxelib refs
+- Updated hxluau to Luau 0.748 and libffi 3.8.2
+- Switched hxcpp's GC to the generational one
 - Updated gamemode config
 - Updated touchpad assets
 - Base Game has been added
