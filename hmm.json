@@ -3,7 +3,7 @@
     {
       "name": "lime",
       "type": "git",
-      "ref": "5408c23b239e4e3d106cd38277d43fa800e037b0",
+      "ref": "5b61a117947e5f3101398daa1a72410e70b2eed7",
       "url": "https://github.com/ShadowEngineTeam/lime"
     },
     {
@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "122b91f953cae76fe2715ec9676ce2988d6413dd",
+      "ref": "509864288df53e14daf502f65c22489aaa774044",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "e61d867c6b274b2a8c7558733a6f9fcf6b3cff29",
+      "ref": "1af5c05f5efd8ccb3ebde72d19a7b0f1f94ed3b8",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
