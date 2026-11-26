@@ -3443,6 +3443,8 @@ class PlayState extends MusicBeatState
 
 	function noteMissCommon(direction:Int, note:Note = null)
 	{
+		Subtitles.noteMissed(note != null ? note.strumTime : Conductor.songPosition);
+
 		// score and data
 		var subtract:Float = 0.05;
 		if (note != null)
@@ -3667,6 +3669,8 @@ class PlayState extends MusicBeatState
 				invalidateNote(note);
 			return;
 		}
+
+		Subtitles.noteHit();
 
 		if (!note.noAnimation)
 		{

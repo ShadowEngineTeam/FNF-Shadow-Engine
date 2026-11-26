@@ -324,7 +324,9 @@ class Character extends FlxAnimate
 		else if (isPlayer)
 			holdTimer = 0;
 
+		// A miss pose is held until it finishes, as the player's is
 		if (!isPlayer
+			&& !animName.endsWith('miss')
 			&& holdTimer >= Conductor.stepCrochet * (0.0011 / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1)) * singDuration)
 		{
 			dance();

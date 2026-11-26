@@ -15,7 +15,14 @@ class Subtitles extends FlxSpriteGroup
 	var subtitlesData:Array<SubtitleEntry>;
 	var assignedSound:FlxSound;
 
+	// Whether each sung syllable was sung while the player was missing
+	var missedSyllables:Map<KaraokeSyllable, Bool> = [];
+	var missing:Bool = false;
+
 	static inline final KARAOKE_COLOR:String = 'FFD54A';
+	static inline final MISS_COLOR:String = 'FF3B3B';
+
+	static final instances:Array<Subtitles> = [];
 
 	public var offsets(default, set):Array<Float> = [0, 0];
 	public var alignment(default, set):SubtitlesAlignment = SUBTITLES_BOTTOM;
@@ -35,6 +42,45 @@ class Subtitles extends FlxSpriteGroup
 		this.alignment = alignment;
 
 		setText([], true);
+
+		instances.push(this);
+	}
+
+	override function destroy():Void
+	{
+		instances.remove(this);
+		super.destroy();
+	}
+
+	/**
+	 * The player missed a note at `time`: the karaoke sung then, and until `noteHit`, shows red.
+	 */
+	public static function noteMissed(time:Float):Void
+	{
+		for (subtitles in instances)
+			subtitles.markMissed(time);
+	}
+
+	/**
+	 * The player hit a note, so the karaoke sung from now on shows normally again.
+	 */
+	public static function noteHit():Void
+	{
+		for (subtitles in instances)
+			subtitles.missing = false;
+	}
+
+	function markMissed(time:Float):Void
+	{
+		missing = true;
+		if (subtitlesData == null)
+			return;
+
+		for (data in subtitlesData)
+			if (data.syllables != null && time >= data.start && time <= data.end)
+				for (syllable in data.syllables)
+					if (time >= syllable.start && time < syllable.end)
+						missedSyllables.set(syllable, true);
 	}
 
 	override function update(elapsed:Float):Void
@@ -62,6 +108,8 @@ class Subtitles extends FlxSpriteGroup
 
 		subtitlesData = null;
 		assignedSound = null;
+		missedSyllables.clear();
+		missing = false;
 
 		if (sound == null)
 			return;
@@ -74,20 +122,41 @@ class Subtitles extends FlxSpriteGroup
 		assignedSound = sound;
 	}
 
-	// The syllables that were sung get colored, like karaoke
+	// The syllables that were sung get colored, like karaoke, and red where the player missed
 	function karaokeText(entry:SubtitleEntry, time:Float):String
 	{
-		var sung:String = '';
-		var unsung:String = '';
+		final sungColor:String = entry.color ?? KARAOKE_COLOR;
+		var result:String = '';
+		var run:String = '';
+		var runColor:Null<String> = null;
 		for (syllable in entry.syllables)
 		{
-			final text:String = syllable.text.htmlEscape();
+			var color:Null<String> = null;
 			if (time >= syllable.start)
-				sung += text;
-			else
-				unsung += text;
+			{
+				if (missing && time < syllable.end)
+					missedSyllables.set(syllable, true);
+				else if (!missedSyllables.exists(syllable))
+					missedSyllables.set(syllable, missing);
+				color = missedSyllables.get(syllable) ? MISS_COLOR : sungColor;
+			}
+
+			if (color != runColor)
+			{
+				result += colored(run, runColor);
+				run = '';
+				runColor = color;
+			}
+			run += syllable.text.htmlEscape();
 		}
-		return sung.length > 0 ? '<font color="#${entry.color ?? KARAOKE_COLOR}">$sung</font>$unsung' : unsung;
+		return result + colored(run, runColor);
+	}
+
+	static function colored(text:String, color:Null<String>):String
+	{
+		if (text.length == 0 || color == null)
+			return text;
+		return '<font color="#$color">$text</font>';
 	}
 
 	function setText(lines:Array<String>, hide:Bool = false):Void
