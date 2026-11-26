@@ -8,13 +8,16 @@
 - Added a fourth FPS counter mode with bgfx's stats
 - System info shows the GPU name and no longer shows VRAM
 - Added an Unlocked Framerate option (desktop and Android)
-- Updated hxluau to Luau 0.747
+- Updated hxluau to Luau 0.748 and libffi 3.8.2
+- Switched hxcpp's GC to the generational one
 - Added new Tracy profiler calls
 - Base Game synced with Funkin (stages, cutscenes, deaths, dialogue, Erect tempo changes, re-charts and more)
 - Base Game textures re-encoded as BC7 and ASTC
 - Added Scroll Velocity events
 - Added `.srt` subtitles for song lyrics and cutscenes, and `game.subtitles` for scripts
 - Added Subtitles and Naughtyness options
+- Missed notes turn the karaoke subtitles red until the next hit
+- Characters singing alongside the player hold their miss poses as long as the player does
 - Added Vibration, Menu Vibration and Note Vibration options and `HapticUtil`
 - Reworked the game over: it uses the playing character when it has death animations, and characters can set its camera offset and zoom with `gameover`
 - Added fakeout deaths and the `onGameOverStart`, `onGameOverMusicStart` and `onGameOverConfirm` script calls
