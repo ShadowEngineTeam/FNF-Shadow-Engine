@@ -57,7 +57,7 @@
     {
       "name": "format",
       "type": "git",
-      "ref": "775a06f0a7aa64cbd060b5c3ba62f65d7fed684a",
+      "ref": "6e41f83987139febbb078ca5056c9c2f395e99d9",
       "url": "https://github.com/HaxeFoundation/format"
     },
     {
@@ -69,7 +69,7 @@
     {
       "name": "hxp",
       "type": "git",
-      "ref": "a060a749bfae3af190c50884cd89f89e5835abd6",
+      "ref": "9019664c287ce1322abac47a7317515511cd21ff",
       "url": "https://github.com/openfl/hxp"
     },
     {
