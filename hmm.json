@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "79d9028fde381a2a931c84667d67650bc38e9a3b",
+      "ref": "dda653567e29bcbdb110ab36f9fbb6ffd0f359f6",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
@@ -45,7 +45,7 @@
     {
       "name": "hxluau",
       "type": "git",
-      "ref": "d823db88605edbe34aaf12e76482267cd8925d39",
+      "ref": "32cb9ae40e03486c0714dbebee4b7785e6a27681",
       "url": "https://github.com/ShadowEngineTeam/hxluau"
     },
     {
