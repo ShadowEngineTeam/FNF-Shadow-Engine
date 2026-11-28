@@ -22,6 +22,8 @@ import openfl.text.TextFormat;
   #include <mach/mach.h>
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
   #include <stdio.h>
+#elif defined(EMSCRIPTEN)
+  #include <emscripten/heap.h>
 #endif
 ')
 @:cppNamespaceCode('
@@ -81,6 +83,8 @@ double MemoryCounter_obj::native_getMemory()
     }
     fclose(fp);
     return (double)(vmrss + vmswap) * 1024.0;
+#elif defined(EMSCRIPTEN)
+    return (double)emscripten_get_heap_size();
 #else
     return 0.0;
 #endif
