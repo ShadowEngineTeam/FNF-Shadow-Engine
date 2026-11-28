@@ -127,7 +127,7 @@ class File
 		FileSystem.clearCache();
 	}
 
-	public static function read(path:String, binary:Bool = true):Null<#if sys FileInput #else Dynamic #end>
+	public static function read(path:String, binary:Bool = true):Null<#if (sys && FEATURE_MODS) FileInput #else Dynamic #end>
 	{
 		#if FEATURE_MODS
 		#if linux
@@ -147,7 +147,7 @@ class File
 		#end
 	}
 
-	public static function write(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
+	public static function write(path:String, binary:Bool = true):Null<#if (sys && FEATURE_MODS) FileOutput #else Dynamic #end>
 	{
 		FileSystem.clearCache();
 
@@ -166,7 +166,7 @@ class File
 		#end
 	}
 
-	public static function append(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
+	public static function append(path:String, binary:Bool = true):Null<#if (sys && FEATURE_MODS) FileOutput #else Dynamic #end>
 	{
 		FileSystem.clearCache();
 
@@ -185,7 +185,7 @@ class File
 		#end
 	}
 
-	public static function update(path:String, binary:Bool = true):Null<#if sys FileOutput #else Dynamic #end>
+	public static function update(path:String, binary:Bool = true):Null<#if (sys && FEATURE_MODS) FileOutput #else Dynamic #end>
 	{
 		FileSystem.clearCache();
 
