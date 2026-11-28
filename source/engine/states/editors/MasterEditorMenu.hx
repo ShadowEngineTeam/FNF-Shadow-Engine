@@ -1,5 +1,6 @@
 package states.editors;
 
+import backend.StageData;
 import backend.WeekData;
 import objects.Character;
 import states.MainMenuState;
@@ -112,6 +113,7 @@ class MasterEditorMenu extends MusicBeatState
 				case 'Chart Editor': // felt it would be cool maybe
 					LoadingState.loadAndSwitchState(ChartingState, false);
 				case 'Character Editor':
+					StageData.forceNextDirectory = 'week1';
 					LoadingState.loadAndSwitchState(CharacterEditorState, [Character.DEFAULT_CHARACTER, false]);
 				case 'Week Editor':
 					Funkin.switchState(WeekEditorState);

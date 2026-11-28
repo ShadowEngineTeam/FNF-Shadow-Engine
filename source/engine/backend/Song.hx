@@ -215,7 +215,7 @@ class Song
 	{
 		final chart:String = Highscore.formatSong(songPath, difficulty) + '.json';
 		final mixes:Array<String> = [substates.FreeplayOptionsSubState.DEFAULT_MIX];
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songPath/'))
+		for (folder in Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/$songPath/'))
 		{
 			for (file in FileSystem.readDirectory(folder))
 			{

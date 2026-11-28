@@ -53,7 +53,8 @@ class OptionsState extends MusicBeatState
 			case 'Gameplay':
 				switchSubState(GameplaySettingsSubState);
 			case 'Adjust Delay and Combo':
-				Funkin.switchState(NoteOffsetState);
+				StageData.forceNextDirectory = 'week1';
+				LoadingState.loadAndSwitchState(NoteOffsetState);
 			#if (mobile || FEATURE_MOBILE_CONTROLS)
 			case 'Mobile':
 				switchSubState(mobile.options.MobileSettingsSubState);

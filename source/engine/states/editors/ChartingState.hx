@@ -451,13 +451,13 @@ class ChartingState extends MusicBeatState
 			directories.push(Paths.mods(Mods.currentModDirectory + '/characters/'));
 		for (mod in Mods.getGlobalMods())
 			directories.push(Paths.mods(mod + '/characters/'));
-		directories.push(Paths.getSharedPath('characters/'));
+		directories.push(Paths.getPreloadPath('characters/'));
 		#else
-		directories.push(Paths.getSharedPath('characters/'));
+		directories.push(Paths.getPreloadPath('characters/'));
 		#end
 
 		var tempArray:Array<String> = [];
-		characters = Mods.mergeAllTextsNamed('data/characterList.txt', Paths.getSharedPath());
+		characters = Mods.mergeAllTextsNamed('data/characterList.txt', Paths.getPreloadPath());
 		for (character in characters)
 		{
 			if (character.trim().length > 0)
@@ -493,12 +493,12 @@ class ChartingState extends MusicBeatState
 			stageDirectories.push(Paths.mods(Mods.currentModDirectory + '/stages/'));
 		for (mod in Mods.getGlobalMods())
 			stageDirectories.push(Paths.mods(mod + '/stages/'));
-		stageDirectories.push(Paths.getSharedPath('stages/'));
+		stageDirectories.push(Paths.getPreloadPath('stages/'));
 		#else
-		stageDirectories.push(Paths.getSharedPath('stages/'));
+		stageDirectories.push(Paths.getPreloadPath('stages/'));
 		#end
 
-		var stageFile:Array<String> = Mods.mergeAllTextsNamed('data/stageList.txt', Paths.getSharedPath());
+		var stageFile:Array<String> = Mods.mergeAllTextsNamed('data/stageList.txt', Paths.getPreloadPath());
 		stageList = [];
 		for (stage in stageFile)
 		{
@@ -1007,7 +1007,7 @@ class ChartingState extends MusicBeatState
 			key++;
 		}
 
-		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'custom_notetypes/');
+		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getPreloadPath(), 'custom_notetypes/');
 		for (folder in foldersToCheck)
 			for (file in FileSystem.readDirectory(folder))
 			{
@@ -1171,7 +1171,7 @@ class ChartingState extends MusicBeatState
 		for (mod in Mods.getGlobalMods())
 			directories.push(Paths.mods(mod + '/custom_events/'));
 		#end
-		directories.push(Paths.getSharedPath('custom_events/'));
+		directories.push(Paths.getPreloadPath('custom_events/'));
 
 		for (i in 0...directories.length)
 		{
@@ -3024,14 +3024,14 @@ class ChartingState extends MusicBeatState
 		if (FileSystem.exists(modPath))
 			path = modPath;
 		else
-			path = Paths.getSharedPath(characterPath);
+			path = Paths.getPath(characterPath);
 		#else
-		path = Paths.getSharedPath(characterPath);
+		path = Paths.getPath(characterPath);
 		#end
 
 		if (!FileSystem.exists(path))
 		{
-			path = Paths.getSharedPath('characters/' + Character.DEFAULT_CHARACTER + '.json');
+			path = Paths.getPath('characters/' + Character.DEFAULT_CHARACTER + '.json');
 			characterFailed = true;
 		}
 

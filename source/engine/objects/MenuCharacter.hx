@@ -50,7 +50,7 @@ class MenuCharacter extends FlxSprite
 			default:
 				var characterPath:String = 'images/menucharacters/' + character + '.json';
 				var defaultPath:String = 'images/menucharacters/' + DEFAULT_CHARACTER + '.json';
-				var path:String = Paths.getSharedPath(characterPath);
+				var path:String = Paths.getPath(characterPath);
 				#if FEATURE_MODS
 				var modPath:String = Paths.modFolders(characterPath);
 				if (FileSystem.exists(modPath))
@@ -58,7 +58,7 @@ class MenuCharacter extends FlxSprite
 				#end
 
 				if (!FileSystem.exists(path))
-					path = Paths.getSharedPath(defaultPath);
+					path = Paths.getPath(defaultPath);
 
 				var rawJson:String = File.getContent(path);
 

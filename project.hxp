@@ -46,6 +46,13 @@ class Project extends HXProject
 
 	static final ENABLE_ASCII_ART:Bool = true;
 
+	static final ASSET_LIBRARIES:Array<String> = [
+		"preload", "shared", "songs", "videos", "week1", "week2", "week3", "week4", "week5", "week6", "week7", "weekend1", "sserafim"
+	];
+	static final WEB_TEXT_EXTENSIONS:Array<String> = [
+		"json", "txt", "xml", "hx", "hxs", "hxc", "hscript", "lua", "luau", "frag", "vert", "glsl", "srt", "ini", "csv"
+	];
+
 	public function new():Void
 	{
 		super();
@@ -377,6 +384,9 @@ class Project extends HXProject
 
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
+
+		if (isWeb())
+			setHaxedef("ON_DEMAND_ASSETS");
 	}
 
 	function configureAssets()
@@ -386,50 +396,63 @@ class Project extends HXProject
 		includeAssetLibrary("default", true, false);
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
-		{
 			addAssetPath("assets/funkin_resources/fonts", 'assets/fonts', true);
-			addAssetPath("assets/funkin_resources/shared", 'assets/shared', embed);
-		}
 
 		addAssetPath("assets/embed", null, true);
 		addAssetPath("assets/fonts", null, true);
-		addAssetPath("assets/shared", null, embed);
-
-		if (FEATURE_MOBILE_CONTROLS.isEnabled())
-			addAssetPath("assets/mobile", 'assets/shared/mobile', embed);
 
 		final textureFormats:Array<String> = ["ASTC", "BC"];
-		var hasFormat:Bool = false;
+		final imageFolders:Array<String> = [];
 
-		for (format in textureFormats)
-			if (defines.exists(format))
-				setHaxedef("USING_GPU_TEXTURES");
-
-		var needsPNG:Bool = true;
 		for (format in textureFormats)
 		{
 			if (defines.exists(format))
 			{
-				needsPNG = false;
-				if (FEATURE_MOBILE_CONTROLS.isEnabled())
-					addAssetPath('assets/mobile-images/${format.toLowerCase()}', 'assets/shared/images', embed);
-				if (FEATURE_FUNKIN_CONTENT.isEnabled())
-					addAssetPath('assets/funkin_resources/images-${format.toLowerCase()}', 'assets/shared/images', embed);
-				addAssetPath('assets/images-${format.toLowerCase()}', 'assets/shared/images', embed);
+				setHaxedef("USING_GPU_TEXTURES");
+				imageFolders.push('images-${format.toLowerCase()}');
 			}
 		}
 
-		if (needsPNG)
+		if (imageFolders.length == 0)
+			imageFolders.push("images-png");
+
+		for (library in ASSET_LIBRARIES)
 		{
-			if (FEATURE_MOBILE_CONTROLS.isEnabled())
-				addAssetPath('assets/mobile-images/png', 'assets/shared/images', embed);
+			final target:String = library == "preload" ? "assets" : 'assets/$library';
+
 			if (FEATURE_FUNKIN_CONTENT.isEnabled())
-				addAssetPath('assets/funkin_resources/images-png', 'assets/shared/images', embed);
-			addAssetPath('assets/images-png', 'assets/shared/images', embed);
+				addLibraryFolder('assets/funkin_resources/$library', target, library, imageFolders, embed);
+			addLibraryFolder('assets/$library', target, library, imageFolders, embed);
+		}
+
+		if (FEATURE_MOBILE_CONTROLS.isEnabled())
+		{
+			addAssetPath("assets/mobile", 'assets/shared/mobile', embed);
+			for (folder in imageFolders)
+				addAssetPath('assets/mobile-images/${folder.substr("images-".length)}', 'assets/shared/images', embed);
 		}
 
 		if (isLinux() && !isDebug())
 			addAsset("gamemode.ini");
+	}
+
+	function addLibraryFolder(path:String, target:String, library:String, imageFolders:Array<String>, embed:Bool):Void
+	{
+		if (!FileSystem.exists(path))
+			return;
+
+		for (file in FileSystem.readDirectory(path))
+		{
+			if (file.startsWith("images-"))
+			{
+				if (imageFolders.contains(file))
+					addAssetPath('${path}/${file}', '${target}/images', embed, library);
+			}
+			else if (FileSystem.isDirectory('${path}/${file}'))
+				addAssetPath('${path}/${file}', '${target}/${file}', embed, library);
+			else
+				addAsset('${path}/${file}', '${target}/${file}', embed, library);
+		}
 	}
 
 	function configureLibs()
@@ -482,14 +505,36 @@ class Project extends HXProject
 	function includeHaxelib(name:String, version:String = ""):Void
 		haxelibs.push(new Haxelib(name, version));
 
-	function addAsset(path:String, ?rename:String, embed:Bool = false):Void
+	function addAsset(path:String, ?rename:String, embed:Bool = false, library:String = "preload"):Void
 	{
 		var asset:Asset = new Asset(path, rename, null, embed, true);
 		asset.library = "default";
+
+		// The web only downloads a library when it is needed, and some of its files only when they are asked for
+		if (isWeb() && !embed)
+		{
+			final textFile:Bool = asset.type == TEXT || WEB_TEXT_EXTENSIONS.contains(Path.extension(path).toLowerCase());
+			if (library != "preload" && !textFile)
+				asset.library = library;
+			asset.embed = (asset.library != "default" && isWebOnDemand(library, asset.targetPath)) ? false : null;
+		}
+
 		assets.push(asset);
 	}
 
-	public function addAssetPath(path:String, ?rename:String, embed:Bool = false):Void
+	// Song audio, videos, characters and the results screen are downloaded one by one, the rest of a library all at once
+	static function isWebOnDemand(library:String, targetPath:String):Bool
+	{
+		if (library == "songs" || library == "videos")
+			return true;
+
+		return library == "shared"
+			&& (targetPath.startsWith("assets/shared/images/characters/")
+				|| targetPath.startsWith("assets/shared/images/resultScreen/")
+				|| targetPath.startsWith("assets/shared/music/results/"));
+	}
+
+	public function addAssetPath(path:String, ?rename:String, embed:Bool = false, library:String = "preload"):Void
 	{
 		if (path == "")
 			return;
@@ -504,9 +549,9 @@ class Project extends HXProject
 		for (file in FileSystem.readDirectory(path))
 		{
 			if (FileSystem.isDirectory('${path}/${file}'))
-				addAssetPath('${path}/${file}', '${targetPath}${file}', embed);
+				addAssetPath('${path}/${file}', '${targetPath}${file}', embed, library);
 			else
-				addAsset('${path}/${file}', '${targetPath}${file}', embed);
+				addAsset('${path}/${file}', '${targetPath}${file}', embed, library);
 		}
 	}
 

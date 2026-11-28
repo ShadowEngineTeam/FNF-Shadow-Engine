@@ -221,7 +221,7 @@ class ScriptManager
 				luaToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(luaToLoad))
 				#end
-				luaToLoad = Paths.getSharedPath(file);
+				luaToLoad = Paths.getPath(file);
 			}
 
 			if (FileSystem.exists(luaToLoad))
@@ -266,7 +266,7 @@ class ScriptManager
 				scriptToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(scriptToLoad))
 				#end
-				scriptToLoad = Paths.getSharedPath(file);
+				scriptToLoad = Paths.getPath(file);
 			}
 
 			if (FileSystem.exists(scriptToLoad))

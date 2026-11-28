@@ -42,6 +42,7 @@ class NoteOffsetState extends MusicBeatState
 	override public function create()
 	{
 		Paths.clearStoredMemory();
+		Paths.setCurrentLevel(stageDirectory);
 		#if FEATURE_DISCORD_RPC
 		DiscordClient.changePresence("Delay/Combo Offset Menu", null);
 		#end

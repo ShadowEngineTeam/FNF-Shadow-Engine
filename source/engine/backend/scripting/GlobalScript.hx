@@ -28,7 +28,7 @@ class GlobalScript
 
 	static function loadAll()
 	{
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/global/'))
+		for (folder in Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/global/'))
 		{
 			if (!FileSystem.exists(folder))
 				continue;

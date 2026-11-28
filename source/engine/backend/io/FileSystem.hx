@@ -69,6 +69,34 @@ class FileSystem
 		return false;
 	}
 
+	/**
+	 * Like `exists()`, but only for files, so it skips the folder search.
+	 */
+	public static function fileExists(path:String):Bool
+	{
+		#if FEATURE_MODS
+		#if linux
+		if (getCaseInsensitivePath(cwd(path)) != null)
+			return true;
+		#else
+		if (SysFileSystem.exists(cwd(path)))
+			return true;
+		#end
+		#end
+
+		#if USE_OPENFL_FILESYSTEM
+		if (OpenFLAssets.exists(openflcwd(path)))
+			return true;
+		#end
+
+		#if mobile
+		if (MobileAssets.exists(path))
+			return true;
+		#end
+
+		return false;
+	}
+
 	public static function rename(path:String, newPath:String):Void
 	{
 		#if FEATURE_MODS

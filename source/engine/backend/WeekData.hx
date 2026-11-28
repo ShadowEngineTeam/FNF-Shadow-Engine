@@ -99,7 +99,7 @@ class WeekData
 	{
 		weeksList = [];
 		weeksLoaded.clear();
-		var directories:Array<String> = [#if FEATURE_MODS Paths.mods(), #end Paths.getSharedPath()];
+		var directories:Array<String> = [#if FEATURE_MODS Paths.mods(), #end Paths.getPreloadPath()];
 		var originalLength:Int = directories.length;
 
 		#if FEATURE_MODS
@@ -107,7 +107,7 @@ class WeekData
 			directories.push(Paths.mods(mod + '/'));
 		#end
 
-		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getSharedPath('weeks/weekList.txt'));
+		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getPath('weeks/weekList.txt'));
 		for (i in 0...sexList.length)
 		{
 			for (j in 0...directories.length)

@@ -11,6 +11,9 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.FlxGraphic;
 import backend.Song;
 import backend.StageData;
+#if ON_DEMAND_ASSETS
+import backend.WebAssets;
+#end
 import objects.Character;
 
 class LoadingState extends MusicBeatState
@@ -24,7 +27,11 @@ class LoadingState extends MusicBeatState
 		this.target = target;
 		this.args = args;
 		this.stopMusic = stopMusic;
+		#if ON_DEMAND_ASSETS
+		startDownloads(startThreads);
+		#else
 		startThreads();
+		#end
 
 		super();
 	}
@@ -71,7 +78,7 @@ class LoadingState extends MusicBeatState
 		loadingText.borderSize = 2;
 		add(loadingText);
 
-		bar = new Bar(0, 660, 'loadingBar', () -> (loaded / loadMax));
+		bar = new Bar(0, 660, 'loadingBar', () -> progress());
 		bar.screenCenter(X);
 		bar.barOffset.set(3, 3);
 		bar.setColors(FlxColor.WHITE, FlxColor.BLACK); // example colors
@@ -97,7 +104,7 @@ class LoadingState extends MusicBeatState
 				onLoad();
 				return;
 			}
-			intendedPercent = loaded / loadMax;
+			intendedPercent = progress();
 		}
 
 		timePassed += elapsed;
@@ -136,7 +143,27 @@ class LoadingState extends MusicBeatState
 	static function checkLoaded():Bool
 	{
 		TaskHandler.processMainThreadQueue();
+		#if ON_DEMAND_ASSETS
+		if (downloaded < downloadMax)
+			return false;
+		#end
 		return (loaded == loadMax);
+	}
+
+	// The web can only wait for its downloads on the loading screen
+	static var usesLoadingScreen(get, never):Bool;
+
+	inline static function get_usesLoadingScreen():Bool
+		return #if ON_DEMAND_ASSETS true #else ClientPrefs.data.loadingScreen #end;
+
+	static function progress():Float
+	{
+		#if ON_DEMAND_ASSETS
+		final total:Int = downloadMax + loadMax;
+		return total > 0 ? (downloaded + loaded) / total : 1;
+		#else
+		return loaded / loadMax;
+		#end
 	}
 
 	static function getNextState(target:Class<FlxState>, ?args:Array<Dynamic>, stopMusic = false, intrusive:Bool = true):{state:Class<FlxState>, args:Array<Dynamic>}
@@ -148,8 +175,19 @@ class LoadingState extends MusicBeatState
 		if (weekDir != null && weekDir.length > 0 && weekDir != '')
 			directory = weekDir;
 
+		Paths.setCurrentLevel(directory);
+
+		#if ON_DEMAND_ASSETS
+		librariesToLoad = directory == 'shared' ? ['shared'] : ['shared', directory];
+		WebAssets.unloadLibrariesExcept(librariesToLoad);
+
+		clearInvalids();
+		if (hasDownloads())
+			return {state: LoadingState, args: [target, args, stopMusic]};
+		#end
+
 		var doPrecache:Bool = false;
-		if (ClientPrefs.data.loadingScreen)
+		if (usesLoadingScreen)
 		{
 			clearInvalids();
 			if (intrusive)
@@ -211,7 +249,7 @@ class LoadingState extends MusicBeatState
 
 	public static function prepareToSong()
 	{
-		if (!ClientPrefs.data.loadingScreen)
+		if (!usesLoadingScreen)
 			return;
 
 		var song:SwagSong = PlayState.SONG;
@@ -264,6 +302,11 @@ class LoadingState extends MusicBeatState
 		if (!stageData?.hide_girlfriend && gfVersion != player2 && gfVersion != player1)
 			preloadCharacter(gfVersion);
 
+		#if ON_DEMAND_ASSETS
+		if (song.gameOverChar != null && song.gameOverChar.length > 0 && song.gameOverChar != player1)
+			preloadCharacter(song.gameOverChar);
+		#end
+
 		if (!dontPreloadDefaultVoices && needsVoices)
 			songsToPrepare.push(prefixVocals);
 
@@ -293,14 +336,16 @@ class LoadingState extends MusicBeatState
 			var folder:String = arr[i];
 			if (folder.trim().endsWith('/'))
 			{
-				for (subfolder in Mods.directoriesWithFile(Paths.getSharedPath(), '$prefix/$folder'))
-					for (file in FileSystem.readDirectory(subfolder))
-						for (ext in exts)
-							if (file.endsWith(ext))
-							{
-								arr.push(folder + file.substr(0, file.length - ext.length));
-								break;
-							}
+				final roots:Array<String> = Paths.getBaseFolders();
+				for (r in 0...roots.length)
+					for (subfolder in Mods.directoriesWithFile(roots[r], '$prefix/$folder', r == roots.length - 1))
+						for (file in FileSystem.readDirectory(subfolder))
+							for (ext in exts)
+								if (file.endsWith(ext))
+								{
+									arr.push(folder + file.substr(0, file.length - ext.length));
+									break;
+								}
 
 				// trace('Folder detected! ' + folder);
 			}
@@ -359,6 +404,71 @@ class LoadingState extends MusicBeatState
 			preloadJson(chart, true);
 	}
 
+	#if ON_DEMAND_ASSETS
+	static var librariesToLoad:Array<String> = [];
+	static var downloaded:Int = 0;
+	static var downloadMax:Int = 0;
+
+	static function filesToDownload():Array<String>
+	{
+		final files:Array<String> = [];
+		function add(file:Null<String>):Void
+		{
+			if (file != null && !files.contains(file) && WebAssets.needsDownload(file))
+				files.push(file);
+		}
+
+		for (image in unique(imagesToPrepare))
+			add(Paths.findImageFile(image));
+		for (sound in unique(soundsToPrepare))
+			add(Paths.findSoundFile('sounds', sound)?.file);
+		for (music in unique(musicToPrepare))
+			add(Paths.findSoundFile('music', music)?.file);
+		for (song in unique(songsToPrepare))
+			add(Paths.findSoundFile(null, 'songs/$song')?.file);
+		return files;
+	}
+
+	static function hasDownloads():Bool
+	{
+		for (library in librariesToLoad)
+			if (!WebAssets.isLibraryLoaded(library))
+				return true;
+		return filesToDownload().length > 0;
+	}
+
+	// Downloads the libraries and files the state needs, then calls `callback` to decode them.
+	static function startDownloads(callback:Void->Void):Void
+	{
+		final files:Array<String> = filesToDownload();
+		final libraries:Array<String> = librariesToLoad.filter(library -> !WebAssets.isLibraryLoaded(library));
+
+		downloaded = 0;
+		downloadMax = libraries.length + files.length;
+		loaded = 0;
+		loadMax = unique(imagesToPrepare).length + unique(soundsToPrepare).length + unique(musicToPrepare).length + unique(songsToPrepare).length
+			+ unique(jsonsToPrepare).length + unique(chartsToPrepare).length;
+
+		if (downloadMax == 0)
+		{
+			callback();
+			return;
+		}
+
+		function done():Void
+		{
+			downloaded++;
+			if (downloaded == downloadMax)
+				callback();
+		}
+
+		for (library in libraries)
+			WebAssets.loadLibrary(library, done);
+		for (file in files)
+			WebAssets.download(file, done);
+	}
+	#end
+
 	static function unique(list:Array<String>):Array<String>
 	{
 		final result:Array<String> = [];
@@ -395,6 +505,11 @@ class LoadingState extends MusicBeatState
 				}
 				else
 					trace('ERROR! fail on preloading ${path ?? 'song'} $key${error != null ? ': $error' : ''}');
+
+				#if ON_DEMAND_ASSETS
+				if (found != null && !found.mod)
+					WebAssets.release(found.file);
+				#end
 
 				loaded++;
 			});
@@ -458,6 +573,11 @@ class LoadingState extends MusicBeatState
 				}
 				catch (e:Dynamic)
 					trace('ERROR! fail on preloading image $image: $e');
+
+				#if (ON_DEMAND_ASSETS && !USING_GPU_TEXTURES)
+				if (file != null)
+					WebAssets.release(file);
+				#end
 
 				loaded++;
 			});

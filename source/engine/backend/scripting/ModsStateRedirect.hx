@@ -29,7 +29,7 @@ class ModsStateRedirect
 		}
 		#end
 
-		var path:String = Paths.getSharedPath('data/redirects.txt');
+		var path:String = Paths.getPath('data/redirects.txt');
 		if (FileSystem.exists(path))
 			loadRedirectFile(path);
 	}

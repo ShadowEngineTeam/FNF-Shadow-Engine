@@ -1165,13 +1165,13 @@ class EditorPlayState extends MusicBeatSubstate
 		if (FileSystem.exists(modPath))
 			path = modPath;
 		else
-			path = Paths.getSharedPath(characterPath);
+			path = Paths.getPath(characterPath);
 		#else
-		path = Paths.getSharedPath(characterPath);
+		path = Paths.getPath(characterPath);
 		#end
 
 		if (!FileSystem.exists(path))
-			path = Paths.getSharedPath('characters/' + Character.DEFAULT_CHARACTER + '.json');
+			path = Paths.getPath('characters/' + Character.DEFAULT_CHARACTER + '.json');
 
 		var rawJson = File.getContent(path);
 		return cast Json.parse(rawJson, path);

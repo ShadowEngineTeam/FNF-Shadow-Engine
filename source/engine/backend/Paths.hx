@@ -35,9 +35,9 @@ class Paths
 		'assets/shared/images/touchpad/bg.astc',
 		#end
 		#end
-		'assets/shared/images/ui/cursor.png',
-		'assets/shared/images/ui/cursorCross.png',
-		'assets/shared/music/freakyMenu.ogg'
+		'assets/images/ui/cursor.png',
+		'assets/images/ui/cursorCross.png',
+		'assets/music/freakyMenu.ogg'
 	];
 
 	public static final currentTrackedAssets:Map<String, FlxGraphic> = [];
@@ -73,7 +73,7 @@ class Paths
 	static final parsedFiles:Map<String, Dynamic> = [];
 
 	inline static function imageMemoKey(key:String, library:String):String
-		return #if FEATURE_MODS '${Mods.currentModDirectory}|' + #end '$library|$key';
+		return #if FEATURE_MODS '${Mods.currentModDirectory}|' + #end '$currentLevel|$library|$key';
 
 	/**
 	 * Forgets every remembered path lookup (resolved image keys and the filesystem's directory
@@ -190,24 +190,64 @@ class Paths
 		if (library != null)
 			return getLibraryPath(file, library);
 
-		return getSharedPath(file);
+		for (folder in baseFolders)
+		{
+			final path:String = folder + file;
+			if (FileSystem.fileExists(path))
+				return path;
+		}
+
+		// Texture atlases are folders
+		for (folder in baseFolders)
+		{
+			final path:String = folder + file;
+			if (FileSystem.exists(path))
+				return path;
+		}
+
+		return getPreloadPath(file);
 	}
+
+	/**
+	 * The library the current state's files come from first, like `week4`, or null for none.
+	 */
+	public static var currentLevel(default, null):Null<String> = null;
+
+	static var baseFolders:Array<String> = [getSharedPath(), getPreloadPath()];
+
+	public static function setCurrentLevel(name:Null<String>):Void
+	{
+		currentLevel = (name != null && name.length > 0) ? name.toLowerCase() : null;
+
+		baseFolders = [getSharedPath(), getPreloadPath()];
+		if (currentLevel != null && currentLevel != "shared" && currentLevel != "preload")
+			baseFolders.unshift(getFolderPath('', currentLevel));
+	}
+
+	/**
+	 * The folders the base game's files are looked up in: the current level, shared, then preload.
+	 */
+	inline public static function getBaseFolders():Array<String>
+		return baseFolders.copy();
 
 	public static function getLibraryPath(file:String, library:String = "shared"):String
 	{
-		return (library == "shared") ? getSharedPath(file) : getLibraryPathForce(file, library);
-	}
-
-	static function getLibraryPathForce(file:String, library:String, ?level:String):String
-	{
-		if (level == null)
-			level = library;
-		return '$library:assets/$level/$file';
+		return switch (library)
+		{
+			case "shared": getSharedPath(file);
+			case "preload" | "default": getPreloadPath(file);
+			default: getFolderPath(file, library);
+		}
 	}
 
 	inline public static function getSharedPath(file:String = ''):String
 	{
 		return 'assets/shared/$file';
+	}
+
+	inline public static function getPreloadPath(file:String = ''):String
+	{
+		return 'assets/$file';
 	}
 
 	inline public static function getFolderPath(file:String, folder:String = "shared"):String
@@ -263,7 +303,7 @@ class Paths
 		#end
 		for (ext in VIDEO_EXTS)
 		{
-			final file:String = getSharedPath('videos/$key.$ext');
+			final file:String = getPath('videos/$key.$ext', BINARY);
 			if (FileSystem.exists(file))
 				return file;
 		}
@@ -558,9 +598,9 @@ class Paths
 		}
 		#end
 
-		var sharedPath:String = getSharedPath(key);
-		if (FileSystem.exists(sharedPath))
-			return File.getContent(sharedPath);
+		var path:String = getPath(key, TEXT);
+		if (FileSystem.exists(path))
+			return File.getContent(path);
 
 		return null;
 	}
@@ -709,6 +749,19 @@ class Paths
 			return;
 		}
 
+		#if ON_DEMAND_ASSETS
+		if (!found.mod && WebAssets.needsDownload(found.file))
+		{
+			WebAssets.download(found.file, () -> decodeSoundAsync(found, callback));
+			return;
+		}
+		#end
+
+		decodeSoundAsync(found, callback);
+	}
+
+	static function decodeSoundAsync(found:{key:String, file:String, mod:Bool}, callback:Null<Sound>->Void):Void
+	{
 		TaskHandler.run(() ->
 		{
 			var sound:Null<Sound> = null;
@@ -719,7 +772,14 @@ class Paths
 			catch (e:Dynamic)
 				trace('ERROR! fail on loading sound ${found.file}: $e');
 
-			TaskHandler.toMainThread(() -> callback(sound != null ? cacheSound(found.key, sound) : null));
+			TaskHandler.toMainThread(() ->
+			{
+				#if ON_DEMAND_ASSETS
+				if (!found.mod)
+					WebAssets.release(found.file);
+				#end
+				callback(sound != null ? cacheSound(found.key, sound) : null);
+			});
 		});
 	}
 

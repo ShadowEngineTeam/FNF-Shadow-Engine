@@ -106,7 +106,7 @@ class HScript extends SScript
 				#end
 				if (found == null)
 				{
-					var sharedPath = Paths.getSharedPath(target);
+					var sharedPath = Paths.getPath(target);
 					if (sharedPath != null && FileSystem.exists(sharedPath))
 						found = sharedPath;
 				}

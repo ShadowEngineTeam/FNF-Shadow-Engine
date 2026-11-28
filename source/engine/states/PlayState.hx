@@ -502,7 +502,7 @@ class PlayState extends MusicBeatState
 
 		// "GLOBAL" SCRIPTS
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
-		for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'scripts/'))
+		for (folder in Mods.directoriesWithFile(Paths.getPreloadPath(), 'scripts/'))
 		{
 			for (file in FileSystem.readDirectory(folder))
 			{
@@ -711,9 +711,9 @@ class PlayState extends MusicBeatState
 
 		// SONG SPECIFIC SCRIPTS
 		#if (FEATURE_LUA || FEATURE_HSCRIPT)
-		final songFolders:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/');
+		final songFolders:Array<String> = Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/$songName/');
 		if (SONG.variant?.length > 0)
-			for (folder in Mods.directoriesWithFile(Paths.getSharedPath(), 'data/$songName/${SONG.variant}/'))
+			for (folder in Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/$songName/${SONG.variant}/'))
 				songFolders.push(folder);
 		for (folder in songFolders)
 		{
@@ -4070,7 +4070,7 @@ class PlayState extends MusicBeatState
 		for (mod in Mods.getGlobalMods())
 			folders.push(Paths.mods(mod + '/shaders/'));
 		#end
-		folders.push(Paths.getSharedPath('shaders/'));
+		folders.push(Paths.getPreloadPath('shaders/'));
 
 		for (folder in folders)
 		{

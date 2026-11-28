@@ -642,7 +642,7 @@ class FunkinLua
 				luaToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(luaToLoad))
 				#end
-					luaToLoad = Paths.getSharedPath(file);
+					luaToLoad = Paths.getPath(file);
 
 				if (FileSystem.exists(luaToLoad))
 				{
@@ -678,7 +678,7 @@ class FunkinLua
 				scriptToLoad = Paths.modFolders(file);
 				if (!FileSystem.exists(scriptToLoad))
 				#end
-				scriptToLoad = Paths.getSharedPath(file);
+				scriptToLoad = Paths.getPath(file);
 
 				if (FileSystem.exists(scriptToLoad))
 				{
@@ -1259,7 +1259,7 @@ class FunkinLua
 		if (!scriptFile.endsWith(ext))
 			scriptFile += ext;
 
-		var sharedPath:String = Paths.getSharedPath(scriptFile);
+		var sharedPath:String = Paths.getPath(scriptFile);
 
 		#if FEATURE_MODS
 		var modPath:String = Paths.modFolders(scriptFile);
@@ -1273,7 +1273,7 @@ class FunkinLua
 		if (ext == '.lua')
 		{
 			var luauFile:String = scriptFile.substr(0, scriptFile.length - 4) + '.luau';
-			var sharedLuauPath:String = Paths.getSharedPath(luauFile);
+			var sharedLuauPath:String = Paths.getPath(luauFile);
 			#if FEATURE_MODS
 			var modLuauPath:String = Paths.modFolders(luauFile);
 			if (FileSystem.exists(modLuauPath))
@@ -1347,7 +1347,7 @@ class FunkinLua
 		for (mod in Mods.getGlobalMods())
 			foldersToCheck.push(Paths.mods(mod + '/shaders/'));
 		#end
-		foldersToCheck.push(Paths.getSharedPath('shaders/'));
+		foldersToCheck.push(Paths.getPreloadPath('shaders/'));
 
 		for (folder in foldersToCheck)
 		{

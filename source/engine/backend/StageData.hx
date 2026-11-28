@@ -115,7 +115,7 @@ class StageData
 			return modPath;
 		#end
 
-		return Paths.getSharedPath('stages/' + stage + '.json');
+		return Paths.getPath('stages/' + stage + '.json');
 	}
 
 	public static function vanillaSongStage(songName):String
