@@ -243,7 +243,7 @@ class Project extends HXProject
 		FEATURE_EMBED_ASSETS.integrate(false);
 		FEATURE_HAPTICS.integrate(isMobile());
 		FEATURE_NATIVE_CRASH_HANDLER.integrate((isDesktop() || isMobile()) && isCPP());
-		FEATURE_MULTITHREADING.integrate(isCPP());
+		FEATURE_MULTITHREADING.integrate(isCPP() && !isWeb());
 
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
