@@ -81,6 +81,24 @@ class WebAssets
 	}
 
 	/**
+	 * The files named `path` with any extension, or inside the folder `path`, that are not downloaded yet.
+	 */
+	public static function filesToDownload(path:String):Array<String>
+	{
+		final files:Array<String> = [];
+		for (name => library in LimeAssets.libraries)
+		{
+			if (name == "default")
+				continue;
+
+			for (id in library.types.keys())
+				if ((id.startsWith('$path.') || id.startsWith('$path/')) && library.preload.get(id) != true && !library.cachedBytes.exists(id))
+					files.push(id);
+		}
+		return files;
+	}
+
+	/**
 	 * Downloads `path` so it can be read, then calls `callback`, also when it fails.
 	 */
 	public static function download(path:String, callback:Void->Void):Void

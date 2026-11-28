@@ -418,8 +418,13 @@ class LoadingState extends MusicBeatState
 				files.push(file);
 		}
 
+		// Images come with their atlas files, and texture atlases are folders
 		for (image in unique(imagesToPrepare))
-			add(Paths.findImageFile(image));
+			for (folder in Paths.getBaseFolders())
+				for (file in WebAssets.filesToDownload(folder + 'images/' + image))
+					add(file);
+		for (json in unique(jsonsToPrepare))
+			add(json);
 		for (sound in unique(soundsToPrepare))
 			add(Paths.findSoundFile('sounds', sound)?.file);
 		for (music in unique(musicToPrepare))

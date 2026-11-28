@@ -513,8 +513,9 @@ class Project extends HXProject
 		// The web only downloads a library when it is needed, and some of its files only when they are asked for
 		if (isWeb() && !embed)
 		{
+			// Song and video text, like subtitles, is read without a loading screen
 			final textFile:Bool = asset.type == TEXT || WEB_TEXT_EXTENSIONS.contains(Path.extension(path).toLowerCase());
-			if (library != "preload" && !textFile)
+			if (library != "preload" && !(textFile && (library == "songs" || library == "videos")))
 				asset.library = library;
 			asset.embed = (asset.library != "default" && isWebOnDemand(library, asset.targetPath)) ? false : null;
 		}
