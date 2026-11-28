@@ -224,9 +224,9 @@ class Project extends HXProject
 
 	function configureCompileFlags()
 	{
-		FEATURE_MODS.integrate(isDesktop() || isMobile());
+		FEATURE_MODS.integrate(isDesktop() || isMobile() || isWeb());
 		FEATURE_HSCRIPT.integrate(true);
-		FEATURE_LUA.integrate(isDesktop() || isMobile());
+		FEATURE_LUA.integrate(isDesktop() || isMobile() || isWeb());
 		FEATURE_VIDEOS.integrate(isDesktop() || isMobile());
 		FEATURE_DISCORD_RPC.integrate(isDesktop());
 		FEATURE_MOBILE_CONTROLS.integrate(isMobile());
@@ -241,7 +241,7 @@ class Project extends HXProject
 		if (FEATURE_FUNKIN_CONTENT.isEnabled())
 			FEATURE_HSCRIPT.integrate(true);
 
-		USE_OPENFL_FILESYSTEM.integrate((FEATURE_MODS.isDisabled() || FEATURE_EMBED_ASSETS.isEnabled()) && !isMobile());
+		USE_OPENFL_FILESYSTEM.integrate(((FEATURE_MODS.isDisabled() || FEATURE_EMBED_ASSETS.isEnabled()) && !isMobile()) || isWeb());
 
 		setHaxedef("FLX_NO_FOCUS_LOST_SCREEN");
 		if (!isDebug())
@@ -377,6 +377,10 @@ class Project extends HXProject
 
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
+
+		// Lua's FFI loads native libraries, and a browser has none to load
+		if (isWeb() && FEATURE_LUA.isEnabled())
+			setHaxedef("HXLUAU_DISABLE_FFI");
 	}
 
 	function configureAssets()
