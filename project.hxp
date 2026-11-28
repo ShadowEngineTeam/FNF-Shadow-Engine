@@ -377,10 +377,6 @@ class Project extends HXProject
 
 		if (isMobile() || isWeb())
 			setHaxedef("TOUCH_HERE_TO_PLAY");
-
-		// Lua's FFI loads native libraries, and a browser has none to load
-		if (isWeb() && FEATURE_LUA.isEnabled())
-			setHaxedef("HXLUAU_DISABLE_FFI");
 	}
 
 	function configureAssets()
