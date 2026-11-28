@@ -272,7 +272,7 @@ class FileSystem
 			for (library in LimeAssets.libraries.keys())
 			{
 				var libPath:String = '$library:$item';
-				if (library != 'default' && Assets.exists(libPath) && !results.contains(libPath))
+				if (library != 'default' && OpenFLAssets.exists(libPath) && !results.contains(libPath))
 					results.push(libPath);
 				else if (OpenFLAssets.exists(item) && !results.contains(item))
 					results.push(item);
