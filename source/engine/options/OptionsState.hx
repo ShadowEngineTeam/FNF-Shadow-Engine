@@ -78,7 +78,7 @@ class OptionsState extends MusicBeatState
 		bg.screenCenter();
 		add(bg);
 
-		var tipY:Int = FlxG.height - #if android 40 #else 24 #end;
+		var tipY:Int = FlxG.height - 24;
 
 		#if FEATURE_MOBILE_CONTROLS
 		var mobileKey:String = Funkin.controls.mobileC ? #if android 'X' #else 'C' #end : 'CTRL';
@@ -87,14 +87,7 @@ class OptionsState extends MusicBeatState
 		var mobileText:String = '';
 		#end
 
-		#if android
-		var dataKey:String = Funkin.controls.mobileC ? #if FEATURE_MOBILE_CONTROLS 'Y' #else 'BACK' #end : 'SHIFT';
-		var dataText:String = '\nPress ${dataKey} to Open DATA Folder';
-		#else
-		var dataText:String = '';
-		#end
-
-		tipText = new FlxText(150, tipY, 0, mobileText + dataText, 16);
+		tipText = new FlxText(150, tipY, 0, mobileText, 16);
 		tipText.setFormat(Paths.font("vcr.ttf"), 17, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tipText.borderSize = 1.25;
 		tipText.scrollFactor.set();
@@ -170,11 +163,6 @@ class OptionsState extends MusicBeatState
 				persistentUpdate = false;
 				switchSubState(MobileControlSelectSubState);
 			}
-			#end
-
-			#if android
-			if (#if FEATURE_MOBILE_CONTROLS touchPad.buttonY.justPressed #else FlxG.android.justReleased.BACK #end || FlxG.keys.justPressed.SHIFT)
-				android.Tools.openDataFolder();
 			#end
 
 			if (Funkin.controls.BACK)

@@ -250,6 +250,88 @@ class Mods
 		#end
 	}
 
+	#if FEATURE_MODS
+	/**
+	 * Installs a mod zip into the mods folder. The mod can sit at the root of the zip
+	 * (installed under the zip's name) or inside a single folder (installed under that folder's name).
+	 * @return The installed folder, or throws with the reason the zip was refused.
+	 */
+	public static function installZip(path:String):String
+	{
+		var bytes:Null<haxe.io.Bytes> = lime.utils.Bytes.fromFile(path);
+		if (bytes == null || bytes.length == 0)
+			throw 'Could not read the file.';
+
+		var entries:List<haxe.zip.Entry>;
+		try
+		{
+			entries = haxe.zip.Reader.readZip(new haxe.io.BytesInput(bytes));
+		}
+		catch (e:Dynamic)
+		{
+			throw 'This is not a valid zip file.';
+		}
+
+		var files:Array<{name:String, entry:haxe.zip.Entry}> = [];
+		for (entry in entries)
+		{
+			var name:String = entry.fileName.replace('\\', '/');
+			while (name.startsWith('./'))
+				name = name.substr(2);
+			if (name.length == 0 || name.endsWith('/') || name.startsWith('__MACOSX/') || haxe.io.Path.withoutDirectory(name) == '.DS_Store')
+				continue;
+			if (name.startsWith('/') || name.indexOf(':') != -1 || name.split('/').contains('..'))
+				throw 'The zip has an unsafe path: $name';
+			files.push({name: name, entry: entry});
+		}
+
+		if (files.length == 0)
+			throw 'The zip is empty.';
+
+		var isModRoot:String->Bool = function(prefix:String):Bool
+		{
+			for (file in files)
+			{
+				if (!file.name.startsWith(prefix))
+					continue;
+				var parts:Array<String> = file.name.substr(prefix.length).split('/');
+				if ((parts.length == 1 && parts[0] == 'pack.json') || (parts.length > 1 && ignoreModFolders.contains(parts[0].toLowerCase())))
+					return true;
+			}
+			return false;
+		}
+
+		var folder:String;
+		var prefix:String = '';
+		if (isModRoot(''))
+			folder = haxe.io.Path.withoutExtension(haxe.io.Path.withoutDirectory(path.replace('\\', '/')));
+		else
+		{
+			var top:String = files[0].name.split('/')[0];
+			for (file in files)
+				if (!file.name.startsWith(top + '/'))
+					throw 'The zip has no mod in it.';
+			prefix = top + '/';
+			if (!isModRoot(prefix))
+				throw 'The zip has no mod in it.';
+			folder = top;
+		}
+
+		folder = folder.trim();
+		if (folder.length == 0 || folder == '.' || ignoreModFolders.contains(folder.toLowerCase()))
+			throw 'The mod folder name "$folder" can not be used.';
+
+		for (file in files)
+		{
+			var target:String = Paths.mods(folder + '/' + file.name.substr(prefix.length));
+			FileSystem.createDirectory(haxe.io.Path.directory(target));
+			File.saveBytes(target, file.entry.compressed ? haxe.zip.Reader.unzip(file.entry) : file.entry.data);
+		}
+
+		return folder;
+	}
+	#end
+
 	public static function loadTopMod()
 	{
 		Mods.currentModDirectory = '';

@@ -24,7 +24,10 @@ class ModsMenuState extends MusicBeatState
 
 	var bgList:FlxSprite;
 	var buttonReload:MenuButton;
-	// var buttonModFolder:MenuButton;
+	var buttonImport:MenuButton;
+	#if android
+	var buttonModFolder:MenuButton;
+	#end
 	var buttonEnableAll:MenuButton;
 	var buttonDisableAll:MenuButton;
 	var buttons:Array<MenuButton> = [];
@@ -38,7 +41,7 @@ class ModsMenuState extends MusicBeatState
 	public static var curSelectedMod:Int = 0;
 
 	var hoveringOnMods:Bool = true;
-	var curSelectedButton:Int = 0; ///-1 = Enable/Disable All, -2 = Reload
+	var curSelectedButton:Int = 0; ///-1 = Enable/Disable All or Mods Folder, -2 = Reload, -3 = Import
 	var modNameInitialY:Float = 0;
 
 	var noModsSine:Float = 0;
@@ -104,25 +107,24 @@ class ModsMenuState extends MusicBeatState
 		var buttonWidth = Std.int(bgList.width);
 		var buttonHeight = 80;
 		var daY = 0;
-		if (Funkin.controls.mobileC)
+		if (Funkin.controls.mobileC #if android && false #end)
 			daY = 70;
 		else
 			daY = 20;
 
-		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + daY, buttonWidth, buttonHeight, "RELOAD", reload);
+		var halfWidth:Int = Std.int((buttonWidth - 20) / 2);
+		buttonReload = new MenuButton(buttonX, bgList.y + bgList.height + daY, halfWidth, buttonHeight, "RELOAD", reload);
 		add(buttonReload);
 
+		buttonImport = new MenuButton(buttonX + halfWidth + 20, buttonReload.y, halfWidth, buttonHeight, "IMPORT", importMod);
+		add(buttonImport);
+
 		var myY = buttonReload.y + buttonReload.bg.height + 20;
-		/*buttonModFolder = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, "MODS FOLDER", function() {
-				var modFolder = Paths.mods();
-				if(!FileSystem.exists(modFolder))
-				{
-					trace('created missing folder');
-					FileSystem.createDirectory(modFolder);
-				}
-				CoolUtil.openFolder(modFolder);
-			});
-			add(buttonModFolder); */
+		#if android
+		buttonModFolder = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, "MODS FOLDER", android.Tools.openDataFolder);
+		if (Funkin.controls.mobileC)
+			add(buttonModFolder);
+		#end
 
 		buttonEnableAll = new MenuButton(buttonX, myY, buttonWidth, buttonHeight, "ENABLE ALL", function()
 		{
@@ -190,6 +192,8 @@ class ModsMenuState extends MusicBeatState
 			add(txt);
 
 			changeSelectedMod();
+			curSelectedButton = -3;
+			buttonImport.onFocus = true;
 			#if FEATURE_MOBILE_CONTROLS
 			addTouchPad("NONE", "B");
 			#end
@@ -555,22 +559,22 @@ class ModsMenuState extends MusicBeatState
 						{
 							switch (curSelectedButton)
 							{
-								case -2:
+								case -2 | -3:
 									curSelectedMod = 0;
 									hoveringOnMods = true;
 									var button = getButton();
 									button.ignoreCheck = button.onFocus = false;
 									changeSelectedMod();
 								case -1:
-									changeSelectedButton(-1);
+									selectButton(-2);
 							}
 						}
 						else if (Funkin.controls.UI_DOWN_P)
 						{
 							switch (curSelectedButton)
 							{
-								case -2:
-									changeSelectedButton(1);
+								case -2 | -3:
+									selectButton(-1);
 								case -1:
 									curSelectedMod = 0;
 									hoveringOnMods = true;
@@ -579,13 +583,10 @@ class ModsMenuState extends MusicBeatState
 									changeSelectedMod();
 							}
 						}
+						else if (Funkin.controls.UI_LEFT_P && curSelectedButton == -3)
+							selectButton(-2);
 						else if (Funkin.controls.UI_RIGHT_P)
-						{
-							var button = getButton();
-							button.ignoreCheck = button.onFocus = false;
-							curSelectedButton = 0;
-							changeSelectedButton();
-						}
+							selectButton(curSelectedButton == -2 ? -3 : 0);
 					}
 					else if (Funkin.controls.UI_LEFT_P)
 						changeSelectedButton(-1);
@@ -598,6 +599,9 @@ class ModsMenuState extends MusicBeatState
 		{
 			noModsSine += 180 * elapsed;
 			noModsTxt.alpha = 1 - Math.sin((Math.PI * noModsSine) / 180);
+
+			if (Funkin.controls.ACCEPT)
+				importMod();
 
 			// Keep refreshing mods list every 2 seconds until you add a mod on the folder
 			nextAttempt -= elapsed;
@@ -625,8 +629,8 @@ class ModsMenuState extends MusicBeatState
 		button.ignoreCheck = button.onFocus = false;
 
 		curSelectedButton += add;
-		if (curSelectedButton < -2)
-			curSelectedButton = -2;
+		if (curSelectedButton < -3)
+			curSelectedButton = -3;
 		else if (curSelectedButton > max)
 			curSelectedButton = max;
 
@@ -652,13 +656,27 @@ class ModsMenuState extends MusicBeatState
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 	}
 
+	function selectButton(id:Int)
+	{
+		var button = getButton();
+		button.ignoreCheck = button.onFocus = false;
+		curSelectedButton = id;
+		changeSelectedButton();
+	}
+
 	function getButton()
 	{
 		switch (curSelectedButton)
 		{
+			case -3:
+				return buttonImport;
 			case -2:
 				return buttonReload;
 			case -1:
+				#if android
+				if (Funkin.controls.mobileC)
+					return buttonModFolder;
+				#end
 				return buttonEnableAll.enabled ? buttonEnableAll : buttonDisableAll;
 		}
 
@@ -859,6 +877,26 @@ class ModsMenuState extends MusicBeatState
 			final shown:MenuButton = buttonEnableAll.enabled ? buttonEnableAll : buttonDisableAll;
 			shown.ignoreCheck = shown.onFocus = true;
 		}
+	}
+
+	function importMod()
+	{
+		lime.ui.FileDialog.openFile(FlxG.stage.window, 'Import a mod zip', function(files:Array<String>, filter:lime.ui.FileDialogFilter)
+		{
+			if (files.length < 1)
+				return;
+
+			try
+			{
+				final folder:String = Mods.installZip(files[0]);
+				trace('installed mod "$folder"');
+				reload();
+			}
+			catch (e:Dynamic)
+			{
+				CoolUtil.showPopUp('Could not import the mod.\n$e', 'Import Mod');
+			}
+		}, [new lime.ui.FileDialogFilter('Mod zip', 'zip')]);
 	}
 
 	function reload()
