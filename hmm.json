@@ -9,7 +9,7 @@
     {
       "name": "openfl",
       "type": "git",
-      "ref": "7fd28053b9a90375cd4024fce0d9b3797d2bc5cf",
+      "ref": "5c41a53f61a461da770cb920ea7746951046b4a4",
       "url": "https://github.com/ShadowEngineTeam/openfl"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "c454a95eb1ea114d1ee58dffc4407ab73a0f4c34",
+      "ref": "07637b570ef95548e567930eb25fccbb7ac02b50",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
