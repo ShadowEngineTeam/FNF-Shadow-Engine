@@ -240,7 +240,7 @@ class ApplicationMain
 
 		var result = app.exec();
 
-		#if (sys && !ios)
+		#if (sys && !ios && !emscripten)
 		lime.system.System.exit(result);
 		#end
 
