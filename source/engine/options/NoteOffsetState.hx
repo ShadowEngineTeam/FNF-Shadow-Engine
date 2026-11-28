@@ -6,7 +6,7 @@ import objects.Bar;
 import flixel.addons.display.shapes.FlxShapeCircle;
 import states.stages.Stage as BackgroundStage;
 import openfl.media.Sound;
-#if (target.threaded)
+#if FEATURE_MULTITHREADING
 #end
 
 class NoteOffsetState extends MusicBeatState

@@ -6,7 +6,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import mobile.substates.MobileControlSelectSubState;
 import backend.ui.ShadowStyle;
 import options.*;
-#if (target.threaded)
+#if FEATURE_MULTITHREADING
 #end
 
 class OptionsState extends MusicBeatState

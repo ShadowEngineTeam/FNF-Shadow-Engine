@@ -1,7 +1,7 @@
 package backend.codename;
 
 import lime.utils.Log;
-#if (target.threaded)
+#if FEATURE_MULTITHREADING
 import sys.thread.Deque;
 import sys.thread.Thread;
 import sys.thread.Mutex;
@@ -27,7 +27,7 @@ final class ThreadUtil
 	 */
 	public static function createSafe(func:Void->Void, autoRestart:Bool = false):Thread
 	{
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		try
 		{
 			return if (autoRestart) Thread.create(() ->
@@ -57,7 +57,7 @@ final class ThreadUtil
 		return null;
 	}
 
-	#if (target.threaded)
+	#if FEATURE_MULTITHREADING
 	public static var maxThreads:Int = 4;
 
 	static var __threads:Array<Thread> = [];
@@ -91,7 +91,7 @@ final class ThreadUtil
 		if (func == null)
 			return;
 
-		#if ((target.threaded) && !macro)
+		#if (FEATURE_MULTITHREADING && !macro)
 		__pendingExecs.add(func);
 		if (__threadUsed >= __threads.length)
 		{

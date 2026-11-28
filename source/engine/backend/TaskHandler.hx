@@ -3,7 +3,7 @@ package backend;
 import lime.app.Future;
 import lime.app.Future.FutureWork;
 import lime.system.ThreadPool;
-#if (target.threaded)
+#if FEATURE_MULTITHREADING
 import sys.thread.Deque;
 #end
 
@@ -31,7 +31,7 @@ class TaskHandler
 	 */
 	public static var blockingThreads(default, null):Int = 1;
 
-	#if (target.threaded)
+	#if FEATURE_MULTITHREADING
 	static final mainThreadQueue:Deque<Void->Void> = new Deque();
 	#else
 	static final mainThreadQueue:Array<Void->Void> = [];
@@ -90,7 +90,7 @@ class TaskHandler
 	 */
 	public static function toMainThread(callback:Void->Void):Void
 	{
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		mainThreadQueue.add(callback);
 		#else
 		mainThreadQueue.push(callback);
@@ -106,7 +106,7 @@ class TaskHandler
 	{
 		var count:Int = 0;
 
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		var callback:Null<Void->Void> = mainThreadQueue.pop(false);
 		while (callback != null)
 		{

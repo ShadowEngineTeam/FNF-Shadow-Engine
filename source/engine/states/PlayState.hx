@@ -31,7 +31,7 @@ import states.stages.objects.*;
 import substates.ResultsScreen;
 import effects.RetroCameraFade;
 
-#if (target.threaded)
+#if FEATURE_MULTITHREADING
 import sys.thread.Thread;
 import sys.thread.Mutex;
 #end
@@ -265,7 +265,7 @@ class PlayState extends MusicBeatState
 	public var startCallback:Void->Void = null;
 	public var endCallback:Void->Void = null;
 
-	#if (target.threaded)
+	#if FEATURE_MULTITHREADING
 	private var shutdownThread:Bool = false;
 	private var gameFroze:Bool = false;
 	private var requiresSyncing:Bool = false;
@@ -1364,7 +1364,7 @@ class PlayState extends MusicBeatState
 		setOnScripts('songLength', songLength);
 		callOnScripts('onSongStart');
 
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		runSongSyncThread();
 		#end
 	}
@@ -1736,7 +1736,7 @@ class PlayState extends MusicBeatState
 
 			resetRPC(startTimer != null && startTimer.finished);
 
-			#if (target.threaded)
+			#if FEATURE_MULTITHREADING
 			runSongSyncThread();
 			#end
 		}
@@ -1748,7 +1748,7 @@ class PlayState extends MusicBeatState
 		if (health > 0 && !paused)
 			resetRPC(Conductor.songPosition > 0.0);
 
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		shutdownThread = false;
 		runSongSyncThread();
 		#end
@@ -1763,7 +1763,7 @@ class PlayState extends MusicBeatState
 			DiscordClient.changePresence(detailsPausedText, discordSongText(), iconP2.getCharacter());
 		#end
 
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		shutdownThread = true;
 		#end
 		super.onFocusLost();
@@ -3841,7 +3841,7 @@ class PlayState extends MusicBeatState
 		FlxG.game._filters = [];
 		camGame.filters = camHUD.filters = camOther.filters = [];
 
-		#if (target.threaded)
+		#if FEATURE_MULTITHREADING
 		shutdownThread = true;
 		FlxG.signals.preUpdate.remove(checkForResync);
 		#end
@@ -4203,7 +4203,7 @@ class PlayState extends MusicBeatState
 		return "good";
 	}
 
-	#if (target.threaded)
+	#if FEATURE_MULTITHREADING
 	function checkForResync()
 	{
 		if (endingSong || paused || shutdownThread)
