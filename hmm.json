@@ -15,7 +15,7 @@
     {
       "name": "flixel",
       "type": "git",
-      "ref": "509864288df53e14daf502f65c22489aaa774044",
+      "ref": "cc39846b347871c8f28eb414730a1ec23b0cea6a",
       "url": "https://github.com/ShadowEngineTeam/flixel"
     },
     {
@@ -27,7 +27,7 @@
     {
       "name": "hxcpp",
       "type": "git",
-      "ref": "2c827172a196857ca822e69e39aa622b59ecb327",
+      "ref": "c454a95eb1ea114d1ee58dffc4407ab73a0f4c34",
       "url": "https://github.com/ShadowEngineTeam/libhxcpp"
     },
     {
@@ -81,7 +81,7 @@
     {
       "name": "flixel-animate",
       "type": "git",
-      "ref": "a57f3a7c99a31e29a792d8cd1d0f2f9e5db06eb7",
+      "ref": "256b3e1fdd6060a2e166e47153d6185a44337f8b",
       "url": "https://github.com/ShadowEngineTeam/flixel-animate"
     },
     {
